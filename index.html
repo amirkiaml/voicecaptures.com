@@ -60,7 +60,6 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .calc-row .item .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 .calc-cta { text-align: center; margin-top: 28px; }
 
-/* Split: How it works + Demo */
 .split-section { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .split-left h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 32px; }
 .steps-list { display: flex; flex-direction: column; gap: 0; }
@@ -82,11 +81,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .demo-note strong { color: var(--text); }
 .demo-cta { margin-top: 20px; }
 
-/* Calendar */
 .calendar-section { padding: 60px 0; }
 .calendar-wrapper { max-width: 800px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 .calendar-wrapper iframe { border: 0; width: 100%; height: 500px; }
-.calendar-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 12px; }
+.calendar-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 12px; }
 
 .forward-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
 .forward-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
@@ -196,17 +194,6 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
   </div>
 </section>
 
-<!-- Live Calendar -->
-<div class="calendar-section">
-  <div class="container">
-    <h2 class="section-title">See it in action.</h2>
-    <p class="calendar-label">Live demo calendar — call the demo number, then refresh this page to see your booking appear</p>
-    <div class="calendar-wrapper">
-      <iframe src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&ctz=America%2FToronto&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&bgcolor=%23161616&color=%231DB954" frameborder="0" scrolling="no"></iframe>
-    </div>
-  </div>
-</div>
-
 <!-- How it works + Demo side by side -->
 <section class="section-dark" id="demo">
   <div class="container">
@@ -244,7 +231,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
           <div class="demo-phone"><a href="tel:+19592156754">+1 (959) 215-6754</a></div>
           <p>Pretend you're a customer with a plumbing emergency or a routine booking. You'll get a text summary when it's done.</p>
           <div class="demo-note">
-            <strong>How the demo works:</strong> This number is connected to the live calendar above — it checks real availability and books real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
+            <strong>How the demo works:</strong> This number is connected to the live calendar below — it checks real availability and books real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
           </div>
           <div class="demo-cta">
             <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min audit →</a>
@@ -254,6 +241,17 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     </div>
   </div>
 </section>
+
+<!-- Live Calendar -->
+<div class="calendar-section">
+  <div class="container">
+    <h2 class="section-title">See it in action.</h2>
+    <p class="calendar-label">Live demo calendar — <span style="color: var(--accent); font-weight: 700;">refresh this page after your call to see your booking appear</span></p>
+    <div class="calendar-wrapper">
+      <iframe src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&ctz=America%2FToronto&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&bgcolor=%23161616&color=%231DB954" frameborder="0" scrolling="no"></iframe>
+    </div>
+  </div>
+</div>
 
 <!-- Call Forwarding -->
 <section>
