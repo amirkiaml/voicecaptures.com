@@ -32,7 +32,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .btn-outline:hover { background: var(--bg3); }
 .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-/* Stats bar */
 .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .stat { background: var(--bg); padding: 36px 20px; text-align: center; }
 .stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
@@ -44,7 +43,6 @@ section { padding: 80px 0; }
 .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
 .section-sub { text-align: center; color: var(--muted); font-size: 16px; margin-bottom: 48px; }
 
-/* Calculator */
 .calc-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 48px; max-width: 520px; margin: 0 auto; }
 .slider-group { margin-bottom: 24px; }
 .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -72,7 +70,6 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
 .step-content p { font-size: 14px; color: var(--muted); }
 
-/* Demo box */
 .demo-box { background: var(--bg2); border: 1px solid var(--accent); border-radius: 16px; padding: 36px; text-align: center; position: relative; overflow: hidden; }
 .demo-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #5DCAA5); }
 .demo-badge { display: inline-block; background: var(--accent-glow); color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 16px; border-radius: 100px; margin-bottom: 16px; }
@@ -84,11 +81,13 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .demo-note { background: rgba(29, 185, 84, 0.08); border: 1px solid rgba(29, 185, 84, 0.2); border-radius: 10px; padding: 14px 18px; margin-top: 20px; font-size: 12px; color: var(--muted); line-height: 1.7; text-align: left; }
 .demo-note strong { color: var(--text); }
 .demo-cta { margin-top: 20px; }
-.demo-calendar { margin-top: 20px; border-radius: 10px; overflow: hidden; }
-.demo-calendar iframe { border: 0; width: 100%; height: 400px; border-radius: 10px; }
-.calendar-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 
-/* Forwarding */
+/* Calendar */
+.calendar-section { padding: 60px 0; }
+.calendar-wrapper { max-width: 800px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.calendar-wrapper iframe { border: 0; width: 100%; height: 500px; }
+.calendar-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 12px; }
+
 .forward-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
 .forward-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
 .forward-card .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 100px; margin-bottom: 12px; background: var(--accent-glow); color: var(--accent); }
@@ -96,7 +95,6 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .forward-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .forward-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-/* Customize */
 .custom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .custom-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; }
 .custom-icon { width: 40px; height: 40px; margin-bottom: 16px; }
@@ -104,17 +102,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .custom-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .custom-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-/* Who it's for */
 .tags-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 48px; }
 .industry-tag { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 28px; font-size: 14px; font-weight: 500; }
 
-/* FAQ */
 .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 .faq-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
 .faq-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
 .faq-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
-/* CTA */
 .cta-section { padding: 100px 0; text-align: center; }
 .cta-section h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 16px; }
 .cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
@@ -136,7 +131,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
   .cta-buttons { flex-direction: column; align-items: center; }
   .footer-inner { flex-direction: column; text-align: center; }
   .hero-buttons { flex-direction: column; align-items: center; }
-  .demo-calendar iframe { height: 300px; }
+  .calendar-wrapper iframe { height: 350px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -165,21 +160,9 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
 
 <!-- Stats -->
 <div class="stats-bar">
-  <div class="stat">
-    <div class="num">$75B</div>
-    <div class="label">Lost annually to unanswered business calls</div>
-    <div class="source">Source: Forbes</div>
-  </div>
-  <div class="stat">
-    <div class="num">85%</div>
-    <div class="label">Of callers won't leave voicemail — they call competitors</div>
-    <div class="source">Source: Forbes</div>
-  </div>
-  <div class="stat">
-    <div class="num">62%</div>
-    <div class="label">Of customer calls happen outside business hours</div>
-    <div class="source">Source: HomeAdvisor</div>
-  </div>
+  <div class="stat"><div class="num">$75B</div><div class="label">Lost annually to unanswered business calls</div><div class="source">Source: Forbes</div></div>
+  <div class="stat"><div class="num">85%</div><div class="label">Of callers won't leave voicemail — they call competitors</div><div class="source">Source: Forbes</div></div>
+  <div class="stat"><div class="num">62%</div><div class="label">Of customer calls happen outside business hours</div><div class="source">Source: HomeAdvisor</div></div>
 </div>
 
 <!-- Calculator -->
@@ -212,6 +195,17 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     </div>
   </div>
 </section>
+
+<!-- Live Calendar -->
+<div class="calendar-section">
+  <div class="container">
+    <h2 class="section-title">See it in action.</h2>
+    <p class="calendar-label">Live demo calendar — call the demo number, then refresh this page to see your booking appear</p>
+    <div class="calendar-wrapper">
+      <iframe src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&ctz=America%2FToronto&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&bgcolor=%23161616&color=%231DB954" frameborder="0" scrolling="no"></iframe>
+    </div>
+  </div>
+</div>
 
 <!-- How it works + Demo side by side -->
 <section class="section-dark" id="demo">
@@ -250,17 +244,11 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
           <div class="demo-phone"><a href="tel:+19592156754">+1 (959) 215-6754</a></div>
           <p>Pretend you're a customer with a plumbing emergency or a routine booking. You'll get a text summary when it's done.</p>
           <div class="demo-note">
-            <strong>How the demo works:</strong> This number is connected to the live calendar below — it checks real availability and books real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
+            <strong>How the demo works:</strong> This number is connected to the live calendar above — it checks real availability and books real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
           </div>
           <div class="demo-cta">
             <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min audit →</a>
           </div>
-        </div>
-
-        <!-- Live Calendar -->
-        <div class="demo-calendar" style="margin-top: 24px;">
-          <div class="calendar-label">Live demo calendar — watch bookings appear in real-time</div>
-          <iframe src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&ctz=America%2FToronto&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&bgcolor=%23161616&color=%231DB954" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
     </div>
