@@ -18,501 +18,119 @@
   --red: #E24B4A;
   --border: rgba(255,255,255,0.08);
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-}
-
-.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+.container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
 
 /* Hero */
-.hero {
-  padding: 120px 0 60px;
-  text-align: center;
-}
-
-.hero h1 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(36px, 6vw, 58px);
-  font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
-}
-
+.hero { padding: 100px 0 40px; text-align: center; }
+.hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 6vw, 58px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em; }
 .hero h1 .green { color: var(--accent); }
-
-.hero p {
-  font-size: 17px;
-  color: var(--muted);
-  max-width: 520px;
-  margin: 0 auto 36px;
-  line-height: 1.7;
-}
-
-.btn {
-  display: inline-block;
-  background: var(--accent);
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 14px 32px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.2s, transform 0.1s;
-  border: none;
-  cursor: pointer;
-}
-
+.hero p { font-size: 17px; color: var(--muted); max-width: 520px; margin: 0 auto 36px; }
+.btn { display: inline-block; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; text-decoration: none; transition: background 0.2s, transform 0.1s; border: none; cursor: pointer; }
 .btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .btn-outline:hover { background: var(--bg3); }
+.hero-btn { margin-bottom: 20px; }
 
 /* Stats bar */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  margin: 40px 0;
-}
-
-.stat {
-  background: var(--bg);
-  padding: 32px 20px;
-  text-align: center;
-}
-
-.stat .num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 4px;
-}
-
-.stat .label {
-  font-size: 12px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
+.stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.stat { background: var(--bg); padding: 32px 20px; text-align: center; }
+.stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.stat .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
 
 /* Sections */
 section { padding: 80px 0; }
-
 .section-dark { background: var(--bg2); }
-
-.section-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.section-sub {
-  text-align: center;
-  color: var(--muted);
-  font-size: 16px;
-  margin-bottom: 48px;
-}
-
-/* How it works */
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 24px;
-}
-
-.step-card {
-  text-align: center;
-  padding: 8px;
-}
-
-.step-num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.step-card h3 {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.step-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-/* Demo box */
-.demo-section { padding: 80px 0; }
-
-.demo-box {
-  background: var(--bg2);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  padding: 48px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-.demo-box::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), #5DCAA5);
-}
-
-.demo-badge {
-  display: inline-block;
-  background: var(--accent-glow);
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  padding: 6px 16px;
-  border-radius: 100px;
-  margin-bottom: 20px;
-}
-
-.demo-box h2 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.demo-phone {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--accent);
-  margin: 16px 0;
-}
-
-.demo-phone a { color: inherit; text-decoration: none; }
-.demo-phone a:hover { text-decoration: underline; }
-
-.demo-box > p {
-  color: var(--muted);
-  font-size: 15px;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.demo-note {
-  background: rgba(29, 185, 84, 0.08);
-  border: 1px solid rgba(29, 185, 84, 0.2);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-top: 24px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.7;
-  text-align: left;
-}
-
-.demo-note strong { color: var(--text); }
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.section-sub { text-align: center; color: var(--muted); font-size: 16px; margin-bottom: 48px; }
 
 /* Calculator */
-.calc-section { padding: 80px 0; }
-
-.calc-box {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 48px;
-  max-width: 520px;
-  margin: 0 auto;
-}
-
+.calc-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 48px; max-width: 520px; margin: 0 auto; }
 .slider-group { margin-bottom: 24px; }
-
-.slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.slider-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-}
-
-.slider-val {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 4px;
-  background: var(--bg3);
-  border-radius: 4px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px; height: 16px;
-  background: var(--accent);
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.calc-results {
-  text-align: center;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-
-.calc-results .small-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.calc-results .big-num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--red);
-}
-
+.slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.slider-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.slider-val { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--bg3); border-radius: 4px; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+.calc-results { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+.calc-results .small-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+.calc-results .big-num { font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: var(--red); }
 .calc-results .big-num span { font-size: 24px; }
-
-.calc-row {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 16px;
-}
-
+.calc-row { display: flex; justify-content: center; gap: 40px; margin-top: 16px; }
 .calc-row .item { text-align: center; }
+.calc-row .item .val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
+.calc-row .item .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.calc-cta { text-align: center; margin-top: 28px; }
 
-.calc-row .item .val {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-}
+/* Side by side: How it works + Demo */
+.split-section { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.split-left h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 32px; }
+.steps-list { display: flex; flex-direction: column; gap: 0; }
+.step-row { display: flex; align-items: flex-start; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+.step-row:last-child { border-bottom: none; }
+.step-num { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: var(--accent); line-height: 1; min-width: 56px; }
+.step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.step-content p { font-size: 14px; color: var(--muted); }
 
-.calc-row .item .lbl {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
+/* Demo box */
+.demo-box { background: var(--bg2); border: 1px solid var(--accent); border-radius: 16px; padding: 36px; text-align: center; position: relative; overflow: hidden; }
+.demo-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #5DCAA5); }
+.demo-badge { display: inline-block; background: var(--accent-glow); color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 16px; border-radius: 100px; margin-bottom: 16px; }
+.demo-box h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.demo-phone { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--accent); margin: 12px 0; }
+.demo-phone a { color: inherit; text-decoration: none; }
+.demo-phone a:hover { text-decoration: underline; }
+.demo-box > p { color: var(--muted); font-size: 14px; max-width: 400px; margin: 0 auto; }
+.demo-note { background: rgba(29, 185, 84, 0.08); border: 1px solid rgba(29, 185, 84, 0.2); border-radius: 10px; padding: 14px 18px; margin-top: 20px; font-size: 12px; color: var(--muted); line-height: 1.7; text-align: left; }
+.demo-note strong { color: var(--text); }
 
 /* Forwarding */
-.forward-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
-}
+.forward-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.forward-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.forward-card .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 100px; margin-bottom: 12px; background: var(--accent-glow); color: var(--accent); }
+.forward-card .tag.popular { background: rgba(226, 75, 74, 0.12); color: var(--red); }
+.forward-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.forward-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-.forward-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.forward-card .tag {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 4px 10px;
-  border-radius: 100px;
-  margin-bottom: 12px;
-  background: var(--accent-glow);
-  color: var(--accent);
-}
-
-.forward-card .tag.popular {
-  background: rgba(226, 75, 74, 0.12);
-  color: var(--red);
-}
-
-.forward-card h3 {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.forward-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-/* Customize */
-.custom-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-}
-
-.custom-item {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.custom-item h3 {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: var(--accent);
-}
-
-.custom-item p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-}
+/* Customize — icon cards */
+.custom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.custom-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; }
+.custom-icon { width: 40px; height: 40px; margin-bottom: 16px; }
+.custom-icon svg { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.custom-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.custom-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
 /* Who it's for */
-.tags-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 48px;
-}
-
-.industry-tag {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 28px;
-  font-size: 14px;
-  font-weight: 500;
-}
+.tags-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 48px; }
+.industry-tag { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 28px; font-size: 14px; font-weight: 500; }
 
 /* FAQ */
-.faq-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.faq-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.faq-card h3 {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--accent);
-}
-
-.faq-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.7;
-}
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.faq-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.faq-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
+.faq-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
 /* CTA */
-.cta-section {
-  padding: 100px 0;
-  text-align: center;
-}
-
-.cta-section h2 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.cta-section p {
-  color: var(--muted);
-  font-size: 16px;
-  margin-bottom: 32px;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+.cta-section { padding: 100px 0; text-align: center; }
+.cta-section h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 16px; }
+.cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
+.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
 /* Footer */
-footer {
-  padding: 32px 0;
-  border-top: 1px solid var(--border);
-}
-
-.footer-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.footer-inner .logo {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  font-style: italic;
-}
-
-.footer-inner span {
-  font-size: 13px;
-  color: var(--muted);
-}
+footer { padding: 32px 0; border-top: 1px solid var(--border); }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-inner .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; font-style: italic; }
+.footer-inner span { font-size: 13px; color: var(--muted); }
 
 /* Mobile */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .stats-bar { grid-template-columns: 1fr; }
+  .split-section { grid-template-columns: 1fr; gap: 40px; }
+  .custom-grid { grid-template-columns: 1fr; }
   .hero { padding: 80px 0 40px; }
-  .demo-box { padding: 32px 20px; }
   .calc-box { padding: 32px 20px; }
-  .demo-phone { font-size: 28px; }
+  .demo-phone { font-size: 26px; }
   .calc-row { flex-direction: column; gap: 16px; }
   .cta-buttons { flex-direction: column; align-items: center; }
   .footer-inner { flex-direction: column; text-align: center; }
@@ -520,17 +138,11 @@ footer {
 
 /* Animations */
 @media (prefers-reduced-motion: no-preference) {
-  .hero h1, .hero p, .demo-box, .step-card, .forward-card, .custom-item, .faq-card {
-    opacity: 0; transform: translateY(20px);
-    animation: fadeUp 0.6s ease forwards;
+  .hero h1, .hero p, .demo-box, .step-row, .forward-card, .custom-card, .faq-card, .calc-box {
+    opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s ease forwards;
   }
   .hero h1 { animation-delay: 0.1s; }
   .hero p { animation-delay: 0.2s; }
-  .step-card:nth-child(1) { animation-delay: 0.1s; }
-  .step-card:nth-child(2) { animation-delay: 0.2s; }
-  .step-card:nth-child(3) { animation-delay: 0.3s; }
-  .step-card:nth-child(4) { animation-delay: 0.4s; }
-  .step-card:nth-child(5) { animation-delay: 0.5s; }
 }
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -542,75 +154,16 @@ footer {
   <div class="container">
     <h1>You're missing calls.<br><span class="green">We answer them.</span></h1>
     <p>VoiceCaptures is an AI voice agent that answers every call 24/7, qualifies the job, and books it straight into your calendar — so you never lose a lead to voicemail again.</p>
-    <a href="#demo" class="btn">Try the live demo →</a>
+    <a href="#demo" class="btn hero-btn">See how it works ↓</a>
   </div>
 </div>
 
 <!-- Stats -->
 <div class="stats-bar">
-  <div class="stat">
-    <div class="num">28%</div>
-    <div class="label">of calls go unanswered</div>
-  </div>
-  <div class="stat">
-    <div class="num">$50,000+</div>
-    <div class="label">lost per year to missed calls</div>
-  </div>
-  <div class="stat">
-    <div class="num">85%</div>
-    <div class="label">of callers never call back</div>
-  </div>
+  <div class="stat"><div class="num">28%</div><div class="label">of calls go unanswered</div></div>
+  <div class="stat"><div class="num">$50,000+</div><div class="label">lost per year to missed calls</div></div>
+  <div class="stat"><div class="num">85%</div><div class="label">of callers never call back</div></div>
 </div>
-
-<!-- How it works -->
-<section>
-  <div class="container">
-    <h2 class="section-title">How it works</h2>
-    <p class="section-sub">Keep your number. We handle the rest.</p>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">01</div>
-        <h3>Customer calls you</h3>
-        <p>They dial the same number they've always used. Nothing changes for them.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">02</div>
-        <h3>You answer — or we do</h3>
-        <p>If you're busy, on a job, or after hours, calls forward to your AI receptionist.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">03</div>
-        <h3>AI collects details</h3>
-        <p>Name, phone, address, issue. Confirms each piece before moving on.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">04</div>
-        <h3>Checks your calendar</h3>
-        <p>Finds open slots on your real Google Calendar and offers them live on the call.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">05</div>
-        <h3>You get a text</h3>
-        <p>Customer name, number, address, issue, and appointment time — all in one SMS.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Live Demo -->
-<section class="section-dark" id="demo">
-  <div class="container">
-    <div class="demo-box">
-      <div class="demo-badge">Live demo — try it now</div>
-      <h2>Call and hear it yourself</h2>
-      <div class="demo-phone"><a href="tel:+19592156754">(959) 215-6754</a></div>
-      <p>Pretend you're a customer with a plumbing emergency or a routine booking. Go through the full experience. You'll get a text summary when it's done.</p>
-      <div class="demo-note">
-        <strong>How the demo works:</strong> This number is connected to a sample calendar you can't see — but it's checking real availability and booking real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable to your business.
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- Calculator -->
 <section>
@@ -619,37 +172,85 @@ footer {
     <p class="section-sub">Adjust the sliders to match your business.</p>
     <div class="calc-box">
       <div class="slider-group">
-        <div class="slider-header">
-          <span class="slider-label">Monthly calls received</span>
-          <span class="slider-val" id="calls-val">600</span>
-        </div>
+        <div class="slider-header"><span class="slider-label">Monthly calls received</span><span class="slider-val" id="calls-val">600</span></div>
         <input type="range" min="50" max="2000" value="600" id="calls-slider" oninput="updateCalc()">
       </div>
       <div class="slider-group">
-        <div class="slider-header">
-          <span class="slider-label">Average job value</span>
-          <span class="slider-val" id="job-val">$325</span>
-        </div>
+        <div class="slider-header"><span class="slider-label">Average job value</span><span class="slider-val" id="job-val">$325</span></div>
         <input type="range" min="50" max="2000" value="325" id="job-slider" oninput="updateCalc()">
       </div>
       <div class="slider-group">
-        <div class="slider-header">
-          <span class="slider-label">Missed call rate</span>
-          <span class="slider-val" id="rate-val">28%</span>
-        </div>
+        <div class="slider-header"><span class="slider-label">Missed call rate</span><span class="slider-val" id="rate-val">28%</span></div>
         <input type="range" min="5" max="60" value="28" id="rate-slider" oninput="updateCalc()">
       </div>
       <div class="calc-results">
         <div class="small-label">You're losing roughly</div>
         <div class="big-num" id="total-loss">~$16,464<span>/mo</span></div>
         <div class="calc-row">
-          <div class="item">
-            <div class="val" id="missed-count">~168 calls/mo</div>
-            <div class="lbl">Missed calls</div>
+          <div class="item"><div class="val" id="missed-count">~168 calls/mo</div><div class="lbl">Missed calls</div></div>
+          <div class="item"><div class="val" id="per-call">~$98</div><div class="lbl">Cost per missed call</div></div>
+        </div>
+      </div>
+      <div class="calc-cta"><a href="#demo" class="btn" style="margin-top:8px;">Try the live demo →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works + Demo side by side -->
+<section class="section-dark" id="demo">
+  <div class="container">
+    <div class="split-section">
+      <!-- Left: How it works -->
+      <div class="split-left">
+        <h2>How it works</h2>
+        <div class="steps-list">
+          <div class="step-row">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h3>Customer calls your number</h3>
+              <p>Same number they've always used</p>
+            </div>
           </div>
-          <div class="item">
-            <div class="val" id="per-call">~$98</div>
-            <div class="lbl">Cost per missed call</div>
+          <div class="step-row">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h3>You answer — or the AI does</h3>
+              <p>Calls forward when you're busy, on a job, or after hours</p>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h3>AI collects every detail</h3>
+              <p>Name, phone, address, issue — confirms each piece</p>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <h3>Checks your real calendar and books</h3>
+              <p>Offers open slots live on the call</p>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">05</div>
+            <div class="step-content">
+              <h3>You get a text with everything</h3>
+              <p>Customer gets a confirmation text too</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Demo box -->
+      <div>
+        <div class="demo-box">
+          <div class="demo-badge">Live demo — try it now</div>
+          <h2>Call and hear it yourself</h2>
+          <div class="demo-phone"><a href="tel:+19592156754">(959) 215-6754</a></div>
+          <p>Pretend you're a customer with a plumbing emergency or a routine booking. You'll get a text summary when it's done.</p>
+          <div class="demo-note">
+            <strong>How the demo works:</strong> This number is connected to a sample calendar you can't see — but it's checking real availability and booking real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
           </div>
         </div>
       </div>
@@ -658,7 +259,7 @@ footer {
 </section>
 
 <!-- Call Forwarding -->
-<section class="section-dark">
+<section>
   <div class="container">
     <h2 class="section-title">Call forwarding — your way</h2>
     <p class="section-sub">Keep your existing number. Choose when the AI picks up.</p>
@@ -666,17 +267,17 @@ footer {
       <div class="forward-card">
         <div class="tag popular">Most popular</div>
         <h3>When you don't answer</h3>
-        <p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over. Best for techs who answer when they can.</p>
+        <p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over.</p>
       </div>
       <div class="forward-card">
         <div class="tag">After hours</div>
         <h3>Always forward</h3>
-        <p>Send all calls to the AI. Toggle on for evenings, weekends, and holidays. Toggle off when you're available. Takes 2 seconds.</p>
+        <p>Send all calls to the AI. Toggle on for evenings, weekends, holidays. Toggle off when available.</p>
       </div>
       <div class="forward-card">
         <div class="tag">Busy on a job</div>
         <h3>When you're on another call</h3>
-        <p>Already on the phone? The AI catches the second call so you never miss a lead while helping another customer.</p>
+        <p>Already on the phone? The AI catches the second call so you never miss a lead.</p>
       </div>
       <div class="forward-card">
         <div class="tag">Dead zone</div>
@@ -687,42 +288,48 @@ footer {
   </div>
 </section>
 
-<!-- Customization -->
-<section>
+<!-- Everything adapts -->
+<section class="section-dark">
   <div class="container">
-    <h2 class="section-title">Everything adapts to your business</h2>
-    <p class="section-sub">Not a one-size-fits-all answering machine.</p>
+    <h2 class="section-title">Everything adapts to you</h2>
+    <p class="section-sub">Customize every part of the experience to match your business.</p>
     <div class="custom-grid">
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
         <h3>Your voice</h3>
         <p>Choose from multiple AI voices — male, female, different tones. Pick what fits your brand.</p>
       </div>
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         <h3>Your calendar</h3>
-        <p>Connects to your Google Calendar. The AI only offers times you're actually free.</p>
+        <p>Connects to Google Calendar — only offers times you're actually free.</p>
       </div>
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <h3>Your hours</h3>
-        <p>Set your business hours. The AI won't book outside them — 7 AM to 10 PM, 9 to 5, whatever you need.</p>
+        <p>Set business hours — AI won't book outside them. 7 AM to 10 PM, 9 to 5, whatever you need.</p>
       </div>
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
         <h3>Your appointment length</h3>
-        <p>2-hour slots, 1-hour, 30 minutes — match how long your jobs actually take.</p>
+        <p>2-hour, 1-hour, or 30-minute slots — match how long your jobs actually take.</p>
       </div>
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <h3>Your greeting</h3>
-        <p>The AI answers with your business name and your preferred opening. Sounds like your front desk.</p>
+        <p>Answers with your business name and your preferred opening. Sounds like your front desk.</p>
       </div>
-      <div class="custom-item">
+      <div class="custom-card">
+        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
         <h3>Your services</h3>
-        <p>Plumbing, HVAC, electrical, general contracting — the AI knows what you do and stays on topic.</p>
+        <p>Plumbing, HVAC, electrical, contracting — knows what you do, stays on topic.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Who it's for -->
-<section class="section-dark">
+<section>
   <div class="container">
     <h2 class="section-title">Who it's for</h2>
     <p class="section-sub">If your phone is your business, VoiceCaptures is for you.</p>
@@ -736,7 +343,6 @@ footer {
       <div class="industry-tag">General Contracting</div>
       <div class="industry-tag">Locksmith</div>
     </div>
-
     <div class="faq-grid">
       <div class="faq-card">
         <h3>"Will it sound robotic?"</h3>
@@ -782,16 +388,13 @@ function updateCalc() {
   const calls = parseInt(document.getElementById('calls-slider').value);
   const job = parseInt(document.getElementById('job-slider').value);
   const rate = parseInt(document.getElementById('rate-slider').value);
-
   document.getElementById('calls-val').textContent = calls.toLocaleString();
   document.getElementById('job-val').textContent = '$' + job.toLocaleString();
   document.getElementById('rate-val').textContent = rate + '%';
-
   const missed = Math.round(calls * rate / 100);
   const bookingRate = 0.3;
   const perCall = Math.round(job * bookingRate);
   const total = missed * perCall;
-
   document.getElementById('missed-count').textContent = '~' + missed + ' calls/mo';
   document.getElementById('per-call').textContent = '~$' + perCall.toLocaleString();
   document.getElementById('total-loss').innerHTML = '~$' + total.toLocaleString() + '<span>/mo</span>';
