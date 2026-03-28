@@ -22,7 +22,6 @@
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
 .container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
 
-/* Hero */
 .hero { padding: 100px 0 40px; text-align: center; }
 .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 6vw, 58px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em; }
 .hero h1 .green { color: var(--accent); }
@@ -35,11 +34,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 /* Stats bar */
 .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.stat { background: var(--bg); padding: 32px 20px; text-align: center; }
+.stat { background: var(--bg); padding: 36px 20px; text-align: center; }
 .stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
-.stat .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.stat .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.stat .source { font-size: 11px; color: #555; letter-spacing: 0.04em; }
 
-/* Sections */
 section { padding: 80px 0; }
 .section-dark { background: var(--bg2); }
 .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
@@ -63,7 +62,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .calc-row .item .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 .calc-cta { text-align: center; margin-top: 28px; }
 
-/* Side by side: How it works + Demo */
+/* Split: How it works + Demo */
 .split-section { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .split-left h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 32px; }
 .steps-list { display: flex; flex-direction: column; gap: 0; }
@@ -93,7 +92,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .forward-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .forward-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-/* Customize — icon cards */
+/* Customize */
 .custom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .custom-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; }
 .custom-icon { width: 40px; height: 40px; margin-bottom: 16px; }
@@ -117,13 +116,11 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16p
 .cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
 .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-/* Footer */
 footer { padding: 32px 0; border-top: 1px solid var(--border); }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .footer-inner .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; font-style: italic; }
 .footer-inner span { font-size: 13px; color: var(--muted); }
 
-/* Mobile */
 @media (max-width: 768px) {
   .stats-bar { grid-template-columns: 1fr; }
   .split-section { grid-template-columns: 1fr; gap: 40px; }
@@ -136,7 +133,6 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
   .footer-inner { flex-direction: column; text-align: center; }
 }
 
-/* Animations */
 @media (prefers-reduced-motion: no-preference) {
   .hero h1, .hero p, .demo-box, .step-row, .forward-card, .custom-card, .faq-card, .calc-box {
     opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s ease forwards;
@@ -160,9 +156,21 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
 
 <!-- Stats -->
 <div class="stats-bar">
-  <div class="stat"><div class="num">28%</div><div class="label">of calls go unanswered</div></div>
-  <div class="stat"><div class="num">$50,000+</div><div class="label">lost per year to missed calls</div></div>
-  <div class="stat"><div class="num">85%</div><div class="label">of callers never call back</div></div>
+  <div class="stat">
+    <div class="num">$75B</div>
+    <div class="label">Lost annually to unanswered business calls</div>
+    <div class="source">Source: Forbes</div>
+  </div>
+  <div class="stat">
+    <div class="num">85%</div>
+    <div class="label">Of callers won't leave voicemail — they call competitors</div>
+    <div class="source">Source: Forbes</div>
+  </div>
+  <div class="stat">
+    <div class="num">62%</div>
+    <div class="label">Of customer calls happen outside business hours</div>
+    <div class="source">Source: HomeAdvisor</div>
+  </div>
 </div>
 
 <!-- Calculator -->
@@ -200,49 +208,32 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
 <section class="section-dark" id="demo">
   <div class="container">
     <div class="split-section">
-      <!-- Left: How it works -->
       <div class="split-left">
         <h2>How it works</h2>
         <div class="steps-list">
           <div class="step-row">
             <div class="step-num">01</div>
-            <div class="step-content">
-              <h3>Customer calls your number</h3>
-              <p>Same number they've always used</p>
-            </div>
+            <div class="step-content"><h3>Customer calls your number</h3><p>Same number they've always used</p></div>
           </div>
           <div class="step-row">
             <div class="step-num">02</div>
-            <div class="step-content">
-              <h3>You answer — or the AI does</h3>
-              <p>Calls forward when you're busy, on a job, or after hours</p>
-            </div>
+            <div class="step-content"><h3>You answer — or the AI does</h3><p>Calls forward when you're busy, on a job, or after hours</p></div>
           </div>
           <div class="step-row">
             <div class="step-num">03</div>
-            <div class="step-content">
-              <h3>AI collects every detail</h3>
-              <p>Name, phone, address, issue — confirms each piece</p>
-            </div>
+            <div class="step-content"><h3>AI collects every detail</h3><p>Name, phone, address, issue — confirms each piece</p></div>
           </div>
           <div class="step-row">
             <div class="step-num">04</div>
-            <div class="step-content">
-              <h3>Checks your real calendar and books</h3>
-              <p>Offers open slots live on the call</p>
-            </div>
+            <div class="step-content"><h3>Checks your real calendar and books</h3><p>Offers open slots live on the call</p></div>
           </div>
           <div class="step-row">
             <div class="step-num">05</div>
-            <div class="step-content">
-              <h3>You get a text with everything</h3>
-              <p>Customer gets a confirmation text too</p>
-            </div>
+            <div class="step-content"><h3>You get a text with everything</h3><p>Customer gets a confirmation text too</p></div>
           </div>
         </div>
       </div>
 
-      <!-- Right: Demo box -->
       <div>
         <div class="demo-box">
           <div class="demo-badge">Live demo — try it now</div>
@@ -367,7 +358,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     <p>Set up takes 10 minutes. Try the demo first, then let's talk.</p>
     <div class="cta-buttons">
       <a href="tel:+19592156754" class="btn">Try the live demo →</a>
-      <a href="tel:+14168226186" class="btn btn-outline">Book a free 15-min audit</a>
+      <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn btn-outline">Book a free 15-min audit</a>
     </div>
   </div>
 </div>
