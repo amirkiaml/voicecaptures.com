@@ -19,7 +19,7 @@
   --border: rgba(255,255,255,0.08);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; } body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
 .container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
 
 .hero { padding: 100px 0 40px; text-align: center; }
@@ -197,7 +197,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     <p>A voice receptionist that books appointments, logs requests, and texts your team — available 24/7, works with any business.</p>
     <div class="hero-buttons">
       <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn btn-primary">Book a free 15-min call →</a>
-      <a href="tel:+16476921081" class="btn btn-demo">Try the live demo →</a>
+      <a href="#live-demo" class="btn btn-demo">Try the live demo →</a>
     </div>
   </div>
 </section>
@@ -355,7 +355,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
         </div>
       </div>
       <div class="split-right">
-        <div class="demo-box">
+        <div class="demo-box" id="live-demo">
           <span class="demo-badge">Live Demo</span>
           <h2>Try it yourself</h2>
           <div class="demo-phone">
@@ -486,7 +486,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     <p>Get 14 days free. No credit card required. Try the demo, then decide.</p>
     <div class="cta-buttons">
       <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min call →</a>
-      <a href="tel:+16476921081" class="btn btn-demo">Try the live demo →</a>
+      <a href="#live-demo" class="btn btn-demo">Try the live demo →</a>
     </div>
   </div>
 </div>
