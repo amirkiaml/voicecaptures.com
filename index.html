@@ -86,8 +86,24 @@ input[type="number"]:focus { outline: none; border-color: var(--accent); }
 .demo-badge { display: inline-block; background: var(--accent-glow); color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 16px; border-radius: 100px; margin-bottom: 16px; }
 .demo-box h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
 .demo-phone { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin: 12px 0; }
-.demo-phone a { color: #E24B4A; font-weight: 700; text-decoration: none; }
-.demo-phone a:hover { text-decoration: underline; }
+.demo-phone a {
+  color: #E24B4A;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  padding: 16px 32px;
+  background: rgba(226, 75, 74, 0.15);
+  border: 2px solid #E24B4A;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+.demo-phone a:hover {
+  background: rgba(226, 75, 74, 0.25);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(226, 75, 74, 0.4);
+}
 .demo-box > p { color: var(--muted); font-size: 14px; max-width: 400px; margin: 0 auto; }
 .demo-note { background: rgba(29, 185, 84, 0.08); border: 1px solid rgba(29, 185, 84, 0.2); border-radius: 10px; padding: 14px 18px; margin-top: 20px; font-size: 12px; color: var(--muted); line-height: 1.7; text-align: left; }
 .demo-note strong { color: var(--text); }
@@ -125,7 +141,36 @@ input[type="number"]:focus { outline: none; border-color: var(--accent); }
 .cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
 .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
+.btn-demo {
+  background: linear-gradient(135deg, #FFD700, #FFC700);
+  color: #000;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+.btn-demo:hover {
+  background: linear-gradient(135deg, #FFC700, #FFB700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
 footer { padding: 32px 0; border-top: 1px solid var(--border); }
+.btn-primary {
+  background: linear-gradient(135deg, #1DB954, #27c263);
+  box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 16px 36px;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #17a348, #20b858);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+}
+
 .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .footer-inner .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; font-style: italic; }
 .footer-inner span { font-size: 13px; color: var(--muted); }
@@ -151,8 +196,8 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     <h1>Never miss a call again.<br>Let AI answer yours.</h1>
     <p>A voice receptionist that books appointments, logs requests, and texts your team — available 24/7, works with any business.</p>
     <div class="hero-buttons">
-      <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min call →</a>
-      <a href="tel:+16476921081" class="btn btn-outline">Try the live demo →</a>
+      <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn btn-primary">Book a free 15-min call →</a>
+      <a href="tel:+16476921081" class="btn btn-demo">Try the live demo →</a>
     </div>
   </div>
 </section>
@@ -314,6 +359,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
           <span class="demo-badge">Live Demo</span>
           <h2>Try it yourself</h2>
           <div class="demo-phone">
+            <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em;">📞 Tap to call</div>
             <a href="tel:+16476921081">+1 (647) 692-1081</a>
           </div>
           <p>Call anytime. It's a real AI handling a real calendar.</p>
@@ -440,7 +486,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--border); }
     <p>Get 14 days free. No credit card required. Try the demo, then decide.</p>
     <div class="cta-buttons">
       <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min call →</a>
-      <a href="tel:+16476921081" class="btn btn-outline">Try the live demo →</a>
+      <a href="tel:+16476921081" class="btn btn-demo">Try the live demo →</a>
     </div>
   </div>
 </div>
