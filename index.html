@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoiceCaptures — AI voice agent that answers and books every call</title>
-<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14-day free trial, no credit card.">
+<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. First month free, no credit card.">
 <meta name="theme-color" content="#0d0d0d">
 <link rel="canonical" href="https://voicecaptures.com/">
 <link rel="icon" href="logo-mark.png">
@@ -12,10 +12,10 @@
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/">
 <meta property="og:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14-day free trial, no credit card.">
+<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. First month free, no credit card.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14-day free trial, no credit card.">
+<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. First month free, no credit card.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -187,7 +187,12 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .tier.ent .price{font-size:30px}
 .price em{font-size:15px;font-weight:400;color:var(--muted);letter-spacing:0;font-style:normal}
 .mins{font-size:13px;color:var(--muted);margin-top:8px}
-.feat{display:flex;flex-direction:column;gap:10px;margin:22px 0 24px}
+.bestfor{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--text)}
+.bestfor span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:3px}
+.offer{margin-top:26px;background:var(--bg3);border:1px solid var(--blue);border-radius:12px;
+       padding:20px 24px;text-align:center;font-size:14.5px;line-height:1.65;color:var(--muted)}
+.offer b{color:var(--text)}
+.feat{display:flex;flex-direction:column;gap:10px;margin:18px 0 24px}
 .feat div{font-size:13.5px;color:var(--muted);line-height:1.5;display:flex;gap:8px}
 .feat div span:first-child{color:var(--blue)}
 .tier .btn{margin-top:auto;padding:13px 22px}
@@ -262,7 +267,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   .steps h3{font-size:15px}
   .steps p{font-size:13.5px}
   .card{padding:20px}
-  .tier{padding:24px 20px}
+  .tier{padding:22px 20px}
+  .offer{padding:18px 18px;font-size:13.5px;margin-top:22px}
   .tags{gap:8px;margin-bottom:36px}
   .tags div{padding:9px 18px;font-size:13px}
   .final{padding:64px 0}
@@ -290,7 +296,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <img src="logo-mark.png" alt="" width="32" height="32">
       <span>VoiceCaptures</span>
     </div>
-    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start free trial</a>
+    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start free month</a>
   </div>
 </header>
 
@@ -307,8 +313,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
       <h1>You're missing calls.<br>We answer them.</h1>
       <p class="lede">An AI voice agent picks up every call, qualifies the caller, books the slot on your real calendar, and texts you the summary — on the number you already use.</p>
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
-      <p class="fine">14-day free trial. No credit card. Setup takes 10 minutes.</p>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
+      <p class="fine">First month free. No credit card. Setup takes 10 minutes.</p>
 
       <div class="stats">
         <div class="stat"><b>32%</b><div class="lbl">Missed-call rate in healthcare, the highest of any industry</div><div class="src">CallRail benchmark report, 2025</div></div>
@@ -384,7 +390,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
         <div class="figs" id="figs"></div>
       </div>
       <div class="center" style="margin-top:28px">
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
       </div>
       <p class="note" id="c-note">Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.</p>
     </div>
@@ -410,7 +416,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
       <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
       <div style="margin-top:20px">
-        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
       </div>
     </div>
   </div>
@@ -457,11 +463,17 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <section>
   <div class="wrap">
     <h2 class="center">Pricing</h2>
-    <p class="sub">Month to month. Cancel anytime.</p>
+    <p class="sub" id="p-trades" style="margin-bottom:10px">Plumbing · HVAC · Electrical · Locksmith · Garage door</p>
+    <p class="sub" id="p-note" hidden style="margin-bottom:34px;font-size:13px">No caller health information is stored or logged.</p>
     <div class="grid gp" id="tiers"></div>
+
+    <div class="offer">
+      <b>First month free.</b> Full setup, real calls, your actual number. If it doesn't book you work, you walk. Month-to-month after that — cancel anytime.
+    </div>
+
     <div class="terms">
-      <p id="setup-line">Setup $149 one-time — waived for our first 10 clients.</p>
-      <p>Overage $0.35/min. Most calls run 1–3 minutes.</p>
+      <p>All prices CAD, plus HST. Additional minutes $0.95.</p>
+      <p>Setup $149 — waived for founding clients.</p>
       <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
     </div>
   </div>
@@ -480,9 +492,9 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
       <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
       <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
-      <div class="card"><h3>What happens after the trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
+      <div class="card"><h3>What happens after the free month?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
       <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
-      <div class="card"><h3>What about my sector?</h3><p>These three are what we run today, and restaurants and clinics are pilots. If yours is close, start the trial and we'll tell you honestly whether it fits.</p></div>
+      <div class="card"><h3>What about my sector?</h3><p>These three are what we run today, and restaurants and clinics are pilots. If yours is close, start the free month and we'll tell you honestly whether it fits.</p></div>
     </div>
   </div>
 </section>
@@ -490,9 +502,9 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <div class="final">
   <div class="wrap">
     <h2>Ready to stop losing jobs<br>to voicemail?</h2>
-    <p>Set up takes 10 minutes. Hear it first, then start the trial.</p>
+    <p>Set up takes 10 minutes. Hear it first, then run it free for a month.</p>
     <div class="btns">
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
       <a class="btn btn-ghost" id="final-demo" href="tel:+19592156754">Try the live demo</a>
     </div>
   </div>
@@ -517,7 +529,7 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
 var V = {
   home: {
-    short: "home service businesses", setup: "$149",
+    short: "home service businesses",
     num: "+1 (416) 555-0182", meta: "Mobile · Toronto, ON",
     convo: [
       ["them","Hi — kitchen sink is backing up. Any chance someone can come today?"],
@@ -539,15 +551,16 @@ var V = {
     demoTitle: "Call and hear it yourself",
     demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
     demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
-    demoCta: "Start your 14-day free trial",
+    demoCta: "Start your first month free",
+    trades: "Plumbing \u00b7 HVAC \u00b7 Electrical \u00b7 Locksmith \u00b7 Garage door",
     tiers: [
-      ["Solo","$149","300 minutes",["After-hours and overflow coverage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
-      ["Crew","$279","800 minutes",["Everything in Solo","Full-day coverage","Emergency vs. routine triage","Call transfer to you or your team","Priority support"]],
-      ["Fleet","$449","1,800 minutes",["Everything in Crew","Multiple calendars","Multiple technicians","Custom call flows"]]
+      ["Starter","$179","150 minutes","After-hours",["After-hours and overflow coverage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
+      ["Growth","$349","320 minutes","Full-day + overflow",["Everything in Starter","Full-day coverage","Emergency vs. routine triage","Call transfer to you or your team","Priority support"]],
+      ["Pro","$599","570 minutes","Multi-truck",["Everything in Growth","Multiple calendars","Multiple technicians","Custom call flows"]]
     ]
   },
   food: {
-    short: "restaurants and cafés", setup: "$199",
+    short: "restaurants and cafés",
     num: "+1 (647) 555-0294", meta: "Mobile · Toronto, ON",
     convo: [
       ["them","Do you do catering? I need coffee and pastries for about 40 people Thursday morning."],
@@ -570,14 +583,15 @@ var V = {
     demoBody: "We'll set up a demo line so you can call in as a guest booking a table for four on Friday, or ordering pickup.",
     demoNote: "The restaurant agent is a pilot. Menu, hours and cover limits are configured per venue, and it books and takes callback details — it does not process payments or write to a POS.",
     demoCta: "Request a restaurant demo",
+    trades: "Caf\u00e9s \u00b7 Restaurants \u00b7 Takeout",
     tiers: [
-      ["Counter","$179","400 minutes",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
-      ["Service","$299","1,000 minutes",["Everything in Counter","Full-day coverage","Large-party and catering routing","Call transfer to the floor","Priority support"]],
-      ["Group","$499","2,200 minutes",["Everything in Service","Multiple locations","Custom call flows","Per-venue configuration"]]
+      ["Starter","$199","170 minutes","Single location",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
+      ["Growth","$329","300 minutes","Busy single location",["Everything in Starter","Full-day coverage","Large-party and catering routing","Call transfer to the floor","Priority support"]],
+      ["Multi-location","$549","520 minutes","2\u20134 locations",["Everything in Growth","2\u20134 locations","Custom call flows","Per-venue configuration"]]
     ]
   },
   clinic: {
-    short: "clinics and dental practices", setup: "$349",
+    short: "clinics and dental practices",
     num: "+1 (905) 555-0147", meta: "Mobile · Mississauga, ON",
     convo: [
       ["them","Are you taking new patients? I'd like to book a cleaning."],
@@ -600,15 +614,17 @@ var V = {
     demoBody: "We stand up a demo line configured for your specialty, your providers and your booking rules, then hand you the number to call.",
     demoNote: "The clinic agent is a pilot, scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
     demoCta: "Request a clinic demo",
+    trades: "Dental \u00b7 Vet \u00b7 Physio \u00b7 Chiro",
+    priceNote: "No caller health information is stored or logged.",
     tiers: [
-      ["Practice","$299","600 minutes",["After-hours and reception overflow","New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk"]],
-      ["Practice+","$499","1,500 minutes",["Everything in Practice","Full-day coverage","Multiple providers","Escalation rules configured per practice","Priority support"]],
-      ["Group","$749","3,000 minutes",["Everything in Practice+","Multiple locations","Multiple calendars","Custom booking rules"]]
+      ["Starter","$299","270 minutes","After-hours",["After-hours and reception overflow","New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk"]],
+      ["Growth","$549","520 minutes","Reception overflow",["Everything in Starter","Full-day coverage","Multiple providers","Escalation rules configured per practice","Priority support"]],
+      ["Pro","$899","870 minutes","Multi-practitioner",["Everything in Growth","Multiple locations","Multiple calendars","Custom booking rules"]]
     ]
   }
 };
 
-var ENTERPRISE = ["Enterprise","Custom","Tailored to your volume",
+var ENTERPRISE = ["Enterprise","Custom","Tailored to your volume","Larger operations",
   ["Multi-location deployments","Custom integrations","Dedicated onboarding","SLA"]];
 
 var $ = function(id){ return document.getElementById(id); };
@@ -715,15 +731,19 @@ function renderTiers(v){
       '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
       (pop ? '<span class="pop">Most popular</span>' : "") + "</div>" +
       '<div class="price">' + esc(t[1]) + (ent ? "" : "<em>/mo</em>") + "</div>" +
-      '<div class="mins">' + esc(t[2]) + "</div>" +
-      '<div class="feat">' + t[3].map(function(f){
+      '<div class="mins">' + esc(t[2]) + (ent ? "" : " included") + "</div>" +
+      '<div class="bestfor"><span>Best for</span>' + esc(t[3]) + "</div>" +
+      '<div class="feat">' + t[4].map(function(f){
         return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
       }).join("") + "</div>" +
       '<a class="btn ' + (pop ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
-      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start free trial") + "</a>" +
+      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start free month") + "</a>" +
       "</div>";
   }).join("");
-  $("setup-line").textContent = "Setup " + v.setup + " one-time — waived for our first 10 clients.";
+  $("p-trades").textContent = v.trades;
+  var pn = $("p-note");
+  pn.textContent = v.priceNote || "";
+  pn.hidden = !v.priceNote;
 }
 
 function calc(){
