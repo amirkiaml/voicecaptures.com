@@ -86,10 +86,31 @@ header .btn{font-size:14px;padding:10px 20px;white-space:nowrap}
 .callnum{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.01em;margin:10px 0 2px}
 .callmeta{font-size:11px;color:var(--muted);margin-bottom:24px}
 .wave{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:34px;margin-bottom:20px}
-.wave i{width:3px;border-radius:100px;background:var(--blue);display:block}
+.wave i{width:3px;border-radius:100px;background:var(--blue);display:block;transform-origin:bottom center}
+.wave.live i{animation:wv 1.15s ease-in-out infinite}
+.wave.live i:nth-child(1){animation-delay:0s}
+.wave.live i:nth-child(2){animation-delay:.09s}
+.wave.live i:nth-child(3){animation-delay:.18s}
+.wave.live i:nth-child(4){animation-delay:.27s}
+.wave.live i:nth-child(5){animation-delay:.36s}
+.wave.live i:nth-child(6){animation-delay:.45s}
+.wave.live i:nth-child(7){animation-delay:.54s}
+.wave.live i:nth-child(8){animation-delay:.63s}
+.wave.live i:nth-child(9){animation-delay:.72s}
+@keyframes wv{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:7px;vertical-align:middle;position:relative;top:-1px}
+.dot.live{animation:blip 1.6s ease-in-out infinite}
+@keyframes blip{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,238,.45)}50%{opacity:.55;box-shadow:0 0 0 5px rgba(34,211,238,0)}}
 .fwd{font-size:12px;color:var(--muted);padding-bottom:8px}
 .thread{flex:1 1 236px;min-width:216px;display:flex;flex-direction:column;gap:10px;padding-top:26px}
 .bub{font-size:12.5px;line-height:1.55;padding:11px 14px;max-width:94%}
+.anim .bub,.anim .card{opacity:0;transform:translateY(7px);transition:opacity .34s ease,transform .34s ease}
+.anim .bub.on,.anim .card.on{opacity:1;transform:none}
+.typing{display:inline-flex;gap:3px;align-items:center;height:9px}
+.typing i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);display:block;animation:tp 1.25s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.17s}
+.typing i:nth-child(3){animation-delay:.34s}
+@keyframes tp{0%,100%{opacity:.3;transform:translateY(0)}45%{opacity:1;transform:translateY(-2px)}}
 .row-them{display:flex;justify-content:flex-start}
 .row-us{display:flex;justify-content:flex-end}
 .bub-them{background:var(--bg3);color:var(--text);border:1px solid var(--line);border-radius:14px 14px 14px 4px}
@@ -195,6 +216,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
+  .anim .bub,.anim .card{opacity:1!important;transform:none!important}
 }
 </style>
 </head>
@@ -241,14 +263,14 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
           <div class="mini">Incoming call</div>
           <div class="callnum" id="m-num">+1 (416) 555-0182</div>
           <div class="callmeta" id="m-meta">Mobile · Toronto, ON</div>
-          <div class="wave" aria-hidden="true">
+          <div class="wave live" aria-hidden="true">
             <i style="height:10px;opacity:.84"></i><i style="height:18px;opacity:.79"></i><i style="height:26px;opacity:.89"></i><i style="height:34px;opacity:1"></i><i style="height:22px;opacity:.84"></i><i style="height:30px;opacity:.95"></i><i style="height:16px;opacity:.76"></i><i style="height:24px;opacity:.87"></i><i style="height:12px;opacity:.71"></i>
           </div>
           <div class="fwd">Forwarded to VoiceCaptures</div>
         </div>
       </div>
       <div class="thread">
-        <div class="mini">On the call</div>
+        <div class="mini"><span class="dot live" aria-hidden="true"></span>On the call</div>
         <div id="m-thread">
           <div class="row-them"><div class="bub bub-them">Hi — kitchen sink is backing up. Any chance someone can come today?</div></div>
           <div class="row-us"><div class="bub bub-us">I can get a tech out today. What's the service address?</div></div>
@@ -542,16 +564,67 @@ function renderBad(v){
   }).join("");
 }
 
+var timers = [];
+function clearTimers(){
+  for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+  timers = [];
+}
+function after(ms, fn){ timers.push(setTimeout(fn, ms)); }
+
+var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 function renderThread(v){
+  clearTimers();
   $("m-num").textContent = v.num;
   $("m-meta").textContent = v.meta;
   $("m-sms").textContent = v.sms;
-  $("m-thread").innerHTML = v.convo.map(function(b){
+
+  var thread = $("m-thread");
+  var sms = $("m-sms");
+
+  // Rendered at full size first: the hidden bubbles hold their space, so
+  // revealing them shifts nothing on the page.
+  thread.innerHTML = v.convo.map(function(b){
     var us = b[0] === "us";
     return '<div class="' + (us ? "row-us" : "row-them") + '"><div class="bub ' +
-      (us ? "bub-us" : "bub-them") + '">' + esc(b[1]) + '</div></div>';
+      (us ? "bub-us" : "bub-them") + '"><span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>' +
+      '<span class="txt" hidden>' + esc(b[1]) + "</span></div></div>";
   }).join("");
+
+  var bubbles = thread.querySelectorAll(".bub");
+
+  function settle(el){
+    el.querySelector(".typing").remove();
+    el.querySelector(".txt").hidden = false;
+  }
+
+  if (reduced) {
+    thread.classList.remove("anim");
+    sms.classList.remove("anim");
+    for (var i = 0; i < bubbles.length; i++) settle(bubbles[i]);
+    return;
+  }
+
+  thread.classList.add("anim");
+  sms.parentNode.classList.add("anim");
+  sms.classList.remove("on");
+
+  // Caller lines land quickly; the agent "thinks" for a beat before replying,
+  // which is what makes it read as a live call rather than a stagger effect.
+  var t = 350;
+  Array.prototype.forEach.call(bubbles, function(el, n){
+    var isUs = v.convo[n][0] === "us";
+    var think = isUs ? 620 : 380;
+    var show = t;
+    after(show, function(){ el.classList.add("on"); });
+    after(show + think, function(){ settle(el); });
+    t = show + think + (isUs ? 700 : 520);
+  });
+
+  after(t + 250, function(){ sms.classList.add("on"); });
 }
+
+function replayThread(){ renderThread(V[key]); }
 
 function renderDemo(v){
   $("d-tag").textContent = v.demoTag;
@@ -655,6 +728,17 @@ $("s-rate").addEventListener("input", function(e){ state.rate = +e.target.value;
 $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value; calc(); });
 
 select("home");
+
+// A visitor who scrolls back up should see the call play again, but only
+// after the mockup has fully left the screen — not on every small scroll.
+if (!reduced && window.IntersectionObserver) {
+  var away = false;
+  new IntersectionObserver(function(entries){
+    var e = entries[0];
+    if (!e.isIntersecting) { away = true; return; }
+    if (away) { away = false; replayThread(); }
+  }, { threshold: 0.35 }).observe(document.querySelector(".mock"));
+}
 })();
 </script>
 
