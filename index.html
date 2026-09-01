@@ -63,6 +63,12 @@ header{position:sticky;top:0;z-index:30;background:rgba(13,13,13,.92);backdrop-f
 .brand img{height:32px;width:auto}
 .brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
 header .btn{font-size:14px;padding:10px 20px;white-space:nowrap}
+@media (max-width:480px){
+  .bar{padding:11px 20px;gap:12px}
+  .brand img{height:26px}
+  .brand span{font-size:16px}
+  header .btn{font-size:12.5px;padding:9px 14px}
+}
 
 /* hero */
 .hero{padding:72px 0 64px}
@@ -203,16 +209,63 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 .foot a:hover{color:var(--blue)}
 
 @media (max-width:720px){
-  section{padding:60px 0}
-  .hero{padding:48px 0}
-  .hero-grid{gap:40px}
-  .stats{grid-template-columns:1fr}
-  .calc{padding:28px 20px}
+  body{line-height:1.6}
+  .wrap{padding:0 20px}
+  section{padding:52px 0}
+  .hero{padding:28px 0 40px}
+  .hero-grid{gap:36px}
+
+  /* Long tracked-out label ate two lines and a third of the fold */
+  .eyebrow{font-size:10.5px;letter-spacing:.1em;margin-bottom:16px}
+
+  /* Pills wrapped 2-then-1 inside a rounded container and read as broken.
+     One row that scrolls sideways instead. */
+  .switch{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+          scrollbar-width:none;border-radius:100px;margin-bottom:22px;max-width:100%}
+  .switch::-webkit-scrollbar{display:none}
+  .switch button{white-space:nowrap;flex:0 0 auto;font-size:13px;padding:8px 15px}
+
+  h1{font-size:clamp(30px,8.5vw,40px);margin-bottom:14px}
+  h2{font-size:24px}
+  .lede{font-size:15.5px;line-height:1.55;margin-bottom:24px;max-width:none}
+  .sub{font-size:15px;margin-bottom:32px}
+  .hero .btn-primary{display:block;width:100%}
+  .fine{font-size:11.5px;margin-top:12px}
+
+  /* Stacked stats were one tall column; number and label side by side reads
+     as a compact list instead. */
+  .stats{grid-template-columns:1fr;margin-top:32px}
+  .stat{display:grid;grid-template-columns:74px 1fr;gap:14px;align-items:baseline;padding:16px 2px}
+  .stat b{font-size:24px;margin-bottom:0}
+  .stat .lbl{font-size:11.5px;line-height:1.45;margin-bottom:2px}
+  .stat .src{font-size:10.5px}
+
+  .mock{justify-content:center;gap:16px}
+  .thread{padding-top:0;flex-basis:100%}
+  .calc{padding:26px 18px}
+  .field{margin-bottom:20px}
+  .loss{font-size:38px}
+  .loss em{font-size:19px}
+  .figs{gap:22px}
   .split{gap:32px}
-  .mock{justify-content:flex-start}
-  h2{font-size:26px}
-  .final h2{font-size:28px}
+  .demo{padding:26px 20px}
+  .demoline{font-size:26px}
+  .steps .step{gap:16px;padding:18px 0}
+  .steps b{font-size:30px;min-width:42px}
+  .card{padding:20px}
+  .tier{padding:24px 20px}
+  .tags{gap:8px;margin-bottom:36px}
+  .tags div{padding:9px 18px;font-size:13px}
+  .final{padding:64px 0}
+  .final h2{font-size:27px}
+  .btns{flex-direction:column}
   .btns .btn{width:100%}
+  .foot{flex-direction:column;align-items:flex-start;gap:14px}
+}
+@media (max-width:400px){
+  .stat{grid-template-columns:66px 1fr;gap:11px}
+  .stat b{font-size:21px}
+  h1{font-size:29px}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
