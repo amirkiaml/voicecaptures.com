@@ -1,399 +1,661 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoiceCaptures — AI Voice Agent for Home Services</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceCaptures — AI voice agent that answers and books every call</title>
+<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14-day free trial, no credit card.">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="canonical" href="https://voicecaptures.com/">
+<link rel="icon" href="logo-mark.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VoiceCaptures">
+<meta property="og:url" content="https://voicecaptures.com/">
+<meta property="og:title" content="VoiceCaptures — never lose another call to voicemail">
+<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14-day free trial, no credit card.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VoiceCaptures — never lose another call to voicemail">
+<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14-day free trial, no credit card.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0d0d0d;
-  --bg2: #161616;
-  --bg3: #1e1e1e;
-  --text: #f0f0ec;
-  --muted: #9a9a90;
-  --accent: #1DB954;
-  --accent-dark: #17a348;
-  --accent-glow: rgba(29, 185, 84, 0.15);
-  --red: #E24B4A;
-  --border: rgba(255,255,255,0.08);
+:root{
+  --bg:#0d0d0d; --bg2:#161616; --bg3:#1e1e1e;
+  --text:#f0f0ec; --muted:#9a9a90; --faint:#555;
+  --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.15);
+  --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
+  --cyan:#22D3EE; --cyan-lt:#67E8F9;
+  --red:#E24B4A;
+  --display:'Space Grotesk',sans-serif; --body:'DM Sans',sans-serif;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
-.container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{color:var(--blue-dk)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+img{display:block}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+section{padding:80px 0}
+.alt{background:var(--bg2)}
 
-.hero { padding: 100px 0 40px; text-align: center; }
-.hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(36px, 6vw, 58px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; letter-spacing: -0.02em; }
-.hero h1 .green { color: var(--accent); }
-.hero p { font-size: 17px; color: var(--muted); max-width: 520px; margin: 0 auto 36px; }
-.btn { display: inline-block; background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; text-decoration: none; transition: background 0.2s, transform 0.1s; border: none; cursor: pointer; }
-.btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.btn-outline:hover { background: var(--bg3); }
-.hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* type */
+h1{font-family:var(--display);font-weight:700;font-size:clamp(36px,6vw,58px);letter-spacing:-.02em;line-height:1.1;margin-bottom:20px}
+h2{font-family:var(--display);font-weight:700;font-size:32px;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px}
+h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
+.center{text-align:center}
+.sub{color:var(--muted);font-size:16px;margin:0 auto 48px;max-width:680px;text-align:center}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+.lede{font-size:17px;color:var(--muted);max-width:520px;margin-bottom:32px}
+.fine{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
 
-.stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.stat { background: var(--bg); padding: 36px 20px; text-align: center; }
-.stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
-.stat .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-.stat .source { font-size: 11px; color: #555; letter-spacing: 0.04em; }
+/* buttons */
+.btn{font-family:var(--body);font-size:15px;font-weight:700;padding:14px 30px;border-radius:8px;display:inline-block;border:0;cursor:pointer;transition:background .2s,transform .1s,border-color .2s;text-align:center}
+.btn-primary{background:var(--cyan);color:var(--bg)}
+.btn-primary:hover{background:var(--cyan-lt);color:var(--bg);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--text)}
+.btn-ghost:hover{background:var(--bg3);border-color:rgba(255,255,255,.28);color:var(--text)}
 
-section { padding: 80px 0; }
-.section-dark { background: var(--bg2); }
-.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
-.section-sub { text-align: center; color: var(--muted); font-size: 16px; margin-bottom: 48px; }
+/* header */
+header{position:sticky;top:0;z-index:30;background:rgba(13,13,13,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:32px;width:auto}
+.brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
+header .btn{font-size:14px;padding:10px 20px;white-space:nowrap}
 
-.calc-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 48px; max-width: 520px; margin: 0 auto; }
-.slider-group { margin-bottom: 24px; }
-.slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.slider-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-.slider-val { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; }
-input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--bg3); border-radius: 4px; outline: none; }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
-.calc-results { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
-.calc-results .small-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
-.calc-results .big-num { font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: var(--red); }
-.calc-results .big-num span { font-size: 24px; }
-.calc-row { display: flex; justify-content: center; gap: 40px; margin-top: 16px; }
-.calc-row .item { text-align: center; }
-.calc-row .item .val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
-.calc-row .item .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.calc-cta { text-align: center; margin-top: 28px; }
+/* hero */
+.hero{padding:72px 0 64px}
+.hero-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:56px;align-items:start}
+.switch{display:inline-flex;gap:6px;padding:6px;background:var(--bg2);border:1px solid var(--line);border-radius:100px;margin-bottom:28px;flex-wrap:wrap}
+.switch button{font-family:var(--body);font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:100px;border:0;cursor:pointer;background:var(--bg3);color:var(--muted);transition:background .2s,color .2s}
+.switch button[aria-selected="true"]{background:var(--blue);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
+.stat{background:var(--bg);padding:24px 14px}
+.stat b{display:block;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.2;margin-bottom:6px}
+.stat .lbl{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.stat .src{font-size:11px;color:var(--faint)}
 
-.split-section { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-.split-left h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 32px; }
-.steps-list { display: flex; flex-direction: column; gap: 0; }
-.step-row { display: flex; align-items: flex-start; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); }
-.step-row:last-child { border-bottom: none; }
-.step-num { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: var(--accent); line-height: 1; min-width: 56px; }
-.step-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
-.step-content p { font-size: 14px; color: var(--muted); }
+/* phone */
+.mock{display:flex;gap:20px;align-items:flex-start;justify-content:flex-end;flex-wrap:wrap}
+.phone{flex:0 0 216px;width:216px;background:var(--bg2);border:1px solid var(--line);border-radius:34px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.screen{background:var(--bg);border-radius:26px;padding:14px 16px 20px;text-align:center}
+.notch{width:62px;height:5px;background:#2a2a2a;border-radius:100px;margin:0 auto 18px}
+.statusbar{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:34px}
+.mini{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
+.callnum{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.01em;margin:10px 0 2px}
+.callmeta{font-size:11px;color:var(--muted);margin-bottom:24px}
+.wave{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:34px;margin-bottom:20px}
+.wave i{width:3px;border-radius:100px;background:var(--blue);display:block}
+.fwd{font-size:12px;color:var(--muted);padding-bottom:8px}
+.thread{flex:1 1 236px;min-width:216px;display:flex;flex-direction:column;gap:10px;padding-top:26px}
+.bub{font-size:12.5px;line-height:1.55;padding:11px 14px;max-width:94%}
+.row-them{display:flex;justify-content:flex-start}
+.row-us{display:flex;justify-content:flex-end}
+.bub-them{background:var(--bg3);color:var(--text);border:1px solid var(--line);border-radius:14px 14px 14px 4px}
+.bub-us{background:var(--blue);color:#fff;border-radius:14px 14px 4px 14px}
+.dispatch{margin-top:14px;padding-top:16px;border-top:1px solid var(--line)}
+.dispatch .card{background:var(--bg2);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:12px;line-height:1.6;margin-top:8px}
 
-.demo-box { background: var(--bg2); border: 1px solid var(--accent); border-radius: 16px; padding: 36px; text-align: center; position: relative; overflow: hidden; }
-.demo-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #5DCAA5); }
-.demo-badge { display: inline-block; background: var(--accent-glow); color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 16px; border-radius: 100px; margin-bottom: 16px; }
-.demo-box h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-.demo-phone { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin: 12px 0; }
-.demo-phone a { color: #E24B4A; font-weight: 700; text-decoration: none; }
-.demo-phone a:hover { text-decoration: underline; }
-.demo-box > p { color: var(--muted); font-size: 14px; max-width: 400px; margin: 0 auto; }
-.demo-note { background: rgba(29, 185, 84, 0.08); border: 1px solid rgba(29, 185, 84, 0.2); border-radius: 10px; padding: 14px 18px; margin-top: 20px; font-size: 12px; color: var(--muted); line-height: 1.7; text-align: left; }
-.demo-note strong { color: var(--text); }
-.demo-cta { margin-top: 20px; }
+/* cards */
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.gp{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:24px}
+.card p{font-size:13px;color:var(--muted);line-height:1.6}
+.tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:4px 10px;border-radius:100px;margin-bottom:12px;background:var(--blue-glow);color:var(--text)}
+.pts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.pt{font-size:13px;color:var(--muted);line-height:1.55;display:flex;gap:8px}
+.pt span:first-child{color:var(--faint)}
 
-.calendar-section { padding: 60px 0; }
-.calendar-wrapper { max-width: 800px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-.calendar-wrapper iframe { border: 0; width: 100%; height: 500px; }
-.calendar-label { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 12px; }
+/* calculator */
+.calc{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:48px;max-width:520px;margin:0 auto}
+.field{margin-bottom:24px}
+.field .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px}
+.field .name{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.field .val{font-family:var(--display);font-size:16px;font-weight:700}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:#2a2a2a;border-radius:4px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--blue);border-radius:50%;cursor:pointer;border:0}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue);border-radius:50%;cursor:pointer;border:0}
+.result{text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+.loss{font-family:var(--display);font-size:48px;font-weight:700;color:var(--red);line-height:1.15}
+.loss em{font-size:24px;font-style:normal}
+.figs{display:flex;justify-content:center;gap:32px;margin-top:16px;flex-wrap:wrap}
+.figs b{display:block;font-family:var(--display);font-size:20px;font-weight:700}
+.figs span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.note{font-size:12px;color:var(--faint);text-align:center;line-height:1.7;margin-top:20px}
 
-.forward-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
-.forward-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-.forward-card .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 100px; margin-bottom: 12px; background: var(--accent-glow); color: var(--accent); }
-.forward-card .tag.popular { background: rgba(226, 75, 74, 0.12); color: var(--red); }
-.forward-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-.forward-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+/* demo */
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:48px;align-items:start}
+.steps .step{display:flex;align-items:flex-start;gap:24px;padding:24px 0;border-bottom:1px solid var(--line)}
+.steps .step:last-child{border-bottom:0}
+.steps b{font-family:var(--display);font-size:38px;font-weight:700;line-height:1;min-width:56px}
+.steps p{font-size:14px;color:var(--muted);line-height:1.6}
+.demo{background:var(--bg3);border:1px solid var(--blue);border-radius:16px;padding:36px;text-align:center;position:relative;overflow:hidden}
+.demo::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.demo .tag{margin-bottom:16px}
+.demo h2{font-size:24px}
+.demoline{font-family:var(--display);font-size:32px;font-weight:700;margin:12px 0}
+.demoline a{color:var(--red)}
+.demoline a:hover{color:var(--red);text-decoration:underline}
+.demo p{color:var(--muted);font-size:14px;max-width:400px;margin:0 auto;line-height:1.7}
+.demonote{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:14px 18px;margin-top:20px;font-size:12px;color:var(--muted);line-height:1.7;text-align:left}
 
-.custom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.custom-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; }
-.custom-icon { width: 40px; height: 40px; margin-bottom: 16px; }
-.custom-icon svg { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.custom-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-.custom-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+/* calendar */
+.calframe{max-width:800px;margin:0 auto;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.calframe iframe{border:0;width:100%;height:500px;display:block}
 
-.tags-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 48px; }
-.industry-tag { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 28px; font-size: 14px; font-weight: 500; }
+/* pricing */
+.tier{background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:28px 24px;display:flex;flex-direction:column}
+.tier.ent{border-color:var(--blue)}
+.tier .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tier .nm{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.pop{background:var(--blue-glow);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:100px;text-transform:uppercase}
+.price{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1;font-size:38px}
+.tier.ent .price{font-size:30px}
+.price em{font-size:15px;font-weight:400;color:var(--muted);letter-spacing:0;font-style:normal}
+.mins{font-size:13px;color:var(--muted);margin-top:8px}
+.feat{display:flex;flex-direction:column;gap:10px;margin:22px 0 24px}
+.feat div{font-size:13.5px;color:var(--muted);line-height:1.5;display:flex;gap:8px}
+.feat div span:first-child{color:var(--blue)}
+.tier .btn{margin-top:auto;padding:13px 22px}
+.terms{margin-top:28px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.terms p{font-size:13px;color:var(--muted);line-height:1.6}
 
-.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-.faq-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-.faq-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
-.faq-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+/* who */
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:48px}
+.tags div{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px 28px;font-size:14px;font-weight:500}
+.faq h3{color:var(--text);margin-bottom:8px;font-size:15px}
+.faq p{font-size:13px;color:var(--muted);line-height:1.7}
 
-.cta-section { padding: 100px 0; text-align: center; }
-.cta-section h2 { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 16px; }
-.cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
-.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* cta + footer */
+.final{padding:100px 0;text-align:center}
+.final h2{font-size:36px;line-height:1.1;margin-bottom:16px}
+.final p{color:var(--muted);font-size:16px;margin-bottom:32px}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+footer{padding:36px 0;border-top:1px solid var(--line)}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.foot img{height:28px;width:auto}
+.foot .tl{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-top:8px}
+.foot a,.foot .desc{font-size:13px;color:var(--muted)}
+.foot a:hover{color:var(--blue)}
 
-footer { padding: 32px 0; border-top: 1px solid var(--border); }
-.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.footer-inner .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; font-style: italic; }
-.footer-inner span { font-size: 13px; color: var(--muted); }
-
-@media (max-width: 768px) {
-  .stats-bar { grid-template-columns: 1fr; }
-  .split-section { grid-template-columns: 1fr; gap: 40px; }
-  .custom-grid { grid-template-columns: 1fr; }
-  .hero { padding: 80px 0 40px; }
-  .calc-box { padding: 32px 20px; }
-  .demo-phone { font-size: 26px; }
-  .calc-row { flex-direction: column; gap: 16px; }
-  .cta-buttons { flex-direction: column; align-items: center; }
-  .footer-inner { flex-direction: column; text-align: center; }
-  .hero-buttons { flex-direction: column; align-items: center; }
-  .calendar-wrapper iframe { height: 350px; }
+@media (max-width:720px){
+  section{padding:60px 0}
+  .hero{padding:48px 0}
+  .hero-grid{gap:40px}
+  .stats{grid-template-columns:1fr}
+  .calc{padding:28px 20px}
+  .split{gap:32px}
+  .mock{justify-content:flex-start}
+  h2{font-size:26px}
+  .final h2{font-size:28px}
+  .btns .btn{width:100%}
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero h1, .hero p, .demo-box, .step-row, .forward-card, .custom-card, .faq-card, .calc-box {
-    opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s ease forwards;
-  }
-  .hero h1 { animation-delay: 0.1s; }
-  .hero p { animation-delay: 0.2s; }
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
 }
-@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
-<!-- Hero -->
+<header>
+  <div class="bar">
+    <div class="brand">
+      <img src="logo-mark.png" alt="" width="32" height="32">
+      <span>VoiceCaptures</span>
+    </div>
+    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start free trial</a>
+  </div>
+</header>
+
 <div class="hero">
-  <div class="container">
-    <h1>You're missing calls.<br><span class="green">We answer them.</span></h1>
-    <p>VoiceCaptures is an AI voice agent that answers every call 24/7, qualifies the job, and books it straight into your calendar — so you never lose a lead to voicemail again.</p>
-    <div class="hero-buttons">
-      <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min audit →</a>
-      <a href="#demo" class="btn btn-outline">See how it works ↓</a>
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">AI voice agents for businesses that live on the phone</p>
+
+      <div class="switch" role="tablist" aria-label="Choose your sector">
+        <button type="button" role="tab" aria-selected="true" data-tab="home">Home services</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="food">Restaurants &amp; cafés</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="clinic">Clinics &amp; dental</button>
+      </div>
+
+      <h1>You're missing calls.<br>We answer them.</h1>
+      <p class="lede">An AI voice agent picks up every call, qualifies the caller, books the slot on your real calendar, and texts you the summary — on the number you already use.</p>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <p class="fine">14-day free trial. No credit card. Setup takes 10 minutes.</p>
+
+      <div class="stats">
+        <div class="stat"><b>32%</b><div class="lbl">Missed-call rate in healthcare, the highest of any industry</div><div class="src">CallRail benchmark report, 2025</div></div>
+        <div class="stat"><b>85%</b><div class="lbl">Of callers whose call goes unanswered never call back</div><div class="src">CallRail benchmark report, 2025</div></div>
+        <div class="stat"><b>59.9%</b><div class="lbl">Answer rate across 12,091 analyzed restaurant calls</div><div class="src">Revmo, State of Restaurant Calls, 2026</div></div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Stats -->
-<div class="stats-bar">
-  <div class="stat"><div class="num">$75B</div><div class="label">Lost annually to unanswered business calls</div><div class="source">Source: Forbes</div></div>
-  <div class="stat"><div class="num">85%</div><div class="label">Of callers won't leave voicemail — they call competitors</div><div class="source">Source: Forbes</div></div>
-  <div class="stat"><div class="num">62%</div><div class="label">Of customer calls happen outside business hours</div><div class="source">Source: HomeAdvisor</div></div>
-</div>
-
-<!-- Calculator -->
-<section>
-  <div class="container">
-    <h2 class="section-title">See exactly what you're losing.</h2>
-    <p class="section-sub">Adjust the sliders to match your business.</p>
-    <div class="calc-box">
-      <div class="slider-group">
-        <div class="slider-header"><span class="slider-label">Monthly calls received</span><span class="slider-val" id="calls-val">600</span></div>
-        <input type="range" min="50" max="2000" value="600" id="calls-slider" oninput="updateCalc()">
-      </div>
-      <div class="slider-group">
-        <div class="slider-header"><span class="slider-label">Average job value</span><span class="slider-val" id="job-val">$325</span></div>
-        <input type="range" min="50" max="2000" value="325" id="job-slider" oninput="updateCalc()">
-      </div>
-      <div class="slider-group">
-        <div class="slider-header"><span class="slider-label">Missed call rate</span><span class="slider-val" id="rate-val">28%</span></div>
-        <input type="range" min="5" max="60" value="28" id="rate-slider" oninput="updateCalc()">
-      </div>
-      <div class="calc-results">
-        <div class="small-label">You're losing roughly</div>
-        <div class="big-num" id="total-loss">~$16,464<span>/mo</span></div>
-        <div class="calc-row">
-          <div class="item"><div class="val" id="missed-count">~168 calls/mo</div><div class="lbl">Missed calls</div></div>
-          <div class="item"><div class="val" id="per-call">~$98</div><div class="lbl">Cost per missed call</div></div>
+    <div class="mock">
+      <div class="phone">
+        <div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>9:41</span><span>Tue 14 Oct</span></div>
+          <div class="mini">Incoming call</div>
+          <div class="callnum" id="m-num">+1 (416) 555-0182</div>
+          <div class="callmeta" id="m-meta">Mobile · Toronto, ON</div>
+          <div class="wave" aria-hidden="true">
+            <i style="height:10px;opacity:.84"></i><i style="height:18px;opacity:.79"></i><i style="height:26px;opacity:.89"></i><i style="height:34px;opacity:1"></i><i style="height:22px;opacity:.84"></i><i style="height:30px;opacity:.95"></i><i style="height:16px;opacity:.76"></i><i style="height:24px;opacity:.87"></i><i style="height:12px;opacity:.71"></i>
+          </div>
+          <div class="fwd">Forwarded to VoiceCaptures</div>
         </div>
       </div>
-      <div class="calc-cta"><a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn" style="margin-top:8px;">Book a free 15-min audit →</a></div>
-    </div>
-  </div>
-</section>
-
-<!-- How it works + Demo side by side -->
-<section class="section-dark" id="demo">
-  <div class="container">
-    <div class="split-section">
-      <div class="split-left">
-        <h2>How it works</h2>
-        <div class="steps-list">
-          <div class="step-row">
-            <div class="step-num">01</div>
-            <div class="step-content"><h3>Customer calls your number</h3><p>Same number they've always used</p></div>
-          </div>
-          <div class="step-row">
-            <div class="step-num">02</div>
-            <div class="step-content"><h3>You answer — or the AI does</h3><p>Calls forward when you're busy, on a job, or after hours</p></div>
-          </div>
-          <div class="step-row">
-            <div class="step-num">03</div>
-            <div class="step-content"><h3>AI collects every detail</h3><p>Name, phone, address, issue — confirms each piece</p></div>
-          </div>
-          <div class="step-row">
-            <div class="step-num">04</div>
-            <div class="step-content"><h3>Checks your real calendar and books</h3><p>Offers open slots live on the call</p></div>
-          </div>
-          <div class="step-row">
-            <div class="step-num">05</div>
-            <div class="step-content"><h3>You get a text with everything</h3><p>Customer gets a confirmation text too</p></div>
-          </div>
+      <div class="thread">
+        <div class="mini">On the call</div>
+        <div id="m-thread">
+          <div class="row-them"><div class="bub bub-them">Hi — kitchen sink is backing up. Any chance someone can come today?</div></div>
+          <div class="row-us"><div class="bub bub-us">I can get a tech out today. What's the service address?</div></div>
+          <div class="row-them"><div class="bub bub-them">412 Bathurst St, Unit 3.</div></div>
+          <div class="row-us"><div class="bub bub-us">Booked — today, 2:30–4:30 PM. Confirmation sent to your phone.</div></div>
         </div>
-      </div>
-
-      <div>
-        <div class="demo-box">
-          <div class="demo-badge">Live demo — try it now</div>
-          <h2>Call and hear it yourself</h2>
-          <div class="demo-phone"><a href="tel:+19592156754">+1 (959) 215-6754</a></div>
-          <p>Pretend you're a customer with a plumbing emergency or a routine booking. You'll get a text summary when it's done.</p>
-          <div class="demo-note">
-            <strong>How the demo works:</strong> This number is connected to the live calendar below — it checks real availability and books real appointments in real-time. When you sign up, we connect it to your Google Calendar so it checks and books on yours. The voice, greeting, hours, appointment length, and services are all customizable.
-          </div>
-          <div class="demo-cta">
-            <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min audit →</a>
-          </div>
+        <div class="dispatch">
+          <div class="mini">Text to you</div>
+          <div class="card" id="m-sms">NEW JOB — Marcus T. · 416-555-0182 · 412 Bathurst St Unit 3 · Kitchen sink backup · Today 2:30–4:30 PM</div>
         </div>
       </div>
     </div>
   </div>
-</section>
-
-<!-- Live Calendar -->
-<div class="calendar-section">
-  <div class="container">
-    <h2 class="section-title">See it in action.</h2>
-    <p class="calendar-label">Live demo calendar — <span style="color: var(--accent); font-weight: 700;">refresh this page after your call to see your booking appear</span></p>
-    <div class="calendar-wrapper">
-      <iframe src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&ctz=America%2FToronto&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&bgcolor=%23161616&color=%231DB954" frameborder="0" scrolling="no"></iframe>
-    </div>
-  </div>
 </div>
 
-<!-- Call Forwarding -->
+<section class="alt">
+  <div class="wrap">
+    <h2 class="center">Three bad options</h2>
+    <p class="sub">Every way of handling the phone without an agent costs you something.</p>
+    <div class="grid g3" id="bad"></div>
+  </div>
+</section>
+
 <section>
-  <div class="container">
-    <h2 class="section-title">Call forwarding — your way</h2>
-    <p class="section-sub">Keep your existing number. Choose when the AI picks up.</p>
-    <div class="forward-grid">
-      <div class="forward-card">
-        <div class="tag popular">Most popular</div>
-        <h3>When you don't answer</h3>
-        <p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over.</p>
+  <div class="wrap">
+    <h2 class="center">See exactly what you're losing.</h2>
+    <p class="sub">The sliders start on typical numbers for <span id="c-short">home service businesses</span>.</p>
+    <div class="calc">
+      <div class="field">
+        <div class="head"><label class="name" for="s-calls">Monthly calls received</label><span class="val" id="v-calls">300</span></div>
+        <input type="range" id="s-calls" min="50" max="3000" step="10" value="300">
       </div>
-      <div class="forward-card">
-        <div class="tag">After hours</div>
-        <h3>Always forward</h3>
-        <p>Send all calls to the AI. Toggle on for evenings, weekends, holidays. Toggle off when available.</p>
+      <div class="field">
+        <div class="head"><label class="name" for="s-value" id="l-value">Average job value</label><span class="val" id="v-value">$450</span></div>
+        <input type="range" id="s-value" min="50" max="2000" step="25" value="450">
       </div>
-      <div class="forward-card">
-        <div class="tag">Busy on a job</div>
-        <h3>When you're on another call</h3>
-        <p>Already on the phone? The AI catches the second call so you never miss a lead.</p>
+      <div class="field">
+        <div class="head"><label class="name" for="s-rate">Missed call rate</label><span class="val" id="v-rate">14%</span></div>
+        <input type="range" id="s-rate" min="5" max="70" value="14">
       </div>
-      <div class="forward-card">
-        <div class="tag">Dead zone</div>
-        <h3>When your phone is off</h3>
-        <p>In a basement or out of service? Calls forward automatically when your phone can't be reached.</p>
+      <div class="field" id="f-new" hidden>
+        <div class="head"><label class="name" for="s-new">% of calls from new patients</label><span class="val" id="v-new">35%</span></div>
+        <input type="range" id="s-new" min="5" max="80" value="35">
+      </div>
+
+      <div class="result">
+        <div class="name" style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px">You're losing roughly</div>
+        <div class="loss"><span id="v-loss">~$5,670</span><em>/mo</em></div>
+        <div class="figs" id="figs"></div>
+      </div>
+      <div class="center" style="margin-top:28px">
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      </div>
+      <p class="note" id="c-note">Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="demo">
+  <div class="wrap split">
+    <div>
+      <h2 style="font-size:28px;margin-bottom:32px">How it works</h2>
+      <div class="steps">
+        <div class="step"><b>01</b><div><h3>Customer calls your number</h3><p>Same number they've always used</p></div></div>
+        <div class="step"><b>02</b><div><h3>You answer — or the AI does</h3><p>Calls forward when you're busy, on a job, or after hours</p></div></div>
+        <div class="step"><b>03</b><div><h3>AI collects every detail</h3><p>Confirms each piece back to the caller as it goes</p></div></div>
+        <div class="step"><b>04</b><div><h3>Checks your real calendar and books</h3><p>Offers genuinely open slots live on the call</p></div></div>
+        <div class="step"><b>05</b><div><h3>You get a text with everything</h3><p>Customer gets a confirmation text too</p></div></div>
+      </div>
+    </div>
+    <div class="demo">
+      <span class="tag" id="d-tag">Live demo — try it now</span>
+      <h2 id="d-title">Call and hear it yourself</h2>
+      <div class="demoline" id="d-line"><a href="tel:+19592156754">+1 (959) 215-6754</a></div>
+      <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
+      <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
+      <div style="margin-top:20px">
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Everything adapts -->
-<section class="section-dark">
-  <div class="container">
-    <h2 class="section-title">Everything adapts to you</h2>
-    <p class="section-sub">Customize every part of the experience to match your business.</p>
-    <div class="custom-grid">
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
-        <h3>Your voice</h3>
-        <p>Choose from multiple AI voices — male, female, different tones. Pick what fits your brand.</p>
-      </div>
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-        <h3>Your calendar</h3>
-        <p>Connects to Google Calendar — only offers times you're actually free.</p>
-      </div>
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <h3>Your hours</h3>
-        <p>Set business hours — AI won't book outside them. 7 AM to 10 PM, 9 to 5, whatever you need.</p>
-      </div>
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        <h3>Your appointment length</h3>
-        <p>2-hour, 1-hour, or 30-minute slots — match how long your jobs actually take.</p>
-      </div>
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <h3>Your greeting</h3>
-        <p>Answers with your business name and your preferred opening. Sounds like your front desk.</p>
-      </div>
-      <div class="custom-card">
-        <div class="custom-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-        <h3>Your services</h3>
-        <p>Plumbing, HVAC, electrical, contracting — knows what you do, stays on topic.</p>
-      </div>
+<section class="alt" id="cal-section">
+  <div class="wrap">
+    <h2 class="center">See it in action.</h2>
+    <p class="sub" style="font-size:13px;margin-bottom:24px">Live demo calendar — <strong style="color:var(--text)">refresh this page after your call to see your booking appear</strong></p>
+    <div class="calframe">
+      <iframe title="Live demo calendar" loading="lazy" src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&amp;ctz=America%2FToronto&amp;mode=WEEK&amp;showTitle=0&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;bgcolor=%23161616&amp;color=%232563EB"></iframe>
     </div>
   </div>
 </section>
 
-<!-- Who it's for -->
 <section>
-  <div class="container">
-    <h2 class="section-title">Who it's for</h2>
-    <p class="section-sub">If your phone is your business, VoiceCaptures is for you.</p>
-    <div class="tags-row">
-      <div class="industry-tag">Plumbing</div>
-      <div class="industry-tag">HVAC</div>
-      <div class="industry-tag">Electrical</div>
-      <div class="industry-tag">Roofing</div>
-      <div class="industry-tag">Pest Control</div>
-      <div class="industry-tag">Landscaping</div>
-      <div class="industry-tag">General Contracting</div>
-      <div class="industry-tag">Locksmith</div>
-    </div>
-    <div class="faq-grid">
-      <div class="faq-card">
-        <h3>"Will it sound robotic?"</h3>
-        <p>No. VoiceCaptures uses the latest conversational AI — callers think they're talking to a real person. We'll let you hear it yourself before you go live.</p>
-      </div>
-      <div class="faq-card">
-        <h3>"What if I already have a receptionist?"</h3>
-        <p>Great — we handle overflow and after-hours so they never miss a call. Think of us as your always-on backup that never calls in sick.</p>
-      </div>
-      <div class="faq-card">
-        <h3>"How long does setup take?"</h3>
-        <p>Most businesses are live within 10 minutes. We handle everything — you just forward your line and start booking jobs.</p>
-      </div>
+  <div class="wrap">
+    <h2 class="center">Call forwarding — your way</h2>
+    <p class="sub">Keep your existing number. Choose when the AI picks up.</p>
+    <div class="grid g4">
+      <div class="card"><span class="tag">Most popular</span><h3>When you don't answer</h3><p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over.</p></div>
+      <div class="card"><span class="tag">After hours</span><h3>Always forward</h3><p>Send all calls to the AI. Toggle on for evenings, weekends, holidays. Toggle off when available.</p></div>
+      <div class="card"><span class="tag">Busy on a job</span><h3>When you're on another call</h3><p>Already on the phone? The AI catches the second call so you never miss a lead.</p></div>
+      <div class="card"><span class="tag">Dead zone</span><h3>When your phone is off</h3><p>In a basement or out of service? Calls forward automatically when your phone can't be reached.</p></div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<div class="cta-section">
-  <div class="container">
+<section class="alt">
+  <div class="wrap">
+    <h2 class="center">Everything adapts to you</h2>
+    <p class="sub">One agent, configured per business. Nothing about it is generic.</p>
+    <div class="grid g3">
+      <div class="card"><h3>Your voice</h3><p>Choose from multiple AI voices — male, female, different tones. Pick what fits your brand.</p></div>
+      <div class="card"><h3>Your calendar</h3><p>Connects to Google Calendar — only offers times you're actually free.</p></div>
+      <div class="card"><h3>Your hours</h3><p>Set business hours and the AI won't book outside them. 7 AM to 10 PM, 9 to 5, whatever you need.</p></div>
+      <div class="card"><h3>Your appointment length</h3><p>2-hour, 1-hour, or 30-minute slots — match how long your jobs actually take.</p></div>
+      <div class="card"><h3>Your greeting</h3><p>Answers with your business name and your preferred opening. Sounds like your front desk.</p></div>
+      <div class="card"><h3>Your scope</h3><p>It knows what you offer and what you don't, and stays inside that.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="center">Pricing</h2>
+    <p class="sub">Month to month. Cancel anytime.</p>
+    <div class="grid gp" id="tiers"></div>
+    <div class="terms">
+      <p id="setup-line">Setup $149 one-time — waived for our first 10 clients.</p>
+      <p>Overage $0.35/min. Most calls run 1–3 minutes.</p>
+      <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="center">Who it's for</h2>
+    <p class="sub">If your phone is your business, VoiceCaptures is for you.</p>
+    <div class="tags">
+      <div>Plumbing</div><div>HVAC</div><div>Electrical</div><div>Roofing</div><div>Pest Control</div><div>Landscaping</div><div>General Contracting</div><div>Locksmith</div><div>Restaurants</div><div>Coffee Shops</div><div>Catering</div><div>Dental</div><div>Medical Clinics</div><div>Physio &amp; Chiro</div>
+    </div>
+    <div class="grid g3 faq">
+      <div class="card"><h3>Will it sound robotic?</h3><p>It runs on current conversational voice models, and most callers don't register that it isn't a person. Call the live demo line and judge it for yourself before you commit to anything.</p></div>
+      <div class="card"><h3>What if I already have a receptionist?</h3><p>It takes overflow and after-hours rather than replacing anyone. Your team keeps the calls they can reach, and nothing rings out when they can't.</p></div>
+      <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
+      <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
+      <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
+      <div class="card"><h3>What happens after the trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
+      <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
+      <div class="card"><h3>What about my sector?</h3><p>These three are what we run today, and restaurants and clinics are pilots. If yours is close, start the trial and we'll tell you honestly whether it fits.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="final">
+  <div class="wrap">
     <h2>Ready to stop losing jobs<br>to voicemail?</h2>
-    <p>Set up takes 10 minutes. Try the demo first, then let's talk.</p>
-    <div class="cta-buttons">
-      <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" class="btn">Book a free 15-min audit →</a>
-      <a href="tel:+19592156754" class="btn btn-outline">Try the live demo →</a>
+    <p>Set up takes 10 minutes. Hear it first, then start the trial.</p>
+    <div class="btns">
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <a class="btn btn-ghost" id="final-demo" href="tel:+19592156754">Try the live demo</a>
     </div>
   </div>
 </div>
 
-<!-- Footer -->
 <footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="logo">VoiceCaptures</div>
-      <span>hello@voicecaptures.com</span>
-      <span>AI voice agents for home service businesses</span>
+  <div class="wrap foot">
+    <div>
+      <div class="brand"><img src="logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
+      <div class="tl">Answers · Qualifies · Books</div>
     </div>
+    <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
+    <span class="desc">AI voice agents for home services, hospitality and clinics</span>
   </div>
 </footer>
 
 <script>
-function updateCalc() {
-  const calls = parseInt(document.getElementById('calls-slider').value);
-  const job = parseInt(document.getElementById('job-slider').value);
-  const rate = parseInt(document.getElementById('rate-slider').value);
-  document.getElementById('calls-val').textContent = calls.toLocaleString();
-  document.getElementById('job-val').textContent = '$' + job.toLocaleString();
-  document.getElementById('rate-val').textContent = rate + '%';
-  const missed = Math.round(calls * rate / 100);
-  const bookingRate = 0.3;
-  const perCall = Math.round(job * bookingRate);
-  const total = missed * perCall;
-  document.getElementById('missed-count').textContent = '~' + missed + ' calls/mo';
-  document.getElementById('per-call').textContent = '~$' + perCall.toLocaleString();
-  document.getElementById('total-loss').innerHTML = '~$' + total.toLocaleString() + '<span>/mo</span>';
+(function(){
+"use strict";
+
+var CAL = "https://calendly.com/hello-voicecaptures/30min";
+
+var V = {
+  home: {
+    short: "home service businesses", setup: "$149",
+    num: "+1 (416) 555-0182", meta: "Mobile · Toronto, ON",
+    convo: [
+      ["them","Hi — kitchen sink is backing up. Any chance someone can come today?"],
+      ["us","I can get a tech out today. What's the service address?"],
+      ["them","412 Bathurst St, Unit 3."],
+      ["us","Booked — today, 2:30–4:30 PM. Confirmation sent to your phone."]
+    ],
+    sms: "NEW JOB — Marcus T. · 416-555-0182 · 412 Bathurst St Unit 3 · Kitchen sink backup · Today 2:30–4:30 PM",
+    bad: [
+      ["Answer every call yourself",["The phone rings while you are under a sink.","Hands are wet, dirty, or holding a wrench.","Quoting on the phone stalls the job you are on."]],
+      ["Send them to voicemail",["85% of callers never call back.","The next name on Google answers instead.","You return the call at 8 PM to a booked customer."]],
+      ["Pay a traditional answering service",["Takes a message; cannot see your calendar.","Reads a script; cannot triage an emergency.","Billed per minute on calls that never convert."]]
+    ],
+    calls: 300, value: 450, rate: 14, conv: 0.30, newPct: null,
+    valueLabel: "Average job value", valueMin: 50, valueMax: 2000, valueStep: 25,
+    note: "Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.",
+    hasNumber: true, demoNumber: "+1 (959) 215-6754", tel: "tel:+19592156754",
+    demoTag: "Live demo — try it now",
+    demoTitle: "Call and hear it yourself",
+    demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
+    demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
+    demoCta: "Start your 14-day free trial",
+    tiers: [
+      ["Solo","$149","300 minutes",["After-hours and overflow coverage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
+      ["Crew","$279","800 minutes",["Everything in Solo","Full-day coverage","Emergency vs. routine triage","Call transfer to you or your team","Priority support"]],
+      ["Fleet","$449","1,800 minutes",["Everything in Crew","Multiple calendars","Multiple technicians","Custom call flows"]]
+    ]
+  },
+  food: {
+    short: "restaurants and cafés", setup: "$199",
+    num: "+1 (647) 555-0294", meta: "Mobile · Toronto, ON",
+    convo: [
+      ["them","Do you do catering? I need coffee and pastries for about 40 people Thursday morning."],
+      ["us","We do. Forty people, Thursday — what time and where should we deliver?"],
+      ["them","9 AM, 250 University Ave, 12th floor."],
+      ["us","Got it. The owner will confirm pricing within the hour — I've sent them everything."]
+    ],
+    sms: "CATERING LEAD — Priya S. · 647-555-0294 · 40 people · Thu 9 AM · 250 University Ave, 12th flr · Coffee + pastries · Call back to quote",
+    bad: [
+      ["Answer every call yourself",["Peak call time is peak service time.","The host leaves the door to take a reservation.","A server holds the phone while tables wait."]],
+      ["Send them to voicemail",["Nobody leaves a voicemail to book a table tonight.","Catering enquiries go to the next café.","Guests read \u201cnobody answers\u201d as bad service."]],
+      ["Pay a traditional answering service",["Does not know Thursday is already full.","Cannot answer a menu or dietary question.","Leaves a message you read after close."]]
+    ],
+    calls: 400, value: 45, rate: 28, conv: 0.60, newPct: null,
+    valueLabel: "Average order or cover value", valueMin: 15, valueMax: 400, valueStep: 5,
+    note: "Assumes 60% of answered calls convert to an order or booking — phone callers to a restaurant are usually ready to buy.",
+    hasNumber: false,
+    demoTag: "Pilot — demo on request",
+    demoTitle: "Hear the hospitality agent",
+    demoBody: "We'll set up a demo line so you can call in as a guest booking a table for four on Friday, or ordering pickup.",
+    demoNote: "The restaurant agent is a pilot. Menu, hours and cover limits are configured per venue, and it books and takes callback details — it does not process payments or write to a POS.",
+    demoCta: "Request a restaurant demo",
+    tiers: [
+      ["Counter","$179","400 minutes",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
+      ["Service","$299","1,000 minutes",["Everything in Counter","Full-day coverage","Large-party and catering routing","Call transfer to the floor","Priority support"]],
+      ["Group","$499","2,200 minutes",["Everything in Service","Multiple locations","Custom call flows","Per-venue configuration"]]
+    ]
+  },
+  clinic: {
+    short: "clinics and dental practices", setup: "$349",
+    num: "+1 (905) 555-0147", meta: "Mobile · Mississauga, ON",
+    convo: [
+      ["them","Are you taking new patients? I'd like to book a cleaning."],
+      ["us","We are. I can book you in — can I get your name and a callback number?"],
+      ["them","Sarah Chen, 905-555-0147."],
+      ["us","Booked — Thursday, 10:00 AM. Confirmation sent to your phone."]
+    ],
+    sms: "NEW PATIENT — Sarah Chen · 905-555-0147 · Cleaning · Thu 10:00 AM · Booked",
+    bad: [
+      ["Answer every call yourself",["Front desk is with a patient at the counter.","On hold with an insurer for twenty minutes.","The phone rings out from five o'clock onward."]],
+      ["Send them to voicemail",["85% of patients never call back.","The practice two blocks away picks up.","Six voicemails are waiting at 8 AM Monday."]],
+      ["Pay a traditional answering service",["Takes a message; does not book the slot.","No view of which providers are free.","Priced per minute, not per booking."]]
+    ],
+    calls: 600, value: 300, rate: 32, conv: 0.45, newPct: 35,
+    valueLabel: "Average visit value", valueMin: 60, valueMax: 1500, valueStep: 10,
+    note: "Assumes 45% of answered new-patient calls become a booked appointment; the rest are admin, results and billing questions.",
+    hasNumber: false,
+    demoTag: "Pilot — demo on request",
+    demoTitle: "Clinic agent, built per practice",
+    demoBody: "We stand up a demo line configured for your specialty, your providers and your booking rules, then hand you the number to call.",
+    demoNote: "The clinic agent is a pilot, scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
+    demoCta: "Request a clinic demo",
+    tiers: [
+      ["Practice","$299","600 minutes",["After-hours and reception overflow","New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk"]],
+      ["Practice+","$499","1,500 minutes",["Everything in Practice","Full-day coverage","Multiple providers","Escalation rules configured per practice","Priority support"]],
+      ["Group","$749","3,000 minutes",["Everything in Practice+","Multiple locations","Multiple calendars","Custom booking rules"]]
+    ]
+  }
+};
+
+var ENTERPRISE = ["Enterprise","Custom","Tailored to your volume",
+  ["Multi-location deployments","Custom integrations","Dedicated onboarding","SLA"]];
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ var d = document.createElement("div"); d.textContent = s; return d.innerHTML; };
+var money = function(n){ return "$" + Math.round(n).toLocaleString("en-US"); };
+
+var key = "home";
+var state = { calls: 0, value: 0, rate: 0, newPct: 35 };
+
+function renderBad(v){
+  $("bad").innerHTML = v.bad.map(function(c){
+    return '<div class="card"><h3>' + esc(c[0]) + '</h3><div class="pts">' +
+      c[1].map(function(p){ return '<div class="pt"><span>–</span><span>' + esc(p) + '</span></div>'; }).join("") +
+      '</div></div>';
+  }).join("");
 }
+
+function renderThread(v){
+  $("m-num").textContent = v.num;
+  $("m-meta").textContent = v.meta;
+  $("m-sms").textContent = v.sms;
+  $("m-thread").innerHTML = v.convo.map(function(b){
+    var us = b[0] === "us";
+    return '<div class="' + (us ? "row-us" : "row-them") + '"><div class="bub ' +
+      (us ? "bub-us" : "bub-them") + '">' + esc(b[1]) + '</div></div>';
+  }).join("");
+}
+
+function renderDemo(v){
+  $("d-tag").textContent = v.demoTag;
+  $("d-title").textContent = v.demoTitle;
+  $("d-body").textContent = v.demoBody;
+  $("d-note").textContent = v.demoNote;
+  $("d-cta").textContent = v.demoCta;
+  var line = $("d-line");
+  if (v.hasNumber) {
+    line.hidden = false;
+    line.innerHTML = '<a href="' + v.tel + '">' + esc(v.demoNumber) + "</a>";
+  } else {
+    line.hidden = true;
+    line.innerHTML = "";
+  }
+  $("cal-section").hidden = !v.hasNumber;
+  $("final-demo").hidden = !v.hasNumber;
+}
+
+function renderTiers(v){
+  var all = v.tiers.concat([ENTERPRISE]);
+  $("tiers").innerHTML = all.map(function(t, n){
+    var ent = t[0] === "Enterprise";
+    var pop = n === 1;
+    return '<div class="tier' + (ent ? " ent" : "") + '">' +
+      '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
+      (pop ? '<span class="pop">Most popular</span>' : "") + "</div>" +
+      '<div class="price">' + esc(t[1]) + (ent ? "" : "<em>/mo</em>") + "</div>" +
+      '<div class="mins">' + esc(t[2]) + "</div>" +
+      '<div class="feat">' + t[3].map(function(f){
+        return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
+      }).join("") + "</div>" +
+      '<a class="btn ' + (pop ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
+      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start free trial") + "</a>" +
+      "</div>";
+  }).join("");
+  $("setup-line").textContent = "Setup " + v.setup + " one-time — waived for our first 10 clients.";
+}
+
+function calc(){
+  var v = V[key];
+  var missed = Math.round(state.calls * state.rate / 100);
+  var perCall = Math.round(state.value * v.conv);
+  var usesNew = v.newPct !== null;
+  var newCalls = usesNew ? Math.round(missed * state.newPct / 100) : 0;
+  var loss = usesNew ? newCalls * perCall : missed * perCall;
+
+  $("v-calls").textContent = state.calls.toLocaleString("en-US");
+  $("v-value").textContent = money(state.value);
+  $("v-rate").textContent = state.rate + "%";
+  $("v-new").textContent = state.newPct + "%";
+  $("v-loss").textContent = "~" + money(loss);
+
+  var figs = usesNew
+    ? [["~" + missed.toLocaleString("en-US"), "Missed calls/mo"],
+       ["~" + newCalls.toLocaleString("en-US"), "New-patient calls"],
+       [money(perCall), "Value per new patient"]]
+    : [["~" + missed.toLocaleString("en-US"), "Missed calls/mo"],
+       [money(perCall), "Value per missed call"]];
+
+  $("figs").innerHTML = figs.map(function(f){
+    return "<div><b>" + esc(f[0]) + "</b><span>" + esc(f[1]) + "</span></div>";
+  }).join("");
+}
+
+function loadCalc(v){
+  state.calls = v.calls; state.value = v.value; state.rate = v.rate;
+  state.newPct = v.newPct === null ? 35 : v.newPct;
+
+  $("s-calls").value = v.calls;
+  $("s-rate").value = v.rate;
+  $("s-new").value = state.newPct;
+
+  var sv = $("s-value");
+  sv.min = v.valueMin; sv.max = v.valueMax; sv.step = v.valueStep; sv.value = v.value;
+
+  $("l-value").textContent = v.valueLabel;
+  $("c-short").textContent = v.short;
+  $("c-note").textContent = v.note;
+  $("f-new").hidden = v.newPct === null;
+  calc();
+}
+
+function select(k){
+  key = k;
+  var v = V[k];
+  var tabs = document.querySelectorAll(".switch button");
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].setAttribute("aria-selected", tabs[i].getAttribute("data-tab") === k ? "true" : "false");
+  }
+  renderBad(v); renderThread(v); renderDemo(v); renderTiers(v); loadCalc(v);
+}
+
+document.querySelectorAll(".switch button").forEach(function(b){
+  b.addEventListener("click", function(){ select(b.getAttribute("data-tab")); });
+});
+
+$("s-calls").addEventListener("input", function(e){ state.calls = +e.target.value; calc(); });
+$("s-value").addEventListener("input", function(e){ state.value = +e.target.value; calc(); });
+$("s-rate").addEventListener("input", function(e){ state.rate = +e.target.value; calc(); });
+$("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value; calc(); });
+
+select("home");
+})();
 </script>
 
 </body>
