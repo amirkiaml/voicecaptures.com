@@ -492,7 +492,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
     <div class="terms">
       <p>All prices CAD, plus HST. Additional minutes $1.25.</p>
-      <p id="setup-line">Setup $149 — waived for founding clients.</p>
+      <p id="setup-line">Setup $149 — waived through December 2026.</p>
       <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
     </div>
   </div>
@@ -759,7 +759,7 @@ function renderTiers(v){
       '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start free month") + "</a>" +
       "</div>";
   }).join("");
-  $("setup-line").textContent = "Setup " + v.setup + " \u2014 waived for founding clients.";
+  $("setup-line").textContent = "Setup " + v.setup + " \u2014 waived through December 2026.";
   $("p-trades").textContent = v.trades;
   var pn = $("p-note");
   pn.textContent = v.priceNote || "";
