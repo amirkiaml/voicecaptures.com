@@ -92,7 +92,10 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .switch button[aria-selected="true"]{background:var(--blue);color:#fff}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
 .stat{background:var(--bg);padding:24px 14px}
-.stat b{display:block;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.2;margin-bottom:6px}
+.stat b{display:block;font-family:var(--display);font-weight:700;font-size:28px;
+  line-height:1.2;margin-bottom:6px;white-space:nowrap;letter-spacing:-.02em}
+.stat b.long{font-size:21px}
+.stat b.xlong{font-size:18px}
 .stat .lbl{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:6px}
 .stat .src{font-size:11px;color:var(--faint)}
 
@@ -263,9 +266,11 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   /* Stacked stats were one tall column; number and label side by side reads
      as a compact list instead. */
   .stats{grid-template-columns:1fr;margin-top:32px}
-  .stat{display:grid;grid-template-columns:auto 1fr;column-gap:14px;row-gap:2px;
+  .stat{display:grid;grid-template-columns:max-content 1fr;column-gap:14px;row-gap:2px;
         align-items:baseline;padding:15px 2px}
   .stat b{font-size:23px;margin-bottom:0;grid-row:1/span 2}
+  .stat b.long{font-size:18px}
+  .stat b.xlong{font-size:15.5px}
   .stat .lbl{font-size:11.5px;line-height:1.45;margin-bottom:0;grid-column:2}
   .stat .src{font-size:10.5px;grid-column:2}
 
@@ -296,8 +301,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   .foot{flex-direction:column;align-items:flex-start;gap:14px}
 }
 @media (max-width:400px){
-  .stat{grid-template-columns:66px 1fr;gap:11px}
+  .stat{grid-template-columns:max-content 1fr;column-gap:10px}
   .stat b{font-size:21px}
+  .stat b.long{font-size:17px}
+  .stat b.xlong{font-size:14.5px}
   h1{font-size:29px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -330,14 +337,14 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       </div>
 
       <h1>You're missing calls.<br>We answer them.</h1>
-      <p class="lede">An AI voice agent picks up every call, qualifies the caller, books the slot on your real calendar, and texts you the summary — on the number you already use.</p>
+      <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
       <p class="fine">First month free. No credit card. Setup takes 10 minutes.</p>
 
-      <div class="stats">
-        <div class="stat"><b>32%</b><div class="lbl">Missed-call rate in healthcare, the highest of any industry</div><div class="src">CallRail benchmark report, 2025</div></div>
+      <div class="stats" id="stats">
+        <div class="stat"><b>14%</b><div class="lbl">Missed-call rate in home services</div><div class="src">CallRail benchmark report, 2025</div></div>
         <div class="stat"><b>85%</b><div class="lbl">Of callers whose call goes unanswered never call back</div><div class="src">CallRail benchmark report, 2025</div></div>
-        <div class="stat"><b>59.9%</b><div class="lbl">Answer rate across 12,091 analyzed restaurant calls</div><div class="src">Revmo, State of Restaurant Calls, 2026</div></div>
+        <div class="stat"><b class="xlong">$500–$1,200</b><div class="lbl">Typical value of one missed service call</div><div class="src">answeringagent.com, 2026</div></div>
       </div>
     </div>
 
@@ -571,7 +578,13 @@ var V = {
     demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
     demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
     demoCta: "Start your first month free",
+    lede: "An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details \u2014 on the number you already use.",
     trades: "Plumbing \u00b7 HVAC \u00b7 Electrical \u00b7 Locksmith \u00b7 Garage door",
+    stats: [
+      ["14%","Missed-call rate in home services","CallRail benchmark report, 2025"],
+      ["85%","Of callers whose call goes unanswered never call back","CallRail benchmark report, 2025"],
+      ["$500\u2013$1,200","Typical value of one missed service call","answeringagent.com, 2026"]
+    ],
     tiers: [
       ["Starter","$179","150 minutes","After-hours",["After-hours and overflow coverage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
       ["Growth","$349","320 minutes","Full-day + overflow",["Everything in Starter","Full-day coverage","Emergency vs. routine triage","Call transfer to you or your team","Priority support"]],
@@ -602,7 +615,13 @@ var V = {
     demoBody: "We'll set up a demo line so you can call in as a guest booking a table for four on Friday, or ordering pickup.",
     demoNote: "The restaurant agent is a pilot. Menu, hours and cover limits are configured per venue, and it books and takes callback details — it does not process payments or write to a POS.",
     demoCta: "Request a restaurant demo",
+    lede: "An AI voice agent picks up every call, answers hours and menu questions, takes the reservation, and texts you every catering and large-order lead \u2014 on the number you already use.",
     trades: "Caf\u00e9s \u00b7 Restaurants \u00b7 Takeout",
+    stats: [
+      ["59.9%","Answer rate across 12,091 analyzed restaurant calls","Revmo, State of Restaurant Calls, 2026"],
+      ["$73,000","Lost per location each year to unanswered calls","Revmo, State of Restaurant Calls, 2026"],
+      ["69%","Of guests give up if no one answers the phone","Hostie, 2025"]
+    ],
     tiers: [
       ["Starter","$199","170 minutes","Single location",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
       ["Growth","$329","300 minutes","Busy single location",["Everything in Starter","Full-day coverage","Large-party and catering routing","Call transfer to the floor","Priority support"]],
@@ -633,7 +652,13 @@ var V = {
     demoBody: "We stand up a demo line configured for your specialty, your providers and your booking rules, then hand you the number to call.",
     demoNote: "The clinic agent is a pilot, scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
     demoCta: "Request a clinic demo",
+    lede: "An AI voice agent picks up every call, sorts new patients from returning ones, books into your real calendar, and texts your front desk the callback details \u2014 on the number you already use.",
     trades: "Dental \u00b7 Vet \u00b7 Physio \u00b7 Chiro",
+    stats: [
+      ["32%","Missed-call rate in healthcare, the highest of any industry","CallRail benchmark report, 2025"],
+      ["85%","Of callers whose call goes unanswered never call back","CallRail benchmark report, 2025"],
+      ["38%","Calls unanswered in an audit of a 26-location practice group","Peerlogic, 2026"]
+    ],
     priceNote: "No caller health information is stored or logged.",
     tiers: [
       ["Starter","$299","270 minutes","After-hours",["After-hours and reception overflow","New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk"]],
@@ -652,6 +677,16 @@ var money = function(n){ return "$" + Math.round(n).toLocaleString("en-US"); };
 
 var key = "home";
 var state = { calls: 0, value: 0, rate: 0, newPct: 35 };
+
+function renderStats(v){
+  $("lede").textContent = v.lede;
+  $("stats").innerHTML = v.stats.map(function(t){
+    var n = t[0].length;
+    var size = n > 9 ? " xlong" : (n > 6 ? " long" : "");
+    return '<div class="stat"><b class="' + size.trim() + '">' + esc(t[0]) + '</b><div class="lbl">' + esc(t[1]) +
+           '</div><div class="src">' + esc(t[2]) + "</div></div>";
+  }).join("");
+}
 
 function renderBad(v){
   $("bad").innerHTML = v.bad.map(function(c){
@@ -817,7 +852,7 @@ function select(k){
   for (var i = 0; i < tabs.length; i++) {
     tabs[i].setAttribute("aria-selected", tabs[i].getAttribute("data-tab") === k ? "true" : "false");
   }
-  renderBad(v); renderThread(v); renderDemo(v); renderTiers(v); loadCalc(v);
+  renderStats(v); renderBad(v); renderThread(v); renderDemo(v); renderTiers(v); loadCalc(v);
 }
 
 document.querySelectorAll(".switch button").forEach(function(b){
