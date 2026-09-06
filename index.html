@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoiceCaptures — AI voice agent that answers and books every call</title>
-<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. First month free, no credit card.">
+<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, no credit card.">
 <meta name="theme-color" content="#0d0d0d">
 <link rel="canonical" href="https://voicecaptures.com/">
 <link rel="icon" href="logo-mark.png">
@@ -12,10 +12,10 @@
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/">
 <meta property="og:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. First month free, no credit card.">
+<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. First month free, no credit card.">
+<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -311,6 +311,47 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   *{transition:none!important;animation:none!important}
   .anim .bub,.anim .card{opacity:1!important;transform:none!important}
 }
+
+/* Promo — amber, intentionally outside the blue/cyan system so it reads as
+   a time-limited offer rather than part of the product UI. */
+.promo-veil[hidden]{display:none}
+.promo-veil{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.68);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .28s ease}
+.promo-veil.on{opacity:1;pointer-events:auto}
+.promo{position:relative;width:100%;max-width:440px;background:#17130a;
+  border:1px solid #F59E0B;border-radius:16px;padding:32px 30px 28px;text-align:center;
+  box-shadow:0 26px 70px rgba(0,0,0,.65),0 0 0 1px rgba(245,158,11,.12);
+  transform:translateY(14px) scale(.985);transition:transform .28s cubic-bezier(.2,.7,.3,1)}
+.promo-veil.on .promo{transform:none}
+.promo::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:16px 16px 0 0;background:linear-gradient(90deg,#F59E0B,#FDE047)}
+.promo .tagline{display:inline-block;background:rgba(245,158,11,.14);color:#FCD34D;
+  font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 14px;border-radius:100px;margin-bottom:18px}
+.promo h3{font-family:var(--display);font-size:27px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.15;color:#fff;margin-bottom:12px}
+.promo h3 em{font-style:normal;color:#F59E0B}
+.promo p{font-size:14.5px;line-height:1.6;color:#c9bfa8;margin-bottom:22px}
+.promo .go{display:block;width:100%;background:#F59E0B;color:#17130a;
+  font-family:var(--body);font-size:15px;font-weight:700;padding:14px 24px;
+  border-radius:8px;border:0;cursor:pointer;transition:background .2s,transform .1s}
+.promo .go:hover{background:#FBBF24;color:#17130a;transform:translateY(-1px)}
+.promo .later{display:block;width:100%;margin-top:12px;background:none;border:0;cursor:pointer;
+  font-family:var(--body);font-size:13px;color:#8a8172;padding:6px}
+.promo .later:hover{color:#c9bfa8}
+.promo .shut{position:absolute;top:12px;right:14px;background:none;border:0;cursor:pointer;
+  color:#8a8172;font-size:22px;line-height:1;padding:4px 8px;font-family:var(--body)}
+.promo .shut:hover{color:#fff}
+.promo .terms-line{font-size:11.5px;color:#7d7566;margin:16px 0 0}
+@media (max-width:520px){
+  .promo{padding:28px 22px 24px}
+  .promo h3{font-size:23px}
+}
+@media (prefers-reduced-motion:reduce){
+  .promo-veil,.promo{transition:none}
+}
 </style>
 </head>
 <body>
@@ -321,7 +362,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <img src="logo-mark.png" alt="" width="32" height="32">
       <span>VoiceCaptures</span>
     </div>
-    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start free month</a>
+    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your free trial</a>
   </div>
 </header>
 
@@ -338,8 +379,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
       <h1>You're missing calls.<br>We answer them.</h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
-      <p class="fine">First month free. No credit card. Setup takes 10 minutes.</p>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <p class="fine">14 days free. No credit card. Setup takes 10 minutes.</p>
 
       <div class="stats" id="stats">
         <div class="stat"><b>14%</b><div class="lbl">Missed-call rate in home services</div><div class="src">CallRail benchmark report, 2025</div></div>
@@ -415,7 +456,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
         <div class="figs" id="figs"></div>
       </div>
       <div class="center" style="margin-top:28px">
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
       </div>
       <p class="note" id="c-note">Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.</p>
     </div>
@@ -437,11 +478,11 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
     <div class="demo">
       <span class="tag" id="d-tag">Live demo — try it now</span>
       <h2 id="d-title">Call and hear it yourself</h2>
-      <div class="demoline" id="d-line"><a href="tel:+19592156754">+1 (959) 215-6754</a></div>
+      <div class="demoline" id="d-line"><a href="tel:+16476921081">+1 (647) 692-1081</a></div>
       <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
       <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
       <div style="margin-top:20px">
-        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
       </div>
     </div>
   </div>
@@ -494,7 +535,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
     <div class="grid gp" id="tiers"></div>
 
     <div class="offer">
-      <b>First month free.</b> Full setup, real calls, your actual number. If it doesn't book you work, you walk. Month-to-month after that — cancel anytime.
+      <b>14 days free, no credit card.</b> Full setup, real calls, your actual number. If it doesn't book you work, you walk. Month-to-month after that — cancel anytime.
     </div>
 
     <div class="terms">
@@ -518,9 +559,9 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
       <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
       <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
-      <div class="card"><h3>What happens after the free month?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
+      <div class="card"><h3>What happens after the free trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
       <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
-      <div class="card"><h3>What about my sector?</h3><p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free month and we'll tell you honestly whether it fits before you pay anything.</p></div>
+      <div class="card"><h3>What about my sector?</h3><p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free trial and we'll tell you honestly whether it fits before you pay anything.</p></div>
     </div>
   </div>
 </section>
@@ -528,10 +569,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <div class="final">
   <div class="wrap">
     <h2>Ready to stop losing jobs<br>to voicemail?</h2>
-    <p>Set up takes 10 minutes. Hear it first, then run it free for a month.</p>
+    <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
     <div class="btns">
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your first month free</a>
-      <a class="btn btn-ghost" id="final-demo" href="tel:+19592156754">Try the live demo</a>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <a class="btn btn-ghost" id="final-demo" href="tel:+16476921081">Try the live demo</a>
     </div>
   </div>
 </div>
@@ -546,6 +587,18 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
     <span class="desc">AI voice agents for home services, hospitality and clinics</span>
   </div>
 </footer>
+
+<div class="promo-veil" id="promo" role="dialog" aria-modal="true" aria-labelledby="promo-h" hidden>
+  <div class="promo">
+    <button class="shut" id="promo-x" aria-label="Close">&times;</button>
+    <span class="tagline">Through December 2026</span>
+    <h3 id="promo-h">Get <em>30 days free</em><br>instead of 14.</h3>
+    <p>Full setup, real calls, your actual number — for a whole month. Setup fee waived. If it doesn't book you work, you walk.</p>
+    <a class="go" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Claim 30 days free</a>
+    <button class="later" id="promo-no">No thanks, I'll take the 14</button>
+    <p class="terms-line">No credit card. Cancel anytime.</p>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -572,12 +625,12 @@ var V = {
     calls: 300, value: 450, rate: 14, conv: 0.30, newPct: null,
     valueLabel: "Average job value", valueMin: 50, valueMax: 2000, valueStep: 25,
     note: "Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.",
-    hasNumber: true, demoNumber: "+1 (959) 215-6754", tel: "tel:+19592156754",
+    hasNumber: true, demoNumber: "+1 (647) 692-1081", tel: "tel:+16476921081",
     demoTag: "Live demo — try it now",
     demoTitle: "Call and hear it yourself",
     demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
     demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
-    demoCta: "Start your first month free",
+    demoCta: "Start your 14-day free trial",
     lede: "An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details \u2014 on the number you already use.",
     trades: "Plumbing \u00b7 HVAC \u00b7 Electrical \u00b7 Locksmith \u00b7 Garage door",
     stats: [
@@ -791,7 +844,7 @@ function renderTiers(v){
         return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
       }).join("") + "</div>" +
       '<a class="btn ' + (pop ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
-      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start free month") + "</a>" +
+      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start your free trial") + "</a>" +
       "</div>";
   }).join("");
   $("setup-line").textContent = "Setup " + v.setup + " \u2014 waived through December 2026.";
@@ -877,7 +930,65 @@ if (!reduced && window.IntersectionObserver) {
   }, { threshold: 0.35 }).observe(document.querySelector(".mock"));
 }
 })();
+
+/* ---- Promo: 30 days instead of 14, through December 2026 ----
+   Self-expires after the deadline so it cannot outlive the offer.
+   Shows once per browser, after the visitor has read a little. */
+(function(){
+  var DEADLINE = new Date("2026-12-31T23:59:59-05:00");
+  var KEY = "vc_promo_30d_seen";
+  var veil = document.getElementById("promo");
+  if (!veil) return;
+  if (new Date() > DEADLINE) { veil.remove(); return; }
+
+  function seen(){ try { return localStorage.getItem(KEY) === "1"; } catch(e){ return false; } }
+  function mark(){ try { localStorage.setItem(KEY, "1"); } catch(e){} }
+  if (seen()) { veil.remove(); return; }
+
+  var open = false, timer = null;
+
+  function show(){
+    if (open || seen()) return;
+    open = true;
+    clearTimeout(timer);
+    window.removeEventListener("scroll", onScroll);
+    veil.hidden = false;
+    // next frame, so the transition has a starting state to animate from
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ veil.classList.add("on"); }); });
+    document.body.style.overflow = "hidden";
+    var btn = document.getElementById("promo-x");
+    if (btn) btn.focus();
+  }
+
+  function hide(){
+    if (!open) return;
+    open = false;
+    mark();
+    veil.classList.remove("on");
+    document.body.style.overflow = "";
+    setTimeout(function(){ veil.hidden = true; }, 300);
+  }
+
+  function onScroll(){
+    var d = document.documentElement;
+    var pct = d.scrollTop / Math.max(1, d.scrollHeight - d.clientHeight);
+    if (pct > 0.3) show();
+  }
+
+  // Whichever comes first: a bit of reading time, or 30% down the page.
+  timer = setTimeout(show, 12000);
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  document.getElementById("promo-x").addEventListener("click", hide);
+  document.getElementById("promo-no").addEventListener("click", hide);
+  veil.addEventListener("click", function(e){ if (e.target === veil) hide(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") hide(); });
+  // Taking the offer counts as seen, so it doesn't reappear on return.
+  veil.querySelector(".go").addEventListener("click", function(){ mark(); });
+})();
 </script>
+
+
 
 </body>
 </html>
