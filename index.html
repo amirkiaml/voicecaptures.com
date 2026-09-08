@@ -317,46 +317,6 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   .anim .bub,.anim .card{opacity:1!important;transform:none!important}
 }
 
-/* Promo — amber, intentionally outside the blue/cyan system so it reads as
-   a time-limited offer rather than part of the product UI. */
-.promo-veil[hidden]{display:none}
-.promo-veil{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.68);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  opacity:0;pointer-events:none;transition:opacity .28s ease}
-.promo-veil.on{opacity:1;pointer-events:auto}
-.promo{position:relative;width:100%;max-width:440px;background:#140d1c;
-  border:1px solid #A855F7;border-radius:16px;padding:32px 30px 28px;text-align:center;
-  box-shadow:0 26px 70px rgba(0,0,0,.65),0 0 0 1px rgba(168,85,247,.14);
-  transform:translateY(14px) scale(.985);transition:transform .28s cubic-bezier(.2,.7,.3,1)}
-.promo-veil.on .promo{transform:none}
-.promo::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
-  border-radius:16px 16px 0 0;background:linear-gradient(90deg,#A855F7,#E9D5FF)}
-.promo .tagline{display:inline-block;background:rgba(168,85,247,.16);color:#DDB6FD;
-  font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  padding:6px 14px;border-radius:100px;margin-bottom:18px}
-.promo h3{font-family:var(--display);font-size:27px;font-weight:700;letter-spacing:-.02em;
-  line-height:1.15;color:#fff;margin-bottom:12px}
-.promo h3 em{font-style:normal;color:#A855F7}
-.promo p{font-size:14.5px;line-height:1.6;color:#c4b8d4;margin-bottom:22px}
-.promo .go{display:block;width:100%;background:#A855F7;color:#140d1c;
-  font-family:var(--body);font-size:15px;font-weight:700;padding:14px 24px;
-  border-radius:8px;border:0;cursor:pointer;transition:background .2s,transform .1s}
-.promo .go:hover{background:#B975F9;color:#140d1c;transform:translateY(-1px)}
-.promo .later{display:block;width:100%;margin-top:12px;background:none;border:0;cursor:pointer;
-  font-family:var(--body);font-size:13px;color:#8d81a0;padding:6px}
-.promo .later:hover{color:#c4b8d4}
-.promo .shut{position:absolute;top:12px;right:14px;background:none;border:0;cursor:pointer;
-  color:#8d81a0;font-size:22px;line-height:1;padding:4px 8px;font-family:var(--body)}
-.promo .shut:hover{color:#fff}
-.promo .terms-line{font-size:11.5px;color:#8d81a0;margin:16px 0 0}
-@media (max-width:520px){
-  .promo{padding:28px 22px 24px}
-  .promo h3{font-size:23px}
-}
-@media (prefers-reduced-motion:reduce){
-  .promo-veil,.promo{transition:none}
-}
 </style>
 </head>
 <body>
@@ -545,7 +505,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
     <div class="terms">
       <p>All prices CAD, plus HST. Additional minutes $1.25.</p>
-      <p id="setup-line">Setup $149 — waived through December 2026.</p>
+      <p id="setup-line">Setup $149 — one-time.</p>
+      <p>Every tier answers 24/7 — after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
       <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
     </div>
   </div>
@@ -593,17 +554,6 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   </div>
 </footer>
 
-<div class="promo-veil" id="promo" role="dialog" aria-modal="true" aria-labelledby="promo-h" hidden>
-  <div class="promo">
-    <button class="shut" id="promo-x" aria-label="Close">&times;</button>
-    <span class="tagline">Through December 2026</span>
-    <h3 id="promo-h">Get <em>30 days free</em><br>instead of 14.</h3>
-    <p>Full setup, real calls, your actual number — for a whole month. Setup fee waived. If it doesn't book you work, you walk.</p>
-    <a class="go" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Claim 30 days free</a>
-    <button class="later" id="promo-no">No thanks, I'll take the 14</button>
-    <p class="terms-line">No credit card. Cancel anytime.</p>
-  </div>
-</div>
 
 <script>
 (function(){
@@ -644,9 +594,9 @@ var V = {
       ["$500\u2013$1,200","Typical value of one missed service call","answeringagent.com, 2026"]
     ],
     tiers: [
-      ["Starter","$179","150 minutes","After-hours",["After-hours and overflow coverage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
-      ["Growth","$349","320 minutes","Full-day + overflow",["Everything in Starter","Full-day coverage","Emergency vs. routine triage","Call transfer to you or your team","Priority support"]],
-      ["Pro","$599","570 minutes","Multi-truck",["Everything in Growth","Multiple calendars","Multiple technicians","Custom call flows"]]
+      ["Starter","$179","150 minutes","Solo operator",["Emergency vs. routine triage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
+      ["Growth","$349","320 minutes","Small crew",["Everything in Starter","Call transfer to you or your team","Two calendars","Custom greeting and service list","Priority support"]],
+      ["Pro","$599","570 minutes","Multi-truck",["Everything in Growth","Multiple calendars and technicians","Custom call flows","Dedicated onboarding"]]
     ]
   },
   food: {
@@ -681,9 +631,9 @@ var V = {
       ["69%","Of guests give up if no one answers the phone","Hostie, 2025"]
     ],
     tiers: [
-      ["Starter","$199","170 minutes","Single location",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
-      ["Growth","$329","300 minutes","Busy single location",["Everything in Starter","Full-day coverage","Large-party and catering routing","Call transfer to the floor","Priority support"]],
-      ["Multi-location","$549","520 minutes","2\u20134 locations",["Everything in Growth","2\u20134 locations","Custom call flows","Per-venue configuration"]]
+      ["Starter","$199","170 minutes","Caf\u00e9 or takeout",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
+      ["Growth","$329","300 minutes","Full-service venue",["Everything in Starter","Large-party and catering routing","Call transfer to the floor","Custom menu and hours configuration","Priority support"]],
+      ["Multi-location","$549","520 minutes","Small group",["Everything in Growth","Per-venue configuration","Custom call flows","Dedicated onboarding"]]
     ]
   },
   clinic: {
@@ -695,7 +645,7 @@ var V = {
       ["them","Sarah Chen, 905-555-0147."],
       ["us","Booked — Thursday, 10:00 AM. Confirmation sent to your phone."]
     ],
-    sms: "NEW PATIENT — Sarah Chen · 905-555-0147 · Cleaning · Thu 10:00 AM · Booked",
+    sms: "NEW PATIENT — Sarah Chen · 905-555-0147 · Cleaning · Thu 10:00 AM · Booked", 
     bad: [
       ["Answer every call yourself",["Front desk is with a patient at the counter.","On hold with an insurer for twenty minutes.","The phone rings out from five o'clock onward."]],
       ["Send them to voicemail",["85% of patients never call back.","The practice two blocks away picks up.","Six voicemails are waiting at 8 AM Monday."]],
@@ -719,9 +669,9 @@ var V = {
     ],
     priceNote: "No caller health information is stored or logged.",
     tiers: [
-      ["Starter","$299","270 minutes","After-hours",["After-hours and reception overflow","New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk"]],
-      ["Growth","$549","520 minutes","Reception overflow",["Everything in Starter","Full-day coverage","Multiple providers","Escalation rules configured per practice","Priority support"]],
-      ["Pro","$899","870 minutes","Multi-practitioner",["Everything in Growth","Multiple locations","Multiple calendars","Custom booking rules"]]
+      ["Starter","$349","320 minutes","Single practitioner",["New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk","Call log and summaries"]],
+      ["Growth","$549","520 minutes","Multi-practitioner",["Everything in Starter","Multiple providers and calendars","Escalation rules configured per practice","Call transfer to your front desk","Priority support"]],
+      ["Pro","$899","870 minutes","Group practice",["Everything in Growth","Multiple locations","Custom booking rules","Dedicated onboarding"]]
     ]
   }
 };
@@ -852,7 +802,7 @@ function renderTiers(v){
       '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start your free trial") + "</a>" +
       "</div>";
   }).join("");
-  $("setup-line").textContent = "Setup " + v.setup + " \u2014 waived through December 2026.";
+  $("setup-line").textContent = "Setup " + v.setup + " \u2014 one-time.";
   $("p-trades").textContent = v.trades;
   var pn = $("p-note");
   pn.textContent = v.priceNote || "";
@@ -936,61 +886,6 @@ if (!reduced && window.IntersectionObserver) {
 }
 })();
 
-/* ---- Promo: 30 days instead of 14, through December 2026 ----
-   Self-expires after the deadline so it cannot outlive the offer.
-   Shows once per browser, after the visitor has read a little. */
-(function(){
-  var DEADLINE = new Date("2026-12-31T23:59:59-05:00");
-  var KEY = "vc_promo_30d_seen";
-  var veil = document.getElementById("promo");
-  if (!veil) return;
-  if (new Date() > DEADLINE) { veil.remove(); return; }
-
-  function seen(){ try { return localStorage.getItem(KEY) === "1"; } catch(e){ return false; } }
-  function mark(){ try { localStorage.setItem(KEY, "1"); } catch(e){} }
-  if (seen()) { veil.remove(); return; }
-
-  var open = false, timer = null;
-
-  function show(){
-    if (open || seen()) return;
-    open = true;
-    clearTimeout(timer);
-    window.removeEventListener("scroll", onScroll);
-    veil.hidden = false;
-    // next frame, so the transition has a starting state to animate from
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ veil.classList.add("on"); }); });
-    document.body.style.overflow = "hidden";
-    var btn = document.getElementById("promo-x");
-    if (btn) btn.focus();
-  }
-
-  function hide(){
-    if (!open) return;
-    open = false;
-    mark();
-    veil.classList.remove("on");
-    document.body.style.overflow = "";
-    setTimeout(function(){ veil.hidden = true; }, 300);
-  }
-
-  function onScroll(){
-    var d = document.documentElement;
-    var pct = d.scrollTop / Math.max(1, d.scrollHeight - d.clientHeight);
-    if (pct > 0.3) show();
-  }
-
-  // Whichever comes first: a bit of reading time, or 30% down the page.
-  timer = setTimeout(show, 12000);
-  window.addEventListener("scroll", onScroll, { passive: true });
-
-  document.getElementById("promo-x").addEventListener("click", hide);
-  document.getElementById("promo-no").addEventListener("click", hide);
-  veil.addEventListener("click", function(e){ if (e.target === veil) hide(); });
-  document.addEventListener("keydown", function(e){ if (e.key === "Escape") hide(); });
-  // Taking the offer counts as seen, so it doesn't reappear on return.
-  veil.querySelector(".go").addEventListener("click", function(){ mark(); });
-})();
 </script>
 
 
