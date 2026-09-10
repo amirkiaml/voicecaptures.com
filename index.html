@@ -47,8 +47,35 @@ img{display:block}
 section{padding:clamp(52px,7vw,80px) 0}
 .alt{background:var(--bg2)}
 
+
+/* ---- Per-vertical theming ------------------------------------------------
+   Every accent on the page resolves through these four variables, so swapping
+   them re-skins the whole layout. Surfaces shift a few degrees of hue too, so
+   moving between sectors feels like moving somewhere, not just new copy.
+   Red stays reserved for the loss figure and the demo number in all three. */
+body{transition:background-color .45s ease}
+.alt,.card,.tier,.calc,.mock,.mk-panel,.demo,.stat,header,.tags div,.switch,.switch button{
+  transition:background-color .45s ease,border-color .45s ease}
+
+[data-v="food"]{
+  --bg:#0a0f0d; --bg2:#111a16; --bg3:#17231e;
+  --blue:#047857; --blue-dk:#065F46; --blue-glow:rgba(4,120,87,.18);
+  --cyan:#34D399; --cyan-lt:#6EE7B7;
+}
+[data-v="food"] .mk-phone{background:linear-gradient(168deg,#123027 0%,#0f1a15 68%)}
+[data-v="food"] header{background:rgba(10,15,13,.76)}
+
+[data-v="clinic"]{
+  --bg:#0d0b13; --bg2:#16121d; --bg3:#1e1927;
+  --blue:#7C3AED; --blue-dk:#6D28D9; --blue-glow:rgba(124,58,237,.18);
+  --cyan:#A78BFA; --cyan-lt:#C4B5FD;
+}
+[data-v="clinic"] .mk-phone{background:linear-gradient(168deg,#2a1f4a 0%,#161027 68%)}
+[data-v="clinic"] .mk-caller{background:#6D28D9}
+[data-v="clinic"] header{background:rgba(13,11,19,.76)}
+
 /* type */
-h1{font-family:var(--display);font-weight:700;font-size:clamp(29px,5.4vw,54px);letter-spacing:-.02em;line-height:1.1;margin-bottom:20px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(29px,4.6vw,47px);letter-spacing:-.02em;line-height:1.1;margin-bottom:20px}
 h2{font-family:var(--display);font-weight:700;font-size:clamp(23px,3.4vw,32px);letter-spacing:-.02em;line-height:1.2;margin-bottom:8px}
 h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
 .center{text-align:center}
@@ -91,8 +118,12 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 /* hero */
 .hero{padding:clamp(28px,4vw,72px) 0 clamp(40px,5vw,64px)}
 .hero-grid{display:grid;width:100%;grid-template-columns:minmax(0,1fr);gap:clamp(32px,4vw,56px);align-items:start}
-@media (min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
-.switch{display:inline-flex;gap:6px;padding:6px;background:var(--bg2);border:1px solid var(--line);border-radius:100px;margin-bottom:28px;flex-wrap:wrap}
+@media (min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}}
+.switch{display:flex;gap:6px;padding:6px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:100px;margin-bottom:28px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;
+  scrollbar-width:none}
+.switch::-webkit-scrollbar{display:none}
+.switch button{white-space:nowrap;flex:0 0 auto}
 .switch button{font-family:var(--body);font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:100px;border:0;cursor:pointer;background:var(--bg3);color:var(--muted);transition:background .2s,color .2s}
 .switch button[aria-selected="true"]{background:var(--blue);color:#fff}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
@@ -104,20 +135,8 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .stat .lbl{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:6px}
 .stat .src{font-size:11px;color:var(--faint)}
 
-/* phone */
 .mock{display:flex;gap:20px;align-items:flex-start;justify-content:flex-end;flex-wrap:wrap;width:100%}
-.phone{flex:0 1 216px;width:216px;max-width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:34px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
-.screen{background:var(--bg);border-radius:26px;padding:14px 12px 20px;text-align:center}
-.notch{width:62px;height:5px;background:#232833;border-radius:100px;margin:0 auto 18px}
-.statusbar{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:34px}
 .mini{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
-.callnum{font-family:var(--display);font-weight:700;font-size:clamp(15px,4.6vw,18px);
-  letter-spacing:-.02em;margin:10px 0 2px;
-  /* tabular figures make every number the same width, and nowrap stops a
-     device with slightly wider metrics from breaking it onto two lines */
-  font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1;
-  white-space:nowrap}
-.callmeta{font-size:11px;color:var(--muted);margin-bottom:24px}
 .wave{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:34px;margin-bottom:20px}
 .wave i{width:3px;border-radius:100px;background:var(--blue);display:block;transform-origin:bottom center}
 .wave.live i{animation:wv 1.15s ease-in-out infinite}
@@ -133,10 +152,8 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 @keyframes wv{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
 .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:7px;vertical-align:middle;position:relative;top:-1px}
 .dot.live{animation:blip 1.6s ease-in-out infinite}
-@keyframes blip{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,238,.45)}50%{opacity:.55;box-shadow:0 0 0 5px rgba(34,211,238,0)}}
-.fwd{font-size:12px;color:var(--muted);padding-bottom:8px}
-.thread{flex:1 1 236px;min-width:min(216px,100%);display:flex;flex-direction:column;gap:10px;padding-top:26px}
-.bub{font-size:12.5px;line-height:1.55;padding:11px 14px;max-width:94%}
+@keyframes blip{0%,100%{opacity:1;box-shadow:0 0 0 0 color-mix(in srgb, var(--cyan) 45%, transparent)}
+  50%{opacity:.55;box-shadow:0 0 0 5px transparent}}
 .anim .bub,.anim .card{opacity:0;transform:translateY(7px);transition:opacity .34s ease,transform .34s ease}
 .anim .bub.on,.anim .card.on{opacity:1;transform:none}
 .typing{display:inline-flex;gap:3px;align-items:center;height:9px}
@@ -144,12 +161,76 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .typing i:nth-child(2){animation-delay:.17s}
 .typing i:nth-child(3){animation-delay:.34s}
 @keyframes tp{0%,100%{opacity:.3;transform:translateY(0)}45%{opacity:1;transform:translateY(-2px)}}
-.row-them{display:flex;justify-content:flex-start}
-.row-us{display:flex;justify-content:flex-end}
-.bub-them{background:var(--bg3);color:var(--text);border:1px solid var(--line);border-radius:14px 14px 14px 4px}
-.bub-us{background:var(--blue);color:#fff;border-radius:14px 14px 4px 14px}
-.dispatch{margin-top:14px;padding-top:16px;border-top:1px solid var(--line)}
-.dispatch .card{background:var(--bg2);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:12px;line-height:1.6;margin-top:8px}
+
+
+/* ---- Hero call card: phone on the left, transcript beside it ---- */
+.mock{display:grid;grid-template-columns:minmax(0,1fr);gap:0;width:100%;
+  background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+@media (min-width:620px){.mock{grid-template-columns:178px minmax(0,1fr)}}
+
+.mk-phone{background:linear-gradient(168deg,#16233f 0%,#111725 68%);padding:24px 14px 20px;
+  text-align:center;border-bottom:1px solid var(--line)}
+@media (min-width:620px){.mk-phone{border-bottom:0;border-right:1px solid var(--line)}}
+.mk-biz{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.3;margin-bottom:6px}
+.mk-state{font-size:9.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:4px}
+.mk-timer{font-family:var(--display);font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums;margin-bottom:18px}
+.mk-play{width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:var(--cyan);
+  color:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  transition:transform .12s,background .2s;box-shadow:0 8px 24px color-mix(in srgb, var(--cyan) 22%, transparent)}
+.mk-play:hover{background:var(--cyan-lt);transform:scale(1.05)}
+.mk-play svg{width:23px;height:23px;fill:currentColor;margin-left:2px}
+.mk-play[hidden]{display:none}
+.mk-phone .wave{margin-bottom:14px}
+.mk-phone.on .wave i{animation:wv 1.15s ease-in-out infinite}
+.mk-phone:not(.on) .wave i{opacity:.32}
+.mk-phone.ringing .wave i{animation:wv 1.6s ease-in-out infinite;opacity:.55}
+.mk-hint{font-size:11px;color:var(--muted);line-height:1.5}
+
+.mk-panel{padding:18px 18px 16px;min-width:0}
+.mk-bar{height:2px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:14px}
+.mk-bar i{display:block;height:100%;width:0;background:var(--cyan);border-radius:100px;transition:width .2s linear}
+.mk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.mk-lines{position:relative;display:flex;flex-direction:column;gap:9px;height:250px;overflow-y:auto;
+  padding-right:6px;scroll-behavior:smooth;scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.14) transparent}
+.mk-lines::-webkit-scrollbar{width:4px}
+.mk-lines::-webkit-scrollbar-track{background:transparent}
+.mk-lines::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:100px}
+.mk-lines.js .mk-line:not(.on){display:none}
+
+.mk-line{max-width:90%;font-size:12.5px;line-height:1.55;padding:10px 13px;
+  opacity:0;transform:translateY(7px);transition:opacity .34s ease,transform .34s ease}
+.mk-line.on{opacity:1;transform:none}
+.mk-who{display:block;font-size:8.5px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;margin-bottom:4px}
+
+/* the agent and the caller must never be mistaken for one another */
+.mk-agent{align-self:flex-start;background:color-mix(in srgb, var(--cyan) 9%, transparent);
+  border:1px solid color-mix(in srgb, var(--cyan) 22%, transparent);
+  border-radius:13px 13px 13px 4px;color:var(--text)}
+.mk-agent .mk-who{color:var(--cyan)}
+.mk-caller{align-self:flex-end;background:var(--blue);color:#fff;border-radius:13px 13px 4px 13px}
+.mk-caller .mk-who{color:rgba(255,255,255,.7)}
+
+.mk-sms{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+  opacity:0;transform:translateY(7px);transition:opacity .4s ease,transform .4s ease}
+.mk-sms.on{opacity:1;transform:none}
+.mk-sms .card{background:var(--bg3);border:1px solid var(--line);border-radius:13px 13px 13px 4px;
+  padding:11px 13px;font-size:11.5px;line-height:1.65;margin-top:7px;color:var(--muted)}
+.mk-sms .card b{color:var(--text);font-weight:700}
+.mk-note{margin-top:12px;font-size:10.5px;line-height:1.55;color:var(--faint)}
+.mk-note:empty{display:none}
+.mk-fallback{margin-top:12px}
+.mk-fallback.js{display:none}
+.mk-fallback audio{width:100%;height:34px}
+@media (max-width:620px){
+  .mk-lines{height:230px}
+  .mk-line{max-width:94%}
+}
+@media (prefers-reduced-motion:reduce){
+  .mk-line,.mk-sms{opacity:1!important;transform:none!important}
+}
 
 /* cards */
 .grid{display:grid;gap:16px}
@@ -317,6 +398,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   .anim .bub,.anim .card{opacity:1!important;transform:none!important}
 }
 
+
 </style>
 </head>
 <body>
@@ -354,31 +436,34 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       </div>
     </div>
 
-    <div class="mock">
-      <div class="phone">
-        <div class="screen">
-          <div class="notch"></div>
-          <div class="statusbar"><span>9:41</span><span>Tue 14 Oct</span></div>
-          <div class="mini">Incoming call</div>
-          <div class="callnum" id="m-num">+1 (416) 555-0182</div>
-          <div class="callmeta" id="m-meta">Mobile · Toronto, ON</div>
-          <div class="wave live" aria-hidden="true">
-            <i style="height:10px;opacity:.84"></i><i style="height:18px;opacity:.79"></i><i style="height:26px;opacity:.89"></i><i style="height:34px;opacity:1"></i><i style="height:22px;opacity:.84"></i><i style="height:30px;opacity:.95"></i><i style="height:16px;opacity:.76"></i><i style="height:24px;opacity:.87"></i><i style="height:12px;opacity:.71"></i>
-          </div>
-          <div class="fwd">Forwarded to VoiceCaptures</div>
+    <div class="mock" id="mock">
+      <div class="mk-phone" id="mk-phone">
+        <div class="mk-biz" id="mk-biz">Maple Ridge Plumbing</div>
+        <div class="mk-state" id="mk-state">Incoming call</div>
+        <div class="mk-timer" id="mk-timer">0:00</div>
+        <button class="mk-play" id="mk-play" aria-label="Play the recorded call">
+          <svg viewBox="0 0 24 24" id="mk-icon" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="wave" id="mk-wave" aria-hidden="true">
+          <i style="height:10px"></i><i style="height:18px;animation-delay:.09s"></i><i style="height:26px;animation-delay:.18s"></i><i style="height:34px;animation-delay:.27s"></i><i style="height:22px;animation-delay:.36s"></i><i style="height:30px;animation-delay:.45s"></i><i style="height:16px;animation-delay:.54s"></i><i style="height:24px;animation-delay:.63s"></i><i style="height:12px;animation-delay:.72s"></i>
         </div>
+        <p class="mk-hint" id="mk-hint">Press play to hear the real recording.</p>
       </div>
-      <div class="thread">
-        <div class="mini"><span class="dot live" aria-hidden="true"></span>On the call</div>
-        <div id="m-thread">
-          <div class="row-them"><div class="bub bub-them">Hi — kitchen sink is backing up. Any chance someone can come today?</div></div>
-          <div class="row-us"><div class="bub bub-us">I can get a tech out today. What's the service address?</div></div>
-          <div class="row-them"><div class="bub bub-them">412 Bathurst St, Unit 3.</div></div>
-          <div class="row-us"><div class="bub bub-us">Booked — today, 2:30–4:30 PM. Confirmation sent to your phone.</div></div>
+
+      <div class="mk-panel">
+        <div class="mk-bar"><i id="mk-prog"></i></div>
+        <div class="mk-head">
+          <span class="mini"><span class="dot" id="mk-dot" aria-hidden="true"></span>Live transcript</span>
+          <span class="mini" id="mk-len">1:15</span>
         </div>
-        <div class="dispatch">
-          <div class="mini">Text to you</div>
-          <div class="card" id="m-sms">NEW JOB — Marcus T. · 416-555-0182 · 412 Bathurst St Unit 3 · Kitchen sink backup · Today 2:30–4:30 PM</div>
+        <div class="mk-lines" id="mk-lines"></div>
+        <div class="mk-sms" id="mk-sms">
+          <div class="mini">Text to the owner</div>
+          <div class="card" id="mk-smsbody"></div>
+        </div>
+        <p class="mk-note" id="mk-note"></p>
+        <div class="mk-fallback" id="mk-fallback">
+          <audio id="mk-audio" controls preload="metadata" src="sample-call.mp3"></audio>
         </div>
       </div>
     </div>
@@ -452,6 +537,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
     </div>
   </div>
 </section>
+
+
 
 <section class="alt" id="cal-section">
   <div class="wrap">
@@ -564,14 +651,32 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 var V = {
   home: {
     short: "home service businesses", setup: "$149",
-    num: "+1 (416) 555-0182", meta: "Mobile · Toronto, ON",
+    ring: 5.15,
+    audio: "sample-call.mp3",
+    biz: "Maple Ridge Plumbing",
+    len: "1:15",
+    smsBody: '<b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br><b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from under the kitchen sink, steady flow, unable to stop it.',
+    smsAt: 66.9,
+    callNote: "A real call to the demo line. The business, caller and address are invented \u2014 the conversation is not. Lookup pauses were shortened and the callback number is masked.",
     convo: [
-      ["them","Hi — kitchen sink is backing up. Any chance someone can come today?"],
-      ["us","I can get a tech out today. What's the service address?"],
-      ["them","412 Bathurst St, Unit 3."],
-      ["us","Booked — today, 2:30–4:30 PM. Confirmation sent to your phone."]
+      [ 5.15,"agent","Maple Ridge Plumbing, this is Andy. What's going on?"],
+      [ 8.53,"caller","Oh yeah, hi \u2014 I've got water coming out from under my kitchen sink and I can't get it to stop."],
+      [15.15,"agent","That sounds urgent. Let me get the on-call tech on it right away. What's the service address?"],
+      [20.27,"caller","It's 105 Maple Street."],
+      [25.03,"agent","Let me confirm that \u2014 105 Maple Street, is that correct?"],
+      [28.65,"caller","That's right."],
+      [31.40,"agent","Great, I'll get someone out there today. Could you tell me what's happening under the sink?"],
+      [36.53,"caller","There's just some water coming out. It's pretty steady, I can't stop it."],
+      [42.90,"agent","Just a sec."],
+      [44.93,"agent","And who should they ask for when they arrive?"],
+      [48.80,"caller","It's Dave Morrison."],
+      [51.53,"agent","This'll just take a sec."],
+      [55.15,"agent","And is this the best number to text the details to?"],
+      [62.65,"caller","Yeah, that's right."],
+      [64.53,"agent","All right, Dave \u2014 someone will call you within 30 minutes. I've sent you a text with the details. Call back if you haven't heard anything. Hang in there."],
+      [71.15,"caller","Perfect, thanks."],
+      [73.15,"agent","Thanks for calling. Have a good one."]
     ],
-    sms: "NEW JOB — Marcus T. · 416-555-0182 · 412 Bathurst St Unit 3 · Kitchen sink backup · Today 2:30–4:30 PM",
     bad: [
       ["Answer every call yourself",["The phone rings while you are under a sink.","Hands are wet, dirty, or holding a wrench.","Quoting on the phone stalls the job you are on."]],
       ["Send them to voicemail",["85% of callers never call back.","The next name on Google answers instead.","You return the call at 8 PM to a booked customer."]],
@@ -601,14 +706,16 @@ var V = {
   },
   food: {
     short: "restaurants and cafés", setup: "$249",
-    num: "+1 (647) 555-0294", meta: "Mobile · Toronto, ON",
+    ring: 1.1, audio: null, biz: "Kettle Row Coffee", len: null,
+    smsBody: '<b>Catering lead</b><br>Priya S. \u00b7 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>40 people \u00b7 Thu 9 AM<br>250 University Ave, 12th floor<br>Coffee + pastries \u2014 call back to quote',
+    smsAt: 8.6,
+    callNote: "Illustration of a hospitality call. The restaurant agent is a pilot.",
     convo: [
-      ["them","Do you do catering? I need coffee and pastries for about 40 people Thursday morning."],
-      ["us","We do. Forty people, Thursday — what time and where should we deliver?"],
-      ["them","9 AM, 250 University Ave, 12th floor."],
-      ["us","Got it. The owner will confirm pricing within the hour — I've sent them everything."]
+      [1.1,"caller","Do you do catering? I need coffee and pastries for about 40 people Thursday morning."],
+      [3.1,"agent","We do. Forty people, Thursday \u2014 what time and where should we deliver?"],
+      [5.1,"caller","9 AM, 250 University Ave, 12th floor."],
+      [6.9,"agent","Got it. The owner will confirm pricing within the hour \u2014 I've sent them everything."]
     ],
-    sms: "CATERING LEAD — Priya S. · 647-555-0294 · 40 people · Thu 9 AM · 250 University Ave, 12th flr · Coffee + pastries · Call back to quote",
     bad: [
       ["Answer every call yourself",["Peak call time is peak service time.","The host leaves the door to take a reservation.","A server holds the phone while tables wait."]],
       ["Send them to voicemail",["Nobody leaves a voicemail to book a table tonight.","Catering enquiries go to the next café.","Guests read \u201cnobody answers\u201d as bad service."]],
@@ -638,14 +745,16 @@ var V = {
   },
   clinic: {
     short: "clinics and dental practices", setup: "$349",
-    num: "+1 (905) 555-0147", meta: "Mobile · Mississauga, ON",
+    ring: 1.1, audio: null, biz: "Lakeshore Dental", len: null,
+    smsBody: '<b>New patient</b><br>Sarah Chen \u00b7 905 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>Cleaning \u00b7 Thu 10:00 AM<br>Booked',
+    smsAt: 8.4,
+    callNote: "Illustration of a clinic call. Name, callback number and appointment only \u2014 never health information.",
     convo: [
-      ["them","Are you taking new patients? I'd like to book a cleaning."],
-      ["us","We are. I can book you in — can I get your name and a callback number?"],
-      ["them","Sarah Chen, 905-555-0147."],
-      ["us","Booked — Thursday, 10:00 AM. Confirmation sent to your phone."]
+      [1.1,"caller","Are you taking new patients? I'd like to book a cleaning."],
+      [3.1,"agent","We are. I can book you in \u2014 can I get your name and a callback number?"],
+      [5.1,"caller","Sarah Chen, 905 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022."],
+      [6.8,"agent","Booked \u2014 Thursday, 10:00 AM. Confirmation sent to your phone."]
     ],
-    sms: "NEW PATIENT — Sarah Chen · 905-555-0147 · Cleaning · Thu 10:00 AM · Booked", 
     bad: [
       ["Answer every call yourself",["Front desk is with a patient at the counter.","On hold with an insurer for twenty minutes.","The phone rings out from five o'clock onward."]],
       ["Send them to voicemail",["85% of patients never call back.","The practice two blocks away picks up.","Six voicemails are waiting at 8 AM Monday."]],
@@ -713,55 +822,96 @@ function after(ms, fn){ timers.push(setTimeout(fn, ms)); }
 
 var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* ---- Hero call card ------------------------------------------------------
+   Home services plays the real recording and reveals the transcript against
+   audio.currentTime. The pilot verticals have no recording, so the same
+   renderer runs on a clock instead. One component, two clocks. ------------ */
+var MK = {
+  phone: null, tick: null, els: [], v: null, playing: false, t0: 0
+};
+
+function mmss(t){
+  t = Math.max(0, Math.floor(t || 0));
+  return Math.floor(t/60) + ":" + ("0" + (t%60)).slice(-2);
+}
+
+function mkPaint(t){
+  var v = MK.v, box = $("mk-lines"), last = null;
+  for (var i = 0; i < v.convo.length; i++){
+    if (t >= v.convo[i][0]) { MK.els[i].classList.add("on"); last = MK.els[i]; }
+    else if (!reduced) MK.els[i].classList.remove("on");
+  }
+  if (last && last !== box._last){
+    box._last = last;
+    box.scrollTop = Math.max(0, last.offsetTop - box.clientHeight + last.offsetHeight + 12);
+  }
+  var sms = $("mk-sms");
+  if (t >= v.smsAt) sms.classList.add("on");
+  else if (!reduced) sms.classList.remove("on");
+
+  $("mk-timer").textContent = mmss(Math.max(0, t));
+  var ringing = t < v.ring;
+  $("mk-state").textContent = ringing ? "Ringing\u2026" : "On the call";
+  $("mk-phone").classList.toggle("ringing", ringing && MK.playing);
+  $("mk-phone").classList.toggle("on", !ringing && MK.playing);
+
+  var total = v.audio ? ($("mk-audio").duration || 75.3) : (v.convo[v.convo.length-1][0] + 4);
+  $("mk-prog").style.width = Math.min(100, t/total*100) + "%";
+}
+
 function renderThread(v){
   clearTimers();
-  $("m-num").textContent = v.num;
-  $("m-meta").textContent = v.meta;
-  $("m-sms").textContent = v.sms;
+  MK.v = v; MK.playing = false;
+  var box = $("mk-lines"), audio = $("mk-audio");
+  if (audio) { audio.pause(); audio.currentTime = 0; }
 
-  var thread = $("m-thread");
-  var sms = $("m-sms");
+  $("mk-biz").textContent = v.biz;
+  $("mk-smsbody").innerHTML = v.smsBody;
+  $("mk-note").textContent = v.callNote || "";
+  $("mk-len").textContent = v.len || "";
+  $("mk-play").hidden = !v.audio;
+  $("mk-hint").textContent = v.audio
+    ? "Press play to hear the real recording."
+    : "An illustration \u2014 no recording for this sector yet.";
 
-  // Rendered at full size first: the hidden bubbles hold their space, so
-  // revealing them shifts nothing on the page.
-  thread.innerHTML = v.convo.map(function(b){
-    var us = b[0] === "us";
-    return '<div class="' + (us ? "row-us" : "row-them") + '"><div class="bub ' +
-      (us ? "bub-us" : "bub-them") + '"><span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>' +
-      '<span class="txt" hidden>' + esc(b[1]) + "</span></div></div>";
+  box.innerHTML = v.convo.map(function(l){
+    var agent = l[1] === "agent";
+    return '<div class="mk-line ' + (agent ? "mk-agent" : "mk-caller") + '">' +
+      '<span class="mk-who">' + (agent ? "Andy \u00b7 AI receptionist" : "Caller") + "</span>" +
+      l[2].replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   }).join("");
+  MK.els = box.querySelectorAll(".mk-line");
+  box._last = null;
+  box.classList.add("js");
+  $("mk-fallback").classList.add("js");
+  $("mk-sms").classList.remove("on");
+  $("mk-dot").classList.remove("live");
 
-  var bubbles = thread.querySelectorAll(".bub");
-
-  function settle(el){
-    el.querySelector(".typing").remove();
-    el.querySelector(".txt").hidden = false;
-  }
-
-  if (reduced) {
-    thread.classList.remove("anim");
-    sms.classList.remove("anim");
-    for (var i = 0; i < bubbles.length; i++) settle(bubbles[i]);
+  if (reduced){
+    for (var i=0;i<MK.els.length;i++) MK.els[i].classList.add("on");
+    $("mk-sms").classList.add("on");
+    $("mk-timer").textContent = v.len || "";
+    $("mk-state").textContent = "On the call";
     return;
   }
 
-  thread.classList.add("anim");
-  sms.parentNode.classList.add("anim");
-  sms.classList.remove("on");
+  mkPaint(0);
+  // No recording for this vertical, so play the exchange back on a timer.
+  if (!v.audio) mkAutoPlay();
+}
 
-  // Caller lines land quickly; the agent "thinks" for a beat before replying,
-  // which is what makes it read as a live call rather than a stagger effect.
-  var t = 350;
-  Array.prototype.forEach.call(bubbles, function(el, n){
-    var isUs = v.convo[n][0] === "us";
-    var think = isUs ? 620 : 380;
-    var show = t;
-    after(show, function(){ el.classList.add("on"); });
-    after(show + think, function(){ settle(el); });
-    t = show + think + (isUs ? 700 : 520);
-  });
-
-  after(t + 250, function(){ sms.classList.add("on"); });
+function mkAutoPlay(){
+  var v = MK.v;
+  MK.playing = true; MK.t0 = Date.now();
+  $("mk-dot").classList.add("live");
+  var end = v.convo[v.convo.length-1][0] + 4;
+  (function step(){
+    if (MK.v !== v) return;
+    var t = (Date.now() - MK.t0)/1000;
+    mkPaint(t);
+    if (t < end) MK.tick = requestAnimationFrame(step);
+    else { MK.playing = false; $("mk-phone").classList.remove("on","ringing"); $("mk-dot").classList.remove("live"); }
+  })();
 }
 
 function replayThread(){ renderThread(V[key]); }
@@ -855,6 +1005,8 @@ function loadCalc(v){
 
 function select(k){
   key = k;
+  document.documentElement.setAttribute("data-v", k);
+  if (MK.tick) { cancelAnimationFrame(MK.tick); MK.tick = null; }
   var v = V[k];
   var tabs = document.querySelectorAll(".switch button");
   for (var i = 0; i < tabs.length; i++) {
@@ -872,6 +1024,38 @@ $("s-value").addEventListener("input", function(e){ state.value = +e.target.valu
 $("s-rate").addEventListener("input", function(e){ state.rate = +e.target.value; calc(); });
 $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value; calc(); });
 
+
+/* play / pause for the recorded call */
+(function(){
+  var audio = $("mk-audio"), play = $("mk-play"), icon = $("mk-icon");
+  if (!audio || !play) return;
+  var PLAY = "M8 5v14l11-7z", PAUSE = "M6 5h4v14H6zM14 5h4v14h-4z";
+
+  play.addEventListener("click", function(){
+    if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function(){}); }
+    else audio.pause();
+  });
+  audio.addEventListener("play", function(){
+    MK.playing = true;
+    icon.innerHTML = '<path d="' + PAUSE + '"/>';
+    play.setAttribute("aria-label", "Pause the recorded call");
+    $("mk-dot").classList.add("live");
+    $("mk-hint").textContent = "Playing the recording.";
+  });
+  audio.addEventListener("pause", function(){
+    MK.playing = false;
+    icon.innerHTML = '<path d="' + PLAY + '"/>';
+    play.setAttribute("aria-label", "Play the recorded call");
+    $("mk-dot").classList.remove("live");
+    $("mk-phone").classList.remove("on","ringing");
+  });
+  audio.addEventListener("ended", function(){
+    $("mk-hint").textContent = "Dispatched and texted in 70 seconds.";
+  });
+  audio.addEventListener("timeupdate", function(){ if (MK.v && MK.v.audio) mkPaint(audio.currentTime); });
+  audio.addEventListener("seeked",    function(){ if (MK.v && MK.v.audio) mkPaint(audio.currentTime); });
+})();
+
 select("home");
 
 // A visitor who scrolls back up should see the call play again, but only
@@ -881,10 +1065,11 @@ if (!reduced && window.IntersectionObserver) {
   new IntersectionObserver(function(entries){
     var e = entries[0];
     if (!e.isIntersecting) { away = true; return; }
-    if (away) { away = false; replayThread(); }
-  }, { threshold: 0.35 }).observe(document.querySelector(".mock"));
+    if (away) { away = false; if (V[key] && !V[key].audio) replayThread(); }
+  }, { threshold: 0.35 }).observe(document.querySelector(".mk-panel"));
 }
 })();
+
 
 </script>
 
