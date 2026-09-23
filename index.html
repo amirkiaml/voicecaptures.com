@@ -985,8 +985,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 <section id="intake" class="alt">
   <div class="wrap">
-    <h2 class="center" id="in-title">Let's get your line ready.</h2>
-    <p class="sub" id="in-sub">A few quick questions so the setup is shaped around how you actually work.</p>
+    <h2 class="center" id="in-title">Tell me about your line.</h2>
+    <p class="sub" id="in-sub">A few quick questions and I'll come back with what your setup would look like. No obligation.</p>
 
     <form class="in-card" id="in-form">
       <p class="in-leg">Contact</p>
@@ -996,7 +996,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       </div>
       <div class="in-row">
         <label class="in-f"><span>Email</span><input id="in-email" type="email" required autocomplete="email"></label>
-        <label class="in-f"><span>Phone <em>optional</em></span><input id="in-phone" type="tel" autocomplete="tel"></label>
+        <label class="in-f"><span>Phone</span><input id="in-phone" type="tel" required autocomplete="tel"></label>
       </div>
 
       <p class="in-leg" id="in-leg2">About your business</p>
@@ -1072,7 +1072,7 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 var V = {
   home: {
     intake: {
-      title: "Let's get your line ready.",
+      title: "Tell me about your line.",
       nameLabel: "Business name", typeLabel: "Trade",
       sysLabel: "Scheduling or job software",
       types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
@@ -1140,7 +1140,7 @@ var V = {
   },
   food: {
     intake: {
-      title: "Let's get your line ready.",
+      title: "Tell me about your line.",
       nameLabel: "Venue name", typeLabel: "Type of venue",
       sysLabel: "POS system",
       types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
@@ -1192,7 +1192,7 @@ var V = {
   },
   other: {
     intake: {
-      title: "Tell me how your calls work.",
+      title: "Tell me about your line.",
       nameLabel: "Business name", typeLabel: "What you do",
       sysLabel: "Booking or CRM software",
       types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
@@ -1202,7 +1202,7 @@ var V = {
     eyebrow: "Any business where the work arrives by phone",
     headline: "Not on the list?<br>It probably still fits.",
     ctaLabel: "Tell me about your line",
-    ctaHref: "#personal",
+    ctaHref: "#intake",
     ctaFine: "No obligation. If it doesn't fit, I'll say so.",
     short: "businesses like yours", setup: "$249", consumer: true,
     ring: 1.1, audio: null, biz: "Over The Vines", len: null,
@@ -1320,7 +1320,7 @@ var V = {
   },
   clinic: {
     intake: {
-      title: "Let's get your practice set up.",
+      title: "Tell me about your practice.",
       nameLabel: "Practice name", typeLabel: "Type of practice",
       sysLabel: "Practice management software",
       types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
@@ -1682,7 +1682,10 @@ function select(k){
     "calc-section":    !cfg.calls,
     "pricing-section": !(tiers && tiers.length),
     "yourline":        k === "personal",
-    "dashboard":       k === "personal"
+    "dashboard":       k === "personal",
+    // The waitlist is the personal line's own CTA; on a business tab it is
+    // an unrelated consumer product sitting in the middle of the pitch.
+    "personal":        k !== "personal"
   };
   Object.keys(hide).forEach(function(id){
     var el = document.getElementById(id);
@@ -1960,6 +1963,12 @@ select("home");
       if (!payload.first_name || !payload.email || !payload.business_name) {
         m.className = "in-msg err";
         m.textContent = "Name, email and business name, and I can take it from there.";
+        return;
+      }
+      // This is a phone product; a number is how the conversation starts.
+      if (payload.phone.replace(/\D/g, "").length < 10) {
+        m.className = "in-msg err";
+        m.textContent = "A phone number too \u2014 it's the quickest way to sort the setup.";
         return;
       }
       m.className = "in-msg"; m.textContent = "Sending\u2026"; btn.disabled = true;
