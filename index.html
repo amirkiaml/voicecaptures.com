@@ -250,8 +250,15 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .mk-hint{font-size:10.5px;color:var(--muted);line-height:1.5;max-width:150px}
 
 .mk-panel{padding:16px 16px 14px;min-width:0;display:flex;flex-direction:column}
-.mk-bar{height:2px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:12px}
-.mk-bar i{display:block;height:100%;width:0;background:var(--cyan);border-radius:100px;transition:width .2s linear}
+.mk-bar{position:relative;height:3px;background:var(--bg3);border-radius:100px;margin-bottom:12px;
+  cursor:pointer;touch-action:none}
+.mk-bar::before{content:"";position:absolute;inset:-9px 0;}   /* easier to grab */
+.mk-bar:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+.mk-knob{position:absolute;top:50%;left:0;width:11px;height:11px;border-radius:50%;
+  background:var(--cyan);transform:translate(-50%,-50%) scale(0);transition:transform .15s;
+  pointer-events:none;box-shadow:0 0 0 3px color-mix(in srgb, var(--cyan) 22%, transparent)}
+.mk-bar:hover .mk-knob,.mk-bar.dragging .mk-knob,.mk-bar:focus-visible .mk-knob{transform:translate(-50%,-50%) scale(1)}
+.mk-bar i{display:block;height:100%;width:0;background:var(--cyan);border-radius:100px}
 .mk-pick{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .mk-pick[hidden]{display:none}
 .mk-pick button{font-family:var(--body);font-size:11.5px;font-weight:700;padding:6px 12px;
@@ -292,7 +299,7 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .mk-note:empty{display:none}
 .mk-fallback{margin-top:10px}
 .mk-fallback.js{display:none}
-.mk-fallback audio{width:100%;height:34px}
+.mk-fallback audio{width:100%;height:34px;filter:invert(.92) hue-rotate(180deg) contrast(.92)}
 @media (max-width:620px){
   .mk-lines{max-height:300px}
   .mk-line{max-width:94%}
@@ -375,27 +382,68 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .terms p{font-size:13px;color:var(--muted);line-height:1.6}
 
 
-/* ---- Name-your-business demo ---- */
-.nb{max-width:620px;margin:0 auto}
-.nb-form{display:flex;gap:10px;flex-wrap:wrap}
-.nb-form input{flex:1 1 240px;min-width:0;background:var(--bg3);border:1px solid var(--line2);
-  border-radius:8px;padding:14px 16px;color:var(--text);font-family:var(--body);font-size:15px}
+/* ---- Business lookup: the one thing a visitor can do that proves it. ---- */
+.yl-band{background:
+  radial-gradient(900px 340px at 50% -8%, color-mix(in srgb, var(--cyan) 11%, transparent), transparent 70%),
+  var(--bg2);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.yl-head{text-align:center;margin-bottom:26px}
+.yl-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:6px 14px;border-radius:100px;margin-bottom:16px;
+  background:color-mix(in srgb, var(--cyan) 15%, transparent);color:var(--cyan)}
+.yl-band h2{font-size:clamp(26px,4vw,38px)}
+.yl-band h2 em{font-style:normal;color:var(--cyan)}
+.yl-band .sub{margin-bottom:0}
+
+.nb{max-width:600px;margin:0 auto}
+.nb-form{display:flex;gap:10px;flex-wrap:wrap;
+  background:var(--bg3);border:1px solid var(--cyan);border-radius:12px;padding:8px;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--cyan) 10%, transparent)}
+.nb-form input{flex:1 1 220px;min-width:0;background:transparent;border:0;
+  padding:13px 12px;color:var(--text);font-family:var(--body);font-size:16px}
 .nb-form input::placeholder{color:var(--muted)}
-.nb-form input:focus{outline:2px solid var(--cyan);outline-offset:1px}
-.nb-form .btn{flex:0 0 auto}
-.nb-msg{font-size:13px;color:var(--muted);margin-top:12px;min-height:18px}
+.nb-form input:focus{outline:none}
+.nb-form .btn{flex:0 0 auto;padding:13px 26px}
+.nb-msg{font-size:13px;color:var(--muted);margin-top:12px;text-align:center;min-height:18px}
 .nb-msg.err{color:var(--red)}
-.nb-out{margin-top:22px;display:none}
+
+/* Generation takes a few seconds; show the work rather than a dead spinner. */
+.nb-steps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.nb-steps[hidden]{display:none}
+.nb-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);
+  background:var(--bg3);border:1px solid var(--line);border-radius:100px;padding:7px 14px;
+  transition:color .25s,border-color .25s}
+.nb-num{width:17px;height:17px;border-radius:50%;background:var(--bg2);color:var(--faint);
+  display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;
+  transition:background .25s,color .25s}
+.nb-step.on{color:var(--text);border-color:color-mix(in srgb, var(--cyan) 45%, transparent)}
+.nb-step.on .nb-num{background:var(--cyan);color:var(--bg)}
+.nb-step.done{color:var(--muted)}
+.nb-step.done .nb-num{background:color-mix(in srgb, var(--cyan) 30%, transparent);color:var(--text)}
+
+.nb-out{margin-top:24px;display:none}
 .nb-out.on{display:block}
-.nb-biz{font-family:var(--display);font-weight:700;font-size:17px;margin-bottom:2px}
-.nb-addr{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.nb-found{text-align:center;margin-bottom:18px}
+.nb-biz{font-family:var(--display);font-weight:700;font-size:20px;margin-bottom:2px}
+.nb-addr{font-size:13px;color:var(--muted)}
 .nb-clip{background:var(--bg3);border:1px solid var(--line);border-radius:12px;
-  padding:16px 18px;margin-bottom:12px}
-.nb-clip .lab{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--cyan);margin-bottom:8px}
-.nb-clip p{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:12px}
-.nb-clip audio{width:100%;height:36px}
-.nb-note{font-size:11.5px;color:var(--faint);line-height:1.6;margin-top:12px}
+  padding:18px 20px;margin-bottom:12px}
+.nb-clip .lab{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:9px}
+.nb-clip p{font-size:13.5px;line-height:1.6;color:var(--text);margin-bottom:13px}
+.nb-clip audio{width:100%;height:38px;border-radius:100px;
+  /* Native controls render as a white bar on dark. WebKit exposes the
+     shadow parts; other engines fall back to a dimmed default. */
+  filter:invert(.92) hue-rotate(180deg) contrast(.92)}
+.nb-clip audio::-webkit-media-controls-panel{background:#f2f2ee}
+.nb-note{font-size:11.5px;color:var(--faint);line-height:1.6;margin-top:14px;text-align:center}
+@media (max-width:620px){
+  .nb-form{padding:7px}
+  .nb-form input{font-size:15.5px;flex-basis:100%}
+  .nb-form .btn{width:100%}
+  .nb-steps{gap:6px}
+  .nb-step{font-size:11px;padding:6px 11px}
+}
 
 /* ---- Coming soon ---- */
 .soon-tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.14em;
@@ -412,6 +460,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
   padding:clamp(26px,4vw,40px);max-width:680px;margin:0 auto;text-align:center}
 .wl .price{font-size:40px;margin:6px 0 4px}
 .wl .price em{font-size:15px}
+.wl-when{font-size:13px;color:var(--cyan);margin:4px 0 0;font-weight:700}
 .wl-lead{font-size:14.5px;color:var(--muted);line-height:1.65;margin:0 auto 22px;max-width:480px}
 .wl-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .wl-form input,.wl-form select{flex:1 1 200px;min-width:0;background:var(--bg2);
@@ -421,7 +470,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .wl-form input:focus,.wl-form select:focus{outline:2px solid var(--cyan);outline-offset:1px}
 .wl-form .btn{flex:0 0 auto}
 
-.wl-ask{font-size:13px;color:var(--text);margin:22px 0 10px}
+.wl-ask{font-size:13px;color:var(--text);margin:20px 0 10px}
 .wl-ask span{color:var(--muted)}
 .wl-reasons{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .wl-reasons button{font-family:var(--body);font-size:12.5px;line-height:1.3;
@@ -543,8 +592,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 <a class="anno" href="#personal" id="anno">
   <span class="anno-dot" aria-hidden="true"></span>
-  <b>New &mdash; a personal line for your own phone.</b>
-  <span class="anno-sub">Screens spam, takes messages, $9/mo beta.</span>
+  <b>Coming soon &mdash; a personal line for your own phone.</b>
+  <span class="anno-sub">Screens spam, takes messages. $9/mo in beta &mdash; join the waitlist.</span>
   <span class="anno-go" aria-hidden="true">&rarr;</span>
 </a>
 
@@ -606,7 +655,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       </div>
 
       <div class="mk-panel">
-        <div class="mk-bar"><i id="mk-prog"></i></div>
+        <div class="mk-bar" id="mk-bar" role="slider" tabindex="0" aria-label="Seek within the call"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <i id="mk-prog"></i><span class="mk-knob" id="mk-knob" aria-hidden="true"></span>
+        </div>
         <div class="mk-pick" id="mk-pick" role="group" aria-label="Choose an example call" hidden></div>
         <div class="mk-head">
           <span class="mini"><span class="dot" id="mk-dot" aria-hidden="true"></span>Live transcript</span>
@@ -693,21 +745,37 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 
 
-<section id="yourline">
+<section id="yourline" class="yl-band">
   <div class="wrap">
-    <h2 class="center">Hear it answer your line</h2>
-    <p class="sub">Type your business name. We'll pull your public listing and play two sample calls in your name.</p>
+    <div class="yl-head">
+      <span class="yl-tag">Try it on your own business &mdash; free, 20 seconds</span>
+      <h2 class="center">Hear it answer <em>your</em> line.</h2>
+      <p class="sub">Type your business name. We pull your public listing and generate two calls in your name, right now, with your real address and today's hours.</p>
+    </div>
+
     <div class="nb">
       <div class="nb-form">
-        <input id="nb-q" type="text" autocomplete="organization" placeholder="e.g. Maple Ridge Plumbing, Toronto" aria-label="Your business name">
+        <input id="nb-q" type="text" autocomplete="organization" placeholder="Your business name and city" aria-label="Your business name">
         <button class="btn btn-primary" id="nb-go" type="button">Hear it</button>
       </div>
       <p class="nb-msg" id="nb-msg"></p>
+
+      <div class="nb-steps" id="nb-steps" hidden>
+        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Finding your listing</div>
+        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Writing the script</div>
+        <div class="nb-step" data-s="3"><span class="nb-num">3</span>Generating the voice</div>
+      </div>
+
       <div class="nb-out" id="nb-out">
-        <div class="nb-biz" id="nb-biz"></div>
-        <div class="nb-addr" id="nb-addr"></div>
+        <div class="nb-found">
+          <div class="nb-biz" id="nb-biz"></div>
+          <div class="nb-addr" id="nb-addr"></div>
+        </div>
         <div id="nb-clips"></div>
-        <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar — this is the stock version.</p>
+        <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar &mdash; this is the stock version.</p>
+        <div class="center" style="margin-top:18px">
+          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Set this up on my number</a>
+        </div>
       </div>
     </div>
   </div>
@@ -794,8 +862,9 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <section id="personal">
   <div class="wrap">
     <div class="wl">
-      <span class="soon-tag">Beta &mdash; waitlist open</span>
+      <span class="soon-tag">In beta &mdash; not live yet</span>
       <h2>A personal line that screens your calls</h2>
+      <p class="wl-when">Still being built. Join the list and you'll get it first, at the beta price.</p>
       <div class="price">$9<em>/mo</em></div>
       <p style="font-size:12px;color:var(--faint);margin:-2px 0 14px">Introductory beta price. It will change before general release &mdash; everyone on the waitlist gets told before it does, and keeps the beta rate for their first year.</p>
       <p class="wl-lead">Not for a business &mdash; for you. It picks up the numbers you don't recognise, turns away the spam, and texts you who called and what they wanted. You call back the ones that matter.</p>
@@ -805,22 +874,20 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
         <div><span>&#10003;</span><span>Texts you a summary</span></div>
         <div><span>&#10003;</span><span>Keeps your number</span></div>
       </div>
+      <p class="wl-ask">What's driving it? <span>Optional</span></p>
+      <div class="wl-reasons" id="wl-reasons" role="group" aria-label="Why you want this">
+        <button type="button" data-r="spam">Endless spam calls</button>
+        <button type="button" data-r="missed">I miss the ones that matter</button>
+        <button type="button" data-r="other">Something else</button>
+      </div>
+      <input class="wl-other" id="wl-other" type="text" hidden placeholder="What is it?" aria-label="Tell me more">
+
       <form class="wl-form" id="wl-form" style="margin-top:18px">
         <input id="wl-email" type="email" required autocomplete="email" placeholder="you@email.com" aria-label="Your email">
         <input id="wl-phone" type="tel" autocomplete="tel" placeholder="Mobile (optional)" aria-label="Your mobile number">
         <button class="btn btn-primary" type="submit" id="wl-go">Join the waitlist</button>
       </form>
 
-      <p class="wl-ask">What's driving it? <span>Optional &mdash; it shapes what I build first.</span></p>
-      <div class="wl-reasons" id="wl-reasons" role="group" aria-label="Why you want this">
-        <button type="button" data-r="spam">Endless spam and scam calls</button>
-        <button type="button" data-r="unknown">I never answer unknown numbers</button>
-        <button type="button" data-r="missed">I miss calls that actually mattered</button>
-        <button type="button" data-r="work">Work calls bleeding into my evenings</button>
-        <button type="button" data-r="privacy">I don't want to give out my real number</button>
-        <button type="button" data-r="other">Something else</button>
-      </div>
-      <input class="wl-other" id="wl-other" type="text" hidden placeholder="What is it?" aria-label="Tell me more">
 
       <p class="wl-msg" id="wl-msg"></p>
       <p class="nb-note" style="text-align:center">Email is enough. Leave a mobile if you'd rather hear about it by text.</p>
@@ -1232,7 +1299,12 @@ function mkPaint(t){
   $("mk-phone").classList.toggle("on", !ringing && MK.playing);
 
   var total = v.audio ? ($("mk-audio").duration || 75.3) : (v.convo[v.convo.length-1][0] + 4);
-  $("mk-prog").style.width = Math.min(100, t/total*100) + "%";
+  var pct = Math.max(0, Math.min(100, t / total * 100));
+  $("mk-prog").style.width = pct + "%";
+  var knob = $("mk-knob");
+  if (knob) knob.style.left = pct + "%";
+  var bar = $("mk-bar");
+  if (bar) bar.setAttribute("aria-valuenow", Math.round(pct));
 }
 
 function renderThread(v){
@@ -1423,6 +1495,7 @@ function select(k){
   }
 
   var hide = {
+    "demo":            k === "personal",
     "calc-section":    !cfg.calls,
     "pricing-section": !(tiers && tiers.length),
     "yourline":        k === "personal",
@@ -1463,6 +1536,58 @@ $("s-rate").addEventListener("input", function(e){ state.rate = +e.target.value;
 $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value; calc(); });
 
 
+
+/* Scrubbing. Works for the recorded verticals against the audio element, and
+   for the illustrated ones against the clock that drives them. */
+(function(){
+  var bar = document.getElementById("mk-bar");
+  if (!bar) return;
+  var audio = document.getElementById("mk-audio");
+  var dragging = false;
+
+  function total(){
+    var v = MK.v;
+    if (!v) return 1;
+    if (v.audio && audio.duration) return audio.duration;
+    return v.convo[v.convo.length - 1][0] + 4;
+  }
+  function seekTo(clientX){
+    var r = bar.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    var t = pct * total();
+    if (MK.v && MK.v.audio) { audio.currentTime = t; mkPaint(t); }
+    else { MK.t0 = Date.now() - t * 1000; mkPaint(t); }
+  }
+
+  bar.addEventListener("pointerdown", function(e){
+    dragging = true; bar.classList.add("dragging");
+    bar.setPointerCapture(e.pointerId); seekTo(e.clientX); e.preventDefault();
+  });
+  bar.addEventListener("pointermove", function(e){ if (dragging) seekTo(e.clientX); });
+  function stop(e){
+    if (!dragging) return;
+    dragging = false; bar.classList.remove("dragging");
+    try { bar.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  bar.addEventListener("pointerup", stop);
+  bar.addEventListener("pointercancel", stop);
+
+  // keyboard: arrows nudge, home/end jump
+  bar.addEventListener("keydown", function(e){
+    var step = e.shiftKey ? 10 : 5, dur = total(), cur;
+    cur = (MK.v && MK.v.audio) ? audio.currentTime : (Date.now() - MK.t0) / 1000;
+    var next = null;
+    if (e.key === "ArrowRight") next = Math.min(dur, cur + step);
+    else if (e.key === "ArrowLeft") next = Math.max(0, cur - step);
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = dur;
+    if (next === null) return;
+    e.preventDefault();
+    if (MK.v && MK.v.audio) { audio.currentTime = next; mkPaint(next); }
+    else { MK.t0 = Date.now() - next * 1000; mkPaint(next); }
+  });
+})();
+
 /* play / pause for the recorded call */
 (function(){
   var audio = $("mk-audio"), play = $("mk-play"), icon = $("mk-icon");
@@ -1470,11 +1595,13 @@ $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value
   var PLAY = "M8 5v14l11-7z", PAUSE = "M6 5h4v14H6zM14 5h4v14h-4z";
 
   play.addEventListener("click", function(){
+    if (play.dataset.ended === "1") { play.dataset.ended = ""; audio.currentTime = 0; }
     if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function(){}); }
     else audio.pause();
   });
   audio.addEventListener("play", function(){
     MK.playing = true;
+    play.dataset.ended = "";
     icon.innerHTML = '<path d="' + PAUSE + '"/>';
     play.setAttribute("aria-label", "Pause the recorded call");
     $("mk-dot").classList.add("live");
@@ -1487,8 +1614,18 @@ $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value
     $("mk-dot").classList.remove("live");
     $("mk-phone").classList.remove("on","ringing");
   });
+  var REPLAY = "M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z";
   audio.addEventListener("ended", function(){
-    $("mk-hint").textContent = "Dispatched and texted in 70 seconds.";
+    // Hold the finished state — transcript complete, text delivered — and turn
+    // the control into a restart rather than leaving a dead pause button.
+    MK.playing = false;
+    mkPaint(audio.duration || 0);
+    icon.innerHTML = '<path d="' + REPLAY + '"/>';
+    play.setAttribute("aria-label", "Play it again");
+    play.dataset.ended = "1";
+    $("mk-phone").classList.remove("on","ringing");
+    $("mk-dot").classList.remove("live");
+    $("mk-hint").textContent = "That's the whole call. Play it again?";
   });
   audio.addEventListener("timeupdate", function(){ if (MK.v && MK.v.audio) mkPaint(audio.currentTime); });
   audio.addEventListener("seeked",    function(){ if (MK.v && MK.v.audio) mkPaint(audio.currentTime); });
@@ -1511,8 +1648,21 @@ select("home");
       if (text.length < 3) { msg.className = "nb-msg err"; msg.textContent = "Enter your business name."; return; }
       if (busy) return;
       busy = true; go.disabled = true;
-      msg.className = "nb-msg"; msg.textContent = "Looking you up and building the clips\u2026";
+      msg.className = "nb-msg"; msg.textContent = "";
       out.classList.remove("on");
+
+      // Generation takes a few seconds. Walking the steps makes the wait feel
+      // like work being done rather than a page that has stalled.
+      var steps = document.getElementById("nb-steps");
+      var els = steps.querySelectorAll(".nb-step");
+      steps.hidden = false;
+      for (var i = 0; i < els.length; i++) els[i].className = "nb-step";
+      els[0].classList.add("on");
+      var stepTimers = [
+        setTimeout(function(){ els[0].className = "nb-step done"; els[1].classList.add("on"); }, 1400),
+        setTimeout(function(){ els[1].className = "nb-step done"; els[2].classList.add("on"); }, 3200)
+      ];
+      function stopSteps(){ stepTimers.forEach(clearTimeout); steps.hidden = true; }
 
       fetch(API + "/demo-preview", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -1528,10 +1678,13 @@ select("home");
                  "<p>" + esc(c.text) + "</p>" +
                  '<audio controls preload="none" src="' + c.url + '"></audio></div>';
         }).join("");
+        stopSteps();
         msg.textContent = "";
         out.classList.add("on");
+        out.scrollIntoView({ behavior: "smooth", block: "nearest" });
       })
       .catch(function(e){
+        stopSteps();
         msg.className = "nb-msg err";
         msg.textContent = e.message || "Something went wrong. Try again.";
       })
