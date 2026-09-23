@@ -823,6 +823,17 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
   filter:drop-shadow(0 26px 46px rgba(0,0,0,.5))}
 .blob.has-person{align-items:flex-end}
 .blob.has-person .orb-wave{display:none}
+
+/* A photo of the sector, with the same orbit behind it. */
+.blob-shot{position:relative;z-index:2;display:block;width:96%}
+.blob-shot[hidden]{display:none}
+.blob-shot img{width:100%;height:auto;display:block;border-radius:18px;
+  box-shadow:0 26px 60px rgba(0,0,0,.34)}
+html[data-theme="light"] .blob-shot img{box-shadow:0 22px 50px rgba(13,23,41,.18)}
+.blob.has-shot{aspect-ratio:auto;padding:5% 0}
+.blob.has-shot .orb-wave{display:none}
+.blob.has-shot .blob-shape{inset:-4% -6%}
+.blob.has-shot .blob-orbit{inset:-8% -6%}
 .orb-cap{text-align:center;font-size:12px;color:var(--muted);margin-top:20px}
 @media (prefers-reduced-motion:reduce){
   .blob-shape,.blob-orbit .bd,.blob-orbit .bo{animation:none}
@@ -1193,6 +1204,10 @@ footer{background:#07101e}
       <picture class="blob-person" id="blob-person" hidden>
         <source srcset="/personal-hero.webp" type="image/webp">
         <img src="/personal-hero.png" alt="" width="571" height="760" loading="lazy">
+      </picture>
+      <picture class="blob-shot" id="blob-shot" hidden>
+        <source id="blob-shot-src" srcset="" type="image/webp">
+        <img id="blob-shot-img" src="" alt="" width="1100" height="733" loading="lazy">
       </picture>
     </div>
     <p class="orb-cap">Current conversational voice models &mdash; most callers never ask.</p>
@@ -2295,13 +2310,27 @@ function select(k, fromPop){
   var person = document.getElementById("blob-person"),
       blob   = document.getElementById("orb"),
       cap    = document.querySelector(".orb-cap");
+  var shot = document.getElementById("blob-shot");
+  // A photo of the sector where there is one; the portrait for the personal
+  // line; the bare waveform for anything unlisted.
+  var SHOTS = { home:"home", food:"food", clinic:"clinic" };
+  if (shot) {
+    var f = SHOTS[k];
+    shot.hidden = !f;
+    if (f) {
+      document.getElementById("blob-shot-src").srcset = "/sector-" + f + ".webp";
+      document.getElementById("blob-shot-img").src = "/sector-" + f + ".jpg";
+    }
+    blob.classList.toggle("has-shot", !!f);
+  }
+
   if (person && blob) {
     var isPersonal = k === "personal";
     person.hidden = !isPersonal;
     blob.classList.toggle("has-person", isPersonal);
     if (cap) cap.textContent = isPersonal
       ? "Your line answers so you don't have to \u2014 and tells you who it was."
-      : "Current conversational voice models \u2014 most callers never ask.";
+      : "Every call answered while you are working. Illustrative.";
   }
 
   renderIntake(k, cfg, tiers);
