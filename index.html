@@ -72,6 +72,16 @@ body{transition:background-color .45s ease}
 }
 [data-v="clinic"] .mk-phone{background:linear-gradient(168deg,#2a1f4a 0%,#161027 68%)}
 [data-v="clinic"] .mk-caller{background:#6D28D9}
+
+[data-v="personal"]{
+  --bg:#12100a; --bg2:#1a170f; --bg3:#241f15;
+  --blue:#B45309; --blue-dk:#92400E; --blue-glow:rgba(180,83,9,.2);
+  --cyan:#FBBF24; --cyan-lt:#FCD34D;
+}
+[data-v="personal"] .mk-phone{background:linear-gradient(168deg,#3a2c10 0%,#1c1709 68%)}
+[data-v="personal"] header{background:rgba(18,16,10,.76)}
+[data-v="personal"] .anno{display:none}
+
 [data-v="clinic"] header{background:rgba(13,11,19,.76)}
 
 /* type */
@@ -90,6 +100,24 @@ h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
 .btn-primary:hover{background:var(--cyan-lt);color:var(--bg);transform:translateY(-1px)}
 .btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--text)}
 .btn-ghost:hover{background:var(--bg3);border-color:rgba(255,255,255,.28);color:var(--text)}
+
+
+/* ---- Announcement bar: amber on purpose, so it reads as an aside to the
+   main product rather than part of the vertical you're browsing. ---- */
+.anno{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  background:linear-gradient(90deg,#F59E0B,#FBBF24);color:#1a1205;
+  padding:10px 20px;font-size:13.5px;line-height:1.4;text-align:center;
+  text-decoration:none;transition:filter .2s}
+.anno:hover{filter:brightness(1.07);color:#1a1205}
+.anno b{font-weight:700}
+.anno-sub{opacity:.78}
+.anno-dot{width:7px;height:7px;border-radius:50%;background:#1a1205;flex:0 0 auto;
+  animation:blip 1.8s ease-in-out infinite}
+.anno-go{font-weight:700}
+@media (max-width:620px){
+  .anno{font-size:12px;padding:9px 14px;gap:7px}
+  .anno-sub{display:none}
+}
 
 /* header */
 header{position:sticky;top:0;z-index:30;background:rgba(11,13,19,.76);
@@ -126,6 +154,25 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .switch button{white-space:nowrap;flex:0 0 auto}
 .switch button{font-family:var(--body);font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:100px;border:0;cursor:pointer;background:var(--bg3);color:var(--muted);transition:background .2s,color .2s}
 .switch button[aria-selected="true"]{background:var(--blue);color:#fff}
+
+.switch button[data-hue]{position:relative;color:#cfcfc8;background:var(--bg3)}
+.switch button[data-hue]::before{content:"";position:absolute;inset:0;border-radius:100px;
+  background:currentColor;opacity:.13;transition:opacity .2s}
+.switch button[data-hue="personal"]{color:#FBBF24}
+.switch button[data-hue="home"]    {color:#38BDF8}
+.switch button[data-hue="food"]    {color:#34D399}
+.switch button[data-hue="clinic"]  {color:#A78BFA}
+.switch button[data-hue="other"]   {color:#94A3B8}
+.switch button[data-hue] span{position:relative;z-index:1}
+.switch button[data-hue]:hover::before{opacity:.22}
+.switch button[aria-selected="true"][data-hue]{color:#fff;font-weight:700}
+.switch button[aria-selected="true"][data-hue="personal"]{background:#B45309}
+.switch button[aria-selected="true"][data-hue="home"]    {background:#2563EB}
+.switch button[aria-selected="true"][data-hue="food"]    {background:#047857}
+.switch button[aria-selected="true"][data-hue="clinic"]  {background:#7C3AED}
+.switch button[aria-selected="true"][data-hue="other"]   {background:#475569}
+.switch button[aria-selected="true"][data-hue]::before{opacity:0}
+
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
 .stat{background:var(--bg);padding:24px 14px}
 .stat b{display:block;font-family:var(--display);font-weight:700;font-size:28px;
@@ -205,6 +252,13 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .mk-panel{padding:16px 16px 14px;min-width:0;display:flex;flex-direction:column}
 .mk-bar{height:2px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:12px}
 .mk-bar i{display:block;height:100%;width:0;background:var(--cyan);border-radius:100px;transition:width .2s linear}
+.mk-pick{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.mk-pick[hidden]{display:none}
+.mk-pick button{font-family:var(--body);font-size:11.5px;font-weight:700;padding:6px 12px;
+  border-radius:100px;cursor:pointer;background:var(--bg3);border:1px solid var(--line2);
+  color:var(--muted);transition:background .18s,color .18s,border-color .18s}
+.mk-pick button:hover{color:var(--text)}
+.mk-pick button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 .mk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .mk-lines{position:relative;display:flex;flex-direction:column;gap:8px;max-height:330px;
   overflow-y:auto;padding-right:6px;scroll-behavior:smooth;scrollbar-width:thin;
@@ -320,6 +374,75 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .terms{margin-top:28px;text-align:center;display:flex;flex-direction:column;gap:6px}
 .terms p{font-size:13px;color:var(--muted);line-height:1.6}
 
+
+/* ---- Name-your-business demo ---- */
+.nb{max-width:620px;margin:0 auto}
+.nb-form{display:flex;gap:10px;flex-wrap:wrap}
+.nb-form input{flex:1 1 240px;min-width:0;background:var(--bg3);border:1px solid var(--line2);
+  border-radius:8px;padding:14px 16px;color:var(--text);font-family:var(--body);font-size:15px}
+.nb-form input::placeholder{color:var(--muted)}
+.nb-form input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.nb-form .btn{flex:0 0 auto}
+.nb-msg{font-size:13px;color:var(--muted);margin-top:12px;min-height:18px}
+.nb-msg.err{color:var(--red)}
+.nb-out{margin-top:22px;display:none}
+.nb-out.on{display:block}
+.nb-biz{font-family:var(--display);font-weight:700;font-size:17px;margin-bottom:2px}
+.nb-addr{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.nb-clip{background:var(--bg3);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;margin-bottom:12px}
+.nb-clip .lab{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:8px}
+.nb-clip p{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:12px}
+.nb-clip audio{width:100%;height:36px}
+.nb-note{font-size:11.5px;color:var(--faint);line-height:1.6;margin-top:12px}
+
+/* ---- Coming soon ---- */
+.soon-tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:4px 11px;border-radius:100px;margin-bottom:14px;
+  background:color-mix(in srgb, var(--cyan) 14%, transparent);color:var(--cyan)}
+.soon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:14px}
+.soon-card{background:var(--bg3);border:1px dashed var(--line2);border-radius:12px;padding:20px}
+.soon-card h3{font-size:14px;margin-bottom:5px}
+.soon-card p{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ---- Waitlist ---- */
+.wl-featured .wl{border-color:var(--cyan);box-shadow:0 0 0 1px color-mix(in srgb, var(--cyan) 22%, transparent)}
+.wl{background:var(--bg3);border:1px solid var(--line2);border-radius:16px;
+  padding:clamp(26px,4vw,40px);max-width:680px;margin:0 auto;text-align:center}
+.wl .price{font-size:40px;margin:6px 0 4px}
+.wl .price em{font-size:15px}
+.wl-lead{font-size:14.5px;color:var(--muted);line-height:1.65;margin:0 auto 22px;max-width:480px}
+.wl-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.wl-form input,.wl-form select{flex:1 1 200px;min-width:0;background:var(--bg2);
+  border:1px solid var(--line2);border-radius:8px;padding:13px 15px;color:var(--text);
+  font-family:var(--body);font-size:14.5px}
+.wl-form input::placeholder{color:var(--muted)}
+.wl-form input:focus,.wl-form select:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.wl-form .btn{flex:0 0 auto}
+
+.wl-ask{font-size:13px;color:var(--text);margin:22px 0 10px}
+.wl-ask span{color:var(--muted)}
+.wl-reasons{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.wl-reasons button{font-family:var(--body);font-size:12.5px;line-height:1.3;
+  padding:9px 14px;border-radius:100px;cursor:pointer;
+  background:var(--bg2);border:1px solid var(--line2);color:var(--muted);
+  transition:background .18s,border-color .18s,color .18s}
+.wl-reasons button:hover{border-color:color-mix(in srgb, var(--cyan) 45%, transparent);color:var(--text)}
+.wl-reasons button[aria-pressed="true"]{background:color-mix(in srgb, var(--cyan) 16%, transparent);
+  border-color:var(--cyan);color:var(--text);font-weight:700}
+.wl-other{display:block;width:100%;max-width:340px;margin:12px auto 0;background:var(--bg2);
+  border:1px solid var(--line2);border-radius:8px;padding:11px 14px;color:var(--text);
+  font-family:var(--body);font-size:14px}
+.wl-other[hidden]{display:none}
+.wl-other:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.wl-msg{font-size:13px;color:var(--muted);margin-top:14px;min-height:18px}
+.wl-msg.err{color:var(--red)}
+.wl-msg.ok{color:var(--cyan)}
+.wl-pts{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;margin:20px 0 4px}
+.wl-pts div{font-size:12.5px;color:var(--muted);display:flex;gap:7px}
+.wl-pts span:first-child{color:var(--cyan)}
+
 /* who */
 .tags{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:48px}
 .tags div{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px 28px;font-size:14px;font-weight:500}
@@ -418,6 +541,13 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 </head>
 <body>
 
+<a class="anno" href="#personal" id="anno">
+  <span class="anno-dot" aria-hidden="true"></span>
+  <b>New &mdash; a personal line for your own phone.</b>
+  <span class="anno-sub">Screens spam, takes messages, $9/mo beta.</span>
+  <span class="anno-go" aria-hidden="true">&rarr;</span>
+</a>
+
 <header>
   <div class="bar">
     <div class="brand">
@@ -431,18 +561,20 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <div class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">AI voice agents for businesses that live on the phone</p>
+      <p class="eyebrow" id="eyebrow">AI voice agents for businesses that live on the phone</p>
 
       <div class="switch" role="tablist" aria-label="Choose your sector">
-        <button type="button" role="tab" aria-selected="true" data-tab="home">Home services</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="food">Restaurants &amp; cafés</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="clinic">Clinics &amp; dental</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="personal" data-hue="personal">Personal line</button>
+        <button type="button" role="tab" aria-selected="true"  data-tab="home"     data-hue="home">Home services</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="food"     data-hue="food">Restaurants &amp; cafés</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="clinic"   data-hue="clinic">Clinics &amp; dental</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="other"    data-hue="other">Something else</button>
       </div>
 
-      <h1>You're missing calls.<br>We answer them.</h1>
+      <h1 id="headline">You're missing calls.<br>We answer them.</h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
-      <p class="fine">14 days free. No credit card. Setup takes 10 minutes.</p>
+      <a class="btn btn-primary" id="hero-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
 
       <div class="stats" id="stats">
         <div class="stat"><b>14%</b><div class="lbl">Missed-call rate in home services</div><div class="src">CallRail benchmark report, 2025</div></div>
@@ -475,6 +607,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
       <div class="mk-panel">
         <div class="mk-bar"><i id="mk-prog"></i></div>
+        <div class="mk-pick" id="mk-pick" role="group" aria-label="Choose an example call" hidden></div>
         <div class="mk-head">
           <span class="mini"><span class="dot" id="mk-dot" aria-hidden="true"></span>Live transcript</span>
           <span class="mini" id="mk-len">1:15</span>
@@ -497,7 +630,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   </div>
 </section>
 
-<section>
+<section id="calc-section">
   <div class="wrap">
     <h2 class="center">See exactly what you're losing.</h2>
     <p class="sub">The sliders start on typical numbers for <span id="c-short">home service businesses</span>.</p>
@@ -559,6 +692,43 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 
 
+
+<section id="yourline">
+  <div class="wrap">
+    <h2 class="center">Hear it answer your line</h2>
+    <p class="sub">Type your business name. We'll pull your public listing and play two sample calls in your name.</p>
+    <div class="nb">
+      <div class="nb-form">
+        <input id="nb-q" type="text" autocomplete="organization" placeholder="e.g. Maple Ridge Plumbing, Toronto" aria-label="Your business name">
+        <button class="btn btn-primary" id="nb-go" type="button">Hear it</button>
+      </div>
+      <p class="nb-msg" id="nb-msg"></p>
+      <div class="nb-out" id="nb-out">
+        <div class="nb-biz" id="nb-biz"></div>
+        <div class="nb-addr" id="nb-addr"></div>
+        <div id="nb-clips"></div>
+        <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar — this is the stock version.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="dashboard">
+  <div class="wrap center">
+    <span class="soon-tag">Coming soon</span>
+    <h2>Your dashboard</h2>
+    <p class="sub">Every call in one place. In build now — clients on the trial get it first, at no extra cost.</p>
+    <div class="soon-grid" style="text-align:left;max-width:860px;margin:0 auto">
+      <div class="soon-card"><h3>Call log</h3><p>Every call with caller, time, outcome and the details captured.</p></div>
+      <div class="soon-card"><h3>Recordings</h3><p>Play back any call and read the transcript.</p></div>
+      <div class="soon-card"><h3>Bookings</h3><p>What went on the calendar, and what needed a callback.</p></div>
+      <div class="soon-card"><h3>Minutes used</h3><p>Where you are against your plan, before the invoice.</p></div>
+      <div class="soon-card"><h3>History</h3><p>Calls and recordings kept 14 days on every plan. Longer retention is available &mdash; ask for a quote.</p></div>
+    </div>
+    <p class="nb-note" style="text-align:center;margin-top:18px">Until it ships, you get a texted summary of every call and a weekly rundown by email.</p>
+  </div>
+</section>
+
 <section class="alt" id="cal-section">
   <div class="wrap">
     <h2 class="center">See it in action.</h2>
@@ -597,7 +767,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   </div>
 </section>
 
-<section>
+<section id="pricing-section">
   <div class="wrap">
     <h2 class="center">Pricing</h2>
     <p class="sub" id="p-trades" style="margin-bottom:10px">Plumbing · HVAC · Electrical · Locksmith · Garage door</p>
@@ -611,9 +781,49 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
     <div class="terms">
       <p>All prices CAD, plus HST. Additional minutes $1.25.</p>
-      <p id="setup-line">Setup $149 — one-time.</p>
+      <p id="setup-line">Onboarding $249 one-time — your number, your greeting, hours, services and calendar, configured by hand.</p>
+      <p><b style="color:var(--text)">Custom integration from $500</b>, quoted per job. Your CRM, PMS or field-service software, custom call flows, multiple calendars. Starter is the stock build; anything shaped around your systems is scoped on a call and billed separately.</p>
       <p>Every tier answers 24/7 — after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
+      <p>Call history, recordings and transcripts are kept for 14 days on every plan. Extended retention is quoted separately.</p>
       <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
+    </div>
+  </div>
+</section>
+
+
+<section id="personal">
+  <div class="wrap">
+    <div class="wl">
+      <span class="soon-tag">Beta &mdash; waitlist open</span>
+      <h2>A personal line that screens your calls</h2>
+      <div class="price">$9<em>/mo</em></div>
+      <p style="font-size:12px;color:var(--faint);margin:-2px 0 14px">Introductory beta price. It will change before general release &mdash; everyone on the waitlist gets told before it does, and keeps the beta rate for their first year.</p>
+      <p class="wl-lead">Not for a business &mdash; for you. It picks up the numbers you don't recognise, turns away the spam, and texts you who called and what they wanted. You call back the ones that matter.</p>
+      <div class="wl-pts">
+        <div><span>&#10003;</span><span>Screens unknown numbers</span></div>
+        <div><span>&#10003;</span><span>Takes name, reason, callback</span></div>
+        <div><span>&#10003;</span><span>Texts you a summary</span></div>
+        <div><span>&#10003;</span><span>Keeps your number</span></div>
+      </div>
+      <form class="wl-form" id="wl-form" style="margin-top:18px">
+        <input id="wl-email" type="email" required autocomplete="email" placeholder="you@email.com" aria-label="Your email">
+        <input id="wl-phone" type="tel" autocomplete="tel" placeholder="Mobile (optional)" aria-label="Your mobile number">
+        <button class="btn btn-primary" type="submit" id="wl-go">Join the waitlist</button>
+      </form>
+
+      <p class="wl-ask">What's driving it? <span>Optional &mdash; it shapes what I build first.</span></p>
+      <div class="wl-reasons" id="wl-reasons" role="group" aria-label="Why you want this">
+        <button type="button" data-r="spam">Endless spam and scam calls</button>
+        <button type="button" data-r="unknown">I never answer unknown numbers</button>
+        <button type="button" data-r="missed">I miss calls that actually mattered</button>
+        <button type="button" data-r="work">Work calls bleeding into my evenings</button>
+        <button type="button" data-r="privacy">I don't want to give out my real number</button>
+        <button type="button" data-r="other">Something else</button>
+      </div>
+      <input class="wl-other" id="wl-other" type="text" hidden placeholder="What is it?" aria-label="Tell me more">
+
+      <p class="wl-msg" id="wl-msg"></p>
+      <p class="nb-note" style="text-align:center">Email is enough. Leave a mobile if you'd rather hear about it by text.</p>
     </div>
   </div>
 </section>
@@ -669,6 +879,11 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
 var V = {
   home: {
+    eyebrow: "AI voice agents for businesses that live on the phone",
+    headline: "You're missing calls.<br>We answer them.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "home service businesses", setup: "$149",
     ring: 5.15,
     audio: "sample-call.mp3",
@@ -724,6 +939,11 @@ var V = {
     ]
   },
   food: {
+    eyebrow: "AI voice agents for businesses that live on the phone",
+    headline: "You're missing calls.<br>We answer them.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "restaurants and cafés", setup: "$249",
     ring: 1.1, audio: null, biz: "Kettle Row Coffee", len: null,
     smsBody: '<b>Catering lead</b><br>Priya S. \u00b7 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>40 people \u00b7 Thu 9 AM<br>250 University Ave, 12th floor<br>Coffee + pastries \u2014 call back to quote',
@@ -762,7 +982,131 @@ var V = {
       ["Multi-location","$549","520 minutes","Small group",["Everything in Growth","Per-venue configuration","Custom call flows","Dedicated onboarding"]]
     ]
   },
+  other: {
+    eyebrow: "Any business where the work arrives by phone",
+    headline: "Not on the list?<br>It probably still fits.",
+    ctaLabel: "Tell me about your line",
+    ctaHref: "#personal",
+    ctaFine: "No obligation. If it doesn't fit, I'll say so.",
+    short: "businesses like yours", setup: "$249", consumer: true,
+    ring: 1.1, audio: null, biz: "Over The Vines", len: null,
+    agentLabel: "Your agent",
+    smsBody: '<b>New enquiry</b><br>Rachel M. \u00b7 608 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>Wedding, 120 guests, Sept 2027<br>Wants a site visit \u2014 call back to confirm',
+    smsAt: 8.4,
+    callNote: "An illustration. A venue booking line is being built now.",
+    convo: [
+      [1.1,"caller","Hi \u2014 do you have any Saturdays left next September? We're looking at about 120 people."],
+      [3.2,"agent","We may. Let me take a few details and get you in for a site visit \u2014 can I start with your name?"],
+      [5.4,"caller","Rachel Mercer."],
+      [7.0,"agent","Thanks Rachel. I've sent the team everything \u2014 they'll confirm dates with you today."]
+    ],
+    bad: [],
+    calls: 0, value: 0, rate: 0, conv: 0, newPct: null,
+    valueLabel: "", valueMin: 0, valueMax: 1, valueStep: 1, note: "",
+    hasNumber: false,
+    demoTag: "Built per business",
+    demoTitle: "Tell me how your calls work",
+    demoBody: "Every line is configured by hand \u2014 what it asks, what it books, what it escalates. If your work arrives by phone, it almost certainly fits.",
+    demoNote: "Salons, studios, tutors, venues, trades not listed above. I'll tell you honestly on a call whether it's a fit before you pay anything.",
+    demoCta: "Tell me about your line",
+    lede: "Salons, studios, tutors, venues, contractors we haven't listed \u2014 the mechanics are the same anywhere the phone is how work arrives. Someone calls, needs qualifying, and needs a slot booked.",
+    trades: "Salons \u00b7 Studios \u00b7 Tutors \u00b7 Venues \u00b7 Trades",
+    priceNote: "Priced like home services until we know your call volume.",
+    stats: [
+      ["85%","Of callers whose call goes unanswered never call back","CallRail benchmark report, 2025"],
+      ["10 min","To get a line live once we've spoken","Configured by hand, not a template"],
+      ["$249","Onboarding, then from $179/mo","Custom integrations quoted separately"]
+    ],
+    tiers: "home"
+  },
+  personal: {
+    variants: [
+      {
+        key: "spam", label: "A scam robocall",
+        audio: "personal-spam.mp3", len: "0:22", ring: 0, biz: "Unknown number",
+        agentLabel: "Your line \u00b7 screening",
+        smsTitle: "Text to you",
+        smsBody: "URGENCY: <b>SPAM</b><br>Name: Unknown<br>Phone: +1647\u2022\u2022\u2022\u2022\u2022\u2022\u2022<br>Request: [SPAM] Immigration impersonation robocall",
+        smsAt: 20.2,
+        callNote: "A real screened call. Names are masked. The caller is a recorded scam message impersonating an immigration office.",
+        convo: [
+          [ 0.50,"agent","Hi, you've reached \u2022\u2022\u2022. He's not available right now."],
+          [ 5.00,"agent","This is his virtual assistant. Who's calling?"],
+          [10.75,"caller","Immigration Bureau notification."],
+          [13.50,"caller","You have emergency documents."],
+          [16.12,"caller","For details, English press one, Chinese press two."],
+          [18.88,"caller","\u4f60\u597d\uff0c\u79fb\u6c11\u5c40\u8bed\u97f3\u63d0\u9192\u2026 (recorded Mandarin, same script)"]
+        ]
+      },
+      {
+        key: "bmo", label: "A call worth taking",
+        audio: "personal-bmo.mp3", len: "0:36", ring: 0, biz: "Unknown number",
+        agentLabel: "Your line \u00b7 screening",
+        smsTitle: "Text to you",
+        smsBody: "URGENCY: <b>MESSAGE</b><br>Name: \u2022\u2022\u2022<br>Phone: +1416\u2022\u2022\u2022\u2022\u2022\u2022\u2022<br>Request: \u2022\u2022\u2022 from BMO is checking in with the client and would like a callback",
+        smsAt: 33.0,
+        callNote: "A real screened call. Names and the callback number are masked; everything else is as it happened.",
+        convo: [
+          [ 0.12,"agent","Hi, you've reached \u2022\u2022\u2022. He's not available right now."],
+          [ 2.25,"agent","This is his virtual assistant. Who's calling?"],
+          [ 7.50,"caller","My name is \u2022\u2022\u2022. I'm calling from BMO."],
+          [12.38,"agent","What's it about?"],
+          [14.00,"caller","I'm just checking in with the client."],
+          [17.62,"agent","And what's the best number for him?"],
+          [20.28,"caller","Um \u2014 for me?"],
+          [22.65,"agent","Yes \u2014 what's the best number for \u2022\u2022\u2022 to reach you?"],
+          [26.15,"caller","Oh \u2014 four one six, \u2022\u2022\u2022 \u2022\u2022\u2022\u2022."],
+          [29.75,"agent","So that's \u2022\u2022\u2022 from BMO checking in with a client, and he'd like a call back. Have I got that right?"],
+          [35.50,"caller","That's right."]
+        ]
+      }
+    ],
+    eyebrow: "A personal line \u2014 for your own phone, not your business",
+    headline: "Stop answering<br>numbers you don't know.",
+    ctaLabel: "Join the waitlist",
+    ctaHref: "#personal",
+    ctaFine: "Beta. $9/mo introductory price, subject to change. No card now.",
+    short: "personal lines", setup: "$0", consumer: true,
+    ring: 1.1, audio: null, biz: "Your mobile", len: null,
+    agentLabel: "Your line \u00b7 screening",
+    smsBody: '<b>Screened</b><br>Caller said: BMO, about your credit card<br>Left a callback number<br>Not spam \u2014 worth returning',
+    smsAt: 8.4,
+    callNote: "Placeholder \u2014 real recordings from the beta go here.",
+    convo: [
+      [1.1,"caller","Hi, I'm calling from an unknown number about an urgent matter."],
+      [3.1,"agent","Sure \u2014 who's calling, and what's it regarding?"],
+      [5.1,"caller","It's about a vehicle warranty that's about to expire."],
+      [6.8,"agent","They're not taking those. I'll pass it on if they want it \u2014 thanks."]
+    ],
+    bad: [
+      ["Answer every unknown number",["Most of them are trying to sell you something.","You lose ten minutes to a warranty robot.","You still miss the one that mattered."]],
+      ["Ignore them all",["The clinic calling back about an appointment.","A recruiter, a landlord, a delivery driver.","You find out days later, from a voicemail you never played."]],
+      ["Block and hope",["Spam numbers rotate faster than you can block them.","Legitimate callers get caught in the same net.","Nothing tells you which was which."]]
+    ],
+    calls: 0, value: 0, rate: 0, conv: 0, newPct: null,
+    valueLabel: "", valueMin: 0, valueMax: 1, valueStep: 1,
+    note: "",
+    hasNumber: false,
+    demoTag: "Beta \u2014 waitlist open",
+    demoTitle: "A second number that screens for you",
+    demoBody: "Forward your unknown callers to it. It asks who's calling and why, then texts you a summary \u2014 tagged MESSAGE or SPAM, so you know at a glance what deserves a call back.",
+    demoNote: "Beta. It screens and takes messages \u2014 it does not book appointments or access your calendar. Pricing is introductory and will change before general release.",
+    demoCta: "Join the waitlist",
+    lede: "A second number that picks up the callers you don't recognise, finds out who they are and what they want, and texts you a summary with the spam already flagged \u2014 so you only call back what matters.",
+    trades: "For your own phone \u00b7 not a business line",
+    stats: [
+      ["$9","Per month during the beta","Introductory \u2014 subject to change"],
+      ["0","Setup fee, no contract","Cancel any time"],
+      ["24/7","Screening, including overnight","Your number stays yours"]
+    ],
+    tiers: []
+  },
   clinic: {
+    eyebrow: "AI voice agents for businesses that live on the phone",
+    headline: "You're missing calls.<br>We answer them.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "clinics and dental practices", setup: "$349",
     ring: 1.1, audio: null, biz: "Lakeshore Dental", len: null,
     smsBody: '<b>New patient</b><br>Sarah Chen \u00b7 905 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>Cleaning \u00b7 Thu 10:00 AM<br>Booked',
@@ -816,6 +1160,14 @@ var state = { calls: 0, value: 0, rate: 0, newPct: 35 };
 
 function renderStats(v){
   $("lede").textContent = v.lede;
+  $("eyebrow").textContent = v.eyebrow;
+  $("headline").innerHTML = v.headline;
+  var cta = $("hero-cta");
+  cta.textContent = v.ctaLabel;
+  cta.href = v.ctaHref;
+  if (v.ctaHref.charAt(0) === "#") { cta.removeAttribute("target"); cta.removeAttribute("rel"); }
+  else { cta.target = "_blank"; cta.rel = "noopener"; }
+  $("hero-fine").textContent = v.ctaFine;
   $("stats").innerHTML = v.stats.map(function(t){
     var n = t[0].length;
     var size = n > 9 ? " xlong" : (n > 6 ? " long" : "");
@@ -885,6 +1237,26 @@ function mkPaint(t){
 
 function renderThread(v){
   clearTimers();
+
+  // A vertical may carry several example calls. Draw the picker, then work
+  // from the chosen one as if it were the vertical's own call.
+  var pick = $("mk-pick");
+  if (v.variants && v.variants.length) {
+    var idx = Math.min(v._pick || 0, v.variants.length - 1);
+    v._pick = idx;
+    pick.hidden = false;
+    pick.innerHTML = v.variants.map(function(x, i){
+      return '<button type="button" data-i="' + i + '" aria-pressed="' +
+        (i === idx ? "true" : "false") + '">' + esc(x.label) + "</button>";
+    }).join("");
+    var chosen = v.variants[idx];
+    v = Object.assign({}, v, chosen);
+    MK.parent = V[key];
+  } else {
+    pick.hidden = true;
+    MK.parent = null;
+  }
+
   MK.v = v; MK.playing = false;
   var box = $("mk-lines"), audio = $("mk-audio");
   if (audio) { audio.pause(); audio.currentTime = 0; }
@@ -892,6 +1264,11 @@ function renderThread(v){
   $("mk-biz").textContent = v.biz;
   $("mk-note").textContent = v.callNote || "";
   $("mk-len").textContent = v.len || "";
+  var au = $("mk-audio");
+  if (v.audio) {
+    var want = v.audio;
+    if (au.getAttribute("src") !== want) { au.setAttribute("src", want); au.load(); }
+  }
   $("mk-play").hidden = !v.audio;
   $("mk-hint").textContent = v.audio
     ? "Press play to hear the real recording."
@@ -900,10 +1277,10 @@ function renderThread(v){
   box.innerHTML = v.convo.map(function(l){
     var agent = l[1] === "agent";
     return '<div class="mk-line ' + (agent ? "mk-agent" : "mk-caller") + '">' +
-      '<span class="mk-who">' + (agent ? "Andy \u00b7 AI receptionist" : "Caller") + "</span>" +
+      '<span class="mk-who">' + (agent ? (v.agentLabel || "Andy \u00b7 AI receptionist") : "Caller") + "</span>" +
       l[2].replace(/&/g,"&amp;").replace(/</g,"&lt;") + "</div>";
   }).join("") +
-  '<div class="mk-line mk-sms" id="mk-sms"><span class="mk-who">Text to the owner</span>' +
+  '<div class="mk-line mk-sms" id="mk-sms"><span class="mk-who">' + esc(v.smsTitle || "Text to the owner") + '</span>' +
   v.smsBody + "</div>";
   MK.els = box.querySelectorAll(".mk-line:not(.mk-sms)");
   box._last = null;
@@ -959,7 +1336,10 @@ function renderDemo(v){
 }
 
 function renderTiers(v){
-  var all = v.tiers.concat([ENTERPRISE]);
+  // A vertical can point at another's tiers instead of repeating them.
+  var tiers = typeof v.tiers === "string" ? V[v.tiers].tiers : v.tiers;
+  if (!tiers || !tiers.length) return;
+  var all = tiers.concat([ENTERPRISE]);
   $("tiers").innerHTML = all.map(function(t, n){
     var ent = t[0] === "Enterprise";
     var pop = n === 1;
@@ -976,7 +1356,6 @@ function renderTiers(v){
       '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start your free trial") + "</a>" +
       "</div>";
   }).join("");
-  $("setup-line").textContent = "Setup " + v.setup + " \u2014 one-time.";
   $("p-trades").textContent = v.trades;
   var pn = $("p-note");
   pn.textContent = v.priceNote || "";
@@ -1010,6 +1389,7 @@ function calc(){
 }
 
 function loadCalc(v){
+  if (v.consumer) return;
   state.calls = v.calls; state.value = v.value; state.rate = v.rate;
   state.newPct = v.newPct === null ? 35 : v.newPct;
 
@@ -1030,6 +1410,31 @@ function loadCalc(v){
 function select(k){
   key = k;
   document.documentElement.setAttribute("data-v", k);
+
+  // Show a section only where the vertical has data for it, rather than
+  // hard-coding which ones are "business". A vertical may point its tiers at
+  // another's, so resolve that before deciding.
+  var cfg = V[k];
+  var tiers = typeof cfg.tiers === "string" ? V[cfg.tiers].tiers : cfg.tiers;
+
+  var badBox = document.getElementById("bad");
+  if (badBox && badBox.parentNode && badBox.parentNode.parentNode) {
+    badBox.parentNode.parentNode.hidden = !(cfg.bad && cfg.bad.length);
+  }
+
+  var hide = {
+    "calc-section":    !cfg.calls,
+    "pricing-section": !(tiers && tiers.length),
+    "yourline":        k === "personal",
+    "dashboard":       k === "personal"
+  };
+  Object.keys(hide).forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.hidden = hide[id];
+  });
+
+  var wl = document.getElementById("personal");
+  if (wl) wl.classList.toggle("wl-featured", k === "personal");
   if (MK.tick) { cancelAnimationFrame(MK.tick); MK.tick = null; }
   var v = V[k];
   var tabs = document.querySelectorAll(".switch button");
@@ -1038,6 +1443,15 @@ function select(k){
   }
   renderStats(v); renderBad(v); renderThread(v); renderDemo(v); renderTiers(v); loadCalc(v);
 }
+
+document.getElementById("mk-pick").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-i]");
+  if (!b) return;
+  var a = $("mk-audio");
+  if (a && !a.paused) a.pause();
+  V[key]._pick = +b.getAttribute("data-i");
+  renderThread(V[key]);
+});
 
 document.querySelectorAll(".switch button").forEach(function(b){
   b.addEventListener("click", function(){ select(b.getAttribute("data-tab")); });
@@ -1081,6 +1495,104 @@ $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value
 })();
 
 select("home");
+
+/* ---- Hear it answer your line + waitlist -------------------------------
+   Both post to the Railway server; the marketing site itself is static. ---- */
+(function(){
+  var API = "https://torontoleads-production.up.railway.app";
+
+  /* -- business name -> two sample clips -- */
+  var q = document.getElementById("nb-q"), go = document.getElementById("nb-go"),
+      msg = document.getElementById("nb-msg"), out = document.getElementById("nb-out");
+  if (q && go) {
+    var busy = false;
+    function run(){
+      var text = q.value.trim();
+      if (text.length < 3) { msg.className = "nb-msg err"; msg.textContent = "Enter your business name."; return; }
+      if (busy) return;
+      busy = true; go.disabled = true;
+      msg.className = "nb-msg"; msg.textContent = "Looking you up and building the clips\u2026";
+      out.classList.remove("on");
+
+      fetch(API + "/demo-preview", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: text })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't build that preview.");
+        document.getElementById("nb-biz").textContent = d.business.name;
+        document.getElementById("nb-addr").textContent = d.business.address || "";
+        document.getElementById("nb-clips").innerHTML = d.clips.map(function(c){
+          return '<div class="nb-clip"><div class="lab">' + esc(c.label) + "</div>" +
+                 "<p>" + esc(c.text) + "</p>" +
+                 '<audio controls preload="none" src="' + c.url + '"></audio></div>';
+        }).join("");
+        msg.textContent = "";
+        out.classList.add("on");
+      })
+      .catch(function(e){
+        msg.className = "nb-msg err";
+        msg.textContent = e.message || "Something went wrong. Try again.";
+      })
+      .then(function(){ busy = false; go.disabled = false; });
+    }
+    go.addEventListener("click", run);
+    q.addEventListener("keydown", function(e){ if (e.key === "Enter") run(); });
+  }
+
+  /* -- waitlist -- */
+
+  // Multi-select: people rarely have one reason, and the combination is more
+  // useful than forcing a single pick.
+  var reasons = document.getElementById("wl-reasons");
+  var otherBox = document.getElementById("wl-other");
+  if (reasons) {
+    reasons.addEventListener("click", function(e){
+      var b = e.target.closest("button[data-r]");
+      if (!b) return;
+      var on = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", on ? "false" : "true");
+      var anyOther = reasons.querySelector('button[data-r="other"][aria-pressed="true"]');
+      otherBox.hidden = !anyOther;
+      if (!anyOther) otherBox.value = "";
+    });
+  }
+  function pickedReasons(){
+    return [].slice.call(reasons ? reasons.querySelectorAll('button[aria-pressed="true"]') : [])
+             .map(function(b){ return b.getAttribute("data-r"); });
+  }
+
+  var form = document.getElementById("wl-form");
+  if (form) {
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var email = document.getElementById("wl-email").value.trim(),
+          phone = document.getElementById("wl-phone").value.trim(),
+          btn   = document.getElementById("wl-go"),
+          m     = document.getElementById("wl-msg");
+      m.className = "wl-msg"; m.textContent = "Adding you\u2026"; btn.disabled = true;
+
+      fetch(API + "/waitlist", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, phone: phone, kind: "assistant",
+          reasons: pickedReasons(), note: otherBox.value.trim(), source: "site" })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't save that.");
+        m.className = "wl-msg ok";
+        m.textContent = "You're on the list. I'll be in touch when the beta opens.";
+        form.reset();
+      })
+      .catch(function(err){
+        m.className = "wl-msg err";
+        m.textContent = (err.message || "Couldn't save that.") + " Or email hello@voicecaptures.com.";
+      })
+      .then(function(){ btn.disabled = false; });
+    });
+  }
+})();
 
 // A visitor who scrolls back up should see the call play again, but only
 // after the mockup has fully left the screen — not on every small scroll.
