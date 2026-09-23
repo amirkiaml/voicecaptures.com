@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoiceCaptures — AI voice agent that answers and books every call</title>
 <meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, no credit card.">
-<meta name="theme-color" content="#080f1e">
+<meta name="theme-color" content="#f6f8fc">
 <link rel="canonical" href="https://voicecaptures.com/">
 <link rel="icon" href="logo-mark.png">
 <meta property="og:type" content="website">
@@ -64,6 +64,11 @@ h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
 .lede{font-size:17px;color:var(--muted);max-width:520px;margin-bottom:32px}
 .fine{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
 
+
+/* Two-tone headline: the statement in ink, the promise in the accent. */
+h1 .hl,h2 .hl{color:var(--blue)}
+html[data-theme="light"] h1 .hl,html[data-theme="light"] h2 .hl{color:#2563EB}
+
 /* buttons */
 .btn{font-family:var(--body);font-size:15px;font-weight:700;padding:14px 30px;border-radius:8px;display:inline-block;border:0;cursor:pointer;transition:background .2s,transform .1s,border-color .2s;text-align:center}
 .btn-primary{background:var(--cyan);color:var(--bg)}
@@ -116,7 +121,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
 .nav-menu button[aria-current="true"]{color:var(--cyan);font-weight:700}
 /* Below tablet the links crowd the logo; the page has its own switcher and
    anchors, so the nav simply steps aside. */
-@media (max-width:860px){ .nav{display:none} }
+@media (max-width:1000px){ .nav{display:none} }
 .bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{height:32px;width:auto}
@@ -137,8 +142,8 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 
 /* ---- Nav: plain text, spaced. No pills — they read as cramped buttons
    competing with the one real CTA. ---- */
-.nav{display:flex;align-items:center;gap:clamp(18px,2.4vw,38px);margin-left:auto;margin-right:clamp(20px,3vw,44px)}
-.nav-a{font-family:var(--body);font-size:15.5px;font-weight:500;color:var(--text);
+.nav{display:flex;align-items:center;gap:7px;margin-left:auto;margin-right:clamp(14px,2vw,26px)}
+.nav-a{font-family:var(--body);font-size:14.5px;font-weight:500;color:var(--text);
   background:none;border:0;cursor:pointer;padding:6px 0;border-radius:0;
   text-decoration:none;display:inline-flex;align-items:center;gap:7px;
   letter-spacing:-.005em;transition:color .18s}
@@ -178,7 +183,7 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .btn-arrow:hover::before{transform:translateX(3px)}
 .nav-cta{padding:7px 26px 7px 7px}
 .nav-cta::before{width:38px;height:38px}
-@media (max-width:860px){ .nav{display:none} }
+@media (max-width:1000px){ .nav{display:none} }
 
 
 /* ---- Light mode ----------------------------------------------------------
@@ -240,6 +245,133 @@ html[data-theme="light"] .dring,html[data-theme="light"] .dconv-track{background
 html[data-theme="light"] .dconv-track{background:#e3e9f2}
 html[data-theme="light"] input[type=range]{background:#dde4ee}
 html[data-theme="light"] .nb-clip audio{filter:none}
+
+
+/* Navy against the light page; the CTA is the only filled element. */
+html[data-theme="light"] .nav-a{color:#12233f}
+html[data-theme="light"] .nav-a:hover{color:#1D4ED8}
+html[data-theme="light"] .nav-trigger{border-color:rgba(18,35,63,.22);color:#12233f}
+html[data-theme="light"] .nav-trigger:hover{border-color:#2563EB;color:#1D4ED8}
+html[data-theme="light"] .nav-trigger[aria-expanded="true"]{border-color:#1D4ED8;color:#1D4ED8}
+html[data-theme="light"] .nav-pulse{background:#0E93B8;box-shadow:none}
+html[data-theme="light"] .brand span{color:#0b1728}
+html[data-theme="light"] header{background:rgba(255,255,255,.88);
+  border-bottom:1px solid rgba(18,35,63,.10)}
+html[data-theme="light"] .theme-btn{border-color:rgba(18,35,63,.18);color:#4a5d78}
+html[data-theme="light"] .theme-btn:hover{color:#12233f;border-color:#2563EB}
+html[data-theme="light"] .nav-cta{background:#12233f;color:#fff;
+  box-shadow:0 8px 22px rgba(18,35,63,.20)}
+html[data-theme="light"] .nav-cta:hover{background:#1D4ED8;color:#fff}
+html[data-theme="light"] .nav-menu button b{color:#12233f}
+html[data-theme="light"] .nav-menu button[aria-current="true"] b{color:#1D4ED8}
+
+
+/* Places where the refresh hard-coded a dark fill that a variable can't reach. */
+html[data-theme="light"] .hero .eyebrow{background:rgba(37,99,235,.08);
+  border-color:rgba(37,99,235,.22);color:#1D4ED8;backdrop-filter:none}
+html[data-theme="light"] .hero .eyebrow::before{background:#0E93B8;box-shadow:none}
+html[data-theme="light"] .switch{background:none;backdrop-filter:none;
+  border-bottom:1px solid rgba(18,35,63,.14)}
+html[data-theme="light"] .switch button{color:#5a6b82}
+html[data-theme="light"] .switch button:hover,
+html[data-theme="light"] .switch button[aria-selected="true"]{color:#12233f}
+html[data-theme="light"] .switch button::after{background:#2563EB}
+html[data-theme="light"] .stat{background:#fff;border:1px solid rgba(18,35,63,.10);
+  backdrop-filter:none;box-shadow:0 6px 18px rgba(13,23,41,.05)}
+html[data-theme="light"] .stat b{color:#0b1728}
+html[data-theme="light"] .stat .src{color:#8496ab}
+html[data-theme="light"] .tag{color:#12233f}
+html[data-theme="light"] .offer,html[data-theme="light"] .demo{background:#fff}
+html[data-theme="light"] .calframe{border-color:rgba(18,35,63,.12)}
+/* the waveform inside the blob was white — invisible on a light fill */
+html[data-theme="light"] .orb-wave i{background:#1D4ED8;opacity:.85}
+html[data-theme="light"] .blob-shape{
+  background:linear-gradient(150deg,rgba(37,99,235,.20),rgba(14,147,184,.14))}
+html[data-theme="light"] .blob-orbit .bo{stroke:rgba(37,99,235,.30)}
+html[data-theme="light"] .blob-orbit .bd{fill:#2563EB;filter:none}
+
+
+/* The call card keeps a dark interior in light mode, so its own text has to
+   be forced light — var(--text) is navy out here. */
+html[data-theme="light"] .mk-biz,
+html[data-theme="light"] .mk-line,
+html[data-theme="light"] .mk-agent,
+html[data-theme="light"] .mk-sms{color:#eef4fb}
+html[data-theme="light"] .mk-state,
+html[data-theme="light"] .mk-hint{color:#93a7c2}
+html[data-theme="light"] .mk-sms b{color:#fff}
+html[data-theme="light"] .mk-pick button{background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.18);color:#b9c9de}
+html[data-theme="light"] .mk-pick button[aria-pressed="true"]{background:#2563EB;
+  border-color:#2563EB;color:#fff}
+html[data-theme="light"] .mk-caller{background:#2563EB;color:#fff}
+html[data-theme="light"] .mk-play{background:#5cdbf4;color:#08243a}
+html[data-theme="light"] .mk-play:hover{background:#8fe9fb}
+html[data-theme="light"] .mk-knob,html[data-theme="light"] .mk-bar i{background:#5cdbf4}
+html[data-theme="light"] .mk-vw i{background:#5cdbf4}
+html[data-theme="light"] .mk-avatar .mk-glyph{fill:#cfe6f7;background:none}
+html[data-theme="light"] .mk-agent{background:rgba(92,219,244,.12);
+  border-color:rgba(92,219,244,.26)}
+html[data-theme="light"] .mk-agent .mk-who{color:#5cdbf4}
+
+
+/* A quiet outline so the links read as controls rather than body text. */
+.nav-a{border:1px solid transparent;border-radius:9px;padding:8px 14px;white-space:nowrap}
+.nav-a:hover{border-color:var(--line2)}
+html[data-theme="light"] .nav-a{border-color:rgba(18,35,63,.10);background:rgba(255,255,255,.7)}
+html[data-theme="light"] .nav-a:hover{border-color:#2563EB;background:#fff;color:#1D4ED8}
+html[data-theme="dark"] .nav-a{border-color:rgba(168,205,255,.13);background:rgba(255,255,255,.03)}
+html[data-theme="dark"] .nav-a:hover{border-color:color-mix(in srgb, var(--cyan) 45%, transparent);
+  background:rgba(255,255,255,.06)}
+
+
+/* ---- Dark: near-black surfaces, white text, light blue accent ---- */
+html[data-theme="dark"]{
+  --bg:#05070c; --bg2:#0a0e16; --bg3:#0f141f;
+  --text:#ffffff; --muted:#9fb3cc; --faint:#6d8099;
+  --line:rgba(160,200,255,.10); --line2:rgba(160,200,255,.20);
+  --blue:#3B82F6; --blue-dk:#60A5FA; --blue-glow:rgba(59,130,246,.16);
+  --cyan:#7DD3FC; --cyan-lt:#BAE6FD;
+}
+html[data-theme="dark"] body{background:var(--bg)}
+html[data-theme="dark"] .alt{background:#080b12}
+html[data-theme="dark"] header{background:rgba(5,7,12,.86);
+  border-bottom:1px solid rgba(160,200,255,.10)}
+html[data-theme="dark"] footer{background:#04060a}
+html[data-theme="dark"] .hero{
+  background:linear-gradient(90deg,rgba(5,7,12,.97) 0%,rgba(5,7,12,.9) 44%,rgba(5,7,12,.6) 100%),
+             url('/hero-glass-phone.webp') center 18%/cover no-repeat}
+html[data-theme="dark"] .btn-primary{background:var(--cyan);color:#05070c;
+  box-shadow:0 8px 30px rgba(125,211,252,.18)}
+html[data-theme="dark"] .btn-primary:hover{background:var(--cyan-lt);color:#05070c}
+html[data-theme="dark"] .nav-cta{background:var(--cyan);color:#05070c}
+html[data-theme="dark"] .nav-cta:hover{background:var(--cyan-lt);color:#05070c}
+html[data-theme="dark"] .anno{background:#0d1a2b;color:#dbeafe;
+  border-bottom:1px solid rgba(125,211,252,.18)}
+html[data-theme="dark"] .anno:hover{background:#122439;color:#fff}
+html[data-theme="dark"] .anno-dot{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+html[data-theme="dark"] .stat{background:#0b1018;border:1px solid rgba(160,200,255,.11);
+  backdrop-filter:none}
+html[data-theme="dark"] .stat b{color:#fff}
+html[data-theme="dark"] .hero .eyebrow{background:rgba(125,211,252,.08);
+  border-color:rgba(125,211,252,.24);color:var(--cyan);backdrop-filter:none}
+html[data-theme="dark"] .hero .eyebrow::before{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+html[data-theme="dark"] .switch{background:none;backdrop-filter:none;
+  border-bottom:1px solid rgba(160,200,255,.12)}
+html[data-theme="dark"] .mock{background:linear-gradient(145deg,#0e1726,#070b12);
+  border-color:rgba(160,200,255,.16)}
+html[data-theme="dark"] .mk-phone{background:linear-gradient(168deg,#122036 0%,#0a1220 55%,#05080e 100%)}
+html[data-theme="dark"] .mk-panel{background:#080c14}
+html[data-theme="dark"] .card,html[data-theme="dark"] .tier,html[data-theme="dark"] .calc,
+html[data-theme="dark"] .soon-card,html[data-theme="dark"] .in-card,html[data-theme="dark"] .wl,
+html[data-theme="dark"] .nb-clip,html[data-theme="dark"] .dcard,html[data-theme="dark"] .nb-item{
+  background:#0c111b;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+html[data-theme="dark"] .nav-menu{background:#0c111b}
+html[data-theme="dark"] .yl-band{
+  background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.14),transparent 65%),#070a11}
+html[data-theme="dark"] .final{
+  background:radial-gradient(ellipse at 50% 90%,rgba(59,130,246,.13),transparent 70%)}
+html[data-theme="dark"] h1 .hl,html[data-theme="dark"] h2 .hl{color:var(--cyan)}
 
 /* hero */
 .hero{padding:clamp(28px,4vw,72px) 0 clamp(40px,5vw,64px)}
@@ -307,9 +439,9 @@ html[data-theme="light"] .nb-clip audio{filter:none}
 
 
 /* ---- Hero call card: phone on the left, transcript beside it ---- */
-.mock{display:grid;grid-template-columns:minmax(0,1fr);gap:0;width:100%;align-items:stretch;
+.mock{display:grid;grid-template-columns:minmax(0,1fr);gap:0;width:100%;max-width:900px;margin:30px auto 56px;align-items:stretch;
   background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-@media (min-width:620px){.mock{grid-template-columns:186px minmax(0,1fr)}}
+@media (min-width:620px){.mock{grid-template-columns:210px minmax(0,1fr)}}
 
 .mk-phone{background:linear-gradient(168deg,#1a2b4d 0%,#0f1626 55%,#0b0f1a 100%);
   padding:22px 14px 20px;text-align:center;border-bottom:1px solid var(--line);
@@ -368,7 +500,7 @@ html[data-theme="light"] .nb-clip audio{filter:none}
 .mk-play[hidden]{display:none}
 .mk-hint{font-size:10.5px;color:var(--muted);line-height:1.5;max-width:150px}
 
-.mk-panel{padding:16px 16px 14px;min-width:0;display:flex;flex-direction:column}
+.mk-panel{padding:18px 18px 16px;min-width:0;display:flex;flex-direction:column}
 .mk-bar{position:relative;height:3px;background:var(--bg3);border-radius:100px;margin-bottom:12px;
   cursor:pointer;touch-action:none}
 .mk-bar::before{content:"";position:absolute;inset:-9px 0;}   /* easier to grab */
@@ -386,7 +518,8 @@ html[data-theme="light"] .nb-clip audio{filter:none}
 .mk-pick button:hover{color:var(--text)}
 .mk-pick button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 .mk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.mk-lines{position:relative;display:flex;flex-direction:column;gap:8px;max-height:330px;
+.mk-lines{position:relative;display:flex;flex-direction:column;gap:8px;
+  min-height:210px;max-height:330px;
   overflow-y:auto;padding-right:6px;scroll-behavior:smooth;scrollbar-width:thin;
   scrollbar-color:rgba(255,255,255,.14) transparent}
 .mk-lines::-webkit-scrollbar{width:4px}
@@ -654,7 +787,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 
 /* ---- Blob with orbiting rings. The shape is static; the rings and the dots
    riding them are what move, which is the whole effect. ---- */
-.blob{position:relative;width:min(400px,84vw);aspect-ratio:1;margin:8px auto 0;
+.blob{position:relative;width:min(440px,90%);aspect-ratio:1;margin:0 auto;
   display:flex;align-items:center;justify-content:center}
 .blob-shape{position:absolute;inset:4%;
   border-radius:58% 42% 47% 53%/44% 56% 44% 56%;
@@ -1013,7 +1146,7 @@ footer{background:#07101e}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <a class="btn btn-primary btn-arrow nav-cta" href="#intake">Get in touch</a>
+    <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
   </div>
 </header>
 
@@ -1030,11 +1163,11 @@ footer{background:#07101e}
         <button type="button" role="tab" aria-selected="false" data-tab="other">Other</button>
       </div>
 
-      <h1 id="headline">You're missing calls.<br>We answer them.</h1>
+      <h1 id="headline">You're missing calls.<br><span class="hl">We answer them.</span></h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <div class="hero-btns">
         <a class="btn btn-primary btn-arrow" id="hero-cta" href="#intake">Tell us about your line</a>
-        <a class="btn btn-ghost btn-arrow hero-try" id="hero-try" href="#yourline">Hear your business name</a>
+        <a class="btn btn-ghost btn-arrow hero-try" id="hero-try" href="#yourline">Hear it answer as your business</a>
       </div>
       <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
 
@@ -1045,56 +1178,33 @@ footer{background:#07101e}
       </div>
     </div>
 
-    <div class="mock" id="mock">
-      <div class="mk-phone" id="mk-phone">
-        <div class="mk-avatar" aria-hidden="true">
-          <span class="mk-halo"></span>
-          <svg class="mk-glyph" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z"/></svg>
-          <div class="mk-vw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        </div>
-        <div class="mk-timer" id="mk-timer">0:00</div>
-        <div class="mk-biz" id="mk-biz">Maple Ridge Plumbing</div>
-        <div class="mk-state" id="mk-state">Incoming call</div>
-        <div class="wave" id="mk-wave" aria-hidden="true">
-          <i style="height:9px"></i><i style="height:15px;animation-delay:.09s"></i><i style="height:22px;animation-delay:.18s"></i><i style="height:28px;animation-delay:.27s"></i><i style="height:18px;animation-delay:.36s"></i><i style="height:24px;animation-delay:.45s"></i><i style="height:13px;animation-delay:.54s"></i><i style="height:20px;animation-delay:.63s"></i><i style="height:10px;animation-delay:.72s"></i>
-        </div>
-        <div class="mk-keys" aria-hidden="true">
-          <div><span><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>Speaker</div>
-          <div><span><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="4" y1="4" x2="20" y2="20"/></svg></span>Mute</div>
-          <div><span><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg></span>Keypad</div>
-        </div>
-        <button class="mk-play" id="mk-play" aria-label="Play the recorded call">
-          <svg viewBox="0 0 24 24" id="mk-icon" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <p class="mk-hint" id="mk-hint">Press play to hear the real recording.</p>
+    <div class="blob" id="orb">
+      <span class="blob-shape" aria-hidden="true"></span>
+      <svg class="blob-orbit" viewBox="0 0 400 400" aria-hidden="true">
+        <circle class="bo bo1" cx="200" cy="200" r="150"/>
+        <circle class="bo bo2" cx="200" cy="200" r="172"/>
+        <circle class="bd bd1" cx="200" cy="50"  r="9"/>
+        <circle class="bd bd2" cx="372" cy="200" r="6"/>
+        <circle class="bd bd3" cx="200" cy="350" r="7"/>
+      </svg>
+      <div class="blob-mid" id="blob-mid" aria-hidden="true">
+        <div class="orb-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
-
-      <div class="mk-panel">
-        <div class="mk-bar" id="mk-bar" role="slider" tabindex="0" aria-label="Seek within the call"
-             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <i id="mk-prog"></i><span class="mk-knob" id="mk-knob" aria-hidden="true"></span>
-        </div>
-        <div class="mk-pick" id="mk-pick" role="group" aria-label="Choose an example call" hidden></div>
-        <div class="mk-head">
-          <span class="mini"><span class="dot" id="mk-dot" aria-hidden="true"></span>Live transcript</span>
-          <span class="mini" id="mk-len">1:15</span>
-        </div>
-        <div class="mk-lines" id="mk-lines"></div>
-        <p class="mk-note" id="mk-note"></p>
-        <div class="mk-fallback" id="mk-fallback">
-          <audio id="mk-audio" controls preload="metadata" src="/sample-call.mp3"></audio>
-        </div>
-      </div>
+      <picture class="blob-person" id="blob-person" hidden>
+        <source srcset="/personal-hero.webp" type="image/webp">
+        <img src="/personal-hero.png" alt="" width="571" height="760" loading="lazy">
+      </picture>
     </div>
+    <p class="orb-cap">Current conversational voice models &mdash; most callers never ask.</p>
   </div>
 </div>
 
 <section id="yourline" class="yl-band">
   <div class="wrap">
     <div class="yl-head">
-      <span class="yl-tag">Try it on your own business &mdash; free, 20 seconds</span>
-      <h2 class="center">Hear it answer <em>your</em> line.</h2>
-      <p class="sub">Type your business name. We pull your public listing and generate two calls in your name, right now, with your real address and today's hours.</p>
+      <span class="yl-tag">Free &mdash; 20 seconds, no signup</span>
+      <h2 class="center">Hear it pick up as <em>your</em> business.</h2>
+      <p class="sub">Type your business name and the agent will answer a call as if it worked for you &mdash; your name, your real address, today's opening hours. Generated on the spot from your public listing.</p>
     </div>
 
     <div class="nb">
@@ -1320,24 +1430,47 @@ footer{background:#07101e}
     <h2 class="center">Sounds human. Built for you.</h2>
     <p class="sub">It sounds like a person, and it is built around how <em style="font-style:normal;color:var(--text)">your</em> business takes calls. Nothing about it is off the shelf.</p>
 
-    <div class="blob" id="orb">
-      <span class="blob-shape" aria-hidden="true"></span>
-      <svg class="blob-orbit" viewBox="0 0 400 400" aria-hidden="true">
-        <circle class="bo bo1" cx="200" cy="200" r="150"/>
-        <circle class="bo bo2" cx="200" cy="200" r="172"/>
-        <circle class="bd bd1" cx="200" cy="50"  r="9"/>
-        <circle class="bd bd2" cx="372" cy="200" r="6"/>
-        <circle class="bd bd3" cx="200" cy="350" r="7"/>
-      </svg>
-      <div class="blob-mid" id="blob-mid" aria-hidden="true">
-        <div class="orb-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="mock" id="mock">
+      <div class="mk-phone" id="mk-phone">
+        <div class="mk-avatar" aria-hidden="true">
+          <span class="mk-halo"></span>
+          <svg class="mk-glyph" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+          <div class="mk-vw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="mk-timer" id="mk-timer">0:00</div>
+        <div class="mk-biz" id="mk-biz">Maple Ridge Plumbing</div>
+        <div class="mk-state" id="mk-state">Incoming call</div>
+        <div class="wave" id="mk-wave" aria-hidden="true">
+          <i style="height:9px"></i><i style="height:15px;animation-delay:.09s"></i><i style="height:22px;animation-delay:.18s"></i><i style="height:28px;animation-delay:.27s"></i><i style="height:18px;animation-delay:.36s"></i><i style="height:24px;animation-delay:.45s"></i><i style="height:13px;animation-delay:.54s"></i><i style="height:20px;animation-delay:.63s"></i><i style="height:10px;animation-delay:.72s"></i>
+        </div>
+        <div class="mk-keys" aria-hidden="true">
+          <div><span><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>Speaker</div>
+          <div><span><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="4" y1="4" x2="20" y2="20"/></svg></span>Mute</div>
+          <div><span><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="1.4"/><circle cx="18" cy="18" r="1.4"/></svg></span>Keypad</div>
+        </div>
+        <button class="mk-play" id="mk-play" aria-label="Play the recorded call">
+          <svg viewBox="0 0 24 24" id="mk-icon" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <p class="mk-hint" id="mk-hint">Press play to hear the real recording.</p>
       </div>
-      <picture class="blob-person" id="blob-person" hidden>
-        <source srcset="/personal-hero.webp" type="image/webp">
-        <img src="/personal-hero.png" alt="" width="571" height="760" loading="lazy">
-      </picture>
+
+      <div class="mk-panel">
+        <div class="mk-bar" id="mk-bar" role="slider" tabindex="0" aria-label="Seek within the call"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <i id="mk-prog"></i><span class="mk-knob" id="mk-knob" aria-hidden="true"></span>
+        </div>
+        <div class="mk-pick" id="mk-pick" role="group" aria-label="Choose an example call" hidden></div>
+        <div class="mk-head">
+          <span class="mini"><span class="dot" id="mk-dot" aria-hidden="true"></span>Live transcript</span>
+          <span class="mini" id="mk-len">1:15</span>
+        </div>
+        <div class="mk-lines" id="mk-lines"></div>
+        <p class="mk-note" id="mk-note"></p>
+        <div class="mk-fallback" id="mk-fallback">
+          <audio id="mk-audio" controls preload="metadata" src="/sample-call.mp3"></audio>
+        </div>
+      </div>
     </div>
-    <p class="orb-cap">Current conversational voice models &mdash; most callers never ask.</p>
 
     <div class="grid g3">
       <div class="card"><h3>Your voice</h3><p>Choose from multiple AI voices — male, female, different tones. Pick what fits your brand.</p></div>
@@ -1378,7 +1511,7 @@ footer{background:#07101e}
   <div class="wrap">
     <div class="wl">
       <span class="soon-tag">In beta &mdash; not live yet</span>
-      <h2>A personal line that screens your calls</h2>
+      <h2>A personal line<br><span class="hl">that screens your calls</span></h2>
       <div class="price">$9<em>/mo</em></div>
       <p style="font-size:12px;color:var(--faint);margin:-2px 0 14px">Introductory beta price. It will change before general release &mdash; everyone on the waitlist gets told before it does, and keeps the beta rate for their first year.</p>
       <p class="wl-lead">Not for a business &mdash; for you. It picks up the numbers you don't recognise, turns away the spam, and texts you who called and what they wanted. You call back the ones that matter.</p>
@@ -1528,7 +1661,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -1596,7 +1729,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -1648,7 +1781,7 @@ var V = {
     },
 
     eyebrow: "Any business where the work arrives by phone",
-    headline: "Not on the list?<br>It probably still fits.",
+    headline: "Not on the list?<br><span class=\"hl\">It probably still fits.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. If it isn't a fit, we'll say so.",
@@ -1727,7 +1860,7 @@ var V = {
       }
     ],
     eyebrow: "A personal line \u2014 for your own phone, not your business",
-    headline: "Stop answering<br>numbers you don't know.",
+    headline: "Stop answering<br><span class=\"hl\">numbers you don't know.</span>",
     ctaLabel: "Join the waitlist",
     ctaHref: "#personal",
     ctaFine: "Beta. $9/mo introductory price, subject to change. No card now.",
@@ -1776,7 +1909,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -2146,6 +2279,16 @@ function select(k, fromPop){
     if (el) el.hidden = hide[id];
   });
 
+  // The header CTA points at whatever this page's free, no-commitment step
+  // actually is — the lookup for businesses, the waitlist for the personal line.
+  var navCta = document.getElementById("nav-cta");
+  if (navCta) {
+    var isPersonal = k === "personal";
+    navCta.setAttribute("href", isPersonal ? "#personal" : "#yourline");
+    navCta.childNodes[navCta.childNodes.length - 1].nodeValue =
+      isPersonal ? "Join the waitlist" : "Try it on your business";
+  }
+
   var tryBtn = document.getElementById("hero-try");
   if (tryBtn) tryBtn.hidden = !!hide["yourline"];
 
@@ -2304,13 +2447,13 @@ window.addEventListener("popstate", function(){
     document.documentElement.setAttribute("data-theme", t);
     btn.setAttribute("aria-label", t === "light" ? "Switch to dark mode" : "Switch to light mode");
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute("content", t === "light" ? "#f6f8fc" : "#080f1e");
+    if (m) m.setAttribute("content", t === "light" ? "#f6f8fc" : "#05070c");
   }
   var saved;
   try { saved = localStorage.getItem(KEY); } catch(e){}
   // respect the visitor's own setting before falling back to dark
-  if (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) saved = "light";
-  apply(saved === "light" ? "light" : "dark");
+  if (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) saved = "dark";
+  apply(saved === "dark" ? "dark" : "light");
   btn.addEventListener("click", function(){
     var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
     apply(next);
