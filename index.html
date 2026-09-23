@@ -439,25 +439,39 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .nb-results[hidden]{display:none}
 .nb-pick{font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:12px}
 .nb-item{display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;cursor:pointer;
-  background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:15px 17px;
-  margin-bottom:9px;font-family:var(--body);color:var(--text);
+  background:var(--bg3);border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+  margin-bottom:10px;font-family:var(--body);color:var(--text);
   transition:border-color .18s,background .18s}
 .nb-item:hover{border-color:var(--cyan);background:color-mix(in srgb, var(--cyan) 7%, transparent)}
 .nb-item:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.nb-item[aria-busy="true"]{border-color:var(--cyan);opacity:.75;cursor:default}
-.nb-item .b{flex:1 1 auto;min-width:0}
-.nb-item .b{display:block}
-.nb-item .nm{display:block;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.3;margin-bottom:3px}
+.nb-item[aria-busy="true"]{border-color:var(--cyan);opacity:.7;cursor:default}
+.nb-ph{flex:0 0 auto;width:56px;height:56px;border-radius:9px;object-fit:cover;
+  background:var(--bg2);border:1px solid var(--line)}
+.nb-ph-e{display:block;background:
+  linear-gradient(135deg, color-mix(in srgb, var(--blue) 22%, var(--bg2)), var(--bg2))}
+.nb-item .b{display:block;flex:1 1 auto;min-width:0}
+.nb-item .nm{display:block;font-family:var(--display);font-weight:700;font-size:15.5px;
+  line-height:1.3;margin-bottom:3px}
 .nb-item .ad{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
-.nb-item .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:7px;font-size:11.5px}
-.nb-item .hrs{color:var(--cyan)}
-.nb-item .hrs.shut{color:var(--muted)}
-.nb-item .rate{color:var(--muted)}
+.nb-item .meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:7px;font-size:12px}
+.nb-item .rate{display:inline-flex;align-items:center;gap:5px;color:var(--text);font-weight:700}
+.nb-item .star{color:#F5B301}
+.nb-item .rc{color:var(--muted);font-weight:400}
+.nb-item .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:100px}
+.nb-item .pill::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.nb-item .pill.op{background:rgba(16,185,129,.14);color:#34D399}
+.nb-item .pill.cl{background:rgba(226,75,74,.14);color:#F0807F}
+.nb-item .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nb-item .chip{font-size:10.5px;color:var(--muted);background:var(--bg2);
+  border:1px solid var(--line);border-radius:6px;padding:3px 8px;text-transform:capitalize}
 .nb-item .go{flex:0 0 auto;align-self:center;font-size:11px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--cyan);white-space:nowrap}
-@media (max-width:520px){
-  .nb-item{padding:13px 14px;gap:10px}
+@media (max-width:560px){
+  .nb-item{padding:12px 13px;gap:11px}
+  .nb-ph{width:48px;height:48px}
   .nb-item .go{display:none}
+  .nb-item .chips{display:none}
 }
 .nb-out{margin-top:24px;display:none}
 .nb-out.on{display:block}
@@ -491,6 +505,33 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .soon-card{background:var(--bg3);border:1px dashed var(--line2);border-radius:12px;padding:20px}
 .soon-card h3{font-size:14px;margin-bottom:5px}
 .soon-card p{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+
+/* ---- Intake form ---- */
+.in-card{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
+  border-radius:16px;padding:clamp(24px,4vw,36px)}
+.in-leg{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.in-leg + .in-row{margin-top:0}
+.in-card .in-leg:not(:first-child){margin-top:26px}
+.in-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:14px;margin-bottom:14px}
+.in-f{display:block}
+.in-f > span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.in-f > span em{font-style:normal;color:var(--faint)}
+.in-f input,.in-f select,.in-f textarea{width:100%;background:var(--bg2);border:1px solid var(--line2);
+  border-radius:9px;padding:12px 14px;color:var(--text);font-family:var(--body);font-size:14.5px}
+.in-f textarea{resize:vertical;line-height:1.55}
+.in-f input:focus,.in-f select:focus,.in-f textarea:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.in-f select{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
+                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+.in-note{font-size:11.5px;color:var(--faint);margin:18px 0 14px;line-height:1.6}
+.in-go{width:100%;padding:15px}
+.in-msg{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;min-height:18px}
+.in-msg.err{color:var(--red)}
+.in-msg.ok{color:var(--cyan)}
 
 /* ---- Waitlist ---- */
 .wl-featured .wl{border-color:var(--cyan);box-shadow:0 0 0 1px color-mix(in srgb, var(--cyan) 22%, transparent)}
@@ -941,6 +982,44 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   </div>
 </section>
 
+
+<section id="intake" class="alt">
+  <div class="wrap">
+    <h2 class="center" id="in-title">Let's get your line ready.</h2>
+    <p class="sub" id="in-sub">A few quick questions so the setup is shaped around how you actually work.</p>
+
+    <form class="in-card" id="in-form">
+      <p class="in-leg">Contact</p>
+      <div class="in-row">
+        <label class="in-f"><span>First name</span><input id="in-first" required autocomplete="given-name"></label>
+        <label class="in-f"><span>Last name</span><input id="in-last" autocomplete="family-name"></label>
+      </div>
+      <div class="in-row">
+        <label class="in-f"><span>Email</span><input id="in-email" type="email" required autocomplete="email"></label>
+        <label class="in-f"><span>Phone <em>optional</em></span><input id="in-phone" type="tel" autocomplete="tel"></label>
+      </div>
+
+      <p class="in-leg" id="in-leg2">About your business</p>
+      <div class="in-row">
+        <label class="in-f"><span id="in-l-name">Business name</span><input id="in-business" required autocomplete="organization"></label>
+        <label class="in-f"><span id="in-l-type">Type</span><select id="in-type"></select></label>
+      </div>
+      <div class="in-row">
+        <label class="in-f"><span id="in-l-sys">Software you use</span><select id="in-system"></select></label>
+        <label class="in-f"><span>Plan you're considering</span><select id="in-plan"></select></label>
+      </div>
+
+      <label class="in-f"><span>Anything else <em>optional</em></span>
+        <textarea id="in-comments" rows="3" placeholder="How calls reach you today, what you'd want it to handle, anything unusual."></textarea>
+      </label>
+
+      <p class="in-note">Whatever you pick here shapes the onboarding. Nothing is locked in.</p>
+      <button class="btn btn-primary in-go" type="submit" id="in-go">Send it over</button>
+      <p class="in-msg" id="in-msg"></p>
+    </form>
+  </div>
+</section>
+
 <section class="alt">
   <div class="wrap">
     <h2 class="center">Who it's for</h2>
@@ -992,6 +1071,14 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
 var V = {
   home: {
+    intake: {
+      title: "Let's get your line ready.",
+      nameLabel: "Business name", typeLabel: "Trade",
+      sysLabel: "Scheduling or job software",
+      types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
+      systems: ["None \u2014 phone and calendar","Jobber","Housecall Pro","ServiceTitan","Google Calendar only","Other"]
+    },
+
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
     ctaLabel: "Start your 14-day free trial",
@@ -1052,6 +1139,14 @@ var V = {
     ]
   },
   food: {
+    intake: {
+      title: "Let's get your line ready.",
+      nameLabel: "Venue name", typeLabel: "Type of venue",
+      sysLabel: "POS system",
+      types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
+      systems: ["None","Toast","Square","TouchBistro","Lightspeed","Clover","Other"]
+    },
+
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
     ctaLabel: "Start your 14-day free trial",
@@ -1096,6 +1191,14 @@ var V = {
     ]
   },
   other: {
+    intake: {
+      title: "Tell me how your calls work.",
+      nameLabel: "Business name", typeLabel: "What you do",
+      sysLabel: "Booking or CRM software",
+      types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
+      systems: ["None","Google Calendar only","Square","HubSpot","Other"]
+    },
+
     eyebrow: "Any business where the work arrives by phone",
     headline: "Not on the list?<br>It probably still fits.",
     ctaLabel: "Tell me about your line",
@@ -1133,6 +1236,7 @@ var V = {
     tiers: "home"
   },
   personal: {
+    intake: null,
     variants: [
       {
         key: "spam", label: "A scam robocall",
@@ -1215,6 +1319,14 @@ var V = {
     tiers: []
   },
   clinic: {
+    intake: {
+      title: "Let's get your practice set up.",
+      nameLabel: "Practice name", typeLabel: "Type of practice",
+      sysLabel: "Practice management software",
+      types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
+      systems: ["None","Dentrix","Open Dental","Eaglesoft","Jane","Other"]
+    },
+
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
     ctaLabel: "Start your 14-day free trial",
@@ -1270,6 +1382,31 @@ var money = function(n){ return "$" + Math.round(n).toLocaleString("en-US"); };
 
 var key = "home";
 var state = { calls: 0, value: 0, rate: 0, newPct: 35 };
+
+
+function renderIntake(key, cfg, tiers){
+  var sec = document.getElementById("intake");
+  if (!sec) return;
+  // The personal line is a waitlist, not an onboarding — no form for it.
+  if (!cfg.intake) { sec.hidden = true; return; }
+  sec.hidden = false;
+  var c = cfg.intake;
+
+  $("in-title").textContent = c.title;
+  $("in-l-name").textContent = c.nameLabel;
+  $("in-l-type").textContent = c.typeLabel;
+  $("in-l-sys").textContent = c.sysLabel;
+
+  function fill(el, opts, placeholder){
+    el.innerHTML = '<option value="">' + placeholder + "</option>" +
+      opts.map(function(o){ return '<option value="' + esc(o) + '">' + esc(o) + "</option>"; }).join("");
+  }
+  fill($("in-type"), c.types, "Select\u2026");
+  fill($("in-system"), c.systems, "Select\u2026");
+  fill($("in-plan"),
+    (tiers || []).map(function(t){ return t[0] + " (" + t[1] + "/mo)"; }).concat(["Not sure yet"]),
+    "Select\u2026");
+}
 
 function renderStats(v){
   $("lede").textContent = v.lede;
@@ -1555,6 +1692,8 @@ function select(k){
   var tryBtn = document.getElementById("hero-try");
   if (tryBtn) tryBtn.hidden = !!hide["yourline"];
 
+  renderIntake(k, cfg, tiers);
+
   var wl = document.getElementById("personal");
   if (wl) wl.classList.toggle("wl-featured", k === "personal");
   if (MK.tick) { cancelAnimationFrame(MK.tick); MK.tick = null; }
@@ -1723,17 +1862,23 @@ select("home");
       .then(function(d){
         if (!d || !d.ok) throw new Error((d && d.error) || "Nothing matched.");
         list.innerHTML = d.results.map(function(b, i){
-          var hrs = b.today
-            ? '<span class="hrs' + (/closed/i.test(b.today) ? " shut" : "") + '">Today ' + esc(b.today) + "</span>"
-            : "";
+          var img = b.photo
+            ? '<img class="nb-ph" src="' + API + "/demo-photo?n=" + encodeURIComponent(b.photo) +
+              '" alt="" loading="lazy" width="56" height="56">'
+            : '<span class="nb-ph nb-ph-e" aria-hidden="true"></span>';
           var rate = (b.rating != null)
-            ? '<span class="rate">\u2605 ' + b.rating.toFixed(1) +
-              (b.reviews ? " (" + b.reviews.toLocaleString() + ")" : "") + "</span>"
+            ? '<span class="rate"><span class="star">\u2605</span>' + b.rating.toFixed(1) +
+              (b.reviews ? "<span class=\"rc\">(" + b.reviews.toLocaleString() + ")</span>" : "") + "</span>"
             : "";
+          var open = (b.openNow === true)  ? '<span class="pill op">Open</span>'
+                   : (b.openNow === false) ? '<span class="pill cl">Closed</span>' : "";
+          var tags = (b.tags || []).map(function(t){ return '<span class="chip">' + esc(t) + "</span>"; }).join("");
           return '<button type="button" class="nb-item" data-id="' + esc(b.placeId) + '" data-i="' + i + '">' +
+            img +
             '<span class="b"><span class="nm">' + esc(b.name) + "</span>" +
             '<span class="ad">' + esc(b.address) + "</span>" +
-            (hrs || rate ? '<span class="meta">' + hrs + rate + "</span>" : "") +
+            '<span class="meta">' + rate + open + "</span>" +
+            (tags ? '<span class="chips">' + tags + "</span>" : "") +
             "</span><span class=\"go\">Hear it \u2192</span></button>";
         }).join("");
         msg.textContent = "";
@@ -1789,6 +1934,53 @@ select("home");
     list.addEventListener("click", function(e){
       var btn = e.target.closest(".nb-item");
       if (btn) generate(btn);
+    });
+  }
+
+
+  /* -- intake form -- */
+  var inForm = document.getElementById("in-form");
+  if (inForm) {
+    inForm.addEventListener("submit", function(e){
+      e.preventDefault();
+      var btn = document.getElementById("in-go"), m = document.getElementById("in-msg");
+      var payload = {
+        first_name:    document.getElementById("in-first").value.trim(),
+        last_name:     document.getElementById("in-last").value.trim(),
+        email:         document.getElementById("in-email").value.trim(),
+        phone:         document.getElementById("in-phone").value.trim(),
+        business_name: document.getElementById("in-business").value.trim(),
+        business_type: document.getElementById("in-type").value,
+        system:        document.getElementById("in-system").value,
+        plan:          document.getElementById("in-plan").value,
+        comments:      document.getElementById("in-comments").value.trim(),
+        vertical:      key,
+        source:        "site"
+      };
+      if (!payload.first_name || !payload.email || !payload.business_name) {
+        m.className = "in-msg err";
+        m.textContent = "Name, email and business name, and I can take it from there.";
+        return;
+      }
+      m.className = "in-msg"; m.textContent = "Sending\u2026"; btn.disabled = true;
+
+      fetch(API + "/intake-form", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't send that.");
+        m.className = "in-msg ok";
+        m.textContent = "Got it \u2014 I'll come back to you within a day.";
+        inForm.reset();
+        renderIntake(key, V[key], typeof V[key].tiers === "string" ? V[V[key].tiers].tiers : V[key].tiers);
+      })
+      .catch(function(err){
+        m.className = "in-msg err";
+        m.textContent = (err.message || "Couldn't send that.") + " Or email hello@voicecaptures.com.";
+      })
+      .then(function(){ btn.disabled = false; });
     });
   }
 
