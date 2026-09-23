@@ -435,6 +435,30 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .nb-step.done{color:var(--muted)}
 .nb-step.done .nb-num{background:color-mix(in srgb, var(--cyan) 30%, transparent);color:var(--text)}
 
+.nb-results{margin-top:20px}
+.nb-results[hidden]{display:none}
+.nb-pick{font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:12px}
+.nb-item{display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;cursor:pointer;
+  background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:15px 17px;
+  margin-bottom:9px;font-family:var(--body);color:var(--text);
+  transition:border-color .18s,background .18s}
+.nb-item:hover{border-color:var(--cyan);background:color-mix(in srgb, var(--cyan) 7%, transparent)}
+.nb-item:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.nb-item[aria-busy="true"]{border-color:var(--cyan);opacity:.75;cursor:default}
+.nb-item .b{flex:1 1 auto;min-width:0}
+.nb-item .b{display:block}
+.nb-item .nm{display:block;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.3;margin-bottom:3px}
+.nb-item .ad{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
+.nb-item .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:7px;font-size:11.5px}
+.nb-item .hrs{color:var(--cyan)}
+.nb-item .hrs.shut{color:var(--muted)}
+.nb-item .rate{color:var(--muted)}
+.nb-item .go{flex:0 0 auto;align-self:center;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--cyan);white-space:nowrap}
+@media (max-width:520px){
+  .nb-item{padding:13px 14px;gap:10px}
+  .nb-item .go{display:none}
+}
 .nb-out{margin-top:24px;display:none}
 .nb-out.on{display:block}
 .nb-found{text-align:center;margin-bottom:18px}
@@ -708,9 +732,13 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <p class="nb-msg" id="nb-msg"></p>
 
       <div class="nb-steps" id="nb-steps" hidden>
-        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Finding your listing</div>
-        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Writing the script</div>
-        <div class="nb-step" data-s="3"><span class="nb-num">3</span>Generating the voice</div>
+        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Writing the script</div>
+        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Generating the voice</div>
+      </div>
+
+      <div class="nb-results" id="nb-results" hidden>
+        <p class="nb-pick">Which one is yours?</p>
+        <div id="nb-list"></div>
       </div>
 
       <div class="nb-out" id="nb-out">
@@ -1659,35 +1687,79 @@ select("home");
 (function(){
   var API = "https://torontoleads-production.up.railway.app";
 
-  /* -- business name -> two sample clips -- */
+  /* -- business name -> pick a match -> two sample clips -- */
   var q = document.getElementById("nb-q"), go = document.getElementById("nb-go"),
-      msg = document.getElementById("nb-msg"), out = document.getElementById("nb-out");
+      msg = document.getElementById("nb-msg"), out = document.getElementById("nb-out"),
+      results = document.getElementById("nb-results"), list = document.getElementById("nb-list"),
+      steps = document.getElementById("nb-steps");
+
   if (q && go) {
     var busy = false;
-    function run(){
+
+    function setSteps(on){
+      var els = steps.querySelectorAll(".nb-step");
+      for (var i = 0; i < els.length; i++) els[i].className = "nb-step";
+      steps.hidden = !on;
+      if (on) els[0].classList.add("on");
+      return on ? [setTimeout(function(){
+        els[0].className = "nb-step done"; els[1].classList.add("on");
+      }, 1600)] : [];
+    }
+
+    /* Step one: search. Cheap, so it can be generous with results. */
+    function search(){
       var text = q.value.trim();
       if (text.length < 3) { msg.className = "nb-msg err"; msg.textContent = "Enter your business name."; return; }
       if (busy) return;
       busy = true; go.disabled = true;
+      msg.className = "nb-msg"; msg.textContent = "Searching\u2026";
+      results.hidden = true; out.classList.remove("on"); steps.hidden = true;
+
+      fetch(API + "/demo-search", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: text })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.ok) throw new Error((d && d.error) || "Nothing matched.");
+        list.innerHTML = d.results.map(function(b, i){
+          var hrs = b.today
+            ? '<span class="hrs' + (/closed/i.test(b.today) ? " shut" : "") + '">Today ' + esc(b.today) + "</span>"
+            : "";
+          var rate = (b.rating != null)
+            ? '<span class="rate">\u2605 ' + b.rating.toFixed(1) +
+              (b.reviews ? " (" + b.reviews.toLocaleString() + ")" : "") + "</span>"
+            : "";
+          return '<button type="button" class="nb-item" data-id="' + esc(b.placeId) + '" data-i="' + i + '">' +
+            '<span class="b"><span class="nm">' + esc(b.name) + "</span>" +
+            '<span class="ad">' + esc(b.address) + "</span>" +
+            (hrs || rate ? '<span class="meta">' + hrs + rate + "</span>" : "") +
+            "</span><span class=\"go\">Hear it \u2192</span></button>";
+        }).join("");
+        msg.textContent = "";
+        results.hidden = false;
+        results.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      })
+      .catch(function(e){
+        msg.className = "nb-msg err";
+        msg.textContent = e.message || "Something went wrong. Try again.";
+      })
+      .then(function(){ busy = false; go.disabled = false; });
+    }
+
+    /* Step two: generate, for the one they picked. */
+    function generate(btn){
+      if (busy) return;
+      busy = true;
+      btn.setAttribute("aria-busy", "true");
       msg.className = "nb-msg"; msg.textContent = "";
       out.classList.remove("on");
-
-      // Generation takes a few seconds. Walking the steps makes the wait feel
-      // like work being done rather than a page that has stalled.
-      var steps = document.getElementById("nb-steps");
-      var els = steps.querySelectorAll(".nb-step");
-      steps.hidden = false;
-      for (var i = 0; i < els.length; i++) els[i].className = "nb-step";
-      els[0].classList.add("on");
-      var stepTimers = [
-        setTimeout(function(){ els[0].className = "nb-step done"; els[1].classList.add("on"); }, 1400),
-        setTimeout(function(){ els[1].className = "nb-step done"; els[2].classList.add("on"); }, 3200)
-      ];
-      function stopSteps(){ stepTimers.forEach(clearTimeout); steps.hidden = true; }
+      var timers = setSteps(true);
+      function stopSteps(){ timers.forEach(clearTimeout); steps.hidden = true; }
 
       fetch(API + "/demo-preview", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text })
+        body: JSON.stringify({ place_id: btn.getAttribute("data-id"), query: q.value.trim() })
       })
       .then(function(r){ return r.json(); })
       .then(function(d){
@@ -1700,7 +1772,7 @@ select("home");
                  '<audio controls preload="none" src="' + c.url + '"></audio></div>';
         }).join("");
         stopSteps();
-        msg.textContent = "";
+        results.hidden = true;
         out.classList.add("on");
         out.scrollIntoView({ behavior: "smooth", block: "nearest" });
       })
@@ -1709,10 +1781,15 @@ select("home");
         msg.className = "nb-msg err";
         msg.textContent = e.message || "Something went wrong. Try again.";
       })
-      .then(function(){ busy = false; go.disabled = false; });
+      .then(function(){ busy = false; btn.removeAttribute("aria-busy"); });
     }
-    go.addEventListener("click", run);
-    q.addEventListener("keydown", function(e){ if (e.key === "Enter") run(); });
+
+    go.addEventListener("click", search);
+    q.addEventListener("keydown", function(e){ if (e.key === "Enter") search(); });
+    list.addEventListener("click", function(e){
+      var btn = e.target.closest(".nb-item");
+      if (btn) generate(btn);
+    });
   }
 
   /* -- waitlist -- */
