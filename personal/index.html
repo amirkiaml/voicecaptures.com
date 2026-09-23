@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="personal">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VoiceCaptures — AI voice agent that answers and books every call</title>
-<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, no credit card.">
+<title>Personal line that screens your calls — VoiceCaptures</title>
+<meta name="description" content="A second number that picks up unknown callers, turns away the spam and texts you who called and what they wanted. $9/mo beta.">
 <meta name="theme-color" content="#0b0d13">
-<link rel="canonical" href="https://voicecaptures.com/">
-<link rel="icon" href="logo-mark.png">
+<link rel="canonical" href="https://voicecaptures.com/personal/">
+<link rel="icon" href="/logo-mark.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VoiceCaptures">
-<meta property="og:url" content="https://voicecaptures.com/">
-<meta property="og:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
+<meta property="og:url" content="https://voicecaptures.com/personal/">
+<meta property="og:title" content="Personal line that screens your calls — VoiceCaptures">
+<meta property="og:description" content="A second number that picks up unknown callers, turns away the spam and texts you who called and what they wanted. $9/mo beta.">
 <meta property="og:image" content="https://voicecaptures.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="VoiceCaptures — you're missing calls. We answer them.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="VoiceCaptures — never lose another call to voicemail">
+<meta name="twitter:title" content="Personal line that screens your calls — VoiceCaptures">
 <meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
-<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
+<meta name="twitter:description" content="A second number that picks up unknown callers, turns away the spam and texts you who called and what they wanted. $9/mo beta.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -120,34 +120,13 @@ h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
 }
 
 /* header */
-header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
+header{position:sticky;top:0;z-index:30;background:rgba(11,13,19,.76);
        -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
        border-bottom:1px solid var(--line)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   header{background:rgba(11,13,19,.94)}
 }
-
-.nav{display:flex;align-items:center;gap:4px;margin-left:auto;margin-right:12px}
-.nav-a{font-family:var(--body);font-size:13.5px;font-weight:500;color:var(--muted);
-  background:none;border:0;cursor:pointer;padding:8px 12px;border-radius:8px;
-  text-decoration:none;display:inline-flex;align-items:center;gap:5px;
-  transition:color .18s,background .18s}
-.nav-a:hover{color:var(--text);background:rgba(255,255,255,.06)}
-.nav-car{font-size:9px;opacity:.7}
-.nav-drop{position:relative}
-.nav-menu{position:absolute;top:calc(100% + 8px);left:0;min-width:186px;z-index:40;
-  background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:6px;
-  box-shadow:0 18px 44px rgba(0,0,0,.5)}
-.nav-menu[hidden]{display:none}
-.nav-menu button{display:block;width:100%;text-align:left;font-family:var(--body);
-  font-size:13.5px;color:var(--muted);background:none;border:0;cursor:pointer;
-  padding:9px 12px;border-radius:8px;transition:color .15s,background .15s}
-.nav-menu button:hover{color:var(--text);background:rgba(255,255,255,.07)}
-.nav-menu button[aria-current="true"]{color:var(--cyan);font-weight:700}
-/* Below tablet the links crowd the logo; the page has its own switcher and
-   anchors, so the nav simply steps aside. */
-@media (max-width:860px){ .nav{display:none} }
-.bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{height:32px;width:auto}
 .brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
@@ -564,20 +543,24 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
   max-width:460px;margin-left:auto;margin-right:auto;text-align:center}
 .wl-lead{font-size:14.5px;color:var(--muted);line-height:1.65;margin:0 auto 22px;max-width:480px}
 .wl-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.wl-form input,.wl-form select{flex:1 1 190px;min-width:0;background:var(--bg2);
+.wl-form input,.wl-form select{flex:1 1 200px;min-width:0;background:var(--bg2);
   border:1px solid var(--line2);border-radius:8px;padding:13px 15px;color:var(--text);
   font-family:var(--body);font-size:14.5px}
 .wl-form input::placeholder{color:var(--muted)}
 .wl-form input:focus,.wl-form select:focus{outline:2px solid var(--cyan);outline-offset:1px}
-.wl-form .btn{flex:1 1 auto;min-width:170px}
-.wl-form select{appearance:none;cursor:pointer;
-  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
-                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
-  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
-  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:34px}
-.wl-form select:invalid,.wl-form select option[value=""]{color:var(--muted)}
+.wl-form .btn{flex:0 0 auto}
 
-.wl-other{display:block;flex:1 1 100%;background:var(--bg2);
+.wl-ask{font-size:13px;color:var(--text);margin:20px 0 10px}
+.wl-ask span{color:var(--muted)}
+.wl-reasons{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.wl-reasons button{font-family:var(--body);font-size:12.5px;line-height:1.3;
+  padding:9px 14px;border-radius:100px;cursor:pointer;
+  background:var(--bg2);border:1px solid var(--line2);color:var(--muted);
+  transition:background .18s,border-color .18s,color .18s}
+.wl-reasons button:hover{border-color:color-mix(in srgb, var(--cyan) 45%, transparent);color:var(--text)}
+.wl-reasons button[aria-pressed="true"]{background:color-mix(in srgb, var(--cyan) 16%, transparent);
+  border-color:var(--cyan);color:var(--text);font-weight:700}
+.wl-other{display:block;width:100%;max-width:340px;margin:12px auto 0;background:var(--bg2);
   border:1px solid var(--line2);border-radius:8px;padding:11px 14px;color:var(--text);
   font-family:var(--body);font-size:14px}
 .wl-other[hidden]{display:none}
@@ -697,27 +680,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 <header>
   <div class="bar">
     <div class="brand">
-      <img src="logo-mark.png" alt="" width="32" height="32">
+      <img src="/logo-mark.png" alt="" width="32" height="32">
       <span>VoiceCaptures</span>
     </div>
-    <nav class="nav" aria-label="Main">
-      <div class="nav-drop">
-        <button type="button" class="nav-a" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
-          Sectors <span class="nav-car" aria-hidden="true">&#9662;</span>
-        </button>
-        <div class="nav-menu" id="nav-menu" hidden>
-          <button type="button" data-goto="personal">Personal line</button>
-          <button type="button" data-goto="home">Home services</button>
-          <button type="button" data-goto="food">Restaurants &amp; caf&eacute;s</button>
-          <button type="button" data-goto="clinic">Clinics &amp; dental</button>
-          <button type="button" data-goto="other">Something else</button>
-        </div>
-      </div>
-      <a class="nav-a" href="#demo" id="nav-demo">Try the demo line</a>
-      <a class="nav-a" href="#intake">Contact</a>
-      <a class="nav-a" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a>
-    </nav>
-    <a class="btn btn-ghost" href="#intake">Get in touch</a>
+    <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your free trial</a>
   </div>
 </header>
 
@@ -737,7 +703,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <h1 id="headline">You're missing calls.<br>We answer them.</h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <div class="hero-btns">
-        <a class="btn btn-primary" id="hero-cta" href="#intake">Tell us about your line</a>
+        <a class="btn btn-primary" id="hero-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
         <a class="btn btn-ghost hero-try" id="hero-try" href="#yourline">Hear it say your business name &darr;</a>
       </div>
       <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
@@ -867,7 +833,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
         <div class="figs" id="figs"></div>
       </div>
       <div class="center" style="margin-top:28px">
-        <a class="btn btn-primary" href="#intake">Tell us about your line</a>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
       </div>
       <p class="note" id="c-note">Assumes 30% of answered calls turn into a booked job — a conservative close rate for inbound service calls.</p>
     </div>
@@ -893,7 +859,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
       <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
       <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
       <div style="margin-top:20px">
-        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a demo</a>
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
       </div>
     </div>
   </div>
@@ -971,7 +937,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
     <div class="terms">
       <p>All prices CAD, plus HST. Additional minutes $1.25.</p>
-      <p id="setup-line">Onboarding $249 one-time — your number, your greeting, hours, services and calendar, configured for you.</p>
+      <p id="setup-line">Onboarding $249 one-time — your number, your greeting, hours, services and calendar, configured by hand.</p>
       <p><b style="color:var(--text)">Custom integration from $500</b>, quoted per job. Your CRM, PMS or field-service software, custom call flows, multiple calendars. Starter is the stock build; anything shaped around your systems is scoped on a call and billed separately.</p>
       <p>Every tier answers 24/7 — after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
       <p>Call history, recordings and transcripts are kept for 14 days on every plan. Extended retention is quoted separately.</p>
@@ -995,19 +961,17 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
         <div><span>&#10003;</span><span>Texts you a summary</span></div>
         <div><span>&#10003;</span><span>Keeps your number</span></div>
       </div>
-      <form class="wl-form" id="wl-form" style="margin-top:22px">
+      <p class="wl-ask">What's driving it? <span>Optional</span></p>
+      <div class="wl-reasons" id="wl-reasons" role="group" aria-label="Why you want this">
+        <button type="button" data-r="spam">Endless spam calls</button>
+        <button type="button" data-r="missed">I miss the ones that matter</button>
+        <button type="button" data-r="other">Something else</button>
+      </div>
+      <input class="wl-other" id="wl-other" type="text" hidden placeholder="What is it?" aria-label="Tell me more">
+
+      <form class="wl-form" id="wl-form" style="margin-top:18px">
         <input id="wl-email" type="email" required autocomplete="email" placeholder="you@email.com" aria-label="Your email">
         <input id="wl-phone" type="tel" required autocomplete="tel" placeholder="Mobile number" aria-label="Your mobile number">
-        <select id="wl-reason" aria-label="What's driving it (optional)">
-          <option value="">What's driving it? (optional)</option>
-          <option value="spam">Endless spam calls</option>
-          <option value="missed">I miss the ones that matter</option>
-          <option value="unknown">I never answer unknown numbers</option>
-          <option value="work">Work calls in my evenings</option>
-          <option value="privacy">I'd rather not give out my number</option>
-          <option value="other">Something else</option>
-        </select>
-        <input class="wl-other" id="wl-other" type="text" hidden placeholder="What is it?" aria-label="Tell us more">
         <button class="btn btn-primary" type="submit" id="wl-go">Join the waitlist</button>
       </form>
 
@@ -1019,42 +983,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 </section>
 
 
-
-<section class="alt">
-  <div class="wrap">
-    <h2 class="center">Who it's for</h2>
-    <p class="sub">If your phone is your business, VoiceCaptures is for you.</p>
-    <div class="tags">
-      <div>Plumbing</div><div>HVAC</div><div>Electrical</div><div>Roofing</div><div>Pest Control</div><div>Landscaping</div><div>General Contracting</div><div>Locksmith</div><div>Restaurants</div><div>Coffee Shops</div><div>Catering</div><div>Dental</div><div>Medical Clinics</div><div>Physio &amp; Chiro</div>
-    </div>
-    <div class="grid g3 faq">
-      <div class="card"><h3>Will it sound robotic?</h3><p>It runs on current conversational voice models, and most callers don't register that it isn't a person. Call the live demo line and judge it for yourself before you commit to anything.</p></div>
-      <div class="card"><h3>What if I already have a receptionist?</h3><p>It takes overflow and after-hours rather than replacing anyone. Your team keeps the calls they can reach, and nothing rings out when they can't.</p></div>
-      <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
-      <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
-      <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
-      <div class="card"><h3>What happens after the free trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
-      <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
-      <div class="card"><h3>What about my sector?</h3><p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free trial and we'll tell you honestly whether it fits before you pay anything.</p></div>
-    </div>
-  </div>
-</section>
-
-<div class="final">
-  <div class="wrap">
-    <h2>Ready to stop losing jobs<br>to voicemail?</h2>
-    <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
-    <div class="btns">
-      <a class="btn btn-primary" href="#intake">Tell us about your line</a>
-      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Or book a call</a>
-    </div>
-  </div>
-</div>
-
 <section id="intake" class="alt">
   <div class="wrap">
-    <h2 class="center" id="in-title">Tell us about your line.</h2>
-    <p class="sub" id="in-sub">A few quick questions and we'll come back with what your setup would look like. No obligation.</p>
+    <h2 class="center" id="in-title">Tell me about your line.</h2>
+    <p class="sub" id="in-sub">A few quick questions and I'll come back with what your setup would look like. No obligation.</p>
 
     <form class="in-card" id="in-form">
       <p class="in-leg">Contact</p>
@@ -1088,10 +1020,41 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   </div>
 </section>
 
+<section class="alt">
+  <div class="wrap">
+    <h2 class="center">Who it's for</h2>
+    <p class="sub">If your phone is your business, VoiceCaptures is for you.</p>
+    <div class="tags">
+      <div>Plumbing</div><div>HVAC</div><div>Electrical</div><div>Roofing</div><div>Pest Control</div><div>Landscaping</div><div>General Contracting</div><div>Locksmith</div><div>Restaurants</div><div>Coffee Shops</div><div>Catering</div><div>Dental</div><div>Medical Clinics</div><div>Physio &amp; Chiro</div>
+    </div>
+    <div class="grid g3 faq">
+      <div class="card"><h3>Will it sound robotic?</h3><p>It runs on current conversational voice models, and most callers don't register that it isn't a person. Call the live demo line and judge it for yourself before you commit to anything.</p></div>
+      <div class="card"><h3>What if I already have a receptionist?</h3><p>It takes overflow and after-hours rather than replacing anyone. Your team keeps the calls they can reach, and nothing rings out when they can't.</p></div>
+      <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
+      <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
+      <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
+      <div class="card"><h3>What happens after the free trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
+      <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
+      <div class="card"><h3>What about my sector?</h3><p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free trial and we'll tell you honestly whether it fits before you pay anything.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="final">
+  <div class="wrap">
+    <h2>Ready to stop losing jobs<br>to voicemail?</h2>
+    <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
+    <div class="btns">
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <a class="btn btn-ghost" id="final-demo" href="tel:+16476921081">Try the live demo</a>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap foot">
     <div>
-      <div class="brand"><img src="logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
+      <div class="brand"><img src="/logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
       <div class="tl">Answers · Qualifies · Books</div>
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
@@ -1106,28 +1069,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
-// Each vertical has its own URL. The path is the source of truth on load,
-// and the switcher keeps it in step afterwards so any tab can be shared.
-var SLUGS = {
-  personal: "personal",
-  home:     "home-services",
-  food:     "restaurants-cafes",
-  clinic:   "clinics-dental",
-  other:    "other-businesses"
-};
-function keyFromPath(){
-  // Path first: it changes as the visitor navigates. The build-time attribute
-  // is only a fallback for when the page is served from somewhere else.
-  var seg = location.pathname.replace(/^\/|\/$/g, "").split("/")[0];
-  for (var k in SLUGS) if (SLUGS[k] === seg) return k;
-  var built = document.documentElement.getAttribute("data-page");
-  return (built && SLUGS[built]) ? built : null;
-}
-
 var V = {
   home: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell me about your line.",
       nameLabel: "Business name", typeLabel: "Trade",
       sysLabel: "Scheduling or job software",
       types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
@@ -1136,12 +1081,12 @@ var V = {
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
-    ctaLabel: "Tell us about your line",
-    ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "home service businesses", setup: "$149",
     ring: 5.15,
-    audio: "/sample-call.mp3",
+    audio: "sample-call.mp3",
     biz: "Maple Ridge Plumbing",
     len: "1:15",
     smsBody: '<b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br><b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from under the kitchen sink, steady flow, unable to stop it.',
@@ -1179,7 +1124,7 @@ var V = {
     demoTitle: "Call and hear it yourself",
     demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
     demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
-    demoCta: "Tell us about your line",
+    demoCta: "Start your 14-day free trial",
     lede: "An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details \u2014 on the number you already use.",
     trades: "Plumbing \u00b7 HVAC \u00b7 Electrical \u00b7 Locksmith \u00b7 Garage door",
     stats: [
@@ -1195,7 +1140,7 @@ var V = {
   },
   food: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell me about your line.",
       nameLabel: "Venue name", typeLabel: "Type of venue",
       sysLabel: "POS system",
       types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
@@ -1204,9 +1149,9 @@ var V = {
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
-    ctaLabel: "Tell us about your line",
-    ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "restaurants and cafés", setup: "$249",
     ring: 1.1, audio: null, biz: "Kettle Row Coffee", len: null,
     smsBody: '<b>Catering lead</b><br>Priya S. \u00b7 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>40 people \u00b7 Thu 9 AM<br>250 University Ave, 12th floor<br>Coffee + pastries \u2014 call back to quote',
@@ -1247,7 +1192,7 @@ var V = {
   },
   other: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell me about your line.",
       nameLabel: "Business name", typeLabel: "What you do",
       sysLabel: "Booking or CRM software",
       types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
@@ -1256,9 +1201,9 @@ var V = {
 
     eyebrow: "Any business where the work arrives by phone",
     headline: "Not on the list?<br>It probably still fits.",
-    ctaLabel: "Tell us about your line",
+    ctaLabel: "Tell me about your line",
     ctaHref: "#intake",
-    ctaFine: "No obligation. If it isn't a fit, we'll say so.",
+    ctaFine: "No obligation. If it doesn't fit, I'll say so.",
     short: "businesses like yours", setup: "$249", consumer: true,
     ring: 1.1, audio: null, biz: "Over The Vines", len: null,
     agentLabel: "Your agent",
@@ -1276,16 +1221,16 @@ var V = {
     valueLabel: "", valueMin: 0, valueMax: 1, valueStep: 1, note: "",
     hasNumber: false,
     demoTag: "Built per business",
-    demoTitle: "Tell us how your calls work",
-    demoBody: "Every line is configured for the business \u2014 what it asks, what it books, what it escalates. If your work arrives by phone, it almost certainly fits.",
-    demoNote: "Salons, studios, tutors, venues, trades not listed above. We'll tell you honestly on a call whether it's a fit before you pay anything.",
-    demoCta: "Tell us about your line",
+    demoTitle: "Tell me how your calls work",
+    demoBody: "Every line is configured by hand \u2014 what it asks, what it books, what it escalates. If your work arrives by phone, it almost certainly fits.",
+    demoNote: "Salons, studios, tutors, venues, trades not listed above. I'll tell you honestly on a call whether it's a fit before you pay anything.",
+    demoCta: "Tell me about your line",
     lede: "Salons, studios, tutors, venues, contractors we haven't listed \u2014 the mechanics are the same anywhere the phone is how work arrives. Someone calls, needs qualifying, and needs a slot booked.",
     trades: "Salons \u00b7 Studios \u00b7 Tutors \u00b7 Venues \u00b7 Trades",
     priceNote: "Priced like home services until we know your call volume.",
     stats: [
       ["85%","Of callers whose call goes unanswered never call back","CallRail benchmark report, 2025"],
-      ["10 min","To get a line live once we've spoken","Configured per business, not a template"],
+      ["10 min","To get a line live once we've spoken","Configured by hand, not a template"],
       ["$249","Onboarding, then from $179/mo","Custom integrations quoted separately"]
     ],
     tiers: "home"
@@ -1295,7 +1240,7 @@ var V = {
     variants: [
       {
         key: "spam", label: "A scam robocall",
-        audio: "/personal-spam.mp3", len: "0:22", ring: 0, biz: "Unknown number",
+        audio: "personal-spam.mp3", len: "0:22", ring: 0, biz: "Unknown number",
         agentLabel: "Your line \u00b7 screening",
         smsTitle: "Text to you",
         smsBody: "URGENCY: <b>SPAM</b><br>Name: Unknown<br>Phone: +1647\u2022\u2022\u2022\u2022\u2022\u2022\u2022<br>Request: [SPAM] Immigration impersonation robocall",
@@ -1312,7 +1257,7 @@ var V = {
       },
       {
         key: "bmo", label: "A call worth taking",
-        audio: "/personal-bmo.mp3", len: "0:36", ring: 0, biz: "Unknown number",
+        audio: "personal-bmo.mp3", len: "0:36", ring: 0, biz: "Unknown number",
         agentLabel: "Your line \u00b7 screening",
         smsTitle: "Text to you",
         smsBody: "URGENCY: <b>MESSAGE</b><br>Name: \u2022\u2022\u2022<br>Phone: +1416\u2022\u2022\u2022\u2022\u2022\u2022\u2022<br>Request: \u2022\u2022\u2022 from BMO is checking in with the client and would like a callback",
@@ -1375,7 +1320,7 @@ var V = {
   },
   clinic: {
     intake: {
-      title: "Tell us about your practice.",
+      title: "Tell me about your practice.",
       nameLabel: "Practice name", typeLabel: "Type of practice",
       sysLabel: "Practice management software",
       types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
@@ -1384,9 +1329,9 @@ var V = {
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "You're missing calls.<br>We answer them.",
-    ctaLabel: "Tell us about your line",
-    ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaLabel: "Start your 14-day free trial",
+    ctaHref: CAL,
+    ctaFine: "14 days free. No credit card. Setup takes 10 minutes.",
     short: "clinics and dental practices", setup: "$349",
     ring: 1.1, audio: null, biz: "Lakeshore Dental", len: null,
     smsBody: '<b>New patient</b><br>Sarah Chen \u00b7 905 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>Cleaning \u00b7 Thu 10:00 AM<br>Booked',
@@ -1642,7 +1587,7 @@ function renderDemo(v){
     line.innerHTML = "";
   }
   $("cal-section").hidden = !v.hasNumber;
-
+  $("final-demo").hidden = !v.hasNumber;
 }
 
 function renderTiers(v){
@@ -1663,7 +1608,7 @@ function renderTiers(v){
         return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
       }).join("") + "</div>" +
       '<a class="btn ' + (pop ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
-      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Book a call") + "</a>" +
+      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Start your free trial") + "</a>" +
       "</div>";
   }).join("");
   $("p-trades").textContent = v.trades;
@@ -1717,14 +1662,8 @@ function loadCalc(v){
   calc();
 }
 
-function select(k, fromPop){
+function select(k){
   key = k;
-  if (!fromPop && SLUGS[k] && window.history && history.pushState) {
-    var want = "/" + SLUGS[k] + "/";
-    if (location.pathname !== want) {
-      try { history.pushState({ v: k }, "", want); } catch (e) {}
-    }
-  }
   document.documentElement.setAttribute("data-v", k);
 
   // Show a section only where the vertical has data for it, rather than
@@ -1883,49 +1822,7 @@ $("s-new").addEventListener("input", function(e){ state.newPct = +e.target.value
   audio.addEventListener("seeked",    function(){ if (MK.v && MK.v.audio) mkPaint(audio.currentTime); });
 })();
 
-select(keyFromPath() || "home", true);
-
-window.addEventListener("popstate", function(){
-  select(keyFromPath() || "home", true);
-});
-
-/* ---- Header nav ---- */
-(function(){
-  var btn = document.getElementById("nav-sectors"),
-      menu = document.getElementById("nav-menu");
-  if (!btn || !menu) return;
-
-  function close(){ menu.hidden = true; btn.setAttribute("aria-expanded","false"); }
-  function open(){
-    menu.hidden = false; btn.setAttribute("aria-expanded","true");
-    // mark the sector currently being viewed
-    menu.querySelectorAll("button[data-goto]").forEach(function(b){
-      b.setAttribute("aria-current", b.getAttribute("data-goto") === key ? "true" : "false");
-    });
-  }
-  btn.addEventListener("click", function(e){
-    e.stopPropagation();
-    menu.hidden ? open() : close();
-  });
-  menu.addEventListener("click", function(e){
-    var b = e.target.closest("button[data-goto]");
-    if (!b) return;
-    select(b.getAttribute("data-goto"));
-    close();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-  document.addEventListener("click", close);
-  document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
-
-  // "Demo line" only exists on the sectors that have one; send the others to
-  // home services rather than to a hidden section.
-  var demoLink = document.getElementById("nav-demo");
-  if (demoLink) {
-    demoLink.addEventListener("click", function(){
-      if (document.getElementById("demo").hidden) select("home");
-    });
-  }
-})();
+select("home");
 
 /* ---- Hear it answer your line + waitlist -------------------------------
    Both post to the Railway server; the marketing site itself is static. ---- */
@@ -2010,7 +1907,7 @@ window.addEventListener("popstate", function(){
 
       fetch(API + "/demo-preview", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ place_id: btn.getAttribute("data-id"), query: q.value.trim(), vertical: key })
+        body: JSON.stringify({ place_id: btn.getAttribute("data-id"), query: q.value.trim() })
       })
       .then(function(r){ return r.json(); })
       .then(function(d){
@@ -2065,7 +1962,7 @@ window.addEventListener("popstate", function(){
       };
       if (!payload.first_name || !payload.email || !payload.business_name) {
         m.className = "in-msg err";
-        m.textContent = "Name, email and business name, and we can take it from there.";
+        m.textContent = "Name, email and business name, and I can take it from there.";
         return;
       }
       // This is a phone product; a number is how the conversation starts.
@@ -2084,7 +1981,7 @@ window.addEventListener("popstate", function(){
       .then(function(d){
         if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't send that.");
         m.className = "in-msg ok";
-        m.textContent = "Got it \u2014 we'll come back to you within a day.";
+        m.textContent = "Got it \u2014 I'll come back to you within a day.";
         inForm.reset();
         renderIntake(key, V[key], typeof V[key].tiers === "string" ? V[V[key].tiers].tiers : V[key].tiers);
       })
@@ -2098,20 +1995,24 @@ window.addEventListener("popstate", function(){
 
   /* -- waitlist -- */
 
-  // Optional, and a single choice — the point is a signal about what to build
-  // first, not a survey. "Something else" reveals a free-text follow-up.
-  var reasonSel = document.getElementById("wl-reason");
+  // Multi-select: people rarely have one reason, and the combination is more
+  // useful than forcing a single pick.
+  var reasons = document.getElementById("wl-reasons");
   var otherBox = document.getElementById("wl-other");
-  if (reasonSel) {
-    reasonSel.addEventListener("change", function(){
-      var other = reasonSel.value === "other";
-      otherBox.hidden = !other;
-      if (!other) otherBox.value = "";
-      else otherBox.focus();
+  if (reasons) {
+    reasons.addEventListener("click", function(e){
+      var b = e.target.closest("button[data-r]");
+      if (!b) return;
+      var on = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", on ? "false" : "true");
+      var anyOther = reasons.querySelector('button[data-r="other"][aria-pressed="true"]');
+      otherBox.hidden = !anyOther;
+      if (!anyOther) otherBox.value = "";
     });
   }
   function pickedReasons(){
-    return reasonSel && reasonSel.value ? [reasonSel.value] : [];
+    return [].slice.call(reasons ? reasons.querySelectorAll('button[aria-pressed="true"]') : [])
+             .map(function(b){ return b.getAttribute("data-r"); });
   }
 
   var form = document.getElementById("wl-form");
@@ -2142,10 +2043,12 @@ window.addEventListener("popstate", function(){
         if (d.already) {
           // Already signed up — say so plainly instead of a second confirmation
           // that implies something new happened.
-          m.textContent = "You're already on the list \u2014 nothing more to do. We'll be in touch when the beta opens.";
+          m.textContent = "You're already on the list \u2014 nothing more to do. I'll be in touch when the beta opens.";
         } else {
-          m.textContent = "You're on the list. We'll be in touch when the beta opens.";
+          m.textContent = "You're on the list. I'll be in touch when the beta opens.";
           form.reset();
+          [].slice.call(reasons ? reasons.querySelectorAll('button[aria-pressed="true"]') : [])
+            .forEach(function(x){ x.setAttribute("aria-pressed","false"); });
           otherBox.hidden = true; otherBox.value = "";
         }
       })
