@@ -23,7 +23,7 @@
 <meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0b0d13; --bg2:#12151d; --bg3:#191d27;
@@ -683,6 +683,55 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 }
 
 
+/* 2026 visual refresh: preserve the product copy and interactive components. */
+:root{--bg:#080f1e;--bg2:#0d1729;--bg3:#14223a;--text:#f8fbff;--muted:#adbdd2;--faint:#8497b0;--line:rgba(181,211,255,.12);--line2:rgba(181,211,255,.24);--blue:#477cf6;--blue-dk:#6798ff;--blue-glow:rgba(70,124,246,.18);--cyan:#5cdbf4;--cyan-lt:#a1ecfb;--display:'Manrope',sans-serif}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{background:var(--bg);font-size:15px}
+.wrap,.bar{max-width:1240px}
+section{padding:clamp(76px,9vw,132px) 0}
+h1,h2,h3{letter-spacing:-.045em}
+h1{font-size:clamp(44px,5.1vw,76px);line-height:1.045;letter-spacing:-.065em;margin-bottom:26px}
+h2{font-size:clamp(32px,3.6vw,49px);line-height:1.13;margin-bottom:16px}
+h3{font-family:var(--display);font-size:17px}
+.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.17em}
+.lede{font-size:clamp(17px,1.65vw,20px);line-height:1.7;max-width:600px}
+.sub{font-size:17px;line-height:1.75}
+.btn{border-radius:10px;padding:15px 25px;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,border-color .25s ease}
+.btn-primary{background:#83e6f7;color:#071322;box-shadow:0 8px 34px rgba(52,190,225,.16)}
+.btn-primary:hover{background:#b7f5ff;color:#071322;transform:translateY(-3px);box-shadow:0 15px 38px rgba(52,190,225,.26)}
+.btn-ghost:hover{transform:translateY(-2px)}
+.anno{background:#17365c;color:#e4f5ff;border-bottom:1px solid rgba(126,212,246,.2)}
+.anno:hover{color:#fff;background:#1b426d}
+.anno-dot{background:#77ddf2;box-shadow:0 0 15px #77ddf2}
+header{background:rgba(8,15,30,.82)}
+.bar{padding:18px 24px}.brand span{font-size:19px;letter-spacing:-.045em}.brand img{height:34px}
+.hero{position:relative;isolation:isolate;padding:clamp(66px,7vw,110px) 0 90px;background:linear-gradient(90deg,rgba(7,15,29,.96) 0%,rgba(7,15,29,.87) 44%,rgba(7,15,29,.58) 100%),url('/hero-glass-phone.webp') center 18%/cover no-repeat}
+.hero::after{content:"";position:absolute;inset:auto 0 0;height:220px;background:linear-gradient(transparent,var(--bg));z-index:-1;pointer-events:none}
+.hero-grid{align-items:center;gap:clamp(36px,5vw,76px)}
+@media(min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)}}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid rgba(135,220,247,.32);border-radius:100px;background:rgba(19,57,91,.45);backdrop-filter:blur(12px)}
+.hero .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:#87eafa;box-shadow:0 0 12px #87eafa}
+.switch{border-radius:13px;background:rgba(9,20,39,.66);border-color:rgba(170,210,255,.18);backdrop-filter:blur(15px);margin-bottom:38px}
+.switch button{border-radius:9px;background:transparent;font-size:12px;padding:10px 13px}
+.switch button[aria-selected="true"][data-hue]{box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.stats{margin-top:70px;background:transparent;border:0;gap:14px}
+.stat{background:rgba(13,28,51,.65);border:1px solid rgba(164,204,255,.16);border-radius:14px;padding:19px 16px;backdrop-filter:blur(12px)}
+.stat b{font-size:26px;color:#f8fcff}.stat .src{color:#8499b2}
+.mock{border:1px solid rgba(175,219,255,.25);border-radius:25px;background:linear-gradient(145deg,rgba(24,47,80,.82),rgba(8,20,40,.9));padding:13px;box-shadow:0 35px 90px rgba(0,0,0,.4),0 0 80px rgba(50,136,247,.1);backdrop-filter:blur(23px)}
+.mk-phone{border-radius:17px}.mk-panel{border-radius:17px}
+.alt{background:#0d1729}
+.card,.tier,.calc,.demo,.soon-card,.in-card,.wl,.nb-clip{border-radius:18px;border-color:rgba(173,207,255,.15);box-shadow:0 12px 35px rgba(0,0,0,.09)}
+.card,.tier,.soon-card{transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease,background .4s ease}
+.card:hover,.tier:hover,.soon-card:hover{transform:translateY(-5px);border-color:rgba(102,201,245,.38);box-shadow:0 25px 50px rgba(0,0,0,.18)}
+.tier.ent{border-color:rgba(105,216,245,.65);box-shadow:0 0 0 1px rgba(105,216,245,.2),0 25px 70px rgba(22,111,190,.14)}
+.yl-band{background:radial-gradient(ellipse at 50% 0%,rgba(49,120,218,.22),transparent 65%),#0a1426}
+.final{background:radial-gradient(ellipse at 50% 90%,rgba(52,136,235,.22),transparent 70%);padding:120px 0}
+.final h2{font-size:clamp(35px,4.5vw,59px)}
+footer{background:#07101e}
+@media(max-width:1039px){.hero{background-position:64% top}.mock{max-width:760px;margin:auto}}
+@media(max-width:720px){.hero{padding-top:54px;background:linear-gradient(90deg,rgba(7,15,29,.92),rgba(7,15,29,.84)),url('/hero-glass-phone.webp') 64% top/auto 560px no-repeat}.stats{margin-top:45px}.mock{padding:9px}.bar{padding:12px 18px}}
+@media(max-width:480px){h1{font-size:clamp(38px,10vw,52px)}.stat{padding:14px 10px}.stat b{font-size:20px}.stat b.xlong{font-size:15px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.tier,.soon-card,.btn{transition:none}}
 </style>
 </head>
 <body>
