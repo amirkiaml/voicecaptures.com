@@ -145,6 +145,12 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 
 /* hero */
 .hero{padding:clamp(28px,4vw,72px) 0 clamp(40px,5vw,64px)}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hero-try[hidden]{display:none}
+.hero-try{border-color:color-mix(in srgb, var(--cyan) 55%, transparent);color:var(--cyan)}
+.hero-try:hover{background:color-mix(in srgb, var(--cyan) 12%, transparent);
+  border-color:var(--cyan);color:var(--cyan)}
+@media (max-width:720px){.hero-btns .btn{width:100%}}
 .hero-grid{display:grid;width:100%;grid-template-columns:minmax(0,1fr);gap:clamp(32px,4vw,56px);align-items:start}
 @media (min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}}
 .switch{display:flex;gap:6px;padding:6px;background:var(--bg2);border:1px solid var(--line);
@@ -383,27 +389,35 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 
 
 /* ---- Business lookup: the one thing a visitor can do that proves it. ---- */
-.yl-band{background:
-  radial-gradient(900px 340px at 50% -8%, color-mix(in srgb, var(--cyan) 11%, transparent), transparent 70%),
+.yl-band{position:relative;padding:clamp(56px,7vw,86px) 0;background:
+  radial-gradient(1100px 440px at 50% -12%, color-mix(in srgb, var(--cyan) 17%, transparent), transparent 72%),
   var(--bg2);
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  border-top:1px solid color-mix(in srgb, var(--cyan) 30%, transparent);
+  border-bottom:1px solid var(--line)}
+/* a bright hairline along the top edge, so the band announces itself */
+.yl-band::before{content:"";position:absolute;top:-1px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.75}
 .yl-head{text-align:center;margin-bottom:26px}
-.yl-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.14em;
-  text-transform:uppercase;padding:6px 14px;border-radius:100px;margin-bottom:16px;
-  background:color-mix(in srgb, var(--cyan) 15%, transparent);color:var(--cyan)}
-.yl-band h2{font-size:clamp(26px,4vw,38px)}
+.yl-tag{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:7px 16px;border-radius:100px;
+  margin-bottom:18px;background:color-mix(in srgb, var(--cyan) 15%, transparent);
+  color:var(--cyan);border:1px solid color-mix(in srgb, var(--cyan) 32%, transparent)}
+.yl-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  animation:blip 1.8s ease-in-out infinite}
+.yl-band h2{font-size:clamp(28px,4.6vw,44px);margin-bottom:12px}
 .yl-band h2 em{font-style:normal;color:var(--cyan)}
 .yl-band .sub{margin-bottom:0}
 
-.nb{max-width:600px;margin:0 auto}
+.nb{max-width:640px;margin:0 auto}
 .nb-form{display:flex;gap:10px;flex-wrap:wrap;
   background:var(--bg3);border:1px solid var(--cyan);border-radius:12px;padding:8px;
-  box-shadow:0 0 0 4px color-mix(in srgb, var(--cyan) 10%, transparent)}
+  box-shadow:0 0 0 5px color-mix(in srgb, var(--cyan) 12%, transparent),
+              0 14px 40px rgba(0,0,0,.35)}
 .nb-form input{flex:1 1 220px;min-width:0;background:transparent;border:0;
-  padding:13px 12px;color:var(--text);font-family:var(--body);font-size:16px}
+  padding:15px 14px;color:var(--text);font-family:var(--body);font-size:17px}
 .nb-form input::placeholder{color:var(--muted)}
 .nb-form input:focus{outline:none}
-.nb-form .btn{flex:0 0 auto;padding:13px 26px}
+.nb-form .btn{flex:0 0 auto;padding:14px 30px;font-size:16px}
 .nb-msg{font-size:13px;color:var(--muted);margin-top:12px;text-align:center;min-height:18px}
 .nb-msg.err{color:var(--red)}
 
@@ -460,6 +474,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
   padding:clamp(26px,4vw,40px);max-width:680px;margin:0 auto;text-align:center}
 .wl .price{font-size:40px;margin:6px 0 4px}
 .wl .price em{font-size:15px}
+.wl-consent{font-size:11.5px;color:var(--faint);line-height:1.65;margin-top:14px;
+  max-width:460px;margin-left:auto;margin-right:auto;text-align:center}
 .wl-when{font-size:13px;color:var(--cyan);margin:4px 0 0;font-weight:700}
 .wl-lead{font-size:14.5px;color:var(--muted);line-height:1.65;margin:0 auto 22px;max-width:480px}
 .wl-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -622,7 +638,10 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
       <h1 id="headline">You're missing calls.<br>We answer them.</h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
-      <a class="btn btn-primary" id="hero-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+      <div class="hero-btns">
+        <a class="btn btn-primary" id="hero-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Start your 14-day free trial</a>
+        <a class="btn btn-ghost hero-try" id="hero-try" href="#yourline">Hear it say your business name &darr;</a>
+      </div>
       <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
 
       <div class="stats" id="stats">
@@ -673,6 +692,42 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
     </div>
   </div>
 </div>
+
+<section id="yourline" class="yl-band">
+  <div class="wrap">
+    <div class="yl-head">
+      <span class="yl-tag">Try it on your own business &mdash; free, 20 seconds</span>
+      <h2 class="center">Hear it answer <em>your</em> line.</h2>
+      <p class="sub">Type your business name. We pull your public listing and generate two calls in your name, right now, with your real address and today's hours.</p>
+    </div>
+
+    <div class="nb">
+      <div class="nb-form">
+        <input id="nb-q" type="text" autocomplete="organization" placeholder="Your business name and city" aria-label="Your business name">
+        <button class="btn btn-primary" id="nb-go" type="button">Hear it</button>
+      </div>
+      <p class="nb-msg" id="nb-msg"></p>
+
+      <div class="nb-steps" id="nb-steps" hidden>
+        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Finding your listing</div>
+        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Writing the script</div>
+        <div class="nb-step" data-s="3"><span class="nb-num">3</span>Generating the voice</div>
+      </div>
+
+      <div class="nb-out" id="nb-out">
+        <div class="nb-found">
+          <div class="nb-biz" id="nb-biz"></div>
+          <div class="nb-addr" id="nb-addr"></div>
+        </div>
+        <div id="nb-clips"></div>
+        <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar &mdash; this is the stock version.</p>
+        <div class="center" style="margin-top:18px">
+          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Set this up on my number</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="alt">
   <div class="wrap">
@@ -745,41 +800,6 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
 
 
-<section id="yourline" class="yl-band">
-  <div class="wrap">
-    <div class="yl-head">
-      <span class="yl-tag">Try it on your own business &mdash; free, 20 seconds</span>
-      <h2 class="center">Hear it answer <em>your</em> line.</h2>
-      <p class="sub">Type your business name. We pull your public listing and generate two calls in your name, right now, with your real address and today's hours.</p>
-    </div>
-
-    <div class="nb">
-      <div class="nb-form">
-        <input id="nb-q" type="text" autocomplete="organization" placeholder="Your business name and city" aria-label="Your business name">
-        <button class="btn btn-primary" id="nb-go" type="button">Hear it</button>
-      </div>
-      <p class="nb-msg" id="nb-msg"></p>
-
-      <div class="nb-steps" id="nb-steps" hidden>
-        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Finding your listing</div>
-        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Writing the script</div>
-        <div class="nb-step" data-s="3"><span class="nb-num">3</span>Generating the voice</div>
-      </div>
-
-      <div class="nb-out" id="nb-out">
-        <div class="nb-found">
-          <div class="nb-biz" id="nb-biz"></div>
-          <div class="nb-addr" id="nb-addr"></div>
-        </div>
-        <div id="nb-clips"></div>
-        <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar &mdash; this is the stock version.</p>
-        <div class="center" style="margin-top:18px">
-          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Set this up on my number</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section class="alt" id="dashboard">
   <div class="wrap center">
@@ -884,13 +904,13 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 
       <form class="wl-form" id="wl-form" style="margin-top:18px">
         <input id="wl-email" type="email" required autocomplete="email" placeholder="you@email.com" aria-label="Your email">
-        <input id="wl-phone" type="tel" autocomplete="tel" placeholder="Mobile (optional)" aria-label="Your mobile number">
+        <input id="wl-phone" type="tel" required autocomplete="tel" placeholder="Mobile number" aria-label="Your mobile number">
         <button class="btn btn-primary" type="submit" id="wl-go">Join the waitlist</button>
       </form>
 
 
       <p class="wl-msg" id="wl-msg"></p>
-      <p class="nb-note" style="text-align:center">Email is enough. Leave a mobile if you'd rather hear about it by text.</p>
+      <p class="wl-consent">By joining, you agree to be contacted by email and text about the beta &mdash; when it opens, and what it costs. Nothing else, and you can stop either at any time by replying STOP or asking. Your number is needed because this is a phone product: it's the line we'd set the screening up on.</p>
     </div>
   </div>
 </section>
@@ -1506,6 +1526,9 @@ function select(k){
     if (el) el.hidden = hide[id];
   });
 
+  var tryBtn = document.getElementById("hero-try");
+  if (tryBtn) tryBtn.hidden = !!hide["yourline"];
+
   var wl = document.getElementById("personal");
   if (wl) wl.classList.toggle("wl-featured", k === "personal");
   if (MK.tick) { cancelAnimationFrame(MK.tick); MK.tick = null; }
@@ -1724,6 +1747,12 @@ select("home");
           phone = document.getElementById("wl-phone").value.trim(),
           btn   = document.getElementById("wl-go"),
           m     = document.getElementById("wl-msg");
+      // A phone product needs a phone number; say why rather than just refusing.
+      if (phone.replace(/\D/g, "").length < 10) {
+        m.className = "wl-msg err";
+        m.textContent = "A mobile number is needed \u2014 that's the line the screening would run on.";
+        return;
+      }
       m.className = "wl-msg"; m.textContent = "Adding you\u2026"; btn.disabled = true;
 
       fetch(API + "/waitlist", {
