@@ -247,7 +247,6 @@ html[data-theme="light"] .mk-keys svg{stroke:#5a6b82}
 html[data-theme="light"] .mk-keys svg circle{fill:#5a6b82}
 html[data-theme="light"] .mk-keys div{color:#7086a1}
 html[data-theme="light"] .mk-bar{background:rgba(18,35,63,.10)}
-html[data-theme="light"] .mk-agent{color:#f2f6fb}
 html[data-theme="light"] .mk-bar{background:rgba(255,255,255,.14)}
 html[data-theme="light"] .mk-fallback audio{filter:none}
 html[data-theme="light"] .dring,html[data-theme="light"] .dconv-track{background:none;stroke:#e3e9f2}
@@ -931,6 +930,20 @@ html[data-theme="dark"] .dchip{background:rgba(160,200,255,.06);
   border-color:rgba(160,200,255,.16);color:#9fb3cc}
 html[data-theme="light"] .dchip{background:#f4f7fc;border-color:rgba(18,35,63,.12)}
 
+
+/* Transcript text has to read against a white panel now. */
+html[data-theme="light"] .mk-agent{color:#12233f;
+  background:rgba(37,99,235,.07);border-color:rgba(37,99,235,.20)}
+html[data-theme="light"] .mk-agent .mk-who{color:#1D4ED8}
+html[data-theme="light"] .mk-caller{background:#2563EB;color:#fff}
+html[data-theme="light"] .mk-caller .mk-who{color:rgba(255,255,255,.78)}
+html[data-theme="light"] .mk-sms{color:#5a4419;background:rgba(245,158,11,.12);
+  border-color:rgba(217,119,6,.35)}
+html[data-theme="light"] .mk-sms b{color:#3a2c0d}
+html[data-theme="light"] .mk-sms .mk-who{color:#B45309}
+html[data-theme="light"] .mk-biz{color:#12233f}
+html[data-theme="light"] .mk-timer{color:#5a6b82}
+
 /* ---- Intake form ---- */
 .in-card{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
   border-radius:16px;padding:clamp(24px,4vw,36px)}
@@ -1225,8 +1238,8 @@ footer{background:#07101e}
         <div class="orb-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
       <picture class="blob-person" id="blob-person" hidden>
-        <source srcset="/personal-hero.webp?v=3" type="image/webp">
-        <img src="/personal-hero.png?v=3" alt="" width="571" height="760" loading="lazy">
+        <source srcset="/personal-hero.webp?v=4" type="image/webp">
+        <img src="/personal-hero.png?v=4" alt="" width="571" height="760" loading="lazy">
       </picture>
       <picture class="blob-shot" id="blob-shot" hidden>
         <source id="blob-shot-src" srcset="" type="image/webp">
@@ -1674,7 +1687,7 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 // and the switcher keeps it in step afterwards so any tab can be shared.
 // Bump when an image is replaced under the same filename, or returning
 // visitors keep the cached copy.
-var ASSET_V = "3";
+var ASSET_V = "4";
 
 var SLUGS = {
   personal: "personal",
@@ -2346,7 +2359,9 @@ function select(k, fromPop){
   var shot = document.getElementById("blob-shot");
   // A photo of the sector where there is one; the portrait for the personal
   // line; the bare waveform for anything unlisted.
-  var SHOTS = { home:"home", food:"food", clinic:"clinic" };
+  // Add a sector here only once its cutout is in the repo — a missing file
+  // shows a broken image rather than falling back.
+  var SHOTS = { home:"home", food:"food" };
   if (shot) {
     var f = SHOTS[k];
     shot.hidden = !f;
