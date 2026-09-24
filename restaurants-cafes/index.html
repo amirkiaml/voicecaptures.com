@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-page="food">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI phone answering for restaurants and cafés — VoiceCaptures</title>
 <meta name="description" content="Never miss a reservation, takeout order or catering enquiry. An AI voice agent answers in your venue's name and texts you every lead.">
-<meta name="theme-color" content="#0b0d13">
+<meta name="theme-color" content="#f6f8fc">
 <link rel="canonical" href="https://voicecaptures.com/restaurants-cafes/">
-<link rel="icon" href="/logo-mark.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/restaurants-cafes/">
@@ -48,41 +53,11 @@ section{padding:clamp(52px,7vw,80px) 0}
 .alt{background:var(--bg2)}
 
 
-/* ---- Per-vertical theming ------------------------------------------------
-   Every accent on the page resolves through these four variables, so swapping
-   them re-skins the whole layout. Surfaces shift a few degrees of hue too, so
-   moving between sectors feels like moving somewhere, not just new copy.
-   Red stays reserved for the loss figure and the demo number in all three. */
-body{transition:background-color .45s ease}
-.alt,.card,.tier,.calc,.mock,.mk-panel,.demo,.stat,header,.tags div,.switch,.switch button{
-  transition:background-color .45s ease,border-color .45s ease}
-
-[data-v="food"]{
-  --bg:#0a0f0d; --bg2:#111a16; --bg3:#17231e;
-  --blue:#047857; --blue-dk:#065F46; --blue-glow:rgba(4,120,87,.18);
-  --cyan:#34D399; --cyan-lt:#6EE7B7;
-}
-[data-v="food"] .mk-phone{background:linear-gradient(168deg,#123027 0%,#0f1a15 68%)}
-[data-v="food"] header{background:rgba(10,15,13,.76)}
-
-[data-v="clinic"]{
-  --bg:#0d0b13; --bg2:#16121d; --bg3:#1e1927;
-  --blue:#7C3AED; --blue-dk:#6D28D9; --blue-glow:rgba(124,58,237,.18);
-  --cyan:#A78BFA; --cyan-lt:#C4B5FD;
-}
-[data-v="clinic"] .mk-phone{background:linear-gradient(168deg,#2a1f4a 0%,#161027 68%)}
-[data-v="clinic"] .mk-caller{background:#6D28D9}
-
-[data-v="personal"]{
-  --bg:#12100a; --bg2:#1a170f; --bg3:#241f15;
-  --blue:#B45309; --blue-dk:#92400E; --blue-glow:rgba(180,83,9,.2);
-  --cyan:#FBBF24; --cyan-lt:#FCD34D;
-}
-[data-v="personal"] .mk-phone{background:linear-gradient(168deg,#3a2c10 0%,#1c1709 68%)}
-[data-v="personal"] header{background:rgba(18,16,10,.76)}
-[data-v="personal"] .anno{display:none}
-
-[data-v="clinic"] header{background:rgba(13,11,19,.76)}
+/* ---- One palette across every sector -------------------------------------
+   The sectors are distinguished by the tab pills and by their content, not by
+   repainting the whole page. Keeping a single blue means the hero image, the
+   header and every card stay consistent wherever a visitor lands. ---- */
+[data-v="personal"] .anno{display:none}   /* already on that page */
 
 /* type */
 h1{font-family:var(--display);font-weight:700;font-size:clamp(29px,4.6vw,47px);letter-spacing:-.02em;line-height:1.1;margin-bottom:20px}
@@ -93,6 +68,11 @@ h3{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:6px}
 .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
 .lede{font-size:17px;color:var(--muted);max-width:520px;margin-bottom:32px}
 .fine{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
+
+
+/* Two-tone headline: the statement in ink, the promise in the accent. */
+h1 .hl,h2 .hl{color:var(--blue)}
+html[data-theme="light"] h1 .hl,html[data-theme="light"] h2 .hl{color:#2563EB}
 
 /* buttons */
 .btn{font-family:var(--body);font-size:15px;font-weight:700;padding:14px 30px;border-radius:8px;display:inline-block;border:0;cursor:pointer;transition:background .2s,transform .1s,border-color .2s;text-align:center}
@@ -146,9 +126,10 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
 .nav-menu button[aria-current="true"]{color:var(--cyan);font-weight:700}
 /* Below tablet the links crowd the logo; the page has its own switcher and
    anchors, so the nav simply steps aside. */
-@media (max-width:860px){ .nav{display:none} }
+@media (max-width:1000px){ .nav{display:none} }
 .bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.brand{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.brand:hover{color:inherit;opacity:.85}
 .brand img{height:32px;width:auto}
 .brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
 header .btn{font-size:14px;padding:10px 20px;white-space:nowrap}
@@ -164,6 +145,244 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
   header .btn{font-size:12.5px;padding:9px 14px}
 }
 
+
+/* ---- Nav: plain text, spaced. No pills — they read as cramped buttons
+   competing with the one real CTA. ---- */
+.nav{display:flex;align-items:center;gap:7px;margin-left:auto;margin-right:clamp(14px,2vw,26px)}
+.nav-a{font-family:var(--body);font-size:14.5px;font-weight:500;color:var(--text);
+  background:none;border:0;cursor:pointer;padding:6px 0;border-radius:0;
+  text-decoration:none;display:inline-flex;align-items:center;gap:7px;
+  letter-spacing:-.005em;transition:color .18s}
+.nav-a:hover{color:var(--cyan);background:none}
+.nav-a::after{content:"";position:absolute}
+.nav-drop{position:relative}
+.nav-trigger{padding:6px 12px 6px 13px;border:1px solid var(--line2);border-radius:9px}
+.nav-trigger:hover{border-color:color-mix(in srgb, var(--cyan) 50%, transparent)}
+.nav-trigger[aria-expanded="true"]{border-color:var(--cyan);color:var(--cyan)}
+.nav-car{width:12px;height:12px;opacity:.75;transition:transform .2s}
+.nav-trigger[aria-expanded="true"] .nav-car{transform:rotate(180deg);opacity:1}
+.nav-live{color:var(--text)}
+.nav-pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);flex:0 0 auto;
+  box-shadow:0 0 10px var(--cyan);animation:blip 1.8s ease-in-out infinite}
+
+.nav-menu{min-width:292px;padding:8px;border-radius:14px;top:calc(100% + 12px);
+  box-shadow:0 22px 52px rgba(0,0,0,.55)}
+.nav-menu button{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
+  align-items:center;padding:11px 13px;border-radius:11px}
+.nav-menu button i{grid-row:1/span 2;width:4px;height:26px;border-radius:2px;display:block;
+  background:var(--line2);transition:background .16s}
+.nav-menu button:hover i,.nav-menu button[aria-current="true"] i{background:var(--cyan)}
+.nav-menu button b{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.nav-menu button em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}
+.nav-menu button[aria-current="true"] b{color:var(--cyan)}
+.nav-sep{height:1px;background:var(--line);margin:8px 7px}
+
+/* ---- Arrow buttons: the circle carries the affordance, the label stays
+   readable. One solid, one outlined, nothing else. ---- */
+.btn-arrow{display:inline-flex;align-items:center;gap:13px;
+  padding:6px 24px 6px 6px;border-radius:100px;font-size:15.5px;line-height:1.25;text-align:left}
+.btn-arrow::before{content:"";flex:0 0 auto;width:40px;height:40px;border-radius:50%;
+  background-color:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8 12h8M13 8l4 4-4 4'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8 12h8M13 8l4 4-4 4'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:transform .25s}
+.btn-arrow:hover::before{transform:translateX(3px)}
+.nav-cta{padding:7px 26px 7px 7px}
+.nav-cta::before{width:38px;height:38px}
+@media (max-width:1000px){ .nav{display:none} }
+
+
+/* ---- Light mode ----------------------------------------------------------
+   The palette lives in variables, so the theme is mostly a variable swap.
+   The handful of rules below cover places where the refresh hard-coded a
+   dark value and a variable could not reach. ---- */
+.theme-btn{flex:0 0 auto;width:38px;height:38px;border-radius:10px;cursor:pointer;
+  background:none;border:1px solid var(--line2);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;margin-right:14px;
+  transition:color .18s,border-color .18s}
+.theme-btn:hover{color:var(--text);border-color:color-mix(in srgb, var(--cyan) 50%, transparent)}
+.theme-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.t-moon{display:none}
+html[data-theme="light"] .t-sun{display:none}
+html[data-theme="light"] .t-moon{display:block}
+
+html[data-theme="light"]{
+  --bg:#f6f8fc; --bg2:#ffffff; --bg3:#ffffff;
+  --text:#0d1729; --muted:#5a6b82; --faint:#8496ab;
+  --line:rgba(13,23,41,.10); --line2:rgba(13,23,41,.18);
+  --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,.12);
+  --cyan:#0E93B8; --cyan-lt:#0B7C9C;
+}
+html[data-theme="light"] body{background:var(--bg)}
+html[data-theme="light"] .alt{background:#eef2f9}
+html[data-theme="light"] header{background:rgba(246,248,252,.85)}
+html[data-theme="light"] footer{background:#eef2f9}
+html[data-theme="light"] .hero::after{background:linear-gradient(transparent,var(--bg))}
+html[data-theme="light"] .btn-primary{background:var(--blue);color:#fff;
+  box-shadow:0 8px 26px rgba(37,99,235,.22)}
+html[data-theme="light"] .btn-primary:hover{background:var(--blue-dk);color:#fff}
+html[data-theme="light"] .card,html[data-theme="light"] .tier,html[data-theme="light"] .calc,
+html[data-theme="light"] .soon-card,html[data-theme="light"] .in-card,html[data-theme="light"] .wl,
+html[data-theme="light"] .nb-clip,html[data-theme="light"] .dcard,html[data-theme="light"] .nb-item{
+  box-shadow:0 6px 20px rgba(13,23,41,.06)}
+html[data-theme="light"] .nav-menu{background:#fff;box-shadow:0 20px 46px rgba(13,23,41,.16)}
+html[data-theme="light"] .anno{background:#dbe9f7;color:#0d1729;
+  border-bottom:1px solid rgba(13,23,41,.08)}
+html[data-theme="light"] .anno:hover{background:#cfe2f5;color:#0d1729}
+html[data-theme="light"] .anno-dot{background:#0E93B8;box-shadow:none}
+html[data-theme="light"] .yl-band{
+  background:radial-gradient(ellipse at 50% 0%,rgba(37,99,235,.10),transparent 65%),#eef2f9}
+html[data-theme="light"] .final{
+  background:radial-gradient(ellipse at 50% 90%,rgba(37,99,235,.10),transparent 70%)}
+/* the call card and its phone rail stay dark — it is a phone screen */
+html[data-theme="light"] .mock{background:#fff;border-color:rgba(18,35,63,.12);
+  box-shadow:0 18px 44px rgba(13,23,41,.10)}
+html[data-theme="light"] .mk-phone{background:linear-gradient(168deg,#eef4fc,#e2ebf7);
+  border-right-color:rgba(18,35,63,.10);border-bottom-color:rgba(18,35,63,.10)}
+html[data-theme="light"] .mk-panel{background:#fff}
+html[data-theme="light"] .mk-avatar{background:rgba(37,99,235,.10);box-shadow:0 0 0 7px rgba(37,99,235,.05)}
+html[data-theme="light"] .mk-keys span{background:rgba(18,35,63,.06)}
+html[data-theme="light"] .mk-keys svg{stroke:#5a6b82}
+html[data-theme="light"] .mk-keys svg circle{fill:#5a6b82}
+html[data-theme="light"] .mk-keys div{color:#7086a1}
+html[data-theme="light"] .mk-bar{background:rgba(18,35,63,.10)}
+html[data-theme="light"] .mk-agent{color:#f2f6fb}
+html[data-theme="light"] .mk-bar{background:rgba(255,255,255,.14)}
+html[data-theme="light"] .mk-fallback audio{filter:none}
+html[data-theme="light"] .dring,html[data-theme="light"] .dconv-track{background:none;stroke:#e3e9f2}
+html[data-theme="light"] .dconv-track{background:#e3e9f2}
+html[data-theme="light"] input[type=range]{background:#dde4ee}
+html[data-theme="light"] .nb-clip audio{filter:none}
+
+
+/* Navy against the light page; the CTA is the only filled element. */
+html[data-theme="light"] .nav-a{color:#12233f}
+html[data-theme="light"] .nav-a:hover{color:#1D4ED8}
+html[data-theme="light"] .nav-trigger{border-color:rgba(18,35,63,.22);color:#12233f}
+html[data-theme="light"] .nav-trigger:hover{border-color:#2563EB;color:#1D4ED8}
+html[data-theme="light"] .nav-trigger[aria-expanded="true"]{border-color:#1D4ED8;color:#1D4ED8}
+html[data-theme="light"] .nav-pulse{background:#0E93B8;box-shadow:none}
+html[data-theme="light"] .brand span{color:#0b1728}
+html[data-theme="light"] header{background:rgba(255,255,255,.88);
+  border-bottom:1px solid rgba(18,35,63,.10)}
+html[data-theme="light"] .theme-btn{border-color:rgba(18,35,63,.18);color:#4a5d78}
+html[data-theme="light"] .theme-btn:hover{color:#12233f;border-color:#2563EB}
+html[data-theme="light"] .nav-cta{background:#12233f;color:#fff;
+  box-shadow:0 8px 22px rgba(18,35,63,.20)}
+html[data-theme="light"] .nav-cta:hover{background:#1D4ED8;color:#fff}
+html[data-theme="light"] .nav-menu button b{color:#12233f}
+html[data-theme="light"] .nav-menu button[aria-current="true"] b{color:#1D4ED8}
+
+
+/* Places where the refresh hard-coded a dark fill that a variable can't reach. */
+html[data-theme="light"] .hero .eyebrow{background:rgba(37,99,235,.08);
+  border-color:rgba(37,99,235,.22);color:#1D4ED8;backdrop-filter:none}
+html[data-theme="light"] .hero .eyebrow::before{background:#0E93B8;box-shadow:none}
+html[data-theme="light"] .switch{background:none;backdrop-filter:none;
+  border-bottom:1px solid rgba(18,35,63,.14)}
+html[data-theme="light"] .switch button{color:#5a6b82}
+html[data-theme="light"] .switch button:hover,
+html[data-theme="light"] .switch button[aria-selected="true"]{color:#12233f}
+html[data-theme="light"] .switch button::after{background:#2563EB}
+html[data-theme="light"] .stat{background:#fff;border:1px solid rgba(18,35,63,.10);
+  backdrop-filter:none;box-shadow:0 6px 18px rgba(13,23,41,.05)}
+html[data-theme="light"] .stat b{color:#0b1728}
+html[data-theme="light"] .stat .src{color:#8496ab}
+html[data-theme="light"] .tag{color:#12233f}
+html[data-theme="light"] .offer,html[data-theme="light"] .demo{background:#fff}
+html[data-theme="light"] .calframe{border-color:rgba(18,35,63,.12)}
+/* the waveform inside the blob was white — invisible on a light fill */
+html[data-theme="light"] .orb-wave i{background:#1D4ED8;opacity:.85}
+html[data-theme="light"] .blob-shape{
+  background:linear-gradient(150deg,rgba(37,99,235,.09),rgba(14,147,184,.06))}
+html[data-theme="light"] .blob-orbit .bo{stroke:rgba(37,99,235,.20)}
+html[data-theme="light"] .blob-orbit .bd{fill:#2563EB;filter:none}
+
+
+/* The call card keeps a dark interior in light mode, so its own text has to
+   be forced light — var(--text) is navy out here. */
+html[data-theme="light"] .mk-pick button[aria-pressed="true"]{background:#2563EB;
+  border-color:#2563EB;color:#fff}
+html[data-theme="light"] .mk-caller{background:#2563EB;color:#fff}
+html[data-theme="light"] .mk-glyph{fill:#2563EB}
+
+
+/* A quiet outline so the links read as controls rather than body text. */
+.nav-a{border:1px solid transparent;border-radius:9px;padding:8px 14px;white-space:nowrap}
+.nav-a:hover{border-color:var(--line2)}
+html[data-theme="light"] .nav-a{border-color:rgba(18,35,63,.10);background:rgba(255,255,255,.7)}
+html[data-theme="light"] .nav-a:hover{border-color:#2563EB;background:#fff;color:#1D4ED8}
+html[data-theme="dark"] .nav-a{border-color:rgba(168,205,255,.13);background:rgba(255,255,255,.03)}
+html[data-theme="dark"] .nav-a:hover{border-color:color-mix(in srgb, var(--cyan) 45%, transparent);
+  background:rgba(255,255,255,.06)}
+
+
+/* ---- Dark: near-black surfaces, white text, light blue accent ---- */
+html[data-theme="dark"]{
+  --bg:#05070c; --bg2:#0a0e16; --bg3:#0f141f;
+  --text:#ffffff; --muted:#9fb3cc; --faint:#6d8099;
+  --line:rgba(160,200,255,.10); --line2:rgba(160,200,255,.20);
+  --blue:#3B82F6; --blue-dk:#60A5FA; --blue-glow:rgba(59,130,246,.16);
+  --cyan:#7DD3FC; --cyan-lt:#BAE6FD;
+}
+html[data-theme="dark"] body{background:var(--bg)}
+html[data-theme="dark"] .alt{background:#080b12}
+html[data-theme="dark"] header{background:rgba(5,7,12,.86);
+  border-bottom:1px solid rgba(160,200,255,.10)}
+html[data-theme="dark"] footer{background:#04060a}
+html[data-theme="dark"] .btn-primary{background:var(--cyan);color:#05070c;
+  box-shadow:0 8px 30px rgba(125,211,252,.18)}
+html[data-theme="dark"] .btn-primary:hover{background:var(--cyan-lt);color:#05070c}
+html[data-theme="dark"] .nav-cta{background:var(--cyan);color:#05070c}
+html[data-theme="dark"] .nav-cta:hover{background:var(--cyan-lt);color:#05070c}
+html[data-theme="dark"] .anno{background:#0d1a2b;color:#dbeafe;
+  border-bottom:1px solid rgba(125,211,252,.18)}
+html[data-theme="dark"] .anno:hover{background:#122439;color:#fff}
+html[data-theme="dark"] .anno-dot{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+html[data-theme="dark"] .stat{background:#0b1018;border:1px solid rgba(160,200,255,.11);
+  backdrop-filter:none}
+html[data-theme="dark"] .stat b{color:#fff}
+html[data-theme="dark"] .hero .eyebrow{background:rgba(125,211,252,.08);
+  border-color:rgba(125,211,252,.24);color:var(--cyan);backdrop-filter:none}
+html[data-theme="dark"] .hero .eyebrow::before{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+html[data-theme="dark"] .switch{background:none;backdrop-filter:none;
+  border-bottom:1px solid rgba(160,200,255,.12)}
+html[data-theme="dark"] .mock{background:linear-gradient(145deg,#0e1726,#070b12);
+  border-color:rgba(160,200,255,.16)}
+html[data-theme="dark"] .mk-phone{background:linear-gradient(168deg,#122036 0%,#0a1220 55%,#05080e 100%)}
+html[data-theme="dark"] .mk-panel{background:#080c14}
+html[data-theme="dark"] .card,html[data-theme="dark"] .tier,html[data-theme="dark"] .calc,
+html[data-theme="dark"] .soon-card,html[data-theme="dark"] .in-card,html[data-theme="dark"] .wl,
+html[data-theme="dark"] .nb-clip,html[data-theme="dark"] .dcard,html[data-theme="dark"] .nb-item{
+  background:#0c111b;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+html[data-theme="dark"] .nav-menu{background:#0c111b}
+html[data-theme="dark"] .yl-band{
+  background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.14),transparent 65%),#070a11}
+html[data-theme="dark"] .final{
+  background:radial-gradient(ellipse at 50% 90%,rgba(59,130,246,.13),transparent 70%)}
+html[data-theme="dark"] h1 .hl,html[data-theme="dark"] h2 .hl{color:var(--cyan)}
+
+
+/* The theme button was in the flex flow after a hidden nav, so on phones it
+   drifted into the page. Pin the bar to three fixed slots instead. */
+@media (max-width:1000px){
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;
+       padding:11px clamp(14px,4vw,20px);flex-wrap:nowrap}
+  .brand{flex:0 1 auto;min-width:0;overflow:hidden}
+  .brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .theme-btn{margin-right:0;order:2;flex:0 0 auto}
+  .nav-cta{order:3;flex:0 0 auto;font-size:13px;padding:6px 16px 6px 6px;gap:9px}
+  .nav-cta::before{width:32px;height:32px}
+}
+@media (max-width:460px){
+  .brand img{height:26px}
+  .brand span{display:none}
+  .nav-cta{font-size:12px;padding:5px 13px 5px 5px}
+  .nav-cta::before{width:28px;height:28px}
+  .theme-btn{width:34px;height:34px}
+}
+
 /* hero */
 .hero{padding:clamp(28px,4vw,72px) 0 clamp(40px,5vw,64px)}
 .hero-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -174,31 +393,23 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 @media (max-width:720px){.hero-btns .btn{width:100%}}
 .hero-grid{display:grid;width:100%;grid-template-columns:minmax(0,1fr);gap:clamp(32px,4vw,56px);align-items:start}
 @media (min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr)}}
-.switch{display:flex;gap:6px;padding:6px;background:var(--bg2);border:1px solid var(--line);
-  border-radius:100px;margin-bottom:28px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;
-  scrollbar-width:none}
+/* ---- Sector switcher: an underlined tab strip. Five coloured pills fighting
+   for attention read as decoration; tabs read as navigation. ---- */
+.switch{display:flex;gap:clamp(16px,2.2vw,32px);padding:0 0 1px;background:none;border:0;
+  border-bottom:1px solid var(--line);border-radius:0;margin-bottom:30px;
+  flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
 .switch::-webkit-scrollbar{display:none}
-.switch button{white-space:nowrap;flex:0 0 auto}
-.switch button{font-family:var(--body);font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:100px;border:0;cursor:pointer;background:var(--bg3);color:var(--muted);transition:background .2s,color .2s}
-.switch button[aria-selected="true"]{background:var(--blue);color:#fff}
-
-.switch button[data-hue]{position:relative;color:#cfcfc8;background:var(--bg3)}
-.switch button[data-hue]::before{content:"";position:absolute;inset:0;border-radius:100px;
-  background:currentColor;opacity:.13;transition:opacity .2s}
-.switch button[data-hue="personal"]{color:#FBBF24}
-.switch button[data-hue="home"]    {color:#38BDF8}
-.switch button[data-hue="food"]    {color:#34D399}
-.switch button[data-hue="clinic"]  {color:#A78BFA}
-.switch button[data-hue="other"]   {color:#94A3B8}
-.switch button[data-hue] span{position:relative;z-index:1}
-.switch button[data-hue]:hover::before{opacity:.22}
-.switch button[aria-selected="true"][data-hue]{color:#fff;font-weight:700}
-.switch button[aria-selected="true"][data-hue="personal"]{background:#B45309}
-.switch button[aria-selected="true"][data-hue="home"]    {background:#2563EB}
-.switch button[aria-selected="true"][data-hue="food"]    {background:#047857}
-.switch button[aria-selected="true"][data-hue="clinic"]  {background:#7C3AED}
-.switch button[aria-selected="true"][data-hue="other"]   {background:#475569}
-.switch button[aria-selected="true"][data-hue]::before{opacity:0}
+.switch button{position:relative;white-space:nowrap;flex:0 0 auto;border-radius:0;
+  font-family:var(--body);font-size:14.5px;font-weight:500;letter-spacing:-.005em;
+  padding:0 0 13px;background:none;border:0;cursor:pointer;color:var(--muted);
+  transition:color .18s}
+.switch button::before{content:none}
+.switch button::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:var(--cyan);border-radius:2px;transform:scaleX(0);transform-origin:left;
+  transition:transform .22s ease}
+.switch button:hover{color:var(--text)}
+.switch button[aria-selected="true"]{color:var(--text);font-weight:700;background:none}
+.switch button[aria-selected="true"]::after{transform:scaleX(1)}
 
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:44px}
 .stat{background:var(--bg);padding:24px 14px}
@@ -238,9 +449,9 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 
 
 /* ---- Hero call card: phone on the left, transcript beside it ---- */
-.mock{display:grid;grid-template-columns:minmax(0,1fr);gap:0;width:100%;align-items:stretch;
+.mock{display:grid;grid-template-columns:minmax(0,1fr);gap:0;width:100%;max-width:900px;margin:30px auto 56px;align-items:stretch;
   background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-@media (min-width:620px){.mock{grid-template-columns:186px minmax(0,1fr)}}
+@media (min-width:620px){.mock{grid-template-columns:210px minmax(0,1fr)}}
 
 .mk-phone{background:linear-gradient(168deg,#1a2b4d 0%,#0f1626 55%,#0b0f1a 100%);
   padding:22px 14px 20px;text-align:center;border-bottom:1px solid var(--line);
@@ -250,6 +461,29 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
   display:flex;align-items:center;justify-content:center;margin-bottom:12px;
   box-shadow:0 0 0 7px rgba(255,255,255,.035)}
 .mk-avatar svg{width:23px;height:23px;fill:#fff;stroke:none}
+
+/* The phone glyph swaps for a live waveform while audio plays, so the call
+   box itself shows the thing talking rather than a static icon. */
+.mk-avatar{position:relative;overflow:visible}
+.mk-halo{position:absolute;inset:-8px;border-radius:50%;
+  border:1px solid color-mix(in srgb, var(--cyan) 34%, transparent);opacity:0;
+  transition:opacity .3s}
+.mk-phone.on .mk-halo{opacity:1;animation:halo 2s ease-out infinite}
+@keyframes halo{0%{transform:scale(.92);opacity:.85}100%{transform:scale(1.35);opacity:0}}
+.mk-glyph{transition:opacity .25s,transform .25s}
+.mk-phone.on .mk-glyph{opacity:0;transform:scale(.7)}
+.mk-vw{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  gap:3px;opacity:0;transition:opacity .25s}
+.mk-phone.on .mk-vw{opacity:1}
+.mk-vw i{width:3px;height:6px;border-radius:100px;background:var(--cyan);display:block;
+  transform-origin:center;animation:vw 1s ease-in-out infinite}
+.mk-vw i:nth-child(1){animation-delay:0s}   .mk-vw i:nth-child(2){animation-delay:.09s}
+.mk-vw i:nth-child(3){animation-delay:.18s} .mk-vw i:nth-child(4){animation-delay:.27s}
+.mk-vw i:nth-child(5){animation-delay:.36s} .mk-vw i:nth-child(6){animation-delay:.45s}
+.mk-vw i:nth-child(7){animation-delay:.54s}
+@media (prefers-reduced-motion:reduce){
+  .mk-halo,.mk-vw i{animation:none}
+}
 .mk-timer{font-family:var(--display);font-size:12.5px;color:rgba(255,255,255,.55);
   font-variant-numeric:tabular-nums;letter-spacing:.06em;margin-bottom:6px}
 .mk-biz{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.28;margin-bottom:4px}
@@ -276,7 +510,7 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .mk-play[hidden]{display:none}
 .mk-hint{font-size:10.5px;color:var(--muted);line-height:1.5;max-width:150px}
 
-.mk-panel{padding:16px 16px 14px;min-width:0;display:flex;flex-direction:column}
+.mk-panel{padding:18px 18px 16px;min-width:0;display:flex;flex-direction:column}
 .mk-bar{position:relative;height:3px;background:var(--bg3);border-radius:100px;margin-bottom:12px;
   cursor:pointer;touch-action:none}
 .mk-bar::before{content:"";position:absolute;inset:-9px 0;}   /* easier to grab */
@@ -294,7 +528,8 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 .mk-pick button:hover{color:var(--text)}
 .mk-pick button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 .mk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.mk-lines{position:relative;display:flex;flex-direction:column;gap:8px;max-height:330px;
+.mk-lines{position:relative;display:flex;flex-direction:column;gap:8px;
+  min-height:210px;max-height:330px;
   overflow-y:auto;padding-right:6px;scroll-behavior:smooth;scrollbar-width:thin;
   scrollbar-color:rgba(255,255,255,.14) transparent}
 .mk-lines::-webkit-scrollbar{width:4px}
@@ -518,6 +753,36 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
   .nb-step{font-size:11px;padding:6px 11px}
 }
 
+
+/* ---- Generation progress: the wait is 4-6s, so show it moving ---- */
+.nb-gen{margin-top:22px;background:var(--bg3);border:1px solid var(--line);
+  border-radius:14px;padding:18px 20px}
+.nb-gen[hidden]{display:none}
+.nb-gen-top{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;margin-bottom:10px}
+.nb-gen-label{font-size:13px;color:var(--text)}
+.nb-gen-pct{font-family:var(--display);font-size:13px;font-weight:700;color:var(--cyan);
+  font-variant-numeric:tabular-nums}
+.nb-gen-track{height:5px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.nb-gen-track i{display:block;height:100%;width:0;border-radius:100px;
+  background:linear-gradient(90deg, var(--blue), var(--cyan));
+  transition:width .45s cubic-bezier(.3,.8,.3,1)}
+.nb-gen-wave{display:flex;align-items:center;justify-content:center;gap:3px;
+  height:26px;margin-top:14px}
+.nb-gen-wave i{width:3px;height:6px;border-radius:100px;background:var(--cyan);
+  opacity:.65;transform-origin:center;animation:vw 1s ease-in-out infinite}
+.nb-gen-wave i:nth-child(1){animation-delay:0s}      .nb-gen-wave i:nth-child(2){animation-delay:.07s}
+.nb-gen-wave i:nth-child(3){animation-delay:.14s}    .nb-gen-wave i:nth-child(4){animation-delay:.21s}
+.nb-gen-wave i:nth-child(5){animation-delay:.28s}    .nb-gen-wave i:nth-child(6){animation-delay:.35s}
+.nb-gen-wave i:nth-child(7){animation-delay:.42s}    .nb-gen-wave i:nth-child(8){animation-delay:.49s}
+.nb-gen-wave i:nth-child(9){animation-delay:.56s}    .nb-gen-wave i:nth-child(10){animation-delay:.63s}
+.nb-gen-wave i:nth-child(11){animation-delay:.70s}   .nb-gen-wave i:nth-child(12){animation-delay:.77s}
+@keyframes vw{0%,100%{transform:scaleY(1)}50%{transform:scaleY(3.6)}}
+@media (prefers-reduced-motion:reduce){
+  .nb-gen-wave i{animation:none}
+  .nb-gen-track i{transition:none}
+}
+
 /* ---- Coming soon ---- */
 .soon-tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;padding:4px 11px;border-radius:100px;margin-bottom:14px;
@@ -527,6 +792,132 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .soon-card h3{font-size:14px;margin-bottom:5px}
 .soon-card p{font-size:12.5px;color:var(--muted);line-height:1.55}
 
+
+
+
+/* ---- Blob with orbiting rings. The shape is static; the rings and the dots
+   riding them are what move, which is the whole effect. ---- */
+.blob{position:relative;width:100%;max-width:620px;aspect-ratio:1;margin:0 auto;
+  display:flex;align-items:center;justify-content:center}
+.blob-shape{position:absolute;inset:4%;
+  border-radius:58% 42% 47% 53%/44% 56% 44% 56%;
+  background:linear-gradient(150deg, color-mix(in srgb, var(--blue) 30%, transparent),
+             color-mix(in srgb, var(--cyan) 16%, transparent));
+  animation:blobmorph 14s ease-in-out infinite}
+@keyframes blobmorph{
+  0%,100%{border-radius:58% 42% 47% 53%/44% 56% 44% 56%}
+  33%    {border-radius:44% 56% 62% 38%/54% 42% 58% 46%}
+  66%    {border-radius:52% 48% 38% 62%/38% 58% 42% 62%}
+}
+.blob-orbit{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.blob-orbit .bo{fill:none;stroke:color-mix(in srgb, var(--cyan) 30%, transparent);stroke-width:1.2}
+.blob-orbit .bo2{stroke-dasharray:6 14;opacity:.6}
+.blob-orbit .bd{fill:var(--cyan);filter:drop-shadow(0 0 7px var(--cyan))}
+/* each dot rides its own ring at its own pace */
+.blob-orbit .bd1{transform-origin:200px 200px;animation:orbit 16s linear infinite}
+.blob-orbit .bd2{transform-origin:200px 200px;animation:orbit 24s linear infinite reverse}
+.blob-orbit .bd3{transform-origin:200px 200px;animation:orbit 20s linear infinite}
+.blob-orbit .bo1{transform-origin:200px 200px;animation:orbit 60s linear infinite}
+.blob-orbit .bo2{transform-origin:200px 200px;animation:orbit 45s linear infinite reverse}
+@keyframes orbit{to{transform:rotate(360deg)}}
+
+.blob-mid{position:relative;z-index:2;display:flex;align-items:center;justify-content:center}
+.blob img{position:relative;z-index:2;width:78%;height:auto;display:block;
+  filter:drop-shadow(0 24px 50px rgba(0,0,0,.45))}
+
+/* Only the personal line gets a person — it is the one product bought by
+   an individual rather than a business. */
+.blob-person{position:relative;z-index:2;display:block;width:104%;margin-bottom:-9%}
+.blob-person[hidden]{display:none}
+.blob-person img{width:100%;height:auto;display:block;
+  filter:drop-shadow(0 26px 46px rgba(0,0,0,.5))}
+.blob.has-person{align-items:flex-end}
+.blob.has-person .orb-wave{display:none}
+
+/* A photo of the sector, with the same orbit behind it. */
+.blob-shot{position:relative;z-index:2;display:block;width:96%;margin-left:0}
+.blob-shot[hidden]{display:none}
+.blob-shot img{width:100%;height:auto;display:block;border-radius:0;
+  filter:drop-shadow(0 26px 46px rgba(0,0,0,.34))}
+html[data-theme="light"] .blob-shot img{filter:drop-shadow(0 22px 40px rgba(13,23,41,.20))}
+.blob.has-shot{aspect-ratio:1;padding:0;align-items:center}
+.blob.has-shot .orb-wave{display:none}
+.blob.has-shot .blob-shape{inset:-2% 0}
+.blob.has-shot .blob-orbit{inset:-5%}
+.orb-cap{text-align:center;font-size:12px;color:var(--muted);margin-top:20px}
+@media (prefers-reduced-motion:reduce){
+  .blob-shape,.blob-orbit .bd,.blob-orbit .bo{animation:none}
+}
+
+/* ---- Dashboard preview: four panels, because a picture of the product
+   answers "what do I actually get" faster than a list does. ---- */
+.dash{max-width:1000px;margin:0 auto;text-align:left;color:var(--cyan)}
+.dash-grid{display:grid;gap:14px;grid-template-columns:repeat(6,1fr)}
+.dc-vol{grid-column:span 3} .dc-out{grid-column:span 3}
+.dc-kpi{grid-column:span 2} .dc-rec{grid-column:span 4}
+@media (max-width:900px){
+  .dash-grid{grid-template-columns:1fr}
+  .dc-vol,.dc-out,.dc-kpi,.dc-rec{grid-column:span 1}
+}
+.dcard{background:var(--bg3);border:1px solid var(--line);border-radius:16px;padding:20px;
+  box-shadow:0 14px 34px rgba(0,0,0,.2)}
+.dcard header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dcard h3{font-size:15.5px;color:var(--text);margin:0 0 2px}
+.dcard header p{font-size:11.5px;color:var(--muted);line-height:1.4}
+.dchip{flex:0 0 auto;font-size:10.5px;color:var(--muted);border:1px solid var(--line2);
+  border-radius:100px;padding:4px 11px;white-space:nowrap}
+.dbig{font-family:var(--display);font-size:34px;font-weight:700;color:var(--text);
+  letter-spacing:-.03em;line-height:1;margin-bottom:14px}
+.dbig em,.dkpis em{font-style:normal;font-size:13px;font-weight:700}
+.up{color:#34D399} .dn{color:#34D399}
+.dchart svg{width:100%;height:96px;display:block}
+.ddays{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--faint)}
+
+.dout{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ddonut{position:relative;width:132px;height:132px;flex:0 0 auto}
+.ddonut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dring{fill:none;stroke:var(--bg2);stroke-width:5}
+.dseg{fill:none;stroke-width:5;stroke-linecap:round}
+.dseg.s1{stroke:var(--cyan)} .dseg.s2{stroke:var(--blue)}
+.dseg.s3{stroke:#34D399}     .dseg.s4{stroke:#FBBF24}
+.dcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px}
+.dcenter b{font-family:var(--display);font-size:22px;color:var(--text);letter-spacing:-.02em}
+.dcenter span{font-size:10px;color:var(--muted)}
+.dlegend{list-style:none;flex:1 1 210px;min-width:0;display:flex;flex-direction:column;gap:9px}
+.dlegend li{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;
+  gap:9px;font-size:12.5px;color:var(--muted)}
+.dlegend i{width:8px;height:8px;border-radius:50%;display:block}
+.dlegend i.s1{background:var(--cyan)} .dlegend i.s2{background:var(--blue)}
+.dlegend i.s3{background:#34D399}     .dlegend i.s4{background:#FBBF24}
+.dlegend b{color:var(--text);font-size:12.5px}
+.dlegend em{font-style:normal;color:var(--faint);font-size:11.5px;min-width:30px;text-align:right}
+
+.dkpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.dkpis span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.dkpis b{font-family:var(--display);font-size:17px;color:var(--text);letter-spacing:-.02em}
+.dconv-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px}
+.dconv-top b{color:var(--text)}
+.dconv-track{height:6px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.dconv-track i{display:block;height:100%;border-radius:100px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan))}
+
+.dtable{width:100%;border-collapse:collapse;font-size:12.5px}
+.dtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--faint);font-weight:600;padding:0 10px 9px 0;border-bottom:1px solid var(--line)}
+.dtable td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.dtable tr:last-child td{border-bottom:0}
+.dtable td:nth-child(2){color:var(--text)}
+.dpill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap}
+.dpill.ok{background:rgba(52,211,153,.15);color:#34D399}
+.dpill.nt{background:color-mix(in srgb, var(--cyan) 15%, transparent);color:var(--cyan)}
+.dpill.wr{background:rgba(251,191,36,.15);color:#FBBF24}
+@media (max-width:620px){
+  .dcard{padding:16px}
+  .dbig{font-size:28px}
+  .dtable th:nth-child(3),.dtable td:nth-child(3),
+  .dtable th:nth-child(5),.dtable td:nth-child(5){display:none}
+}
 
 /* ---- Intake form ---- */
 .in-card{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
@@ -630,7 +1021,8 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
   h2{font-size:24px}
   .lede{font-size:15.5px;line-height:1.55;margin-bottom:24px;max-width:none}
   .sub{font-size:15px;margin-bottom:32px}
-  .hero .btn-primary{display:block;width:100%}
+  .hero .btn-primary{width:100%}
+  .hero .btn-arrow{display:inline-flex;justify-content:flex-start}
   .fine{font-size:11.5px;margin-top:12px}
 
   /* Stacked stats were one tall column; number and label side by side reads
@@ -697,16 +1089,16 @@ h3{font-family:var(--display);font-size:17px}
 .lede{font-size:clamp(17px,1.65vw,20px);line-height:1.7;max-width:600px}
 .sub{font-size:17px;line-height:1.75}
 .btn{border-radius:10px;padding:15px 25px;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,border-color .25s ease}
-.btn-primary{background:#83e6f7;color:#071322;box-shadow:0 8px 34px rgba(52,190,225,.16)}
-.btn-primary:hover{background:#b7f5ff;color:#071322;transform:translateY(-3px);box-shadow:0 15px 38px rgba(52,190,225,.26)}
+.btn-primary{background:var(--cyan);color:var(--bg);box-shadow:0 8px 34px rgba(52,190,225,.16)}
+.btn-primary:hover{background:var(--cyan-lt);color:var(--bg);transform:translateY(-3px);box-shadow:0 15px 38px rgba(52,190,225,.26)}
 .btn-ghost:hover{transform:translateY(-2px)}
 .anno{background:#17365c;color:#e4f5ff;border-bottom:1px solid rgba(126,212,246,.2)}
 .anno:hover{color:#fff;background:#1b426d}
 .anno-dot{background:#77ddf2;box-shadow:0 0 15px #77ddf2}
 header{background:rgba(8,15,30,.82)}
 .bar{padding:18px 24px}.brand span{font-size:19px;letter-spacing:-.045em}.brand img{height:34px}
-.hero{position:relative;isolation:isolate;padding:clamp(66px,7vw,110px) 0 90px;background:linear-gradient(90deg,rgba(7,15,29,.96) 0%,rgba(7,15,29,.87) 44%,rgba(7,15,29,.58) 100%),url('/hero-glass-phone.webp') center 18%/cover no-repeat}
-.hero::after{content:"";position:absolute;inset:auto 0 0;height:220px;background:linear-gradient(transparent,var(--bg));z-index:-1;pointer-events:none}
+.hero{position:relative;isolation:isolate;padding:clamp(66px,7vw,110px) 0 90px;background:transparent}
+
 .hero-grid{align-items:center;gap:clamp(36px,5vw,76px)}
 @media(min-width:1040px){.hero-grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)}}
 .hero .eyebrow{display:inline-flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid rgba(135,220,247,.32);border-radius:100px;background:rgba(19,57,91,.45);backdrop-filter:blur(12px)}
@@ -728,8 +1120,8 @@ header{background:rgba(8,15,30,.82)}
 .final{background:radial-gradient(ellipse at 50% 90%,rgba(52,136,235,.22),transparent 70%);padding:120px 0}
 .final h2{font-size:clamp(35px,4.5vw,59px)}
 footer{background:#07101e}
-@media(max-width:1039px){.hero{background-position:64% top}.mock{max-width:760px;margin:auto}}
-@media(max-width:720px){.hero{padding-top:54px;background:linear-gradient(90deg,rgba(7,15,29,.92),rgba(7,15,29,.84)),url('/hero-glass-phone.webp') 64% top/auto 560px no-repeat}.stats{margin-top:45px}.mock{padding:9px}.bar{padding:12px 18px}}
+@media(max-width:1039px){.mock{max-width:760px;margin:auto}}
+@media(max-width:720px){.hero{padding-top:54px}.stats{margin-top:45px}.mock{padding:9px}.bar{padding:12px 18px}}
 @media(max-width:480px){h1{font-size:clamp(38px,10vw,52px)}.stat{padding:14px 10px}.stat b{font-size:20px}.stat b.xlong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.tier,.soon-card,.btn{transition:none}}
 </style>
@@ -745,28 +1137,38 @@ footer{background:#07101e}
 
 <header>
   <div class="bar">
-    <div class="brand">
+    <a class="brand" href="/" id="brand-home" aria-label="VoiceCaptures home">
       <img src="/logo-mark.png" alt="" width="32" height="32">
       <span>VoiceCaptures</span>
-    </div>
+    </a>
     <nav class="nav" aria-label="Main">
+      <button type="button" class="nav-a" data-goto="personal">Personal line</button>
       <div class="nav-drop">
-        <button type="button" class="nav-a" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
-          Sectors <span class="nav-car" aria-hidden="true">&#9662;</span>
+        <button type="button" class="nav-a nav-trigger" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
+          Businesses
+          <svg class="nav-car" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor"
+                  stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
         <div class="nav-menu" id="nav-menu" hidden>
-          <button type="button" data-goto="personal">Personal line</button>
-          <button type="button" data-goto="home">Home services</button>
-          <button type="button" data-goto="food">Restaurants &amp; caf&eacute;s</button>
-          <button type="button" data-goto="clinic">Clinics &amp; dental</button>
-          <button type="button" data-goto="other">Something else</button>
+          <button type="button" data-goto="home"><i data-h="home"></i><b>Home services</b><em>Plumbing, HVAC, electrical</em></button>
+          <button type="button" data-goto="food"><i data-h="food"></i><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, takeout, catering</em></button>
+          <button type="button" data-goto="clinic"><i data-h="clinic"></i><b>Clinics &amp; dental</b><em>Patients, bookings, overflow</em></button>
+          <button type="button" data-goto="other"><i data-h="other"></i><b>Something else</b><em>Salons, studios, venues</em></button>
         </div>
       </div>
-      <a class="nav-a" href="#demo" id="nav-demo">Try the demo line</a>
+      <a class="nav-a nav-live" href="#demo" id="nav-demo">
+        <span class="nav-pulse" aria-hidden="true"></span>Try the demo line
+      </a>
       <a class="nav-a" href="#intake">Contact</a>
       <a class="nav-a" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a>
     </nav>
-    <a class="btn btn-ghost" href="#intake">Get in touch</a>
+    <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to light mode" title="Switch theme">
+      <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
+      <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
+    </button>
+    <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
   </div>
 </header>
 
@@ -776,18 +1178,18 @@ footer{background:#07101e}
       <p class="eyebrow" id="eyebrow">AI voice agents for businesses that live on the phone</p>
 
       <div class="switch" role="tablist" aria-label="Choose your sector">
-        <button type="button" role="tab" aria-selected="false" data-tab="personal" data-hue="personal">Personal line</button>
-        <button type="button" role="tab" aria-selected="true"  data-tab="home"     data-hue="home">Home services</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="food"     data-hue="food">Restaurants &amp; cafés</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="clinic"   data-hue="clinic">Clinics &amp; dental</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="other"    data-hue="other">Something else</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="personal">Personal line</button>
+        <button type="button" role="tab" aria-selected="true"  data-tab="home">Home services</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="food">Restaurants</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="clinic">Clinics</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="other">Other</button>
       </div>
 
-      <h1 id="headline">You're missing calls.<br>We answer them.</h1>
+      <h1 id="headline">You're missing calls.<br><span class="hl">We answer them.</span></h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <div class="hero-btns">
-        <a class="btn btn-primary" id="hero-cta" href="#intake">Tell us about your line</a>
-        <a class="btn btn-ghost hero-try" id="hero-try" href="#yourline">Hear it say your business name &darr;</a>
+        <a class="btn btn-primary btn-arrow" id="hero-cta" href="#intake">Tell us about your line</a>
+        <a class="btn btn-ghost btn-arrow hero-try" id="hero-try" href="#yourline">Hear it answer as your business</a>
       </div>
       <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
 
@@ -798,10 +1200,35 @@ footer{background:#07101e}
       </div>
     </div>
 
+    <div class="blob" id="orb">
+      <span class="blob-shape" aria-hidden="true"></span>
+      <svg class="blob-orbit" viewBox="0 0 400 400" aria-hidden="true">
+        <circle class="bo bo1" cx="200" cy="200" r="150"/>
+        <circle class="bo bo2" cx="200" cy="200" r="172"/>
+        <circle class="bd bd1" cx="200" cy="50"  r="9"/>
+        <circle class="bd bd2" cx="372" cy="200" r="6"/>
+        <circle class="bd bd3" cx="200" cy="350" r="7"/>
+      </svg>
+      <div class="blob-mid" id="blob-mid" aria-hidden="true">
+        <div class="orb-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <picture class="blob-person" id="blob-person" hidden>
+        <source srcset="/personal-hero.webp" type="image/webp">
+        <img src="/personal-hero.png" alt="" width="571" height="760" loading="lazy">
+      </picture>
+      <picture class="blob-shot" id="blob-shot" hidden>
+        <source id="blob-shot-src" srcset="" type="image/webp">
+        <img id="blob-shot-img" src="" alt="" width="1100" height="733" loading="lazy">
+      </picture>
+    </div>
+    <p class="orb-cap">Current conversational voice models &mdash; most callers never ask.</p>
+  </div>
     <div class="mock" id="mock">
       <div class="mk-phone" id="mk-phone">
         <div class="mk-avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+          <span class="mk-halo"></span>
+          <svg class="mk-glyph" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+          <div class="mk-vw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         </div>
         <div class="mk-timer" id="mk-timer">0:00</div>
         <div class="mk-biz" id="mk-biz">Maple Ridge Plumbing</div>
@@ -837,15 +1264,14 @@ footer{background:#07101e}
         </div>
       </div>
     </div>
-  </div>
 </div>
 
 <section id="yourline" class="yl-band">
   <div class="wrap">
     <div class="yl-head">
-      <span class="yl-tag">Try it on your own business &mdash; free, 20 seconds</span>
-      <h2 class="center">Hear it answer <em>your</em> line.</h2>
-      <p class="sub">Type your business name. We pull your public listing and generate two calls in your name, right now, with your real address and today's hours.</p>
+      <span class="yl-tag">Free &mdash; 20 seconds, no signup</span>
+      <h2 class="center">Hear it pick up as <em>your</em> business.</h2>
+      <p class="sub">Type your business name and the agent will answer a call as if it worked for you &mdash; your name, your real address, today's opening hours. Generated on the spot from your public listing.</p>
     </div>
 
     <div class="nb">
@@ -855,9 +1281,15 @@ footer{background:#07101e}
       </div>
       <p class="nb-msg" id="nb-msg"></p>
 
-      <div class="nb-steps" id="nb-steps" hidden>
-        <div class="nb-step" data-s="1"><span class="nb-num">1</span>Writing the script</div>
-        <div class="nb-step" data-s="2"><span class="nb-num">2</span>Generating the voice</div>
+      <div class="nb-gen" id="nb-steps" hidden>
+        <div class="nb-gen-top">
+          <span class="nb-gen-label" id="nb-gen-label">Reading your listing</span>
+          <span class="nb-gen-pct" id="nb-gen-pct">0%</span>
+        </div>
+        <div class="nb-gen-track"><i id="nb-gen-fill"></i></div>
+        <div class="nb-gen-wave" id="nb-gen-wave" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
       </div>
 
       <div class="nb-results" id="nb-results" hidden>
@@ -882,7 +1314,7 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Three bad options</h2>
+    <h2 class="center">Three<br><span class="hl">bad options</span></h2>
     <p class="sub">Every way of handling the phone without an agent costs you something.</p>
     <div class="grid g3" id="bad"></div>
   </div>
@@ -890,7 +1322,7 @@ footer{background:#07101e}
 
 <section id="calc-section">
   <div class="wrap">
-    <h2 class="center">See exactly what you're losing.</h2>
+    <h2 class="center">See exactly<br><span class="hl">what you're losing.</span></h2>
     <p class="sub">The sliders start on typical numbers for <span id="c-short">home service businesses</span>.</p>
     <div class="calc">
       <div class="field">
@@ -957,13 +1389,82 @@ footer{background:#07101e}
     <span class="soon-tag">Coming soon</span>
     <h2>Your dashboard</h2>
     <p class="sub">Every call in one place. In build now — clients on the trial get it first, at no extra cost.</p>
-    <div class="soon-grid" style="text-align:left;max-width:860px;margin:0 auto">
-      <div class="soon-card"><h3>Call log</h3><p>Every call with caller, time, outcome and the details captured.</p></div>
-      <div class="soon-card"><h3>Recordings</h3><p>Play back any call and read the transcript.</p></div>
-      <div class="soon-card"><h3>Bookings</h3><p>What went on the calendar, and what needed a callback.</p></div>
-      <div class="soon-card"><h3>Minutes used</h3><p>Where you are against your plan, before the invoice.</p></div>
-      <div class="soon-card"><h3>History</h3><p>Calls and recordings kept 14 days on every plan. Longer retention is available &mdash; ask for a quote.</p></div>
+    <div class="dash" role="img" aria-label="Preview of the call dashboard">
+      <div class="dash-grid">
+
+        <section class="dcard dc-vol">
+          <header><div><h3>Call volume</h3><p>Handled by your agent</p></div><span class="dchip">Last 7 days</span></header>
+          <div class="dbig">248 <em class="up">&uarr; 24%</em></div>
+          <div class="dchart" aria-hidden="true">
+            <svg viewBox="0 0 320 96" preserveAspectRatio="none">
+              <defs><linearGradient id="dgv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="currentColor" stop-opacity=".32"/>
+                <stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0 62 C20 44 32 40 50 50 C70 62 80 70 100 58 C120 46 132 36 152 44
+                       C172 52 180 66 200 52 C220 38 232 22 252 28 C272 34 288 18 320 22 L320 96 L0 96 Z"
+                    fill="url(#dgv)"/>
+              <path d="M0 62 C20 44 32 40 50 50 C70 62 80 70 100 58 C120 46 132 36 152 44
+                       C172 52 180 66 200 52 C220 38 232 22 252 28 C272 34 288 18 320 22"
+                    fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+              <circle cx="152" cy="44" r="4.5" fill="currentColor"/>
+            </svg>
+            <div class="ddays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          </div>
+        </section>
+
+        <section class="dcard dc-out">
+          <header><div><h3>Call outcomes</h3><p>How calls were handled</p></div></header>
+          <div class="dout">
+            <div class="ddonut" aria-hidden="true">
+              <svg viewBox="0 0 42 42">
+                <circle class="dring" cx="21" cy="21" r="15.9"/>
+                <circle class="dseg s1" cx="21" cy="21" r="15.9" stroke-dasharray="56 44" stroke-dashoffset="25"/>
+                <circle class="dseg s2" cx="21" cy="21" r="15.9" stroke-dasharray="26 74" stroke-dashoffset="-31"/>
+                <circle class="dseg s3" cx="21" cy="21" r="15.9" stroke-dasharray="11 89" stroke-dashoffset="-57"/>
+                <circle class="dseg s4" cx="21" cy="21" r="15.9" stroke-dasharray="7 93" stroke-dashoffset="-68"/>
+              </svg>
+              <div class="dcenter"><b>248</b><span>calls</span></div>
+            </div>
+            <ul class="dlegend">
+              <li><i class="s1"></i>Appointments booked<b>138</b><em>56%</em></li>
+              <li><i class="s2"></i>Questions answered<b>64</b><em>26%</em></li>
+              <li><i class="s3"></i>Leads captured<b>28</b><em>11%</em></li>
+              <li><i class="s4"></i>Messages taken<b>18</b><em>7%</em></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="dcard dc-kpi">
+          <header><div><h3>Booked work</h3><p>From AI-handled calls</p></div><span class="dchip">Last 30 days</span></header>
+          <div class="dkpis">
+            <div><span>Bookings made</span><b>92 <em class="up">&uarr;21%</em></b></div>
+            <div><span>Avg. call length</span><b>2m 12s</b></div>
+            <div><span>Missed calls</span><b>2 <em class="dn">&darr;75%</em></b></div>
+            <div><span>Minutes used</span><b>312</b></div>
+          </div>
+          <div class="dconv">
+            <div class="dconv-top"><span>Booking rate</span><b>48%</b></div>
+            <div class="dconv-track"><i style="width:48%"></i></div>
+          </div>
+        </section>
+
+        <section class="dcard dc-rec">
+          <header><div><h3>Recent calls</h3><p>Live view of your line</p></div></header>
+          <table class="dtable">
+            <thead><tr><th>Time</th><th>Caller</th><th>Type</th><th>Outcome</th><th>Length</th></tr></thead>
+            <tbody>
+              <tr><td>10:24 AM</td><td>Sarah M.</td><td>New customer</td><td><span class="dpill ok">Booked</span></td><td>2:14</td></tr>
+              <tr><td>10:18 AM</td><td>(416) &bull;&bull;&bull;-0192</td><td>Existing</td><td><span class="dpill nt">Answered</span></td><td>1:32</td></tr>
+              <tr><td>9:47 AM</td><td>Mike R.</td><td>Service inquiry</td><td><span class="dpill nt">Answered</span></td><td>3:05</td></tr>
+              <tr><td>9:32 AM</td><td>(647) &bull;&bull;&bull;-0134</td><td>New customer</td><td><span class="dpill ok">Booked</span></td><td>2:48</td></tr>
+              <tr><td>9:03 AM</td><td>(416) &bull;&bull;&bull;-0178</td><td>Price inquiry</td><td><span class="dpill wr">Lead captured</span></td><td>2:37</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
     </div>
+
     <p class="nb-note" style="text-align:center;margin-top:18px">Until it ships, you get a texted summary of every call and a weekly rundown by email.</p>
   </div>
 </section>
@@ -993,8 +1494,10 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Everything adapts to you</h2>
-    <p class="sub">One agent, configured per business. Nothing about it is generic.</p>
+    <h2 class="center">Sounds human.<br><span class="hl">Built for you.</span></h2>
+    <p class="sub">It sounds like a person, and it is built around how <em style="font-style:normal;color:var(--text)">your</em> business takes calls. Nothing about it is off the shelf.</p>
+
+
     <div class="grid g3">
       <div class="card"><h3>Your voice</h3><p>Choose from multiple AI voices — male, female, different tones. Pick what fits your brand.</p></div>
       <div class="card"><h3>Your calendar</h3><p>Connects to Google Calendar — only offers times you're actually free.</p></div>
@@ -1034,7 +1537,7 @@ footer{background:#07101e}
   <div class="wrap">
     <div class="wl">
       <span class="soon-tag">In beta &mdash; not live yet</span>
-      <h2>A personal line that screens your calls</h2>
+      <h2>A personal line<br><span class="hl">that screens your calls</span></h2>
       <div class="price">$9<em>/mo</em></div>
       <p style="font-size:12px;color:var(--faint);margin:-2px 0 14px">Introductory beta price. It will change before general release &mdash; everyone on the waitlist gets told before it does, and keeps the beta rate for their first year.</p>
       <p class="wl-lead">Not for a business &mdash; for you. It picks up the numbers you don't recognise, turns away the spam, and texts you who called and what they wanted. You call back the ones that matter.</p>
@@ -1071,7 +1574,7 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Who it's for</h2>
+    <h2 class="center">Who<br><span class="hl">it's for</span></h2>
     <p class="sub">If your phone is your business, VoiceCaptures is for you.</p>
     <div class="tags">
       <div>Plumbing</div><div>HVAC</div><div>Electrical</div><div>Roofing</div><div>Pest Control</div><div>Landscaping</div><div>General Contracting</div><div>Locksmith</div><div>Restaurants</div><div>Coffee Shops</div><div>Catering</div><div>Dental</div><div>Medical Clinics</div><div>Physio &amp; Chiro</div>
@@ -1089,9 +1592,9 @@ footer{background:#07101e}
   </div>
 </section>
 
-<div class="final">
+<div class="final" id="final-cta">
   <div class="wrap">
-    <h2>Ready to stop losing jobs<br>to voicemail?</h2>
+    <h2>Ready to stop losing jobs<br><span class="hl">to voicemail?</span></h2>
     <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
     <div class="btns">
       <a class="btn btn-primary" href="#intake">Tell us about your line</a>
@@ -1102,7 +1605,7 @@ footer{background:#07101e}
 
 <section id="intake" class="alt">
   <div class="wrap">
-    <h2 class="center" id="in-title">Tell us about your line.</h2>
+    <h2 class="center" id="in-title">Tell us about <span class="hl">your line.</span></h2>
     <p class="sub" id="in-sub">A few quick questions and we'll come back with what your setup would look like. No obligation.</p>
 
     <form class="in-card" id="in-form">
@@ -1144,7 +1647,7 @@ footer{background:#07101e}
       <div class="tl">Answers · Qualifies · Books</div>
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
-    <span class="desc">AI voice agents for home services, hospitality and clinics</span>
+    <span class="desc">A human-sounding AI receptionist, configured for your business</span>
   </div>
 </footer>
 
@@ -1170,13 +1673,15 @@ function keyFromPath(){
   var seg = location.pathname.replace(/^\/|\/$/g, "").split("/")[0];
   for (var k in SLUGS) if (SLUGS[k] === seg) return k;
   var built = document.documentElement.getAttribute("data-page");
-  return (built && SLUGS[built]) ? built : null;
+  if (built && SLUGS[built]) return built;
+  // The root is the landing page: home services, never a remembered tab.
+  return null;
 }
 
 var V = {
   home: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Business name", typeLabel: "Trade",
       sysLabel: "Scheduling or job software",
       types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
@@ -1184,7 +1689,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -1244,7 +1749,7 @@ var V = {
   },
   food: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Venue name", typeLabel: "Type of venue",
       sysLabel: "POS system",
       types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
@@ -1252,7 +1757,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -1296,7 +1801,7 @@ var V = {
   },
   other: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Business name", typeLabel: "What you do",
       sysLabel: "Booking or CRM software",
       types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
@@ -1304,7 +1809,7 @@ var V = {
     },
 
     eyebrow: "Any business where the work arrives by phone",
-    headline: "Not on the list?<br>It probably still fits.",
+    headline: "Not on the list?<br><span class=\"hl\">It probably still fits.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. If it isn't a fit, we'll say so.",
@@ -1383,7 +1888,7 @@ var V = {
       }
     ],
     eyebrow: "A personal line \u2014 for your own phone, not your business",
-    headline: "Stop answering<br>numbers you don't know.",
+    headline: "Stop answering<br><span class=\"hl\">numbers you don't know.</span>",
     ctaLabel: "Join the waitlist",
     ctaHref: "#personal",
     ctaFine: "Beta. $9/mo introductory price, subject to change. No card now.",
@@ -1424,7 +1929,7 @@ var V = {
   },
   clinic: {
     intake: {
-      title: "Tell us about your practice.",
+      title: "Tell us about <span class=\"hl\">your practice.</span>",
       nameLabel: "Practice name", typeLabel: "Type of practice",
       sysLabel: "Practice management software",
       types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
@@ -1432,7 +1937,7 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br>We answer them.",
+    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
     ctaFine: "No obligation. 14 days free when you start, and no card up front.",
@@ -1496,7 +2001,7 @@ function renderIntake(key, cfg, tiers){
   sec.hidden = false;
   var c = cfg.intake;
 
-  $("in-title").textContent = c.title;
+  $("in-title").innerHTML = c.title;
   $("in-l-name").textContent = c.nameLabel;
   $("in-l-type").textContent = c.typeLabel;
   $("in-l-sys").textContent = c.sysLabel;
@@ -1802,8 +2307,48 @@ function select(k, fromPop){
     if (el) el.hidden = hide[id];
   });
 
+  // The header CTA points at whatever this page's free, no-commitment step
+  // actually is — the lookup for businesses, the waitlist for the personal line.
+  var finalCta = document.getElementById("final-cta");
+  // The personal line already ends on its own waitlist card.
+  if (finalCta) finalCta.hidden = (k === "personal");
+
+  var navCta = document.getElementById("nav-cta");
+  if (navCta) {
+    var isPersonal = k === "personal";
+    navCta.setAttribute("href", isPersonal ? "#personal" : "#yourline");
+    navCta.childNodes[navCta.childNodes.length - 1].nodeValue =
+      isPersonal ? "Join the waitlist" : "Try it on your business";
+  }
+
   var tryBtn = document.getElementById("hero-try");
   if (tryBtn) tryBtn.hidden = !!hide["yourline"];
+
+  var person = document.getElementById("blob-person"),
+      blob   = document.getElementById("orb"),
+      cap    = document.querySelector(".orb-cap");
+  var shot = document.getElementById("blob-shot");
+  // A photo of the sector where there is one; the portrait for the personal
+  // line; the bare waveform for anything unlisted.
+  var SHOTS = { home:"home", food:"food", clinic:"clinic" };
+  if (shot) {
+    var f = SHOTS[k];
+    shot.hidden = !f;
+    if (f) {
+      document.getElementById("blob-shot-src").srcset = "/sector-" + f + ".webp";
+      document.getElementById("blob-shot-img").src = "/sector-" + f + ".png";
+    }
+    blob.classList.toggle("has-shot", !!f);
+  }
+
+  if (person && blob) {
+    var isPersonal = k === "personal";
+    person.hidden = !isPersonal;
+    blob.classList.toggle("has-person", isPersonal);
+    if (cap) cap.textContent = isPersonal
+      ? "Your line answers so you don't have to \u2014 and tells you who it was."
+      : "Every call answered while you are working. Illustrative.";
+  }
 
   renderIntake(k, cfg, tiers);
 
@@ -1938,6 +2483,30 @@ window.addEventListener("popstate", function(){
   select(keyFromPath() || "home", true);
 });
 
+
+/* ---- Theme toggle ---- */
+(function(){
+  var btn = document.getElementById("theme-btn");
+  if (!btn) return;
+  var KEY = "vc_theme";
+  function apply(t){
+    document.documentElement.setAttribute("data-theme", t);
+    btn.setAttribute("aria-label", t === "light" ? "Switch to dark mode" : "Switch to light mode");
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", t === "light" ? "#f6f8fc" : "#05070c");
+  }
+  var saved;
+  try { saved = localStorage.getItem(KEY); } catch(e){}
+  // Light is the brand default. A visitor who picks dark keeps it, but the OS
+  // setting never decides how a first-time visitor sees the site.
+  apply(saved === "dark" ? "dark" : "light");
+  btn.addEventListener("click", function(){
+    var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch(e){}
+  });
+})();
+
 /* ---- Header nav ---- */
 (function(){
   var btn = document.getElementById("nav-sectors"),
@@ -1963,6 +2532,24 @@ window.addEventListener("popstate", function(){
     close();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+  // the Personal line link sits outside the menu but behaves the same way
+  var brand = document.getElementById("brand-home");
+  if (brand) brand.addEventListener("click", function(e){
+    // Already on the site: switch back rather than reloading.
+    e.preventDefault();
+    select("home");
+    close();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  var direct = document.querySelector('.nav > button[data-goto]');
+  if (direct) direct.addEventListener("click", function(e){
+    e.stopPropagation();
+    select(direct.getAttribute("data-goto"));
+    close();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
   document.addEventListener("click", close);
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
 
@@ -1990,14 +2577,41 @@ window.addEventListener("popstate", function(){
   if (q && go) {
     var busy = false;
 
+    // Generation takes four to six seconds. Rather than a spinner, creep a bar
+    // toward 90% on a curve and let the real response finish it — so it never
+    // shows 100% before the audio exists, and never looks stalled.
     function setSteps(on){
-      var els = steps.querySelectorAll(".nb-step");
-      for (var i = 0; i < els.length; i++) els[i].className = "nb-step";
+      var fill = document.getElementById("nb-gen-fill"),
+          pct  = document.getElementById("nb-gen-pct"),
+          lab  = document.getElementById("nb-gen-label");
       steps.hidden = !on;
-      if (on) els[0].classList.add("on");
-      return on ? [setTimeout(function(){
-        els[0].className = "nb-step done"; els[1].classList.add("on");
-      }, 1600)] : [];
+      if (!on) return [];
+
+      var stages = [
+        [0,  "Reading your listing"],
+        [22, "Checking today's hours"],
+        [45, "Writing the script"],
+        [68, "Generating the voice"],
+        [86, "Almost there"]
+      ];
+      var p = 0, i = 0, timers = [];
+      fill.style.width = "0%"; pct.textContent = "0%"; lab.textContent = stages[0][1];
+
+      var iv = setInterval(function(){
+        // ease out: fast at first, slower as it approaches the ceiling
+        p += Math.max(0.6, (92 - p) * 0.06);
+        if (p > 92) p = 92;
+        fill.style.width = p + "%";
+        pct.textContent = Math.round(p) + "%";
+        while (i < stages.length - 1 && p >= stages[i + 1][0]) { i++; lab.textContent = stages[i][1]; }
+      }, 140);
+      timers.push({ stop: function(){ clearInterval(iv); } });
+
+      timers.finish = function(){
+        clearInterval(iv);
+        fill.style.width = "100%"; pct.textContent = "100%"; lab.textContent = "Ready";
+      };
+      return timers;
     }
 
     /* Step one: search. Cheap, so it can be generous with results. */
@@ -2055,7 +2669,16 @@ window.addEventListener("popstate", function(){
       msg.className = "nb-msg"; msg.textContent = "";
       out.classList.remove("on");
       var timers = setSteps(true);
-      function stopSteps(){ timers.forEach(clearTimeout); steps.hidden = true; }
+      function stopSteps(done){
+        if (done && timers.finish) {
+          timers.finish();
+          // let the bar land on 100 before it disappears
+          setTimeout(function(){ steps.hidden = true; }, 500);
+        } else {
+          timers.forEach(function(t){ t.stop && t.stop(); });
+          steps.hidden = true;
+        }
+      }
 
       fetch(API + "/demo-preview", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -2071,7 +2694,7 @@ window.addEventListener("popstate", function(){
                  "<p>" + esc(c.text) + "</p>" +
                  '<audio controls preload="none" src="' + c.url + '"></audio></div>';
         }).join("");
-        stopSteps();
+        stopSteps(true);
         results.hidden = true;
         out.classList.add("on");
         out.scrollIntoView({ behavior: "smooth", block: "nearest" });

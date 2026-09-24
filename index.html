@@ -128,7 +128,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
    anchors, so the nav simply steps aside. */
 @media (max-width:1000px){ .nav{display:none} }
 .bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.brand{display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.brand:hover{color:inherit;opacity:.85}
 .brand img{height:32px;width:auto}
 .brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
 header .btn{font-size:14px;padding:10px 20px;white-space:nowrap}
@@ -1136,10 +1137,10 @@ footer{background:#07101e}
 
 <header>
   <div class="bar">
-    <div class="brand">
-      <img src="logo-mark.png" alt="" width="32" height="32">
+    <a class="brand" href="/" id="brand-home" aria-label="VoiceCaptures home">
+      <img src="/logo-mark.png" alt="" width="32" height="32">
       <span>VoiceCaptures</span>
-    </div>
+    </a>
     <nav class="nav" aria-label="Main">
       <button type="button" class="nav-a" data-goto="personal">Personal line</button>
       <div class="nav-drop">
@@ -1642,7 +1643,7 @@ footer{background:#07101e}
 <footer>
   <div class="wrap foot">
     <div>
-      <div class="brand"><img src="logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
+      <div class="brand"><img src="/logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
       <div class="tl">Answers · Qualifies · Books</div>
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
@@ -1672,7 +1673,9 @@ function keyFromPath(){
   var seg = location.pathname.replace(/^\/|\/$/g, "").split("/")[0];
   for (var k in SLUGS) if (SLUGS[k] === seg) return k;
   var built = document.documentElement.getAttribute("data-page");
-  return (built && SLUGS[built]) ? built : null;
+  if (built && SLUGS[built]) return built;
+  // The root is the landing page: home services, never a remembered tab.
+  return null;
 }
 
 var V = {
@@ -2494,8 +2497,8 @@ window.addEventListener("popstate", function(){
   }
   var saved;
   try { saved = localStorage.getItem(KEY); } catch(e){}
-  // respect the visitor's own setting before falling back to dark
-  if (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) saved = "dark";
+  // Light is the brand default. A visitor who picks dark keeps it, but the OS
+  // setting never decides how a first-time visitor sees the site.
   apply(saved === "dark" ? "dark" : "light");
   btn.addEventListener("click", function(){
     var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
@@ -2530,6 +2533,15 @@ window.addEventListener("popstate", function(){
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
   // the Personal line link sits outside the menu but behaves the same way
+  var brand = document.getElementById("brand-home");
+  if (brand) brand.addEventListener("click", function(e){
+    // Already on the site: switch back rather than reloading.
+    e.preventDefault();
+    select("home");
+    close();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
   var direct = document.querySelector('.nav > button[data-goto]');
   if (direct) direct.addEventListener("click", function(e){
     e.stopPropagation();
