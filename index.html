@@ -835,7 +835,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 
 /* A photo of the sector, with the same orbit behind it. */
 .blob-shot{position:relative;z-index:2;display:block;width:96%;margin-left:0}
-.blob-shot[hidden]{display:none}
+.blob-shot[hidden]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .blob-shot img{width:100%;height:auto;display:block;border-radius:0;
   filter:drop-shadow(0 26px 46px rgba(0,0,0,.34))}
 html[data-theme="light"] .blob-shot img{filter:drop-shadow(0 22px 40px rgba(13,23,41,.20))}
@@ -1243,7 +1243,7 @@ footer{background:#07101e}
       </picture>
       <picture class="blob-shot" id="blob-shot" hidden>
         <source id="blob-shot-src" srcset="" type="image/webp">
-        <img id="blob-shot-img" src="" alt="" width="1100" height="733" loading="lazy">
+        <img id="blob-shot-img" src="" alt="" width="1100" height="733" decoding="async">
       </picture>
     </div>
     <p class="orb-cap">Current conversational voice models &mdash; most callers never ask.</p>
@@ -2357,19 +2357,31 @@ function select(k, fromPop){
       blob   = document.getElementById("orb"),
       cap    = document.querySelector(".orb-cap");
   var shot = document.getElementById("blob-shot");
-  // A photo of the sector where there is one; the portrait for the personal
-  // line; the bare waveform for anything unlisted.
-  // Add a sector here only once its cutout is in the repo — a missing file
-  // shows a broken image rather than falling back.
-  var SHOTS = { home:"home", food:"food" };
+  // Every business sector has a photo; the personal line has the portrait.
+  // If a file is missing the image fails and we fall back to the waveform,
+  // so a sector can be added or removed by dropping files in or out.
+  var SHOTS = { home:"home", food:"food", clinic:"clinic", other:"other" };
   if (shot) {
     var f = SHOTS[k];
-    shot.hidden = !f;
+    var img = document.getElementById("blob-shot-img");
+    var src = document.getElementById("blob-shot-src");
+    // Hide first: a 404 leaves the previous sector's photo on screen until the
+    // new request fails, so the wrong image would flash in between.
+    shot.hidden = true;
+    blob.classList.remove("has-shot");
     if (f) {
-      document.getElementById("blob-shot-src").srcset = "/sector-" + f + ".webp?v=" + ASSET_V;
-      document.getElementById("blob-shot-img").src = "/sector-" + f + ".png?v=" + ASSET_V;
+      img.onerror = function(){
+        // No cutout on the server for this sector yet.
+        shot.hidden = true;
+        blob.classList.remove("has-shot");
+      };
+      img.onload = function(){
+        shot.hidden = false;
+        blob.classList.add("has-shot");
+      };
+      src.srcset = "/sector-" + f + ".webp?v=" + ASSET_V;
+      img.src = "/sector-" + f + ".png?v=" + ASSET_V;
     }
-    blob.classList.toggle("has-shot", !!f);
   }
 
   if (person && blob) {
