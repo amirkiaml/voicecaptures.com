@@ -919,6 +919,18 @@ html[data-theme="light"] .blob-shot img{filter:drop-shadow(0 22px 40px rgba(13,2
   .dtable th:nth-child(5),.dtable td:nth-child(5){display:none}
 }
 
+
+/* The <header> inside each dashboard card was matching the global site-header
+   rule — sticky, tinted and backdrop-filtered — which painted a dark band
+   across the top of every card. Scope it back out. */
+.dcard header{position:static;background:none;border-bottom:0;z-index:auto;
+  -webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-theme="dark"] .dcard header,
+html[data-theme="light"] .dcard header{background:none;border-bottom:0}
+html[data-theme="dark"] .dchip{background:rgba(160,200,255,.06);
+  border-color:rgba(160,200,255,.16);color:#9fb3cc}
+html[data-theme="light"] .dchip{background:#f4f7fc;border-color:rgba(18,35,63,.12)}
+
 /* ---- Intake form ---- */
 .in-card{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
   border-radius:16px;padding:clamp(24px,4vw,36px)}
@@ -1213,8 +1225,8 @@ footer{background:#07101e}
         <div class="orb-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
       <picture class="blob-person" id="blob-person" hidden>
-        <source srcset="/personal-hero.webp" type="image/webp">
-        <img src="/personal-hero.png" alt="" width="571" height="760" loading="lazy">
+        <source srcset="/personal-hero.webp?v=3" type="image/webp">
+        <img src="/personal-hero.png?v=3" alt="" width="571" height="760" loading="lazy">
       </picture>
       <picture class="blob-shot" id="blob-shot" hidden>
         <source id="blob-shot-src" srcset="" type="image/webp">
@@ -1660,6 +1672,10 @@ var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
 // Each vertical has its own URL. The path is the source of truth on load,
 // and the switcher keeps it in step afterwards so any tab can be shared.
+// Bump when an image is replaced under the same filename, or returning
+// visitors keep the cached copy.
+var ASSET_V = "3";
+
 var SLUGS = {
   personal: "personal",
   home:     "home-services",
@@ -2335,8 +2351,8 @@ function select(k, fromPop){
     var f = SHOTS[k];
     shot.hidden = !f;
     if (f) {
-      document.getElementById("blob-shot-src").srcset = "/sector-" + f + ".webp";
-      document.getElementById("blob-shot-img").src = "/sector-" + f + ".png";
+      document.getElementById("blob-shot-src").srcset = "/sector-" + f + ".webp?v=" + ASSET_V;
+      document.getElementById("blob-shot-img").src = "/sector-" + f + ".png?v=" + ASSET_V;
     }
     blob.classList.toggle("has-shot", !!f);
   }
