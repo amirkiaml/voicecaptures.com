@@ -7,7 +7,12 @@
 <meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, no credit card.">
 <meta name="theme-color" content="#f6f8fc">
 <link rel="canonical" href="https://voicecaptures.com/">
-<link rel="icon" href="logo-mark.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/">
@@ -241,7 +246,6 @@ html[data-theme="light"] .mk-keys svg{stroke:#5a6b82}
 html[data-theme="light"] .mk-keys svg circle{fill:#5a6b82}
 html[data-theme="light"] .mk-keys div{color:#7086a1}
 html[data-theme="light"] .mk-bar{background:rgba(18,35,63,.10)}
-html[data-theme="light"] .mk-panel{background:#101a2e}
 html[data-theme="light"] .mk-agent{color:#f2f6fb}
 html[data-theme="light"] .mk-bar{background:rgba(255,255,255,.14)}
 html[data-theme="light"] .mk-fallback audio{filter:none}
@@ -290,8 +294,8 @@ html[data-theme="light"] .calframe{border-color:rgba(18,35,63,.12)}
 /* the waveform inside the blob was white — invisible on a light fill */
 html[data-theme="light"] .orb-wave i{background:#1D4ED8;opacity:.85}
 html[data-theme="light"] .blob-shape{
-  background:linear-gradient(150deg,rgba(37,99,235,.20),rgba(14,147,184,.14))}
-html[data-theme="light"] .blob-orbit .bo{stroke:rgba(37,99,235,.30)}
+  background:linear-gradient(150deg,rgba(37,99,235,.09),rgba(14,147,184,.06))}
+html[data-theme="light"] .blob-orbit .bo{stroke:rgba(37,99,235,.20)}
 html[data-theme="light"] .blob-orbit .bd{fill:#2563EB;filter:none}
 
 
@@ -830,15 +834,15 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;background:var(--blue
 .blob.has-person .orb-wave{display:none}
 
 /* A photo of the sector, with the same orbit behind it. */
-.blob-shot{position:relative;z-index:2;display:block;width:114%;margin-left:-7%}
+.blob-shot{position:relative;z-index:2;display:block;width:96%;margin-left:0}
 .blob-shot[hidden]{display:none}
 .blob-shot img{width:100%;height:auto;display:block;border-radius:0;
   filter:drop-shadow(0 26px 46px rgba(0,0,0,.34))}
 html[data-theme="light"] .blob-shot img{filter:drop-shadow(0 22px 40px rgba(13,23,41,.20))}
 .blob.has-shot{aspect-ratio:1;padding:0;align-items:center}
 .blob.has-shot .orb-wave{display:none}
-.blob.has-shot .blob-shape{inset:6% 8%}
-.blob.has-shot .blob-orbit{inset:0}
+.blob.has-shot .blob-shape{inset:-2% 0}
+.blob.has-shot .blob-orbit{inset:-5%}
 .orb-cap{text-align:center;font-size:12px;color:var(--muted);margin-top:20px}
 @media (prefers-reduced-motion:reduce){
   .blob-shape,.blob-orbit .bd,.blob-orbit .bo{animation:none}
@@ -1309,7 +1313,7 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Three bad options</h2>
+    <h2 class="center">Three<br><span class="hl">bad options</span></h2>
     <p class="sub">Every way of handling the phone without an agent costs you something.</p>
     <div class="grid g3" id="bad"></div>
   </div>
@@ -1317,7 +1321,7 @@ footer{background:#07101e}
 
 <section id="calc-section">
   <div class="wrap">
-    <h2 class="center">See exactly what you're losing.</h2>
+    <h2 class="center">See exactly<br><span class="hl">what you're losing.</span></h2>
     <p class="sub">The sliders start on typical numbers for <span id="c-short">home service businesses</span>.</p>
     <div class="calc">
       <div class="field">
@@ -1489,7 +1493,7 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Sounds human. Built for you.</h2>
+    <h2 class="center">Sounds human.<br><span class="hl">Built for you.</span></h2>
     <p class="sub">It sounds like a person, and it is built around how <em style="font-style:normal;color:var(--text)">your</em> business takes calls. Nothing about it is off the shelf.</p>
 
 
@@ -1569,7 +1573,7 @@ footer{background:#07101e}
 
 <section class="alt">
   <div class="wrap">
-    <h2 class="center">Who it's for</h2>
+    <h2 class="center">Who<br><span class="hl">it's for</span></h2>
     <p class="sub">If your phone is your business, VoiceCaptures is for you.</p>
     <div class="tags">
       <div>Plumbing</div><div>HVAC</div><div>Electrical</div><div>Roofing</div><div>Pest Control</div><div>Landscaping</div><div>General Contracting</div><div>Locksmith</div><div>Restaurants</div><div>Coffee Shops</div><div>Catering</div><div>Dental</div><div>Medical Clinics</div><div>Physio &amp; Chiro</div>
@@ -1589,7 +1593,7 @@ footer{background:#07101e}
 
 <div class="final" id="final-cta">
   <div class="wrap">
-    <h2>Ready to stop losing jobs<br>to voicemail?</h2>
+    <h2>Ready to stop losing jobs<br><span class="hl">to voicemail?</span></h2>
     <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
     <div class="btns">
       <a class="btn btn-primary" href="#intake">Tell us about your line</a>
@@ -1600,7 +1604,7 @@ footer{background:#07101e}
 
 <section id="intake" class="alt">
   <div class="wrap">
-    <h2 class="center" id="in-title">Tell us about your line.</h2>
+    <h2 class="center" id="in-title">Tell us about <span class="hl">your line.</span></h2>
     <p class="sub" id="in-sub">A few quick questions and we'll come back with what your setup would look like. No obligation.</p>
 
     <form class="in-card" id="in-form">
@@ -1674,7 +1678,7 @@ function keyFromPath(){
 var V = {
   home: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Business name", typeLabel: "Trade",
       sysLabel: "Scheduling or job software",
       types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
@@ -1742,7 +1746,7 @@ var V = {
   },
   food: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Venue name", typeLabel: "Type of venue",
       sysLabel: "POS system",
       types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
@@ -1794,7 +1798,7 @@ var V = {
   },
   other: {
     intake: {
-      title: "Tell us about your line.",
+      title: "Tell us about <span class=\"hl\">your line.</span>",
       nameLabel: "Business name", typeLabel: "What you do",
       sysLabel: "Booking or CRM software",
       types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
@@ -1922,7 +1926,7 @@ var V = {
   },
   clinic: {
     intake: {
-      title: "Tell us about your practice.",
+      title: "Tell us about <span class=\"hl\">your practice.</span>",
       nameLabel: "Practice name", typeLabel: "Type of practice",
       sysLabel: "Practice management software",
       types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
@@ -1994,7 +1998,7 @@ function renderIntake(key, cfg, tiers){
   sec.hidden = false;
   var c = cfg.intake;
 
-  $("in-title").textContent = c.title;
+  $("in-title").innerHTML = c.title;
   $("in-l-name").textContent = c.nameLabel;
   $("in-l-type").textContent = c.typeLabel;
   $("in-l-sys").textContent = c.sysLabel;
