@@ -241,8 +241,12 @@ assistant rather than a person.</p>
 </div>
 
 <h2>Call recording</h2>
-<p>Callers are told that calls may be recorded. Recording is used to produce the
-transcript and the summary that the business owner receives.</p>
+<p>Callers are told at the start of the call that it may be recorded. Calls
+answered by the assistant are recorded and transcribed. The recording and
+transcript are used to produce the summary the business owner receives, and to
+improve how the assistant handles calls for that business. Recordings and
+transcripts are deleted after 14 days. If you would prefer your recording deleted
+sooner, email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
 <h2>How long we keep it</h2>
 <p>Recordings, transcripts and call details are kept for <strong>14 days</strong>
