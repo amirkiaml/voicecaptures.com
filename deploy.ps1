@@ -23,6 +23,17 @@ Write-Host "Building sector pages..." -ForegroundColor Cyan
 python build.py
 if ($LASTEXITCODE -ne 0) { Write-Host "Build failed. Nothing pushed." -ForegroundColor Red; exit 1 }
 
+# /privacy/ and /terms/ are the URLs on the Twilio A2P campaign. If they 404,
+# the campaign gets rejected, so they are built on every push too.
+Write-Host "Building legal pages..." -ForegroundColor Cyan
+python build-legal.py
+if ($LASTEXITCODE -ne 0) { Write-Host "Legal build failed. Nothing pushed." -ForegroundColor Red; exit 1 }
+foreach ($d in @("privacy","terms")) {
+    if (-not (Test-Path (Join-Path $d "index.html"))) {
+        Write-Host "Missing $d/index.html" -ForegroundColor Red; exit 1
+    }
+}
+
 # Every generated folder must be newer than the source, or the build silently
 # did nothing and the subpages would ship stale.
 $src = (Get-Item index.html).LastWriteTime
@@ -48,3 +59,5 @@ git push
 Write-Host "`nPushed. Give GitHub Pages a minute, then check:" -ForegroundColor Green
 Write-Host "  https://voicecaptures.com/"
 Write-Host "  https://voicecaptures.com/personal/"
+Write-Host "  https://voicecaptures.com/privacy/"
+Write-Host "  https://voicecaptures.com/terms/"

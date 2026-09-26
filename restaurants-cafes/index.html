@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-page="food" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +37,7 @@
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
   --cyan:#22D3EE; --cyan-lt:#67E8F9;
   --red:#E24B4A;
-  --display:'Space Grotesk',sans-serif; --body:'DM Sans',sans-serif;
+  --display:'Manrope',sans-serif; --body:'DM Sans',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;min-width:0}
 html{overflow-x:clip}
@@ -1022,6 +1022,7 @@ footer{padding:36px 0;border-top:1px solid var(--line)}
 .foot .tl{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-top:8px}
 .foot a,.foot .desc{font-size:13px;color:var(--muted)}
 .foot a:hover{color:var(--blue)}
+.foot-legal{display:flex;gap:16px;flex-wrap:wrap}
 
 @media (max-width:720px){
   body{line-height:1.6}
@@ -1670,6 +1671,10 @@ footer{background:#07101e}
     <div>
       <div class="brand"><img src="/logo-mark.png" alt="" width="28" height="28"><span>VoiceCaptures</span></div>
       <div class="tl">Answers · Qualifies · Books</div>
+    </div>
+    <div class="foot-legal">
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>

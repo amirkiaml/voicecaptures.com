@@ -92,7 +92,10 @@ def build_page(src: str, key: str, meta: dict) -> str:
 
     # The page tells its own script which vertical to open with, so the right
     # one is selected on first paint rather than after a redirect.
-    out = out.replace("<html lang=\"en\">", f'<html lang="en" data-page="{key}">', 1)
+    # The <html> tag also carries data-theme, so a literal match on
+    # '<html lang="en">' silently did nothing and every subpage opened on the
+    # default vertical. Insert the attribute instead of rewriting the tag.
+    out = re.sub(r"<html lang=\"en\"", f'<html lang="en" data-page="{key}"', out, count=1)
     return out
 
 
@@ -102,6 +105,7 @@ def sitemap(slugs) -> str:
         f"\n  <url><loc>{SITE}/{s}</loc><lastmod>{today}</lastmod>"
         f"<changefreq>monthly</changefreq><priority>{p}</priority></url>"
         for s, p in [("", "1.0")] + [(f"{x}/", "0.9") for x in slugs]
+                     + [("privacy/", "0.3"), ("terms/", "0.3")]
     )
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}\n</urlset>\n'
 
