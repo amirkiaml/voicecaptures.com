@@ -14,7 +14,7 @@ fonts, palette and theme toggle so they do not look like someone else's site.
 import pathlib
 
 ROOT = pathlib.Path(__file__).parent
-UPDATED = "26 September 2026"
+UPDATED = "28 September 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 LEGAL = "Amirhossein Kiani"
@@ -239,6 +239,22 @@ assistant rather than a person.</p>
   <p><strong>We do not sell or share your SMS opt-in data or personal information
   with third parties for marketing purposes.</strong></p>
 </div>
+
+<h2>SMS Messaging and Consent</h2>
+
+<div class="box">
+  <p><strong>No mobile information will be shared with third parties or affiliates
+  for marketing or promotional purposes. All other categories exclude text
+  messaging originator opt-in data and consent; this information will not be
+  shared with any third parties.</strong></p>
+</div>
+
+<p>Callers opt in verbally during a phone call by agreeing when our assistant
+offers to send a text. Messages are transactional and sent only in response to
+that request &mdash; typically one message per call. Message and data rates may
+apply. Reply <strong>STOP</strong> to opt out, or <strong>HELP</strong> for help.
+Our terms of service are at <a href="/terms/">voicecaptures.com/terms</a> and this
+privacy policy is at <a href="/privacy/">voicecaptures.com/privacy</a>.</p>
 
 <h2>Call recording</h2>
 <p>Callers are told at the start of the call that it may be recorded. Calls
