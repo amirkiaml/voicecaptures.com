@@ -119,11 +119,11 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
   background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:6px;
   box-shadow:0 18px 44px rgba(0,0,0,.5)}
 .nav-menu[hidden]{display:none}
-.nav-menu button{display:block;width:100%;text-align:left;font-family:var(--body);
+:is(.nav-menu button,.nav-menu a){display:block;width:100%;text-align:left;font-family:var(--body);
   font-size:13.5px;color:var(--muted);background:none;border:0;cursor:pointer;
   padding:9px 12px;border-radius:8px;transition:color .15s,background .15s}
-.nav-menu button:hover{color:var(--text);background:rgba(255,255,255,.07)}
-.nav-menu button[aria-current="true"]{color:var(--cyan);font-weight:700}
+:is(.nav-menu button,.nav-menu a):hover{color:var(--text);background:rgba(255,255,255,.07)}
+:is(.nav-menu button,.nav-menu a)[aria-current="true"]{color:var(--cyan);font-weight:700}
 /* Below tablet the links crowd the logo; the page has its own switcher and
    anchors, so the nav simply steps aside. */
 @media (max-width:1000px){ .nav{display:none} }
@@ -167,14 +167,14 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 
 .nav-menu{min-width:292px;padding:8px;border-radius:14px;top:calc(100% + 12px);
   box-shadow:0 22px 52px rgba(0,0,0,.55)}
-.nav-menu button{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
+:is(.nav-menu button,.nav-menu a){display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
   align-items:center;padding:11px 13px;border-radius:11px}
-.nav-menu button i{grid-row:1/span 2;width:4px;height:26px;border-radius:2px;display:block;
+:is(.nav-menu button,.nav-menu a) i{grid-row:1/span 2;width:4px;height:26px;border-radius:2px;display:block;
   background:var(--line2);transition:background .16s}
-.nav-menu button:hover i,.nav-menu button[aria-current="true"] i{background:var(--cyan)}
-.nav-menu button b{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
-.nav-menu button em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}
-.nav-menu button[aria-current="true"] b{color:var(--cyan)}
+:is(.nav-menu button,.nav-menu a):hover i,:is(.nav-menu button,.nav-menu a)[aria-current="true"] i{background:var(--cyan)}
+:is(.nav-menu button,.nav-menu a) b{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+:is(.nav-menu button,.nav-menu a) em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}
+:is(.nav-menu button,.nav-menu a)[aria-current="true"] b{color:var(--cyan)}
 .nav-sep{height:1px;background:var(--line);margin:8px 7px}
 
 /* ---- Arrow buttons: the circle carries the affordance, the label stays
@@ -270,8 +270,8 @@ html[data-theme="light"] .theme-btn:hover{color:#12233f;border-color:#2563EB}
 html[data-theme="light"] .nav-cta{background:#12233f;color:#fff;
   box-shadow:0 8px 22px rgba(18,35,63,.20)}
 html[data-theme="light"] .nav-cta:hover{background:#1D4ED8;color:#fff}
-html[data-theme="light"] .nav-menu button b{color:#12233f}
-html[data-theme="light"] .nav-menu button[aria-current="true"] b{color:#1D4ED8}
+html[data-theme="light"] :is(.nav-menu button,.nav-menu a) b{color:#12233f}
+html[data-theme="light"] :is(.nav-menu button,.nav-menu a)[aria-current="true"] b{color:#1D4ED8}
 
 
 /* Places where the refresh hard-coded a dark fill that a variable can't reach. */
@@ -1187,8 +1187,21 @@ footer{background:#07101e}
       <a class="nav-a nav-live" href="#demo" id="nav-demo">
         <span class="nav-pulse" aria-hidden="true"></span>Try the demo line
       </a>
-      <a class="nav-a" href="#intake">Contact</a>
-      <a class="nav-a" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a>
+      <div class="nav-drop">
+        <button type="button" class="nav-a nav-trigger" id="nav-company" aria-expanded="false" aria-haspopup="true">
+          Company
+          <svg class="nav-car" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor"
+                  stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="nav-menu" id="nav-company-menu" hidden>
+          <a href="/about/"><i></i><b>About</b><em>Who we are, what we build</em></a>
+          <a href="/careers/"><i></i><b>Careers</b><em>Rolling applications</em></a>
+          <a href="/about/#contact"><i></i><b>Contact</b><em>Send us a message</em></a>
+        </div>
+      </div>
+      <a class="nav-a" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
     </nav>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to light mode" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
@@ -1331,7 +1344,7 @@ footer{background:#07101e}
         <div id="nb-clips"></div>
         <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar &mdash; this is the stock version.</p>
         <div class="center" style="margin-top:18px">
-          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Set this up on my number</a>
+          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Set this up on my number</a>
         </div>
       </div>
     </div>
@@ -1400,7 +1413,7 @@ footer{background:#07101e}
       <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
       <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
       <div style="margin-top:20px">
-        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a demo</a>
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a demo</a>
       </div>
     </div>
   </div>
@@ -1624,7 +1637,7 @@ footer{background:#07101e}
     <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
     <div class="btns">
       <a class="btn btn-primary" href="#intake">Tell us about your line</a>
-      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Or book a call</a>
+      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Or book a call</a>
     </div>
   </div>
 </div>
@@ -1673,6 +1686,8 @@ footer{background:#07101e}
       <div class="tl">Answers · Qualifies · Books</div>
     </div>
     <div class="foot-legal">
+      <a href="/about/">About</a>
+      <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>
       <a href="/terms/">Terms of Service</a>
     </div>
@@ -1686,7 +1701,7 @@ footer{background:#07101e}
 (function(){
 "use strict";
 
-var CAL = "https://calendly.com/hello-voicecaptures/30min";
+var CAL = "https://calendly.com/hello-voicecaptures";
 
 // Each vertical has its own URL. The path is the source of truth on load,
 // and the switcher keeps it in step afterwards so any tab can be shared.
@@ -2559,20 +2574,43 @@ window.addEventListener("popstate", function(){
 (function(){
   var btn = document.getElementById("nav-sectors"),
       menu = document.getElementById("nav-menu");
-  if (!btn || !menu) return;
 
-  function close(){ menu.hidden = true; btn.setAttribute("aria-expanded","false"); }
-  function open(){
-    menu.hidden = false; btn.setAttribute("aria-expanded","true");
-    // mark the sector currently being viewed
-    menu.querySelectorAll("button[data-goto]").forEach(function(b){
-      b.setAttribute("aria-current", b.getAttribute("data-goto") === key ? "true" : "false");
+  // There are now two dropdowns (Businesses and Company). They open and close
+  // the same way, so the handler is generic; only the sector one marks which
+  // item is currently being viewed.
+  var drops = [].slice.call(document.querySelectorAll(".nav-drop"))
+    .map(function(d){
+      return { t: d.querySelector(".nav-trigger"), m: d.querySelector(".nav-menu") };
+    })
+    .filter(function(d){ return d.t && d.m; });
+
+  function close(){
+    drops.forEach(function(d){
+      d.m.hidden = true;
+      d.t.setAttribute("aria-expanded", "false");
     });
   }
-  btn.addEventListener("click", function(e){
-    e.stopPropagation();
-    menu.hidden ? open() : close();
+  function open(d){
+    close();                       // only one open at a time
+    d.m.hidden = false;
+    d.t.setAttribute("aria-expanded", "true");
+    if (d.m === menu) {
+      d.m.querySelectorAll("button[data-goto]").forEach(function(b){
+        b.setAttribute("aria-current", b.getAttribute("data-goto") === key ? "true" : "false");
+      });
+    }
+  }
+  drops.forEach(function(d){
+    d.t.addEventListener("click", function(e){
+      e.stopPropagation();
+      d.m.hidden ? open(d) : close();
+    });
+    // Clicking a link inside a menu should follow it, not be swallowed by the
+    // document-level close handler running first.
+    d.m.addEventListener("click", function(e){ e.stopPropagation(); });
   });
+
+  if (!btn || !menu) return;
   menu.addEventListener("click", function(e){
     var b = e.target.closest("button[data-goto]");
     if (!b) return;

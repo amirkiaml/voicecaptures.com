@@ -17,25 +17,30 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/terms/">
-<meta property="og:title" content="Terms of Service — VoiceCaptures">
+<meta property="og:title" content="Terms of Service">
 <meta property="og:description" content="Terms for the VoiceCaptures AI answering service, including SMS terms, billing, liability and governing law.">
+<meta property="og:image" content="https://voicecaptures.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terms of Service">
+<meta name="twitter:description" content="Terms for the VoiceCaptures AI answering service, including SMS terms, billing, liability and governing law.">
+<meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0b0d13; --bg2:#12151d; --bg3:#191d27;
-  --text:#f0f0ec; --muted:#9a9a90;
+  --text:#f0f0ec; --muted:#9a9a90; --faint:#555;
   --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.15);
-  --blue:#2563EB; --blue-dk:#1D4ED8;
+  --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
   --cyan:#22D3EE; --cyan-lt:#67E8F9;
   --display:'Manrope',sans-serif; --body:'DM Sans',sans-serif;
 }
 html[data-theme="light"]{
   --bg:#f6f8fc; --bg2:#ffffff; --bg3:#ffffff;
-  --text:#0d1729; --muted:#5a6b82;
+  --text:#0d1729; --muted:#5a6b82; --faint:#8496ab;
   --line:rgba(13,23,41,.10); --line2:rgba(13,23,41,.18);
-  --blue:#2563EB; --blue-dk:#1D4ED8;
+  --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,.12);
   --cyan:#0E93B8; --cyan-lt:#0B7C9C;
 }
 *{margin:0;padding:0;box-sizing:border-box;min-width:0}
@@ -47,8 +52,10 @@ a{color:var(--blue);text-decoration:none}
 a:hover{color:var(--blue-dk)}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .wrap{width:100%;max-width:1060px;margin:0 auto;padding:0 clamp(18px,4vw,24px)}
+.alt{background:var(--bg2)}
+html[data-theme="light"] .alt{background:#eef2f9}
 
-/* header — same bar, brand and theme control as the rest of the site */
+/* header */
 header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
   -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
   border-bottom:1px solid var(--line)}
@@ -65,10 +72,11 @@ html[data-theme="light"] header{background:rgba(246,248,252,.85)}
 .nav{display:flex;align-items:center;gap:4px;margin-left:auto;margin-right:12px}
 .nav-a{font-family:var(--body);font-size:13.5px;font-weight:500;color:var(--muted);
   background:none;border:0;cursor:pointer;padding:8px 12px;border-radius:8px;
-  text-decoration:none;transition:color .18s,background .18s}
+  text-decoration:none;white-space:nowrap;transition:color .18s,background .18s}
 .nav-a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-a[aria-current="page"]{color:var(--text);font-weight:700}
 html[data-theme="light"] .nav-a:hover{background:rgba(13,23,41,.05)}
-@media (max-width:700px){ .nav{display:none} }
+@media (max-width:820px){ .nav{display:none} }
 .theme-btn{flex:0 0 auto;width:38px;height:38px;border-radius:10px;cursor:pointer;
   background:none;border:1px solid var(--line2);color:var(--muted);
   display:flex;align-items:center;justify-content:center;margin-left:auto;
@@ -81,29 +89,127 @@ html[data-theme="light"] .nav-a:hover{background:rgba(13,23,41,.05)}
 html[data-theme="light"] .t-sun{display:none}
 html[data-theme="light"] .t-moon{display:block}
 
-/* document */
+/* type */
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,46px);
+  letter-spacing:-.02em;line-height:1.1;margin-bottom:16px}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.2vw,30px);
+  letter-spacing:-.02em;line-height:1.2;margin-bottom:10px;scroll-margin-top:86px}
+h3{font-family:var(--display);font-size:16.5px;font-weight:700;line-height:1.4;margin-bottom:6px}
+h1 .hl,h2 .hl{color:var(--blue)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:18px}
+.lede{font-size:17.5px;color:var(--muted);max-width:640px;margin-bottom:22px}
+section{padding:clamp(44px,6vw,72px) 0}
+.prose p{font-size:16px;margin-bottom:16px;max-width:680px}
+.fine{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* buttons */
+.btn{font-family:var(--body);font-size:15px;font-weight:700;padding:14px 30px;border-radius:8px;
+  display:inline-block;border:0;cursor:pointer;text-align:center;
+  transition:background .2s,transform .1s,border-color .2s}
+.btn-primary{background:var(--cyan);color:var(--bg)}
+.btn-primary:hover{background:var(--cyan-lt);color:var(--bg);transform:translateY(-1px)}
+html[data-theme="light"] .btn-primary{background:var(--blue);color:#fff;
+  box-shadow:0 8px 26px rgba(37,99,235,.22)}
+html[data-theme="light"] .btn-primary:hover{background:var(--blue-dk);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--text)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+
+/* cards */
+.cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:28px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:22px}
+html[data-theme="light"] .card{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.card p{font-size:14.5px;color:var(--muted);margin:0}
+.card .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;background:var(--blue-glow);color:var(--blue);margin-bottom:14px;
+  font-family:var(--display);font-weight:700;font-size:15px}
+
+/* badge strip */
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.badge{font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px;
+  border:1px solid var(--line2);color:var(--muted)}
+.badge-live{border-color:color-mix(in srgb,var(--cyan) 55%,transparent);color:var(--cyan)}
+
+/* callout box (legal pages) */
+.box{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--cyan);
+  border-radius:10px;padding:16px 18px;margin:18px 0;max-width:680px}
+html[data-theme="light"] .box{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.box p:last-child{margin-bottom:0}
+
+/* document pages */
 .doc{padding:clamp(44px,6vw,72px) 0 clamp(56px,7vw,88px);max-width:760px}
-.doc h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,44px);
-  letter-spacing:-.02em;line-height:1.1;margin-bottom:10px}
 .doc .updated{font-size:13px;color:var(--muted);margin-bottom:8px}
 .doc .intro{font-size:17px;color:var(--muted);margin:22px 0 8px}
-.doc h2{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em;
-  line-height:1.3;margin:40px 0 10px;padding-top:26px;border-top:1px solid var(--line);
-  scroll-margin-top:84px}
-.doc h3{font-size:15.5px;font-weight:700;margin:22px 0 4px;scroll-margin-top:84px}
+.doc h2{font-size:21px;margin:40px 0 10px;padding-top:26px;border-top:1px solid var(--line)}
+.doc h3{font-size:15.5px;margin:22px 0 4px;scroll-margin-top:86px}
 .doc p{font-size:15.5px;margin-bottom:14px}
 .doc ul{margin:0 0 16px 20px}
 .doc li{font-size:15.5px;margin-bottom:7px}
-.doc strong{font-weight:700}
-.doc .box{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--cyan);
-  border-radius:10px;padding:16px 18px;margin:18px 0}
-html[data-theme="light"] .doc .box{box-shadow:0 6px 20px rgba(13,23,41,.06)}
-.doc .box p:last-child{margin-bottom:0}
-.doc dl{margin:0 0 16px}
 .doc dt{font-weight:700;font-size:15.5px;margin-top:12px}
 .doc dd{font-size:15.5px;color:var(--muted);margin-left:0}
 
-/* footer — identical to the main site */
+/* roles */
+.role{background:var(--bg2);border:1px solid var(--line);border-radius:16px;
+  margin-bottom:16px;overflow:hidden}
+html[data-theme="light"] .role{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.role summary{list-style:none;cursor:pointer;padding:24px;display:block}
+.role summary::-webkit-details-marker{display:none}
+.role summary:hover{background:rgba(127,127,127,.04)}
+.role-top{display:flex;align-items:flex-start;gap:16px}
+.role-top h3{font-size:19px;margin-bottom:6px}
+.role-sum{font-size:14.5px;color:var(--muted);margin:0}
+.role-toggle{margin-left:auto;flex:0 0 auto;font-size:13px;font-weight:700;color:var(--blue);
+  display:flex;align-items:center;gap:6px;white-space:nowrap}
+.role-toggle svg{width:12px;height:12px;transition:transform .2s}
+.role[open] .role-toggle svg{transform:rotate(180deg)}
+.role[open] .role-toggle .lbl-more{display:none}
+.role:not([open]) .role-toggle .lbl-less{display:none}
+.role-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.role-body{padding:0 24px 26px;border-top:1px solid var(--line);margin-top:4px;padding-top:22px}
+.role-body h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+.role-body h4:first-child{margin-top:0}
+.role-body ul{margin:0 0 4px 20px}
+.role-body li{font-size:14.5px;margin-bottom:6px}
+.role-body .apply{margin-top:22px}
+
+/* forms */
+.formwrap{background:var(--bg2);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(22px,3vw,30px);max-width:760px}
+html[data-theme="light"] .formwrap{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media (max-width:620px){ .grid2{grid-template-columns:1fr} }
+.f{margin-bottom:16px}
+.f label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.f .opt{font-weight:400;color:var(--muted)}
+.f input,.f select,.f textarea{width:100%;font-family:var(--body);font-size:15px;
+  color:var(--text);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;
+  padding:11px 13px;transition:border-color .18s}
+html[data-theme="light"] .f input,html[data-theme="light"] .f select,
+html[data-theme="light"] .f textarea{background:#fbfcfe}
+.f textarea{min-height:104px;resize:vertical;line-height:1.6}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--blue);outline:none}
+.f .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.f input[type=file]{padding:9px;cursor:pointer}
+.f input[type=file]::file-selector-button{font-family:var(--body);font-size:13px;font-weight:700;
+  margin-right:12px;padding:7px 14px;border-radius:7px;border:1px solid var(--line2);
+  background:var(--bg2);color:var(--text);cursor:pointer}
+.check{display:flex;gap:11px;align-items:flex-start;font-size:14px;margin:4px 0 20px;
+  line-height:1.55}
+.check input{width:17px;height:17px;flex:0 0 auto;margin-top:3px;accent-color:var(--blue)}
+.f-msg{font-size:14px;margin-top:14px;padding:12px 14px;border-radius:9px;display:none}
+.f-msg.err{display:block;background:rgba(226,75,74,.12);color:#E24B4A;
+  border:1px solid rgba(226,75,74,.3)}
+.f-ok{display:none;text-align:center;padding:12px 0}
+.f-ok h3{font-size:19px;margin-bottom:8px}
+.f-ok p{color:var(--muted);font-size:15px;max-width:440px;margin:0 auto}
+.f-ok .tick{width:46px;height:46px;border-radius:50%;background:var(--blue-glow);
+  color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.f-ok .tick svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* footer */
 footer{padding:36px 0;border-top:1px solid var(--line);background:var(--bg2)}
 html[data-theme="light"] footer{background:#eef2f9}
 .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
@@ -124,9 +230,10 @@ html[data-theme="light"] footer{background:#eef2f9}
     </a>
     <nav class="nav" aria-label="Main">
       <a class="nav-a" href="/">Home</a>
-      <a class="nav-a" href="/privacy/">Privacy</a>
-      <a class="nav-a" href="/terms/">Terms</a>
-      <a class="nav-a" href="mailto:hello@voicecaptures.com">Contact</a>
+      <a class="nav-a" href="/about/">About</a>
+      <a class="nav-a" href="/careers/">Careers</a>
+      <a class="nav-a" href="/about/#contact">Contact</a>
+      <a class="nav-a" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
     </nav>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch theme" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
@@ -137,7 +244,7 @@ html[data-theme="light"] footer{background:#eef2f9}
 
 <main class="wrap doc">
 <h1>Terms of Service</h1>
-<p class="updated">Last updated: 28 September 2026</p>
+<p class="updated">Last updated: 30 September 2026</p>
 
 <p class="intro">These terms cover the use of VoiceCaptures, a service operated by
 <strong>Amirhossein Kiani</strong>, a sole proprietor based in Toronto, Ontario, Canada, trading as
@@ -208,8 +315,8 @@ federal laws of Canada that apply there.</p>
 <p><strong>Amirhossein Kiani</strong>, trading as VoiceCaptures<br>
 Toronto, Ontario, Canada<br>
 <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></p>
-
 </main>
+
 
 <footer>
   <div class="wrap foot">
@@ -218,6 +325,8 @@ Toronto, Ontario, Canada<br>
       <div class="tl">Answers &middot; Qualifies &middot; Books</div>
     </div>
     <div class="foot-legal">
+      <a href="/about/">About</a>
+      <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>
       <a href="/terms/">Terms of Service</a>
     </div>
@@ -246,6 +355,7 @@ Toronto, Ontario, Canada<br>
   });
 })();
 </script>
+
 
 </body>
 </html>
