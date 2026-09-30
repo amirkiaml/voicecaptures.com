@@ -18,7 +18,10 @@ ROOT = pathlib.Path(__file__).parent
 UPDATED = "30 September 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
-LEGAL = "Amirhossein Kiani"
+# The legal owner's name is deliberately not published. Carriers and
+# regulators get it from the registration record; the site shows the
+# trading name only.
+BRAND = "VoiceCaptures"
 API = "https://torontoleads-production.up.railway.app"
 CAL = "https://calendly.com/hello-voicecaptures"
 
@@ -953,15 +956,14 @@ PRIVACY_BODY = f"""<main class="wrap doc">
 <h1>Privacy Policy</h1>
 <p class="updated">Last updated: {UPDATED}</p>
 
-<p class="intro">VoiceCaptures is a trading name of <strong>{LEGAL}</strong>, a sole
-proprietor based in {ADDR}. This policy explains what we collect when our AI
-voice assistant answers a call on behalf of one of our business clients, what we
-do with it, and how to have it deleted.</p>
+<p class="intro"><strong>{BRAND}</strong> is a registered business based in
+{ADDR}. This policy explains what we collect when our AI voice assistant answers
+a call on behalf of one of our business clients, what we do with it, and how to
+have it deleted.</p>
 
 <h2>Who we are</h2>
-<p>The registered business behind this service is <strong>{LEGAL}</strong>, trading
-as <strong>VoiceCaptures</strong>, {ADDR}. You can reach us at
-<a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p>The registered business behind this service is <strong>{BRAND}</strong>,
+{ADDR}. You can reach us at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 <p>We provide an AI voice assistant that answers inbound phone calls for small
 businesses. When you call one of our clients, you may be speaking to our
 assistant rather than a person.</p>
@@ -1040,7 +1042,7 @@ shared with them only so that the service can run, and for no other purpose.</p>
 roughly when you called, so we can find the record.</p>
 
 <h2>Contact</h2>
-<p><strong>{LEGAL}</strong>, trading as VoiceCaptures<br>
+<p><strong>{BRAND}</strong><br>
 {ADDR}<br>
 <a href="mailto:{EMAIL}">{EMAIL}</a></p>
 </main>
@@ -1050,9 +1052,8 @@ TERMS_BODY = f"""<main class="wrap doc">
 <h1>Terms of Service</h1>
 <p class="updated">Last updated: {UPDATED}</p>
 
-<p class="intro">These terms cover the use of VoiceCaptures, a service operated by
-<strong>{LEGAL}</strong>, a sole proprietor based in {ADDR}, trading as
-<strong>VoiceCaptures</strong>.</p>
+<p class="intro">These terms cover the use of <strong>{BRAND}</strong>, a
+registered business based in {ADDR}.</p>
 
 <h2>The service</h2>
 <p>VoiceCaptures provides an AI voice assistant that answers inbound phone calls
@@ -1116,7 +1117,7 @@ for help, or email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 federal laws of Canada that apply there.</p>
 
 <h2>Contact</h2>
-<p><strong>{LEGAL}</strong>, trading as VoiceCaptures<br>
+<p><strong>{BRAND}</strong><br>
 {ADDR}<br>
 <a href="mailto:{EMAIL}">{EMAIL}</a></p>
 </main>
