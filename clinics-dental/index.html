@@ -127,6 +127,9 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
 /* Below tablet the links crowd the logo; the page has its own switcher and
    anchors, so the nav simply steps aside. */
 @media (max-width:1000px){ .nav{display:none} }
+/* ---- "Book a call" is the highest-intent action in the nav, and as plain
+   text it read as one more link. Amber keeps it clear of the blue primary
+   CTA and the cyan demo-line dot, so the three don't compete. ---- */
 .bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
 .brand:hover{color:inherit;opacity:.85}
@@ -1150,6 +1153,39 @@ footer{background:#07101e}
 @media(max-width:720px){.hero{padding-top:54px}.stats{margin-top:45px}.mock{padding:9px}.bar{padding:12px 18px}}
 @media(max-width:480px){h1{font-size:clamp(38px,10vw,52px)}.stat{padding:14px 10px}.stat b{font-size:20px}.stat b.xlong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.tier,.soon-card,.btn{transition:none}}
+
+/* ---- "Book a call" is the highest-intent action in the nav, and as plain
+   text it read as one more link. Amber keeps it clear of the blue primary
+   CTA and the cyan demo-line dot, so the three don't compete. The themed
+   selectors are deliberate: the generic .nav-a rules are themed too. ---- */
+html .nav-a.nav-cal,
+html[data-theme="light"] .nav-a.nav-cal,
+html[data-theme="dark"] .nav-a.nav-cal{
+  background:#F59E0B;color:#1a1205;font-weight:700;border-color:#F59E0B}
+html .nav-a.nav-cal:hover,
+html[data-theme="light"] .nav-a.nav-cal:hover,
+html[data-theme="dark"] .nav-a.nav-cal:hover{
+  background:#FBBF24;color:#1a1205;border-color:#FBBF24}
+html[data-theme="light"] .nav-a.nav-cal{box-shadow:0 4px 14px rgba(245,158,11,.28)}
+
+/* ---- Ambient blob, toned right down. It sits behind a cut-out person, so
+   it is scenery: at the earlier weight it competed with the subject and the
+   dark theme's saturated navy read as a different brand. Both themes now use
+   a near-neutral wash — white in the dark, a barely-there blue-grey in the
+   light — and the orbit dots lose their glow. ---- */
+html[data-theme="light"] .blob-shape,
+html:not([data-theme="dark"]) .blob-shape{
+  background:linear-gradient(150deg,rgba(37,99,235,.055),rgba(14,147,184,.028))}
+html[data-theme="light"] .blob-orbit .bo{stroke:rgba(37,99,235,.13)}
+html[data-theme="light"] .blob-orbit .bo2{opacity:.45}
+html[data-theme="light"] .blob-orbit .bd{fill:#2563EB;opacity:.42;filter:none}
+
+html[data-theme="dark"] .blob-shape{
+  background:linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018))}
+html[data-theme="dark"] .blob-orbit .bo{stroke:rgba(255,255,255,.12)}
+html[data-theme="dark"] .blob-orbit .bo2{opacity:.5}
+html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.28))}
 </style>
 </head>
 <body>
@@ -1201,7 +1237,7 @@ footer{background:#07101e}
           <a href="/about/#contact"><i></i><b>Contact</b><em>Send us a message</em></a>
         </div>
       </div>
-      <a class="nav-a" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
+      <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
     </nav>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to light mode" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
