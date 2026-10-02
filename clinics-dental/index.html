@@ -1129,9 +1129,10 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{
   70% {box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}
   100%{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}
 }
-.nav-dash .tag{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
-  border-radius:4px;padding:2px 4px}
+/* The pulsing dot already says "new"; the chip beside it was saying it twice
+   and costing the bar 34px it does not have. The compact panel keeps it,
+   where there is room. */
+.nav-dash .tag{display:none}
 @media (prefers-reduced-motion:reduce){ .nav-dash .dot{animation:none} }
 
 /* Between the nav's hide breakpoint and ~1180px the bar is now one item
@@ -1278,6 +1279,23 @@ header .btn.nav-cta::before{width:36px;height:36px}
   border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 html[data-theme="light"] .wb-band{background:linear-gradient(180deg,#eef2f9,var(--bg))}
 .wb-band .sub{margin-bottom:28px}
+
+/* ---- Nav, unboxed -------------------------------------------------------
+   Every item was a bordered pill, so seven of them read as a wall of boxes
+   and the bar had no hierarchy: the two that matter (Book a call, Members)
+   looked the same weight as the four that are just links. Plain text links,
+   with the border reserved for the two that earn it — which is also what the
+   standalone pages already do, so the nav now matches across the site. ---- */
+.nav .nav-a:not(.nav-cal):not(.nav-dash),
+html[data-theme="light"] .nav .nav-a:not(.nav-cal):not(.nav-dash),
+html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash){
+  background:none;border-color:transparent;box-shadow:none;color:var(--muted);
+  font-size:14px;font-weight:500;padding:0 10px}
+.nav .nav-a:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="light"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
+  background:none;border-color:transparent;color:var(--text)}
+.nav{gap:2px}
 </style>
 </head>
 <body>
@@ -1701,8 +1719,8 @@ html[data-theme="light"] .wb-band{background:linear-gradient(180deg,#eef2f9,var(
 <section class="wb-band">
   <div class="wrap center">
     <h2>Already have a customer list? <span class="hl">Turn it into bookings.</span></h2>
-    <p class="sub">We text the people you haven&rsquo;t seen in a year, call the ones
-    who say yes, and book them back onto your calendar.<br>
+    <p class="sub">We reach out to the customers you haven&rsquo;t seen in a year
+    and book the ones who are ready back onto your calendar.<br>
     You pay per booked appointment &mdash; nothing if nothing books.</p>
     <a class="btn btn-primary" href="/win-back/">See how win-back works</a>
   </div>

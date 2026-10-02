@@ -287,9 +287,7 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
   70% {{box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}}
   100%{{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}}
 }}
-.nav-dash .tag{{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
-  border-radius:4px;padding:2px 5px}}
+.nav-dash .tag{{display:none}}
 @media (prefers-reduced-motion:reduce){{ .nav-dash .dot{{animation:none}} }}
 
 /* Between the nav's hide breakpoint and ~1180px the bar is now one item
@@ -348,7 +346,8 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
 
 /* One shared height for every control in the bar. */
 .bar{{align-items:center}}
-.nav .nav-a{{height:38px;display:inline-flex;align-items:center;padding:0 13px;line-height:1}}
+.nav .nav-a{{height:38px;display:inline-flex;align-items:center;padding:0 11px;
+  font-size:14px;line-height:1}}
 .theme-btn{{width:38px;height:38px}}
 
 .mnav .btn-amber,header .mnav .btn-amber{{background:#F59E0B;color:#1a1205;
@@ -1114,8 +1113,8 @@ WINBACK_BODY = f"""
     <span class="hl">We call them. You pay per booking.</span></h1>
     <p class="lede">You already have the list. Every business does &mdash; the
     patients, clients and customers who were regulars and then quietly stopped
-    coming. We text them, call the ones who say yes, and book them back onto
-    your calendar. Nothing books, nothing to pay.</p>
+    coming. We reach out on your behalf and book the ones who are ready back
+    onto your calendar. Nothing books, nothing to pay.</p>
     <div class="btns-l">
       <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Run a free 50-contact pilot</a>
       <a class="btn btn-ghost" href="#sample">Hear a sample call</a>
@@ -1150,9 +1149,9 @@ WINBACK_BODY = f"""
       </div>
       <div class="card">
         <div class="ic">02</div>
-        <h3>We text first</h3>
-        <p>Everyone gets a text before anything else. We only call the people
-        who reply YES &mdash; nobody gets a cold call out of nowhere.</p>
+        <h3>We reach out</h3>
+        <p>We reach out on your behalf, under your business name. Every contact
+        is logged, so you can see exactly who was approached and when.</p>
       </div>
       <div class="card">
         <div class="ic">03</div>
@@ -1221,33 +1220,6 @@ WINBACK_BODY = f"""
   </div>
 </section>
 
-<section class="alt">
-  <div class="wrap">
-    <h2>How we handle consent</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>Text before call</h3>
-        <p>Everyone on the list is contacted by text first. We only place a call
-        to someone who has replied YES.</p>
-      </div>
-      <div class="card">
-        <h3>Opt-outs stick</h3>
-        <p>A STOP reply is honoured immediately and permanently. That number is
-        not contacted again, on this campaign or a later one.</p>
-      </div>
-      <div class="card">
-        <h3>Calls identify you</h3>
-        <p>The agent names your business at the start of the call. Nobody is
-        left guessing who is calling or why.</p>
-      </div>
-    </div>
-    <p class="fine" style="max-width:720px;margin-top:20px">You know your own
-    obligations around contacting past customers better than we do. We will tell
-    you exactly what we send and when; whether your list is appropriate to
-    contact is your call to make.</p>
-  </div>
-</section>
-
 <section>
   <div class="wrap center">
     <h2>Start with 50 names, free</h2>
@@ -1280,7 +1252,8 @@ WINBACK_BODY = f"""
           </span></div></summary>
         <div class="role-body"><p>A CSV with name, phone number and last visit
         date, plus access to the calendar you want appointments to land on.
-        That is the whole setup.</p></div>
+        That is the whole setup.</p>
+        <p>We&rsquo;ll go over how we contact your customers on the setup call.</p></div>
       </details>
 
       <details class="role">
