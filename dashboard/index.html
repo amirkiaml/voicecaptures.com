@@ -188,6 +188,13 @@
   .add-status input { flex: 1 1 180px; }
   .chip .x { border: 0; background: none; color: var(--muted); cursor: pointer; font: inherit; padding: 0 0 0 2px; }
   .chip .ca { color: var(--muted); font-size: 12px; }
+  .turn.tool .bub { background: transparent; border: 1px dashed var(--line); font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); white-space: pre-wrap; }
+  .chk-inline { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); margin: 6px 0; }
+  .scoring { margin-top: 10px; max-width: 720px; }
+  .scoring .k2 { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 4px; }
+  .scoring .kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 14px; }
+  .scoring .kv .k { color: var(--muted); margin: 0; text-transform: none; letter-spacing: 0; font-size: 14px; }
+  .small { font-size: 12px; }
   .admin-note { color: var(--warn); font-size: 12px; margin-top: 4px; }
   .gate { max-width: 460px; margin: 10vh auto; text-align: center; }
   .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
@@ -222,7 +229,11 @@
       <label class="premium-switch" id="premiumWrap" hidden title="Only admins see this switch">
         <input type="checkbox" id="premiumToggle"> <span>Premium: recordings &amp; transcripts</span>
       </label>
+      <label class="premium-switch" id="reviewWrap" hidden title="Only admins see this switch">
+        <input type="checkbox" id="reviewToggle"> <span>Call review: tool calls &amp; scoring</span>
+      </label>
       <button class="gear" id="backfillBtn" type="button" hidden title="Admins only">⟲ Fetch past recordings</button>
+      <a class="gear" id="allCallsLink" href="/admin/" hidden style="text-decoration:none">All calls (every assistant) →</a>
       <span class="admin-note" id="backfillMsg"></span>
       <select class="biz-select" id="bizSelect" hidden aria-label="Choose business"></select>
     </div>
@@ -564,19 +575,22 @@ const fmtT = t => t == null ? "" : `${Math.floor(t / 60)}:${String(Math.floor(t 
 
 function renderPremium(c, i) {
   if (!last) return "";
+  const reviewBtn = last.canReview && c.vapi_call_id
+    ? `<div class="k">Call review</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">Show scoring &amp; tool calls</button><div id="tx${i}"></div>` : "";
   if (!last.canSeeRecordings) {
-    if (!c.has_recording) return "";
-    return `<div class="locked"><span class="pbadge">PREMIUM</span>
+    const lock = c.has_recording ? `<div class="locked"><span class="pbadge">PREMIUM</span>
       <span>🔒 Listen to this call and read the full transcript.</span>
-      <a href="mailto:hello@voicecaptures.com?subject=Premium%20recordings%20%26%20transcripts">Upgrade</a></div>`;
+      <a href="mailto:hello@voicecaptures.com?subject=Premium%20recordings%20%26%20transcripts">Upgrade</a></div>` : "";
+    return reviewBtn + lock;
   }
-  const note = last.isAdmin && !last.features.recordings
-    ? `<div class="admin-note">Admin preview — this client can't see recordings or transcripts (Premium is off).</div>` : "";
+  const off = [!last.features.recordings && "Premium", !last.features.review && "Call review"].filter(Boolean);
+  const note = last.isAdmin && off.length
+    ? `<div class="admin-note">Admin preview — this client doesn't have: ${off.join(", ")}.</div>` : "";
   // No src yet: recording links expire, so a fresh one is fetched when the call is opened.
   const audio = c.has_recording && c.vapi_call_id
     ? `<div class="k">Recording</div><audio controls preload="none" id="au${i}" data-call="${esc(c.vapi_call_id)}"></audio><div class="admin-note" id="aue${i}"></div>` : "";
   const tx = c.vapi_call_id
-    ? `<div class="k">Transcript</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">Show transcript</button><div id="tx${i}"></div>` : "";
+    ? `<div class="k">Transcript${last.canReview ? " &amp; review" : ""}</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">${last.canReview ? "Show transcript &amp; scoring" : "Show transcript"}</button><div id="tx${i}"></div>` : "";
   return note + audio + tx;
 }
 
@@ -602,6 +616,20 @@ function ensureAudio(i) {
   return audioLoads.get(a);
 }
 
+function renderAnalysis(a, can) {
+  if (!can) return "";
+  if (!a || !Object.keys(a).length) return `<div class="muted small" style="margin-top:8px">No scoring was saved for this call.</div>`;
+  const row = (k, v) => `<div class="k">${esc(k)}</div><div>${esc(typeof v === "object" ? JSON.stringify(v) : v)}</div>`;
+  let html = `<div class="scoring">`;
+  if (a.successEvaluation != null) html += `<div class="k2">Success evaluation</div><div class="kv">${row("Result", a.successEvaluation)}</div>`;
+  if (a.structuredData && typeof a.structuredData === "object") html += `<div class="k2">Scoring</div><div class="kv">${Object.entries(a.structuredData).map(([k, v]) => row(k, v)).join("")}</div>`;
+  if (a.structuredOutputs) {
+    const list = Array.isArray(a.structuredOutputs) ? a.structuredOutputs : Object.values(a.structuredOutputs);
+    html += `<div class="k2">Structured outputs</div><div class="kv">${list.map((o, i) => row(o?.name || `#${i + 1}`, o?.result ?? o)).join("")}</div>`;
+  }
+  return html + `</div>`;
+}
+
 async function loadTranscript(btn) {
   const box = $("tx" + btn.dataset.i);
   btn.disabled = true; btn.textContent = "Loading…";
@@ -610,12 +638,17 @@ async function loadTranscript(btn) {
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "Could not load the transcript");
     btn.remove();
+    const scoring = renderAnalysis(d.analysis, d.canReview);
     if (d.turns && d.turns.length) {
-      box.innerHTML = `<div class="tx">${d.turns.map(t => `
-        <div class="turn ${t.role === "caller" ? "caller" : "assistant"}">
-          <div class="who">${t.role === "caller" ? "Caller" : "Receptionist"}${t.t != null ? `<br><button type="button" data-t="${t.t}" title="Play from here">${fmtT(t.t)}</button>` : ""}</div>
+      const hasTools = d.turns.some(t => t.role === "tool");
+      box.innerHTML = (hasTools && d.canTranscript ? `<label class="chk-inline"><input type="checkbox" data-tools checked> show tool calls</label>` : "")
+        + `<div class="tx">${d.turns.map(t => `
+        <div class="turn ${t.role === "caller" ? "caller" : t.role === "tool" ? "tool" : "assistant"}" ${t.role === "tool" ? 'data-tool="1"' : ""}>
+          <div class="who">${t.role === "caller" ? "Caller" : t.role === "tool" ? "Tool" : "Receptionist"}${t.t != null && d.canTranscript ? `<br><button type="button" data-t="${t.t}" title="Play from here">${fmtT(t.t)}</button>` : t.t != null ? `<br>${fmtT(t.t)}` : ""}</div>
           <div class="bub">${esc(t.text)}</div>
-        </div>`).join("")}</div>`;
+        </div>`).join("")}</div>` + scoring;
+      const tg = box.querySelector("[data-tools]");
+      if (tg) tg.onchange = () => box.querySelectorAll('[data-tool="1"]').forEach(el => el.hidden = !tg.checked);
       box.querySelectorAll("button[data-t]").forEach(b => b.onclick = async e => {
         e.stopPropagation();
         const audio = await ensureAudio(btn.dataset.i);
@@ -624,23 +657,23 @@ async function loadTranscript(btn) {
         if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, { once: true }), audio.load();
       });
     } else if (d.text) {
-      box.innerHTML = `<div class="tx"><div class="turn"><div class="bub">${esc(d.text)}</div></div></div>`;
+      box.innerHTML = `<div class="tx"><div class="turn"><div class="bub">${esc(d.text)}</div></div></div>` + scoring;
     } else {
-      box.innerHTML = `<div class="muted" style="margin-top:6px">No transcript was saved for this call.</div>`;
+      box.innerHTML = (d.canTranscript ? `<div class="muted" style="margin-top:6px">No transcript was saved for this call.</div>` : "") + scoring;
     }
   } catch (e) {
     if (e.message === "Signed out") return;
-    btn.disabled = false; btn.textContent = "Show transcript";
+    btn.disabled = false; btn.textContent = "Try again";
     box.innerHTML = `<div class="admin-note">${esc(e.message)}</div>`;
   }
 }
 
-$("premiumToggle").onchange = async e => {
+const featureToggle = key => async e => {
   const on = e.target.checked;
   e.target.disabled = true;
   try {
     const r = await api(`/api/dashboard/admin/features`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordings: on })
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [key]: on })
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "Could not update");
@@ -650,6 +683,8 @@ $("premiumToggle").onchange = async e => {
     alertMsg(err.message);
   } finally { e.target.disabled = false; }
 };
+$("premiumToggle").onchange = featureToggle("recordings");
+$("reviewToggle").onchange = featureToggle("review");
 $("backfillBtn").onclick = async () => {
   const btn = $("backfillBtn"), msg = $("backfillMsg");
   btn.disabled = true; msg.textContent = "Fetching from Vapi… this can take a minute.";
@@ -814,7 +849,10 @@ async function load() {
     business = data.businessId;
     renderBusinesses(data.businesses, data.businessId, data.isAdmin);
     $("premiumWrap").hidden = !data.isAdmin;
+    $("reviewWrap").hidden = !data.isAdmin;
+    $("reviewToggle").checked = !!(data.features && data.features.review);
     $("backfillBtn").hidden = !data.isAdmin;
+    $("allCallsLink").hidden = !data.isAdmin;
     $("premiumToggle").checked = !!(data.features && data.features.recordings);
     $("biz").textContent = data.businessName;
     document.title = `${data.businessName} · Calls`;
