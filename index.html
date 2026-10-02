@@ -1166,6 +1166,70 @@ html[data-theme="dark"] .shot .th-light{display:none}
 html[data-theme="dark"] .shot .th-dark{display:block}
 .soon-tag.live{color:#16A34A;border-color:color-mix(in srgb,#16A34A 45%,transparent)}
 html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
+
+/* ---- Compact nav -------------------------------------------------------
+   The bar used to let flexbox shrink its children below their content, so
+   past a certain width the pills slid under each other instead of
+   overflowing — it looked like a rendering fault and nothing reported it.
+   Items are now rigid, and the whole bar swaps to a burger before it can
+   run out of room. ---- */
+.bar > *{flex:0 0 auto}
+.nav > *{flex:0 0 auto}
+.nav-a{white-space:nowrap}
+.brand span{white-space:nowrap}
+.brand{margin-right:auto}
+.nav{margin-left:0}
+
+.burger{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
+  background:none;border:1px solid var(--line2);
+  align-items:center;justify-content:center;flex-direction:column;gap:4px;
+  margin-left:auto;transition:border-color .18s}
+.burger span{display:block;width:17px;height:2px;border-radius:2px;background:var(--text);
+  transition:transform .22s,opacity .18s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+.mnav{border-top:1px solid var(--line);background:var(--bg2);
+  max-height:calc(100vh - 68px);overflow-y:auto}
+.mnav[hidden]{display:none}
+.mnav-in{max-width:1060px;margin:0 auto;padding:14px clamp(18px,4vw,24px) 20px}
+.mnav-a{display:block;width:100%;text-align:left;font-family:var(--body);font-size:16px;
+  font-weight:600;color:var(--text);background:none;border:0;cursor:pointer;
+  margin:0;padding:11px 12px;border-radius:10px;text-decoration:none;line-height:1.4}
+.mnav-a:hover{background:rgba(127,127,127,.09);color:var(--text)}
+.mnav-a.sub{font-weight:500;font-size:15px;color:var(--muted);padding-left:20px}
+.mnav-a.sub:hover{color:var(--text)}
+.mnav-h{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:14px 0 4px;padding:0 12px}
+.mnav-dash{display:flex;align-items:center;gap:9px;font-size:15.5px;font-weight:700;
+  color:#fff;background:#E24B4A;border-radius:10px;padding:12px 14px;margin-bottom:6px;
+  text-decoration:none}
+.mnav-dash:hover{background:#D13B3A;color:#fff}
+.mnav-dash .dot{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  animation:dashblip 1.9s ease-out infinite}
+.mnav-dash .tag{margin-left:auto;font-style:normal;font-size:10px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.22);
+  border-radius:4px;padding:2px 6px}
+.mnav-foot{display:flex;flex-direction:column;gap:9px;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--line)}
+.mnav-foot .btn{width:100%;font-size:14.5px;padding:12px 18px}
+/* The panel lives inside <header>, so header .btn-ghost{color:#fff} was
+   painting these two white on a white panel. */
+.mnav .btn-ghost,header .mnav .btn-ghost{background:var(--bg3);color:var(--text);
+  border-color:var(--line2);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.mnav .btn-ghost:hover,header .mnav .btn-ghost:hover{background:rgba(127,127,127,.12);
+  color:var(--text);border-color:var(--line2)}
+
+/* Swap to the burger while the inline bar still fits comfortably, rather than
+   at the point where it starts to break. */
+@media (max-width:1240px){
+  .nav{display:none}
+  .burger{display:flex}
+  .nav-cta{display:none}
+  .theme-btn{margin-left:0;margin-right:0}
+}
+@media (min-width:1241px){ .mnav{display:none} }
 </style>
 </head>
 <body>
@@ -1218,13 +1282,46 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
         </div>
       </div>
       <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
     </nav>
+    <button type="button" class="burger" id="burger" aria-label="Menu"
+            aria-expanded="false" aria-controls="mnav">
+      <span></span><span></span><span></span>
+    </button>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to light mode" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
     <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
+  </div>
+
+  <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
+       without overlapping them, so the whole thing moves in here rather than
+       disappearing and leaving a phone visitor with no way to reach Members
+       or Careers. -->
+  <div class="mnav" id="mnav" hidden>
+    <div class="mnav-in">
+      <a class="mnav-dash" href="/login">
+        <span class="dot" aria-hidden="true"></span>Members dashboard
+        <em class="tag">New</em>
+      </a>
+      <button type="button" class="mnav-a" data-goto="personal">Personal line</button>
+      <p class="mnav-h">Businesses</p>
+      <button type="button" class="mnav-a sub" data-goto="home">Home services</button>
+      <button type="button" class="mnav-a sub" data-goto="food">Restaurants &amp; caf&eacute;s</button>
+      <button type="button" class="mnav-a sub" data-goto="clinic">Clinics &amp; dental</button>
+      <button type="button" class="mnav-a sub" data-goto="other">Something else</button>
+      <p class="mnav-h">Company</p>
+      <a class="mnav-a sub" href="/about/">About</a>
+      <a class="mnav-a sub" href="/careers/">Careers</a>
+      <a class="mnav-a sub" href="/about/#contact">Contact</a>
+      <div class="mnav-foot">
+        <a class="btn btn-ghost" href="#demo" data-close>Try the demo line</a>
+        <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures"
+           target="_blank" rel="noopener">Book a call</a>
+        <a class="btn btn-primary" href="#yourline" data-close>Try it on your business</a>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -2903,7 +3000,47 @@ if (!reduced && window.IntersectionObserver) {
     if (away) { away = false; if (V[key] && !V[key].audio) replayThread(); }
   }, { threshold: 0.35 }).observe(document.querySelector(".mk-panel"));
 }
+/* ---- Compact nav ----
+ * Shares select() with the inline nav, so a sector chosen here switches the
+ * page in place exactly as the dropdown does.
+ * ------------------------------------------------------------------ */
+(function(){
+  var btn = document.getElementById("burger"),
+      panel = document.getElementById("mnav");
+  if (!btn || !panel) return;
+
+  function close(){ panel.hidden = true; btn.setAttribute("aria-expanded","false"); }
+  function open(){ panel.hidden = false; btn.setAttribute("aria-expanded","true"); }
+
+  btn.addEventListener("click", function(e){
+    e.stopPropagation();
+    panel.hidden ? open() : close();
+  });
+
+  panel.addEventListener("click", function(e){
+    var go = e.target.closest("[data-goto]");
+    if (go) {
+      select(go.getAttribute("data-goto"));
+      close();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    // Anchor links need the panel out of the way before the scroll happens,
+    // or the target lands under a panel that is still open.
+    if (e.target.closest("a")) close();
+  });
+
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
+  // Resizing past the breakpoint leaves a panel open over a nav that is
+  // already visible.
+  window.addEventListener("resize", function(){
+    if (window.innerWidth > 1240 && !panel.hidden) close();
+  });
 })();
+
+})();
+
+
 
 
 </script>

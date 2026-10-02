@@ -105,7 +105,7 @@ html[data-theme="light"] header{{background:rgba(246,248,252,.85)}}
 .nav-a:hover{{color:var(--text);background:rgba(255,255,255,.06)}}
 .nav-a[aria-current="page"]{{color:var(--text);font-weight:700}}
 html[data-theme="light"] .nav-a:hover{{background:rgba(13,23,41,.05)}}
-@media (max-width:820px){{ .nav{{display:none}} }}
+
 /* ---- "Book a call" is the highest-intent action in the nav, and as plain
    text it read as one more link. Amber keeps it clear of the blue primary
    CTA and the cyan demo-line dot, so the three don't compete. ---- */
@@ -298,6 +298,47 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
   .nav-a{{padding:8px 9px;font-size:13px}}
   .nav-dash .tag{{display:none}}
 }}
+
+/* ---- Compact nav: same burger as the main site, so a phone visitor can
+   still reach Members, Careers and the rest. ---- */
+.bar > *{{flex:0 0 auto}}
+.nav > *{{flex:0 0 auto}}
+.brand{{margin-right:auto}}
+.nav{{margin-left:0}}
+.burger{{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
+  background:none;border:1px solid var(--line2);
+  align-items:center;justify-content:center;flex-direction:column;gap:4px;margin-left:auto}}
+.burger span{{display:block;width:17px;height:2px;border-radius:2px;background:var(--text);
+  transition:transform .22s,opacity .18s}}
+.burger[aria-expanded="true"] span:nth-child(1){{transform:translateY(6px) rotate(45deg)}}
+.burger[aria-expanded="true"] span:nth-child(2){{opacity:0}}
+.burger[aria-expanded="true"] span:nth-child(3){{transform:translateY(-6px) rotate(-45deg)}}
+.mnav{{border-top:1px solid var(--line);background:var(--bg2);
+  max-height:calc(100vh - 68px);overflow-y:auto}}
+.mnav[hidden]{{display:none}}
+.mnav-in{{max-width:1060px;margin:0 auto;padding:14px clamp(18px,4vw,24px) 20px}}
+.mnav-a{{display:block;width:100%;text-align:left;font-family:var(--body);font-size:16px;
+  font-weight:600;color:var(--text);background:none;border:0;cursor:pointer;margin:0;
+  padding:11px 12px;border-radius:10px;text-decoration:none;line-height:1.4}}
+.mnav-a:hover{{background:rgba(127,127,127,.09);color:var(--text)}}
+.mnav-dash{{display:flex;align-items:center;gap:9px;font-size:15.5px;font-weight:700;
+  color:#fff;background:#E24B4A;border-radius:10px;padding:12px 14px;margin-bottom:6px;
+  text-decoration:none}}
+.mnav-dash:hover{{background:#D13B3A;color:#fff}}
+.mnav-dash .dot{{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  animation:dashblip 1.9s ease-out infinite}}
+.mnav-dash .tag{{margin-left:auto;font-style:normal;font-size:10px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.22);
+  border-radius:4px;padding:2px 6px}}
+.mnav-foot{{display:flex;flex-direction:column;gap:9px;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--line)}}
+.mnav-foot .btn{{width:100%;font-size:14.5px;padding:12px 18px}}
+@media (max-width:900px){{
+  .nav{{display:none}}
+  .burger{{display:flex}}
+  .theme-btn{{margin-left:0}}
+}}
+@media (min-width:901px){{ .mnav{{display:none}} }}
 </style>
 </head>
 <body>
@@ -314,12 +355,32 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
       <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
       <a class="nav-a" href="/about/#contact">Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
     </nav>
+    <button type="button" class="burger" id="burger" aria-label="Menu"
+            aria-expanded="false" aria-controls="mnav">
+      <span></span><span></span><span></span>
+    </button>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch theme" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
+  </div>
+
+  <div class="mnav" id="mnav" hidden>
+    <div class="mnav-in">
+      <a class="mnav-dash" href="/login">
+        <span class="dot" aria-hidden="true"></span>Members dashboard
+        <em class="tag">New</em>
+      </a>
+      <a class="mnav-a" href="/">Home</a>
+      <a class="mnav-a" href="/about/">About</a>
+      <a class="mnav-a" href="/careers/">Careers</a>
+      <a class="mnav-a" href="/about/#contact">Contact</a>
+      <div class="mnav-foot">
+        <a class="btn btn-primary" href="{cal}" target="_blank" rel="noopener">Book a call</a>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -360,6 +421,24 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
     var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
     apply(next);
     try {{ localStorage.setItem(KEY, next); }} catch(e){{}}
+  }});
+}})();
+</script>
+
+<script>
+(function(){{
+  var btn = document.getElementById("burger"), panel = document.getElementById("mnav");
+  if (!btn || !panel) return;
+  function close(){{ panel.hidden = true; btn.setAttribute("aria-expanded","false"); }}
+  btn.addEventListener("click", function(e){{
+    e.stopPropagation();
+    if (panel.hidden) {{ panel.hidden = false; btn.setAttribute("aria-expanded","true"); }}
+    else close();
+  }});
+  panel.addEventListener("click", function(e){{ if (e.target.closest("a")) close(); }});
+  document.addEventListener("keydown", function(e){{ if (e.key === "Escape") close(); }});
+  window.addEventListener("resize", function(){{
+    if (window.innerWidth > 900 && !panel.hidden) close();
   }});
 }})();
 </script>
