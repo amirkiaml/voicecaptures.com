@@ -1153,7 +1153,7 @@ WINBACK_BODY = f"""
     seasonal service, the renewals nobody chased. We work through it and book the
     ones who are ready.</p>
     <div class="btns-l">
-      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
       <a class="btn btn-ghost" href="#sample">Hear a sample call</a>
     </div>
     <div class="badges" style="margin-top:22px">
@@ -1253,7 +1253,7 @@ WINBACK_BODY = f"""
           <li>Billing follows the <a href="#booking">booking rules below</a></li>
         </ul>
         <p class="pay-b"><span>Best for</span>Seeing results before committing.</p>
-        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
       </div>
 
       <div class="pay">
@@ -1271,7 +1271,7 @@ WINBACK_BODY = f"""
         </ul>
         <p class="pay-b"><span>Best for</span>A one-time push, like seasonal
         maintenance or annual recalls.</p>
-        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
       </div>
 
       <div class="pay">
@@ -1287,7 +1287,7 @@ WINBACK_BODY = f"""
         </ul>
         <p class="pay-b"><span>Best for</span>Businesses that want full ownership
         of the system and their data.</p>
-        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
       </div>
     </div>
 
@@ -1376,7 +1376,7 @@ WINBACK_BODY = f"""
     <p class="sub">We work the first 100 names at no cost. If it books people,
     we price the rest of the list. If it doesn&rsquo;t, you have lost nothing but
     the export.</p>
-    <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+    <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
   </div>
 </section>
 
@@ -1460,7 +1460,7 @@ WINBACK_BODY = f"""
       <span class="badge">Seasonal maintenance plans</span>
     </div>
     <div style="margin-top:30px">
-      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
     </div>
   </div>
 </section>
