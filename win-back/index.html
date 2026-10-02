@@ -370,6 +370,12 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 .procon h4{margin-top:0}
 .procon ul{margin:0 0 0 18px;padding:0}
 .procon li{font-size:14.5px;margin-bottom:8px;line-height:1.55}
+
+/* A one-word badge per card, so the three options can be told apart before
+   reading them. */
+.pay-badge{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
+  border-radius:5px;padding:4px 8px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -426,15 +432,15 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 <section class="wb-hero">
   <div class="wrap">
     <p class="eyebrow">Outbound campaigns</p>
-    <h1>Bring back customers<br><span class="hl">you already have.</span></h1>
-    <p class="lede">We call your past customers, book them on your calendar, and
-    send you the results.</p>
+    <h1>Send us the customers you haven&rsquo;t seen in a year.<br>
+    <span class="hl">We call them and book them back in.</span></h1>
+    <p class="lede">Pay per booking, per campaign, or own the system outright.</p>
     <p class="lede">You already have the list. Every business does &mdash; the
     clients who were regulars and then quietly stopped coming, the ones due for a
     seasonal service, the renewals nobody chased. We work through it and book the
     ones who are ready.</p>
     <div class="btns-l">
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
       <a class="btn btn-ghost" href="#sample">Hear a sample call</a>
     </div>
     <div class="badges" style="margin-top:22px">
@@ -524,49 +530,57 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 
     <div class="pays">
       <div class="pay">
-        <h3>Per campaign</h3>
-        <p class="pay-d">One flat price, start to finish.</p>
-        <p class="pay-h">What&rsquo;s included</p>
-        <ul class="pay-l">
-          <li>Campaign setup and a call script written for your business</li>
-          <li>All calling and AI usage</li>
-          <li>Bookings on your calendar</li>
-          <li>Results report</li>
-          <li>Support while the campaign runs</li>
-        </ul>
-        <p class="pay-b"><span>Best for</span>A clear one-time push, like seasonal
-        maintenance.</p>
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
-      </div>
-
-      <div class="pay">
+        <span class="pay-badge">Pay for results</span>
         <h3>Per booking</h3>
         <p class="pay-d">Pay only for appointments that land on your calendar.</p>
         <p class="pay-h">What&rsquo;s included</p>
         <ul class="pay-l">
-          <li>Everything in Per campaign</li>
-          <li>We cover all calling and AI usage</li>
-          <li>Small one-time setup fee</li>
+          <li>All calling and AI usage</li>
+          <li>No onboarding fee</li>
+          <li>Billing follows the <a href="#booking">booking rules below</a></li>
         </ul>
         <p class="pay-b"><span>Best for</span>Seeing results before committing.</p>
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
       </div>
 
       <div class="pay">
-        <h3>Custom <em>run it on your own accounts</em></h3>
-        <p class="pay-d">We build the system and hand it over, running on accounts
-        you own.</p>
+        <span class="pay-badge">Simplest</span>
+        <h3>Per campaign</h3>
+        <p class="pay-d">One flat price per campaign, start to finish.</p>
         <p class="pay-h">What&rsquo;s included</p>
         <ul class="pay-l">
-          <li>One-time build and handover</li>
-          <li>You pay the phone and AI providers directly, at cost &mdash; no
-              markup on usage</li>
+          <li>A call script tailored to your business</li>
+          <li>All calling and AI usage</li>
+          <li>Bookings on your calendar</li>
+          <li>Dashboard with recordings</li>
+          <li>Results report</li>
+          <li>Support during the campaign</li>
+        </ul>
+        <p class="pay-b"><span>Best for</span>A one-time push, like seasonal
+        maintenance or annual recalls.</p>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
+      </div>
+
+      <div class="pay">
+        <span class="pay-badge">Own it</span>
+        <h3>Custom</h3>
+        <p class="pay-d">We build the system and hand it over, running on phone
+        and AI accounts you own.</p>
+        <p class="pay-h">What&rsquo;s included</p>
+        <ul class="pay-l">
+          <li>One-time build fee</li>
+          <li>You pay the providers directly, at cost &mdash; no markup</li>
           <li>Support is optional: a monthly maintenance plan, or hourly</li>
         </ul>
-        <p class="pay-b"><span>Best for</span>Keeping everything in-house.</p>
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
+        <p class="pay-b"><span>Best for</span>Businesses that want full ownership
+        of the system and their data.</p>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
       </div>
     </div>
+
+    <p class="fine" style="margin-top:16px">The free 100-contact pilot applies to
+    Per booking and Per campaign. Custom is a build, so it starts with a scoping
+    call instead.</p>
 
     <details class="role" style="margin-top:22px">
       <summary><div class="role-top"><div><h3>Is Custom right for you?</h3>
@@ -595,6 +609,7 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
               <li>You manage your accounts and usage</li>
               <li>Upkeep when providers change their platforms, covered by the
                   maintenance plan or billed hourly</li>
+              <li>You&rsquo;re responsible for calling compliance</li>
               <li>Longer setup than a managed campaign</li>
             </ul>
           </div>
@@ -604,7 +619,7 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
   </div>
 </section>
 
-<section>
+<section id="booking">
   <div class="wrap">
     <h2>What counts as a booking</h2>
     <p class="lede">Worth being precise about, since on Per booking it is the only
@@ -644,10 +659,11 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 
 <section>
   <div class="wrap center">
-    <h2>Start with 50 names, free</h2>
-    <p class="sub">If it books people, we price the rest of the list. If it
-    doesn&rsquo;t, you have lost nothing but the export.</p>
-    <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
+    <h2>Start with 100 names, free</h2>
+    <p class="sub">We work the first 100 names at no cost. If it books people,
+    we price the rest of the list. If it doesn&rsquo;t, you have lost nothing but
+    the export.</p>
+    <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
   </div>
 </section>
 
@@ -672,12 +688,12 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
         <div class="role-body"><p>A CSV with name, phone number and last visit date, plus access to the calendar you want appointments to land on. That is the whole setup.</p><p>We&rsquo;ll go over how we contact your customers on the setup call.</p></div>
       </details>
       <details class="role">
-        <summary><div class="role-top"><div><h3>Who pays for the AI and phone costs?</h3></div>
+        <summary><div class="role-top"><div><h3>Who pays for the calling and AI costs?</h3></div>
           <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>Per campaign and Per booking: included. We cover all calling and AI usage, and it is already in the price.</p><p>Custom: you pay the providers directly, at cost. We put no markup on usage.</p></div>
+        <div class="role-body"><p>Per booking and Per campaign: included &mdash; all calling and AI usage is covered.</p><p>Custom: you pay the providers directly, at cost. We put no markup on usage.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>Do you provide support?</h3></div>
@@ -685,7 +701,7 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>Included with the inbound receptionist, with Per campaign and with Per booking.</p><p>Custom: optional. Either a monthly maintenance plan &mdash; updates when providers change their platforms, script changes, fixes &mdash; or hourly.</p></div>
+        <div class="role-body"><p>Included for Per booking and Per campaign.</p><p>Custom: optional. Either a monthly maintenance plan &mdash; updates when providers change their platforms, script changes, fixes &mdash; or hourly.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>What about no-shows?</h3></div>
@@ -731,7 +747,7 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <span class="badge">Seasonal maintenance plans</span>
     </div>
     <div style="margin-top:30px">
-      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 15-min call</a>
+      <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book the 15-minute call</a>
     </div>
   </div>
 </section>
