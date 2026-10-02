@@ -264,6 +264,40 @@ html[data-theme="light"] .nav-a.nav-cal:hover,
 html[data-theme="dark"] .nav-a.nav-cal:hover{{
   background:#FBBF24;color:#1a1205;border-color:#FBBF24}}
 html[data-theme="light"] .nav-a.nav-cal{{box-shadow:0 4px 14px rgba(245,158,11,.28)}}
+
+/* ---- Client dashboard link. Red because it is the one nav item aimed at
+   existing customers rather than prospects, so it should not read as part of
+   the sales path. The dot pulses once the page settles; it is a "this is new"
+   marker, not a live-status indicator. ---- */
+html .nav-a.nav-dash,
+html[data-theme="light"] .nav-a.nav-dash,
+html[data-theme="dark"] .nav-a.nav-dash{{
+  background:#E24B4A;color:#fff;font-weight:700;border-color:#E24B4A;
+  display:inline-flex;align-items:center;gap:7px}}
+html .nav-a.nav-dash:hover,
+html[data-theme="light"] .nav-a.nav-dash:hover,
+html[data-theme="dark"] .nav-a.nav-dash:hover{{
+  background:#D13B3A;color:#fff;border-color:#D13B3A}}
+html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.28)}}
+.nav-dash .dot{{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(56,189,248,.8);animation:dashblip 1.9s ease-out infinite}}
+@keyframes dashblip{{
+  0%  {{box-shadow:0 0 0 0 rgba(56,189,248,.85);opacity:1}}
+  70% {{box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}}
+  100%{{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}}
+}}
+.nav-dash .tag{{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;background:rgba(255,255,255,.22);border-radius:4px;padding:2px 6px}}
+@media (prefers-reduced-motion:reduce){{ .nav-dash .dot{{animation:none}} }}
+
+/* Between the nav's hide breakpoint and ~1180px the bar is now one item
+   longer than it used to be and spills past the logo. Tighten the spacing
+   through that band rather than hiding the whole nav on a laptop. */
+@media (max-width:1180px){{
+  .nav{{gap:1px;margin-right:8px}}
+  .nav-a{{padding:8px 9px;font-size:13px}}
+  .nav-dash .tag{{display:none}}
+}}
 </style>
 </head>
 <body>
@@ -280,6 +314,7 @@ html[data-theme="light"] .nav-a.nav-cal{{box-shadow:0 4px 14px rgba(245,158,11,.
       <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
       <a class="nav-a" href="/about/#contact">Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
+      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch theme" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
@@ -297,6 +332,7 @@ html[data-theme="light"] .nav-a.nav-cal{{box-shadow:0 4px 14px rgba(245,158,11,.
       <div class="tl">Answers &middot; Qualifies &middot; Books</div>
     </div>
     <div class="foot-legal">
+      <a href="/login">Client dashboard</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>

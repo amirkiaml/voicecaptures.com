@@ -227,7 +227,7 @@ html[data-theme="light"] .btn-primary{background:var(--blue);color:#fff;
 html[data-theme="light"] .btn-primary:hover{background:var(--blue-dk);color:#fff}
 html[data-theme="light"] .card,html[data-theme="light"] .tier,html[data-theme="light"] .calc,
 html[data-theme="light"] .soon-card,html[data-theme="light"] .in-card,html[data-theme="light"] .wl,
-html[data-theme="light"] .nb-clip,html[data-theme="light"] .dcard,html[data-theme="light"] .nb-item{
+html[data-theme="light"] .nb-clip,html[data-theme="light"] .nb-item{
   box-shadow:0 6px 20px rgba(13,23,41,.06)}
 html[data-theme="light"] .nav-menu{background:#fff;box-shadow:0 20px 46px rgba(13,23,41,.16)}
 html[data-theme="light"] .anno{background:#dbe9f7;color:#0d1729;
@@ -356,7 +356,7 @@ html[data-theme="dark"] .mk-phone{background:linear-gradient(168deg,#122036 0%,#
 html[data-theme="dark"] .mk-panel{background:#080c14}
 html[data-theme="dark"] .card,html[data-theme="dark"] .tier,html[data-theme="dark"] .calc,
 html[data-theme="dark"] .soon-card,html[data-theme="dark"] .in-card,html[data-theme="dark"] .wl,
-html[data-theme="dark"] .nb-clip,html[data-theme="dark"] .dcard,html[data-theme="dark"] .nb-item{
+html[data-theme="dark"] .nb-clip,html[data-theme="dark"] .nb-item{
   background:#0c111b;box-shadow:0 14px 34px rgba(0,0,0,.5)}
 html[data-theme="dark"] .nav-menu{background:#0c111b}
 html[data-theme="dark"] .yl-band{
@@ -851,89 +851,6 @@ html[data-theme="light"] .blob-shot img{filter:drop-shadow(0 22px 40px rgba(13,2
   .blob-shape,.blob-orbit .bd,.blob-orbit .bo{animation:none}
 }
 
-/* ---- Dashboard preview: four panels, because a picture of the product
-   answers "what do I actually get" faster than a list does. ---- */
-.dash{max-width:1000px;margin:0 auto;text-align:left;color:var(--cyan)}
-.dash-grid{display:grid;gap:14px;grid-template-columns:repeat(6,1fr)}
-.dc-vol{grid-column:span 3} .dc-out{grid-column:span 3}
-.dc-kpi{grid-column:span 2} .dc-rec{grid-column:span 4}
-@media (max-width:900px){
-  .dash-grid{grid-template-columns:1fr}
-  .dc-vol,.dc-out,.dc-kpi,.dc-rec{grid-column:span 1}
-}
-.dcard{background:var(--bg3);border:1px solid var(--line);border-radius:16px;padding:20px;
-  box-shadow:0 14px 34px rgba(0,0,0,.2)}
-.dcard header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-.dcard h3{font-size:15.5px;color:var(--text);margin:0 0 2px}
-.dcard header p{font-size:11.5px;color:var(--muted);line-height:1.4}
-.dchip{flex:0 0 auto;font-size:10.5px;color:var(--muted);border:1px solid var(--line2);
-  border-radius:100px;padding:4px 11px;white-space:nowrap}
-.dbig{font-family:var(--display);font-size:34px;font-weight:700;color:var(--text);
-  letter-spacing:-.03em;line-height:1;margin-bottom:14px}
-.dbig em,.dkpis em{font-style:normal;font-size:13px;font-weight:700}
-.up{color:#34D399} .dn{color:#34D399}
-.dchart svg{width:100%;height:96px;display:block}
-.ddays{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--faint)}
-
-.dout{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.ddonut{position:relative;width:132px;height:132px;flex:0 0 auto}
-.ddonut svg{width:100%;height:100%;transform:rotate(-90deg)}
-.dring{fill:none;stroke:var(--bg2);stroke-width:5}
-.dseg{fill:none;stroke-width:5;stroke-linecap:round}
-.dseg.s1{stroke:var(--cyan)} .dseg.s2{stroke:var(--blue)}
-.dseg.s3{stroke:#34D399}     .dseg.s4{stroke:#FBBF24}
-.dcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:1px}
-.dcenter b{font-family:var(--display);font-size:22px;color:var(--text);letter-spacing:-.02em}
-.dcenter span{font-size:10px;color:var(--muted)}
-.dlegend{list-style:none;flex:1 1 210px;min-width:0;display:flex;flex-direction:column;gap:9px}
-.dlegend li{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;
-  gap:9px;font-size:12.5px;color:var(--muted)}
-.dlegend i{width:8px;height:8px;border-radius:50%;display:block}
-.dlegend i.s1{background:var(--cyan)} .dlegend i.s2{background:var(--blue)}
-.dlegend i.s3{background:#34D399}     .dlegend i.s4{background:#FBBF24}
-.dlegend b{color:var(--text);font-size:12.5px}
-.dlegend em{font-style:normal;color:var(--faint);font-size:11.5px;min-width:30px;text-align:right}
-
-.dkpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.dkpis span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
-.dkpis b{font-family:var(--display);font-size:17px;color:var(--text);letter-spacing:-.02em}
-.dconv-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px}
-.dconv-top b{color:var(--text)}
-.dconv-track{height:6px;background:var(--bg2);border-radius:100px;overflow:hidden}
-.dconv-track i{display:block;height:100%;border-radius:100px;
-  background:linear-gradient(90deg,var(--blue),var(--cyan))}
-
-.dtable{width:100%;border-collapse:collapse;font-size:12.5px}
-.dtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;
-  color:var(--faint);font-weight:600;padding:0 10px 9px 0;border-bottom:1px solid var(--line)}
-.dtable td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);color:var(--muted)}
-.dtable tr:last-child td{border-bottom:0}
-.dtable td:nth-child(2){color:var(--text)}
-.dpill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap}
-.dpill.ok{background:rgba(52,211,153,.15);color:#34D399}
-.dpill.nt{background:color-mix(in srgb, var(--cyan) 15%, transparent);color:var(--cyan)}
-.dpill.wr{background:rgba(251,191,36,.15);color:#FBBF24}
-@media (max-width:620px){
-  .dcard{padding:16px}
-  .dbig{font-size:28px}
-  .dtable th:nth-child(3),.dtable td:nth-child(3),
-  .dtable th:nth-child(5),.dtable td:nth-child(5){display:none}
-}
-
-
-/* The <header> inside each dashboard card was matching the global site-header
-   rule — sticky, tinted and backdrop-filtered — which painted a dark band
-   across the top of every card. Scope it back out. */
-.dcard header{position:static;background:none;border-bottom:0;z-index:auto;
-  -webkit-backdrop-filter:none;backdrop-filter:none}
-html[data-theme="dark"] .dcard header,
-html[data-theme="light"] .dcard header{background:none;border-bottom:0}
-html[data-theme="dark"] .dchip{background:rgba(160,200,255,.06);
-  border-color:rgba(160,200,255,.16);color:#9fb3cc}
-html[data-theme="light"] .dchip{background:#f4f7fc;border-color:rgba(18,35,63,.12)}
-
-
 /* Transcript text has to read against a white panel now. */
 html[data-theme="light"] .mk-agent{color:#12233f;
   background:rgba(37,99,235,.07);border-color:rgba(37,99,235,.20)}
@@ -1186,6 +1103,69 @@ html[data-theme="dark"] .blob-orbit .bo{stroke:rgba(255,255,255,.12)}
 html[data-theme="dark"] .blob-orbit .bo2{opacity:.5}
 html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
   filter:drop-shadow(0 0 4px rgba(255,255,255,.28))}
+
+/* ---- Client dashboard link. Red because it is the one nav item aimed at
+   existing customers rather than prospects, so it should not read as part of
+   the sales path. The dot pulses once the page settles; it is a "this is new"
+   marker, not a live-status indicator. ---- */
+html .nav-a.nav-dash,
+html[data-theme="light"] .nav-a.nav-dash,
+html[data-theme="dark"] .nav-a.nav-dash{
+  background:#E24B4A;color:#fff;font-weight:700;border-color:#E24B4A;
+  display:inline-flex;align-items:center;gap:7px}
+html .nav-a.nav-dash:hover,
+html[data-theme="light"] .nav-a.nav-dash:hover,
+html[data-theme="dark"] .nav-a.nav-dash:hover{
+  background:#D13B3A;color:#fff;border-color:#D13B3A}
+html[data-theme="light"] .nav-a.nav-dash{box-shadow:0 4px 14px rgba(226,75,74,.28)}
+.nav-dash .dot{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(56,189,248,.8);animation:dashblip 1.9s ease-out infinite}
+@keyframes dashblip{
+  0%  {box-shadow:0 0 0 0 rgba(56,189,248,.85);opacity:1}
+  70% {box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}
+  100%{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}
+}
+.nav-dash .tag{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;background:rgba(255,255,255,.22);border-radius:4px;padding:2px 6px}
+@media (prefers-reduced-motion:reduce){ .nav-dash .dot{animation:none} }
+
+/* Between the nav's hide breakpoint and ~1180px the bar is now one item
+   longer than it used to be and spills past the logo. Tighten the spacing
+   through that band rather than hiding the whole nav on a laptop. */
+@media (max-width:1180px){
+  .nav{gap:1px;margin-right:8px}
+  .nav-a{padding:8px 9px;font-size:13px}
+  .nav-dash .tag{display:none}
+}
+
+/* The bar gained a sixth item and the labels no longer fit at 1240px, so the
+   flex children were silently clipping into each other. Tighten the whole
+   bar rather than letting any one label truncate. */
+.bar{gap:11px}
+.nav{gap:2px;margin-right:9px}
+.nav-a{padding:8px 10px}
+header .btn.nav-cta{padding:10px 16px}
+
+/* ---- Dashboard screenshots. Two shots, one per theme, swapped by CSS rather
+   than by script so the right one is correct on first paint. Both are lazy:
+   the hidden one costs nothing until the visitor switches theme, and nothing
+   here waits on its load event. ---- */
+.shots{display:grid;gap:20px;grid-template-columns:1fr 1fr;margin-top:34px;text-align:left}
+@media (max-width:860px){ .shots{grid-template-columns:1fr} }
+.shot{margin:0}
+.shot picture{display:block}
+.shot img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);
+  box-shadow:0 18px 44px rgba(0,0,0,.28)}
+html[data-theme="light"] .shot img{box-shadow:0 14px 36px rgba(13,23,41,.13)}
+.shot figcaption{font-size:13px;color:var(--muted);line-height:1.55;margin-top:12px}
+/* .shot picture{display:block} is one class + one element, which outranks a
+   bare .th-dark, so both themes' shots rendered at once in light mode. Match
+   the specificity. */
+.shot .th-dark{display:none}
+html[data-theme="dark"] .shot .th-light{display:none}
+html[data-theme="dark"] .shot .th-dark{display:block}
+.soon-tag.live{color:#16A34A;border-color:color-mix(in srgb,#16A34A 45%,transparent)}
+html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 </style>
 </head>
 <body>
@@ -1204,7 +1184,7 @@ html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
       <span>VoiceCaptures</span>
     </a>
     <nav class="nav" aria-label="Main">
-      <button type="button" class="nav-a" data-goto="personal">Personal line</button>
+      <button type="button" class="nav-a" data-goto="personal">Personal</button>
       <div class="nav-drop">
         <button type="button" class="nav-a nav-trigger" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
           Businesses
@@ -1221,7 +1201,7 @@ html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
         </div>
       </div>
       <a class="nav-a nav-live" href="#demo" id="nav-demo">
-        <span class="nav-pulse" aria-hidden="true"></span>Try the demo line
+        <span class="nav-pulse" aria-hidden="true"></span>Demo line
       </a>
       <div class="nav-drop">
         <button type="button" class="nav-a nav-trigger" id="nav-company" aria-expanded="false" aria-haspopup="true">
@@ -1238,6 +1218,7 @@ html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
         </div>
       </div>
       <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
+      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Switch to light mode" title="Switch theme">
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
@@ -1461,86 +1442,45 @@ html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
 
 <section class="alt" id="dashboard">
   <div class="wrap center">
-    <span class="soon-tag">Coming soon</span>
+    <span class="soon-tag live">Live now</span>
     <h2>Your dashboard</h2>
-    <p class="sub">Every call in one place. In build now — clients on the trial get it first, at no extra cost.</p>
-    <div class="dash" role="img" aria-label="Preview of the call dashboard">
-      <div class="dash-grid">
+    <p class="sub">Every call in one place &mdash; what came in, what got booked,
+    and what it was worth. Included with every plan, no extra cost.</p>
 
-        <section class="dcard dc-vol">
-          <header><div><h3>Call volume</h3><p>Handled by your agent</p></div><span class="dchip">Last 7 days</span></header>
-          <div class="dbig">248 <em class="up">&uarr; 24%</em></div>
-          <div class="dchart" aria-hidden="true">
-            <svg viewBox="0 0 320 96" preserveAspectRatio="none">
-              <defs><linearGradient id="dgv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="currentColor" stop-opacity=".32"/>
-                <stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-              <path d="M0 62 C20 44 32 40 50 50 C70 62 80 70 100 58 C120 46 132 36 152 44
-                       C172 52 180 66 200 52 C220 38 232 22 252 28 C272 34 288 18 320 22 L320 96 L0 96 Z"
-                    fill="url(#dgv)"/>
-              <path d="M0 62 C20 44 32 40 50 50 C70 62 80 70 100 58 C120 46 132 36 152 44
-                       C172 52 180 66 200 52 C220 38 232 22 252 28 C272 34 288 18 320 22"
-                    fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-              <circle cx="152" cy="44" r="4.5" fill="currentColor"/>
-            </svg>
-            <div class="ddays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-          </div>
-        </section>
+    <div class="shots">
+      <figure class="shot">
+        <picture class="th-light">
+          <source srcset="/dash-light.webp" type="image/webp">
+          <img src="/dash-light.png" alt="Dashboard overview: calls answered, appointments booked, booking rate, after-hours calls and estimated revenue captured, with charts for calls per day, time of day and call outcomes." width="928" height="866" loading="lazy" decoding="async">
+        </picture>
+        <picture class="th-dark">
+          <source srcset="/dash-dark.webp" type="image/webp">
+          <img src="/dash-dark.png" alt="" width="946" height="868" loading="lazy" decoding="async">
+        </picture>
+        <figcaption>The week at a glance &mdash; what came in, what converted, and
+        how much of it arrived while you were closed.</figcaption>
+      </figure>
 
-        <section class="dcard dc-out">
-          <header><div><h3>Call outcomes</h3><p>How calls were handled</p></div></header>
-          <div class="dout">
-            <div class="ddonut" aria-hidden="true">
-              <svg viewBox="0 0 42 42">
-                <circle class="dring" cx="21" cy="21" r="15.9"/>
-                <circle class="dseg s1" cx="21" cy="21" r="15.9" stroke-dasharray="56 44" stroke-dashoffset="25"/>
-                <circle class="dseg s2" cx="21" cy="21" r="15.9" stroke-dasharray="26 74" stroke-dashoffset="-31"/>
-                <circle class="dseg s3" cx="21" cy="21" r="15.9" stroke-dasharray="11 89" stroke-dashoffset="-57"/>
-                <circle class="dseg s4" cx="21" cy="21" r="15.9" stroke-dasharray="7 93" stroke-dashoffset="-68"/>
-              </svg>
-              <div class="dcenter"><b>248</b><span>calls</span></div>
-            </div>
-            <ul class="dlegend">
-              <li><i class="s1"></i>Appointments booked<b>138</b><em>56%</em></li>
-              <li><i class="s2"></i>Questions answered<b>64</b><em>26%</em></li>
-              <li><i class="s3"></i>Leads captured<b>28</b><em>11%</em></li>
-              <li><i class="s4"></i>Messages taken<b>18</b><em>7%</em></li>
-            </ul>
-          </div>
-        </section>
-
-        <section class="dcard dc-kpi">
-          <header><div><h3>Booked work</h3><p>From AI-handled calls</p></div><span class="dchip">Last 30 days</span></header>
-          <div class="dkpis">
-            <div><span>Bookings made</span><b>92 <em class="up">&uarr;21%</em></b></div>
-            <div><span>Avg. call length</span><b>2m 12s</b></div>
-            <div><span>Missed calls</span><b>2 <em class="dn">&darr;75%</em></b></div>
-            <div><span>Minutes used</span><b>312</b></div>
-          </div>
-          <div class="dconv">
-            <div class="dconv-top"><span>Booking rate</span><b>48%</b></div>
-            <div class="dconv-track"><i style="width:48%"></i></div>
-          </div>
-        </section>
-
-        <section class="dcard dc-rec">
-          <header><div><h3>Recent calls</h3><p>Live view of your line</p></div></header>
-          <table class="dtable">
-            <thead><tr><th>Time</th><th>Caller</th><th>Type</th><th>Outcome</th><th>Length</th></tr></thead>
-            <tbody>
-              <tr><td>10:24 AM</td><td>Sarah M.</td><td>New customer</td><td><span class="dpill ok">Booked</span></td><td>2:14</td></tr>
-              <tr><td>10:18 AM</td><td>(416) &bull;&bull;&bull;-0192</td><td>Existing</td><td><span class="dpill nt">Answered</span></td><td>1:32</td></tr>
-              <tr><td>9:47 AM</td><td>Mike R.</td><td>Service inquiry</td><td><span class="dpill nt">Answered</span></td><td>3:05</td></tr>
-              <tr><td>9:32 AM</td><td>(647) &bull;&bull;&bull;-0134</td><td>New customer</td><td><span class="dpill ok">Booked</span></td><td>2:48</td></tr>
-              <tr><td>9:03 AM</td><td>(416) &bull;&bull;&bull;-0178</td><td>Price inquiry</td><td><span class="dpill wr">Lead captured</span></td><td>2:37</td></tr>
-            </tbody>
-          </table>
-        </section>
-
-      </div>
+      <figure class="shot">
+        <picture class="th-light">
+          <source srcset="/dash-calls-light.webp" type="image/webp">
+          <img src="/dash-calls-light.png" alt="Call log showing a single call expanded, with its recording, full transcript and the summary email that was sent." width="931" height="882" loading="lazy" decoding="async">
+        </picture>
+        <picture class="th-dark">
+          <source srcset="/dash-calls-dark.webp" type="image/webp">
+          <img src="/dash-calls-dark.png" alt="" width="942" height="881" loading="lazy" decoding="async">
+        </picture>
+        <figcaption>Every call with its recording, transcript, and the texts and
+        emails that went out. Caller details are blurred in these screenshots.</figcaption>
+      </figure>
     </div>
 
-    <p class="nb-note" style="text-align:center;margin-top:18px">Until it ships, you get a texted summary of every call and a weekly rundown by email.</p>
+    <div class="btns" style="margin-top:30px">
+      <a class="btn btn-primary" href="/login">Open your dashboard</a>
+    </div>
+    <p class="nb-note" style="text-align:center;margin-top:16px">Real screenshots
+    from a live account. You also get a texted summary of every call and a weekly
+    rundown by email.</p>
   </div>
 </section>
 
@@ -1722,6 +1662,7 @@ html[data-theme="dark"] .blob-orbit .bd{fill:rgba(255,255,255,.62);
       <div class="tl">Answers · Qualifies · Books</div>
     </div>
     <div class="foot-legal">
+      <a href="/login">Client dashboard</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>
