@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>All calls · VoiceCaptures admin</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("vc_theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --ink2: #374151; --muted: #6b7280;
+    --line: #e6e8ec; --hover: #fafbfc; --field: #ffffff;
+    --accent: #3b6fd8; --accent-soft: #dfe8fb;
+    --good: #1f9d55; --warn: #b45309; --bad: #dc2626;
+    --good-soft: #e3f5ea; --warn-soft: #fdf1de; --bad-soft: #fde4e4; --gray-soft: #eef0f3;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1217; --card: #171b22; --ink: #e7eaf0; --ink2: #c4c9d3; --muted: #8b93a1;
+    --line: #262c36; --hover: #1c2129; --field: #11151b;
+    --accent: #7ea4f2; --accent-soft: #1d2a45;
+    --good: #4cc98a; --warn: #f0a33a; --bad: #f37b7b;
+    --good-soft: #15301f; --warn-soft: #33250f; --bad-soft: #3a1a1a; --gray-soft: #232831;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 "DM Sans", -apple-system, "Segoe UI", Roboto, sans-serif; }
+  h1, .stat .v, .brandbar span { font-family: Manrope, "DM Sans", sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .brandbar { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; }
+  .brandbar img { width: 30px; }
+  .brandbar span { font-weight: 800; font-size: 18px; }
+  .tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); }
+  .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn, select, input[type=search] { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 9px; padding: 7px 11px; }
+  .btn { cursor: pointer; color: var(--ink2); }
+  a.btn { text-decoration: none; }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filters input[type=search] { flex: 1 1 220px; min-width: 0; }
+  .filters label.chk { white-space: nowrap; padding: 0 4px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; min-width: 0; }
+  .stat .k { color: var(--muted); font-size: 13px; }
+  .stat .v { font-size: 24px; font-weight: 700; margin-top: 2px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: var(--hover); }
+  .muted { color: var(--muted); }
+  .small { font-size: 12px; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--gray-soft); color: var(--ink2); }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .detail td { background: var(--hover); }
+  .k2 { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin: 12px 0 4px; }
+  .cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; }
+  audio { width: 100%; max-width: 460px; }
+  .tx { max-height: 460px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--card); display: grid; gap: 8px; }
+  .turn { display: grid; grid-template-columns: 82px 1fr; gap: 8px; }
+  .turn .who { font-size: 12px; color: var(--muted); padding-top: 6px; }
+  .turn .who button { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; cursor: pointer; }
+  .bub { padding: 7px 11px; border-radius: 12px; font-size: 14px; white-space: pre-wrap; }
+  .turn.assistant .bub { background: var(--accent-soft); }
+  .turn.caller .bub { background: var(--gray-soft); }
+  .turn.tool .bub { background: transparent; border: 1px dashed var(--line); font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 14px; }
+  .kv .k { color: var(--muted); }
+  .msg { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--card); margin-bottom: 8px; }
+  .msg.failed { border-color: var(--bad); }
+  .msg-body { white-space: pre-wrap; font-size: 13px; color: var(--ink2); margin-top: 4px; }
+  .err { color: var(--bad); font-size: 13px; }
+  .empty { padding: 40px 10px; text-align: center; color: var(--muted); }
+  .more { display: block; margin: 12px auto 0; }
+  label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .hide-sm { display: none; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="/vc-auth.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brandbar" href="/"><img src="/logo-mark.png" alt=""><span>VoiceCaptures</span></a>
+    <div class="right">
+      <span class="tag">Admin</span>
+      <a class="btn" href="/dashboard/">Client dashboards</a>
+      <button class="btn" id="theme" type="button">☾ Dark</button>
+      <button class="btn" id="signOut" type="button">Log out</button>
+    </div>
+  </div>
+
+  <div id="gate" class="card empty" hidden></div>
+
+  <div id="app" hidden>
+    <h1>All calls</h1>
+    <div class="sub">Every call on every assistant, straight from Vapi. Shows what Vapi still keeps (about 14 days).</div>
+
+    <div class="filters">
+      <select id="fAssistant" aria-label="Assistant"><option value="">All assistants</option></select>
+      <select id="fDays" aria-label="Period">
+        <option value="1">Last 24 hours</option><option value="3">Last 3 days</option>
+        <option value="7" selected>Last 7 days</option><option value="14">Last 14 days</option><option value="30">Last 30 days</option>
+      </select>
+      <input id="fSearch" type="search" placeholder="Filter by caller, business, summary, ended reason…">
+      <label class="chk"><input type="checkbox" id="fHideShort"> Hide calls under 10s</label>
+      <button class="btn" id="refresh" type="button">↻ Refresh</button>
+    </div>
+
+    <div class="stats">
+      <div class="card stat"><div class="k">Calls</div><div class="v" id="sCalls">–</div></div>
+      <div class="card stat"><div class="k">Total talk time</div><div class="v" id="sMin">–</div></div>
+      <div class="card stat"><div class="k">Avg. length</div><div class="v" id="sAvg">–</div></div>
+      <div class="card stat"><div class="k">Vapi cost</div><div class="v" id="sCost">–</div></div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>When</th><th>Assistant</th><th>Caller</th><th>Length</th><th class="hide-sm">Ended</th><th class="hide-sm">Cost</th>
+          </tr></thead>
+          <tbody id="log"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <button class="btn more" id="more" type="button" hidden>Load older calls</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fmtDur = s => s == null ? "—" : s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${String(Math.round(s%60)).padStart(2,"0")}s`;
+const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: "America/Toronto", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+const fmtT = t => t == null ? "" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+const money = n => n == null ? "—" : "$" + n.toFixed(2);
+
+let SB = null, calls = [], open = new Set();
+const toLogin = () => location.replace("/login/?next=/admin/");
+
+async function api(path) {
+  const { data: { session } } = await SB.auth.getSession();
+  if (!session) { toLogin(); throw new Error("Signed out"); }
+  const r = await fetch(vcAuth.API + path, { headers: { Authorization: `Bearer ${session.access_token}` } });
+  if (r.status === 401) { await SB.auth.signOut(); toLogin(); throw new Error("Signed out"); }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.error || `Error ${r.status}`); e.status = r.status; throw e; }
+  return d;
+}
+
+function endedPill(reason) {
+  const r = String(reason || "");
+  const cls = /customer-ended|assistant-ended|hangup|transferred|forwarded/.test(r) && !/error|failed/.test(r) ? "good"
+    : /error|failed|fault|crash/.test(r) ? "bad" : /silence|did-not-answer|voicemail|exceeded|timeout|no-answer|busy/.test(r) ? "warn" : "";
+  return `<span class="pill ${cls}" title="${esc(r)}">${esc(r.replace(/-/g, " ") || "—")}</span>`;
+}
+
+function visible() {
+  const q = $("fSearch").value.trim().toLowerCase();
+  const hideShort = $("fHideShort").checked;
+  return calls.filter(c => (!hideShort || (c.durationSeconds || 0) >= 10)
+    && (!q || [c.caller, c.callerName, c.business, c.assistantName, c.summary, c.endedReason].join(" ").toLowerCase().includes(q)));
+}
+
+function renderStats(list) {
+  const durs = list.map(c => c.durationSeconds || 0);
+  const total = durs.reduce((a, b) => a + b, 0);
+  $("sCalls").textContent = list.length;
+  $("sMin").textContent = `${Math.round(total / 60)} min`;
+  $("sAvg").textContent = list.length ? fmtDur(total / list.length) : "—";
+  $("sCost").textContent = money(list.reduce((a, c) => a + (c.cost || 0), 0));
+}
+
+function render() {
+  const list = visible();
+  renderStats(list);
+  const tb = $("log");
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="6" class="empty">No calls match.</td></tr>`; return; }
+  tb.innerHTML = list.map(c => `
+    <tr class="row" data-id="${esc(c.id)}">
+      <td>${esc(fmtWhen(c.createdAt))}<div class="muted small">${esc(c.type === "webCall" ? "web call" : c.type === "outboundPhoneCall" ? "outbound" : "inbound")}</div></td>
+      <td>${esc(c.assistantName)}${c.business ? `<div class="muted small">${esc(c.business)}</div>` : ""}</td>
+      <td>${esc(c.callerName || c.caller || "—")}${c.callerName && c.caller ? `<div class="muted small">${esc(c.caller)}</div>` : ""}${c.messageCount ? `<div class="muted small">✉ ${c.messageCount} sent</div>` : ""}</td>
+      <td>${esc(fmtDur(c.durationSeconds))}</td>
+      <td class="hide-sm">${endedPill(c.endedReason)}</td>
+      <td class="hide-sm">${esc(money(c.cost))}</td>
+    </tr>
+    <tr class="detail" id="d-${esc(c.id)}" ${open.has(c.id) ? "" : "hidden"}><td colspan="6"><div class="dbody" data-id="${esc(c.id)}">${open.has(c.id) ? "" : ""}</div></td></tr>`).join("");
+  tb.querySelectorAll("tr.row").forEach(r => r.onclick = () => toggle(r.dataset.id));
+  open.forEach(id => { if ($("d-" + id)) loadDetail(id); });
+}
+
+function toggle(id) {
+  const d = $("d-" + id);
+  d.hidden = !d.hidden;
+  if (d.hidden) open.delete(id); else { open.add(id); loadDetail(id); }
+}
+
+function kvBlock(title, obj) {
+  if (obj == null || obj === "" || (typeof obj === "object" && !Object.keys(obj).length)) return "";
+  if (typeof obj !== "object") return `<div class="k2">${esc(title)}</div><div>${esc(obj)}</div>`;
+  const rows = Array.isArray(obj)
+    ? obj.map((x, i) => [x?.name || `#${i + 1}`, typeof x?.result === "object" ? JSON.stringify(x.result) : (x?.result ?? JSON.stringify(x))])
+    : Object.entries(obj).map(([k, v]) => [k, typeof v === "object" ? JSON.stringify(v) : v]);
+  return `<div class="k2">${esc(title)}</div><div class="kv">${rows.map(([k, v]) => `<div class="k">${esc(k)}</div><div>${esc(v)}</div>`).join("")}</div>`;
+}
+
+function messagesBlock(list) {
+  if (!list || !list.length) return `<div class="k2">Texts &amp; emails sent</div><div class="muted small">None recorded for this call.</div>`;
+  return `<div class="k2">Texts &amp; emails sent</div>` + list.map(m => `
+    <div class="msg ${m.status === "failed" ? "failed" : ""}">
+      <div class="small"><b>${m.channel === "email" ? "EMAIL" : "TEXT"}</b> to ${m.recipient === "caller" ? "caller" : "owner"} · ${esc(m.to_address || "")}
+        <span class="muted"> · ${esc(fmtWhen(m.created_at))}${m.status === "failed" ? " · not delivered" : ""}</span></div>
+      ${m.subject ? `<div class="msg-body"><b>${esc(m.subject)}</b></div>` : ""}
+      ${m.body ? `<div class="msg-body">${esc(m.body)}</div>` : ""}
+      ${m.status === "failed" && m.error ? `<div class="err">${esc(m.error)}</div>` : ""}
+    </div>`).join("");
+}
+
+const details = new Map();
+async function loadDetail(id) {
+  const box = document.querySelector(`.dbody[data-id="${CSS.escape(id)}"]`);
+  if (!box) return;
+  if (details.has(id)) { box.innerHTML = details.get(id); wireDetail(box, id); return; }
+  box.innerHTML = `<div class="muted">Loading call…</div>`;
+  try {
+    const d = await api(`/api/dashboard/admin/vapi/calls/${encodeURIComponent(id)}`);
+    const c = calls.find(x => x.id === id) || {};
+    const showTools = d.tools && d.tools.length;
+    const timeline = d.turns.map(t => ({ ...t, kind: t.role }))
+      .concat(showTools ? d.tools.map(t => ({ ...t, kind: "tool", text: (t.role === "tool_calls" ? "→ " : "← ") + t.detail })) : [])
+      .sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
+    const tx = timeline.length
+      ? `<div class="tx">${timeline.map(t => `
+          <div class="turn ${t.kind === "caller" ? "caller" : t.kind === "tool" ? "tool" : "assistant"}" ${t.kind === "tool" ? 'data-tool="1"' : ""}>
+            <div class="who">${t.kind === "caller" ? "Caller" : t.kind === "tool" ? "Tool" : "Assistant"}${t.t != null ? `<br><button type="button" data-t="${t.t}">${fmtT(t.t)}</button>` : ""}</div>
+            <div class="bub">${esc(t.text)}</div>
+          </div>`).join("")}</div>`
+      : d.transcript ? `<div class="tx"><div class="bub">${esc(d.transcript)}</div></div>` : `<div class="muted small">No transcript.</div>`;
+    const html = `<div class="cols">
+      <div>
+        <div class="k2">Recording</div>
+        <audio controls preload="none" data-call="${esc(id)}"></audio><div class="err" data-aerr></div>
+        <div class="k2">Transcript ${showTools ? `<label class="chk" style="text-transform:none;letter-spacing:0;margin-left:8px"><input type="checkbox" data-showtools checked> show tool calls</label>` : ""}</div>
+        ${tx}
+      </div>
+      <div>
+        ${kvBlock("Summary", d.summary)}
+        ${kvBlock("Success evaluation", d.successEvaluation)}
+        ${kvBlock("Structured data", d.structuredData)}
+        ${kvBlock("Structured outputs", d.structuredOutputs)}
+        <div class="k2">Call</div>
+        <div class="kv">
+          <div class="k">Vapi call id</div><div class="small">${esc(id)}</div>
+          <div class="k">Ended reason</div><div>${esc(c.endedReason || "—")}</div>
+          <div class="k">Cost</div><div>${esc(money(c.cost))}</div>
+        </div>
+        ${messagesBlock(d.messages)}
+      </div>
+    </div>`;
+    details.set(id, html);
+    box.innerHTML = html;
+    wireDetail(box, id);
+  } catch (e) {
+    if (e.message !== "Signed out") box.innerHTML = `<div class="err">${esc(e.message)}</div>`;
+  }
+}
+
+const audioLoads = new Map();
+function ensureAudio(box, id) {
+  const a = box.querySelector("audio");
+  if (!a) return Promise.resolve(null);
+  if (a.src) return Promise.resolve(a);
+  if (!audioLoads.has(id)) {
+    audioLoads.set(id, api(`/api/dashboard/admin/vapi/calls/${encodeURIComponent(id)}/recording`)
+      .then(d => { a.src = d.url; return a; })
+      .catch(e => { box.querySelector("[data-aerr]").textContent = e.message; audioLoads.delete(id); return null; }));
+  }
+  return audioLoads.get(id).then(x => { if (x && !a.src) a.src = x.src; return a.src ? a : null; });
+}
+
+function wireDetail(box, id) {
+  ensureAudio(box, id);
+  box.querySelectorAll("button[data-t]").forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    const a = await ensureAudio(box, id);
+    if (!a) return;
+    const go = () => { a.currentTime = Number(b.dataset.t); a.play(); };
+    if (a.readyState >= 1) go(); else { a.addEventListener("loadedmetadata", go, { once: true }); a.load(); }
+  });
+  const st = box.querySelector("[data-showtools]");
+  if (st) st.onchange = () => box.querySelectorAll('[data-tool="1"]').forEach(el => el.hidden = !st.checked);
+}
+
+async function load(append = false) {
+  const qs = new URLSearchParams({ days: $("fDays").value });
+  if ($("fAssistant").value) qs.set("assistantId", $("fAssistant").value);
+  if (append && calls.length) qs.set("before", calls[calls.length - 1].createdAt);
+  if (!append) { $("log").innerHTML = `<tr><td colspan="6" class="empty">Loading…</td></tr>`; }
+  try {
+    const d = await api(`/api/dashboard/admin/vapi/calls?${qs}`);
+    calls = append ? calls.concat(d.calls) : d.calls;
+    const sel = $("fAssistant"), cur = sel.value;
+    if (sel.options.length <= 1) {
+      sel.innerHTML = `<option value="">All assistants</option>` + d.assistants.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+      sel.value = cur;
+    }
+    $("more").hidden = !d.more;
+    render();
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    if (e.status === 403) return showGate(`<h2>Admins only</h2><p>This page is for VoiceCaptures admins. <a href="/dashboard/">Go to your dashboard</a>.</p>`);
+    $("log").innerHTML = `<tr><td colspan="6" class="empty err">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function showGate(html) { $("app").hidden = true; $("gate").hidden = false; $("gate").innerHTML = html; }
+
+function syncTheme() { $("theme").textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "☀ Light" : "☾ Dark"; }
+$("theme").onclick = () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("vc_theme", next); } catch (e) {}
+  syncTheme();
+};
+syncTheme();
+
+let leaving = false;
+$("signOut").onclick = async () => { leaving = true; try { await SB.auth.signOut(); } catch (e) {} location.replace("/login/"); };
+$("fAssistant").onchange = () => { open.clear(); load(); };
+$("fDays").onchange = () => { open.clear(); load(); };
+$("refresh").onclick = () => load();
+$("fSearch").oninput = render;
+$("fHideShort").onchange = render;
+$("more").onclick = () => load(true);
+
+vcAuth.client().then(async ({ sb }) => {
+  SB = sb;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return toLogin();
+  sb.auth.onAuthStateChange(ev => { if (ev === "SIGNED_OUT" && !leaving) toLogin(); });
+  $("app").hidden = false;
+  load();
+}).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
+</script>
+</body>
+</html>
