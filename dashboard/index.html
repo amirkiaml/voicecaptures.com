@@ -572,11 +572,34 @@ function renderPremium(c, i) {
   }
   const note = last.isAdmin && !last.features.recordings
     ? `<div class="admin-note">Admin preview — this client can't see recordings or transcripts (Premium is off).</div>` : "";
-  const audio = c.recording_url
-    ? `<div class="k">Recording</div><audio controls preload="none" id="au${i}" src="${esc(c.recording_url)}"></audio>` : "";
+  // No src yet: recording links expire, so a fresh one is fetched when the call is opened.
+  const audio = c.has_recording && c.vapi_call_id
+    ? `<div class="k">Recording</div><audio controls preload="none" id="au${i}" data-call="${esc(c.vapi_call_id)}"></audio><div class="admin-note" id="aue${i}"></div>` : "";
   const tx = c.vapi_call_id
     ? `<div class="k">Transcript</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">Show transcript</button><div id="tx${i}"></div>` : "";
   return note + audio + tx;
+}
+
+// One fetch per player: a timestamp click during loading waits for the same request.
+const audioLoads = new WeakMap();
+function ensureAudio(i) {
+  const a = $("au" + i);
+  if (!a) return Promise.resolve(null);
+  if (!audioLoads.has(a)) {
+    audioLoads.set(a, (async () => {
+      try {
+        const r = await api(`/api/dashboard/recording/${encodeURIComponent(a.dataset.call)}`);
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Could not load the recording");
+        a.src = d.url;
+      } catch (e) {
+        if (e.message !== "Signed out") $("aue" + i).textContent = e.message;
+        audioLoads.delete(a); // allow a retry on the next open
+      }
+      return a;
+    })());
+  }
+  return audioLoads.get(a);
 }
 
 async function loadTranscript(btn) {
@@ -593,10 +616,12 @@ async function loadTranscript(btn) {
           <div class="who">${t.role === "caller" ? "Caller" : "Receptionist"}${t.t != null ? `<br><button type="button" data-t="${t.t}" title="Play from here">${fmtT(t.t)}</button>` : ""}</div>
           <div class="bub">${esc(t.text)}</div>
         </div>`).join("")}</div>`;
-      const audio = $("au" + btn.dataset.i);
-      box.querySelectorAll("button[data-t]").forEach(b => b.onclick = e => {
+      box.querySelectorAll("button[data-t]").forEach(b => b.onclick = async e => {
         e.stopPropagation();
-        if (audio) { audio.currentTime = Number(b.dataset.t); audio.play(); }
+        const audio = await ensureAudio(btn.dataset.i);
+        if (!audio || !audio.src) return;
+        const seek = () => { audio.currentTime = Number(b.dataset.t); audio.play(); };
+        if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, { once: true }), audio.load();
       });
     } else if (d.text) {
       box.innerHTML = `<div class="tx"><div class="turn"><div class="bub">${esc(d.text)}</div></div></div>`;
@@ -633,7 +658,8 @@ $("backfillBtn").onclick = async () => {
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "Could not fetch");
     msg.textContent = d.checked === 0 ? "Every call already has its recording and transcript."
-      : `Filled ${d.filled} of ${d.checked} calls${d.missing ? ` · ${d.missing} not found in Vapi` : ""}${d.failed ? ` · ${d.failed} failed` : ""}.`;
+      : `Filled ${d.filled} of ${d.checked} calls${d.noAudio ? ` · ${d.noAudio} without audio (transcript only)` : ""}${d.missing ? ` · ${d.missing} not found in Vapi` : ""}${d.failed ? ` · ${d.failed} failed` : ""}.`
+        + (d.reasons && d.reasons.length ? ` Reason: ${d.reasons[0]}` : "");
     await load();
   } catch (e) { if (e.message !== "Signed out") msg.textContent = e.message; }
   finally { btn.disabled = false; }
@@ -702,13 +728,14 @@ function renderLog(all) {
     </td></tr>`).join("");
   tb.querySelectorAll("tr.row").forEach(r => r.onclick = () => {
     const d = $("d" + r.dataset.i); d.hidden = !d.hidden;
-    if (d.hidden) openCalls.delete(d.dataset.id); else openCalls.add(d.dataset.id);
+    if (d.hidden) openCalls.delete(d.dataset.id); else { openCalls.add(d.dataset.id); ensureAudio(r.dataset.i); }
   });
   tb.querySelectorAll(".status-sel").forEach(sel => {
     sel.onclick = e => e.stopPropagation();
     sel.onchange = () => setStatus(sel);
   });
   tb.querySelectorAll(".tx-btn").forEach(b => b.onclick = e => { e.stopPropagation(); loadTranscript(b); });
+  tb.querySelectorAll("tr.detail:not([hidden])").forEach(d => ensureAudio(d.id.slice(1))); // re-opened after a refresh
 }
 
 function applySections() {
