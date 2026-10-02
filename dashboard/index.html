@@ -222,6 +222,8 @@
       <label class="premium-switch" id="premiumWrap" hidden title="Only admins see this switch">
         <input type="checkbox" id="premiumToggle"> <span>Premium: recordings &amp; transcripts</span>
       </label>
+      <button class="gear" id="backfillBtn" type="button" hidden title="Admins only">⟲ Fetch past recordings</button>
+      <span class="admin-note" id="backfillMsg"></span>
       <select class="biz-select" id="bizSelect" hidden aria-label="Choose business"></select>
     </div>
     <div class="hdr-right">
@@ -623,6 +625,19 @@ $("premiumToggle").onchange = async e => {
     alertMsg(err.message);
   } finally { e.target.disabled = false; }
 };
+$("backfillBtn").onclick = async () => {
+  const btn = $("backfillBtn"), msg = $("backfillMsg");
+  btn.disabled = true; msg.textContent = "Fetching from Vapi… this can take a minute.";
+  try {
+    const r = await api(`/api/dashboard/admin/backfill`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not fetch");
+    msg.textContent = d.checked === 0 ? "Every call already has its recording and transcript."
+      : `Filled ${d.filled} of ${d.checked} calls${d.missing ? ` · ${d.missing} not found in Vapi` : ""}${d.failed ? ` · ${d.failed} failed` : ""}.`;
+    await load();
+  } catch (e) { if (e.message !== "Signed out") msg.textContent = e.message; }
+  finally { btn.disabled = false; }
+};
 function alertMsg(m) { $("biz").insertAdjacentHTML("afterend", `<div class="admin-note">${esc(m)}</div>`); }
 
 /* ---------- manual status ---------- */
@@ -772,6 +787,7 @@ async function load() {
     business = data.businessId;
     renderBusinesses(data.businesses, data.businessId, data.isAdmin);
     $("premiumWrap").hidden = !data.isAdmin;
+    $("backfillBtn").hidden = !data.isAdmin;
     $("premiumToggle").checked = !!(data.features && data.features.recordings);
     $("biz").textContent = data.businessName;
     document.title = `${data.businessName} · Calls`;
