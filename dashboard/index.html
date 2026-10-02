@@ -183,6 +183,11 @@
   .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
   .status-sel { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
   .manual { font-weight: 400; opacity: .8; }
+  .add-status { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .add-status input, .add-status select { font: inherit; font-size: 14px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); min-width: 0; }
+  .add-status input { flex: 1 1 180px; }
+  .chip .x { border: 0; background: none; color: var(--muted); cursor: pointer; font: inherit; padding: 0 0 0 2px; }
+  .chip .ca { color: var(--muted); font-size: 12px; }
   .admin-note { color: var(--warn); font-size: 12px; margin-top: 4px; }
   .gate { max-width: 460px; margin: 10vh auto; text-align: center; }
   .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
@@ -256,6 +261,23 @@
     </div>
     <div class="set-row"><span class="set-k">Open days</span><span id="sDays"></span></div>
     <div class="set-row"><span class="set-k">Show</span><span id="sSections"></span></div>
+    <div class="set-row"><span class="set-k">Your statuses</span>
+      <div style="flex:1;min-width:0">
+        <div id="sStatuses"></div>
+        <div class="add-status">
+          <input id="nsLabel" maxlength="30" placeholder="New status, e.g. Quote sent">
+          <select id="nsCounts" aria-label="Counts as">
+            <option value="pending">counts as Needs callback</option>
+            <option value="booked">counts as Booked</option>
+            <option value="other">counts as Inquiry</option>
+            <option value="emergency">counts as Emergency</option>
+            <option value="spam">counts as Spam / not a lead</option>
+          </select>
+          <button type="button" class="btn-ghost" id="nsAdd">+ Add</button>
+        </div>
+        <div class="muted" style="font-size:12px;margin-top:4px">"Counts as" decides how a status adds up in your numbers (bookings, booking rate, revenue).</div>
+      </div>
+    </div>
     <div class="set-actions">
       <span class="muted" id="sMsg"></span>
       <button type="button" class="btn-ghost" id="sCancel">Cancel</button>
@@ -464,6 +486,8 @@ function renderWeek(byWeekday) {
 }
 
 /* ---------- outcomes ---------- */
+const COUNTS_COLOR = { booked: "var(--good)", pending: "var(--warn)", emergency: "var(--bad)",
+  abandoned: "var(--gray)", other: "var(--accent)", spam: "var(--neutral-bar)" };
 function renderOutcomes(o, total) {
   const rows = [
     ["Booked", o.booked, "var(--good)"],
@@ -472,7 +496,9 @@ function renderOutcomes(o, total) {
     ["Hung up early", o.abandoned, "var(--gray)"],
     ["Inquiry", o.other, "var(--accent)"],
     ["Spam / not a lead", o.spam || 0, "var(--neutral-bar)"]
-  ].filter(r => r[1] > 0 || !["Inquiry", "Spam / not a lead"].includes(r[0]));
+  ].filter(r => r[1] > 0 || !["Inquiry", "Spam / not a lead"].includes(r[0]))
+   .concat((S.customStatuses || []).filter(cs => (last.customOutcomes || {})[cs.id] > 0)
+     .map(cs => [cs.label, last.customOutcomes[cs.id], COUNTS_COLOR[cs.countsAs] || "var(--accent)"]));
   $("outcomes").innerHTML = rows.map(([label, n, col]) => `
     <div>
       <div class="hb-top"><span>${label}</span><span><b>${n}</b> · ${pct(n, total)}%</span></div>
@@ -508,7 +534,8 @@ function statusPill(c) {
     other: ["p-other", "Inquiry"],
     spam: ["p-abandoned", "Spam / not a lead"]
   };
-  const [cls, label] = map[c.outcome] || map.other;
+  let [cls, label] = map[c.outcome] || map.other;
+  if (c.custom_status) label = c.custom_status.label;
   const manual = c.status_override ? ` <span class="manual" title="Changed by hand">✎</span>` : "";
   return `<span class="pill ${cls}">${esc(label)}${manual}</span>`;
 }
@@ -608,7 +635,10 @@ function statusEditor(c) {
   const autoLabel = STATUS_LABELS[c.auto_outcome] || "Inquiry";
   const opts = [`<option value="auto" ${c.status_override ? "" : "selected"}>Automatic (${esc(autoLabel)})</option>`]
     .concat(Object.entries(STATUS_LABELS).map(([k, v]) =>
-      `<option value="${k}" ${c.status_override === k ? "selected" : ""}>${esc(v)}</option>`)).join("");
+      `<option value="${k}" ${c.status_override === k ? "selected" : ""}>${esc(v)}</option>`))
+    .concat((S.customStatuses || []).length ? [`<optgroup label="Your statuses">${S.customStatuses.map(cs =>
+      `<option value="c:${esc(cs.id)}" ${c.status_override === "c:" + cs.id ? "selected" : ""}>${esc(cs.label)}</option>`).join("")}</optgroup>`] : [])
+    .join("");
   return `<div class="status-row"><span class="k" style="margin:0">Status</span>
     <select class="status-sel" data-id="${esc(c.id)}" aria-label="Change call status">${opts}</select>
     <span class="status-msg muted"></span></div>`;
@@ -768,9 +798,31 @@ function openSettings() {
     `<label class="chip"><input type="checkbox" value="${i}" ${S.openDays.includes(i) ? "checked" : ""}>${d}</label>`).join("");
   $("sSections").innerHTML = Object.entries(SECTION_NAMES).map(([k, v]) =>
     `<label class="chip"><input type="checkbox" value="${k}" ${S.hiddenSections.includes(k) ? "" : "checked"}>${v}</label>`).join("");
+  statusDraft = (S.customStatuses || []).map(x => ({ ...x }));
+  renderStatusDraft();
+  $("nsLabel").value = "";
   $("sMsg").textContent = "";
   $("settings").hidden = false;
 }
+
+let statusDraft = [];
+function renderStatusDraft() {
+  $("sStatuses").innerHTML = statusDraft.length
+    ? statusDraft.map((x, i) => `<span class="chip">${esc(x.label)} <span class="ca">· ${esc(STATUS_LABELS[x.countsAs] || x.countsAs)}</span>
+        <button type="button" class="x" data-i="${i}" aria-label="Remove ${esc(x.label)}">×</button></span>`).join("")
+    : `<span class="muted" style="font-size:13px">None yet — add your own, like "Quote sent" or "Job done".</span>`;
+  $("sStatuses").querySelectorAll(".x").forEach(b => b.onclick = () => { statusDraft.splice(Number(b.dataset.i), 1); renderStatusDraft(); });
+}
+$("nsAdd").onclick = () => {
+  const label = $("nsLabel").value.trim();
+  if (!label) return void ($("sMsg").textContent = "Type a name for the status first.");
+  if (statusDraft.some(x => x.label.toLowerCase() === label.toLowerCase())) return void ($("sMsg").textContent = "You already have that status.");
+  if (statusDraft.length >= 12) return void ($("sMsg").textContent = "Up to 12 custom statuses.");
+  statusDraft.push({ label, countsAs: $("nsCounts").value });
+  $("nsLabel").value = ""; $("sMsg").textContent = "Added — click Save to keep it.";
+  renderStatusDraft();
+};
+$("nsLabel").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("nsAdd").click(); } };
 
 async function saveSettings() {
   const openHour = Number($("sOpen").value), closeHour = Number($("sClose").value);
@@ -780,7 +832,8 @@ async function saveSettings() {
     openDays: [...$("sDays").querySelectorAll("input:checked")].map(i => Number(i.value)),
     bookingLabel: $("sLabel").value.trim() || "Appointments",
     avgJobValue: $("sValue").value === "" ? null : Number($("sValue").value),
-    hiddenSections: [...$("sSections").querySelectorAll("input:not(:checked)")].map(i => i.value)
+    hiddenSections: [...$("sSections").querySelectorAll("input:not(:checked)")].map(i => i.value),
+    customStatuses: statusDraft
   };
   $("sMsg").textContent = "Saving…";
   try {
