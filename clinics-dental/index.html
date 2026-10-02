@@ -1129,9 +1129,9 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{
   70% {box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}
   100%{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}
 }
-.nav-dash .tag{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+.nav-dash .tag{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.06em;
   text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
-  border-radius:4px;padding:2px 5px}
+  border-radius:4px;padding:2px 4px}
 @media (prefers-reduced-motion:reduce){ .nav-dash .dot{animation:none} }
 
 /* Between the nav's hide breakpoint and ~1180px the bar is now one item
@@ -1247,11 +1247,37 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .bar{align-items:center}
 .nav-drop{display:flex;align-items:center}
 .nav .nav-a,.nav-drop .nav-a{height:38px;display:inline-flex;align-items:center;
-  padding:0 13px;line-height:1}
+  padding:0 10px;font-size:13.5px;line-height:1}
+.nav{gap:1px}
 .nav-dash .dot,.nav-live .nav-pulse{flex:0 0 auto}
 .theme-btn{width:38px;height:38px}
-header .btn.nav-cta{height:44px;padding:0 22px 0 4px;font-size:14px;gap:10px}
+header .btn.nav-cta{height:44px;padding:0 18px 0 4px;font-size:13.5px;gap:9px}
 header .btn.nav-cta::before{width:36px;height:36px}
+
+/* Amber in the panel too, so "Book a call" reads the same whichever nav the
+   visitor is using. */
+.mnav .btn-amber,header .mnav .btn-amber{background:#F59E0B;color:#1a1205;
+  border:1px solid #F59E0B;box-shadow:none}
+.mnav .btn-amber:hover,header .mnav .btn-amber:hover{background:#FBBF24;color:#1a1205;
+  border-color:#FBBF24}
+
+/* ---- Pricing display ---------------------------------------------------
+   The entry tier stays public as an anchor; everything above it is quoted.
+   "Quoted on a call" cannot sit at the 38px price size without wrapping, so
+   it gets its own scale. ---- */
+.price .from{display:block;font-family:var(--body);font-size:11.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.price.is-quoted{font-size:20px;letter-spacing:-.01em;line-height:1.3}
+.price .quoted{color:var(--text)}
+.tier.ent .price.is-quoted{font-size:20px}
+.tier.ent .price.is-quoted .quoted{color:inherit}
+
+/* Win-back band: a second product, so it gets its own ground rather than
+   reading as another pricing row. */
+.wb-band{background:linear-gradient(180deg,var(--bg2),var(--bg));
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+html[data-theme="light"] .wb-band{background:linear-gradient(180deg,#eef2f9,var(--bg))}
+.wb-band .sub{margin-bottom:28px}
 </style>
 </head>
 <body>
@@ -1286,6 +1312,7 @@ header .btn.nav-cta::before{width:36px;height:36px}
           <button type="button" data-goto="other"><i data-h="other"></i><b>Something else</b><em>Salons, studios, venues</em></button>
         </div>
       </div>
+      <a class="nav-a" href="/win-back/">Win-back</a>
       <a class="nav-a nav-live" href="#demo" id="nav-demo">
         <span class="nav-pulse" aria-hidden="true"></span>Demo line
       </a>
@@ -1331,19 +1358,20 @@ header .btn.nav-cta::before{width:36px;height:36px}
         </span>
         <em class="tag">New</em>
       </a>
-      <button type="button" class="mnav-a" data-goto="personal">Personal line</button>
+      <button type="button" class="mnav-a sub" data-goto="personal">Personal line</button>
       <p class="mnav-h">Businesses</p>
       <button type="button" class="mnav-a sub" data-goto="home">Home services</button>
       <button type="button" class="mnav-a sub" data-goto="food">Restaurants &amp; caf&eacute;s</button>
       <button type="button" class="mnav-a sub" data-goto="clinic">Clinics &amp; dental</button>
       <button type="button" class="mnav-a sub" data-goto="other">Something else</button>
+      <a class="mnav-a sub" href="/win-back/">Win-back campaigns</a>
       <p class="mnav-h">Company</p>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/about/#contact">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-ghost" href="#demo" data-close>Try the demo line</a>
-        <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures"
+        <a class="btn btn-ghost" href="#demo" data-demo>Try the demo line</a>
+        <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures"
            target="_blank" rel="noopener">Book a call</a>
         <a class="btn btn-primary" href="#yourline" data-close>Try it on your business</a>
       </div>
@@ -1667,6 +1695,16 @@ header .btn.nav-cta::before{width:36px;height:36px}
       <p>Call history, recordings and transcripts are kept for 14 days on every plan. Extended retention is quoted separately.</p>
       <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
     </div>
+  </div>
+</section>
+
+<section class="wb-band">
+  <div class="wrap center">
+    <h2>Already have a customer list? <span class="hl">Turn it into bookings.</span></h2>
+    <p class="sub">We text the people you haven&rsquo;t seen in a year, call the ones
+    who say yes, and book them back onto your calendar.<br>
+    You pay per booked appointment &mdash; nothing if nothing books.</p>
+    <a class="btn btn-primary" href="/win-back/">See how win-back works</a>
   </div>
 </section>
 
@@ -2161,8 +2199,12 @@ function renderIntake(key, cfg, tiers){
   }
   fill($("in-type"), c.types, "Select\u2026");
   fill($("in-system"), c.systems, "Select\u2026");
+  // The tier prices are no longer public above Starter, so the dropdown must
+  // not leak them back.
   fill($("in-plan"),
-    (tiers || []).map(function(t){ return t[0] + " (" + t[1] + "/mo)"; }).concat(["Not sure yet"]),
+    (tiers || []).map(function(t, n){
+      return (n === 0 && key !== "clinic") ? t[0] + " (from " + t[1] + "/mo)" : t[0];
+    }).concat(["Win-back campaign", "Not sure yet"]),
     "Select\u2026");
 }
 
@@ -2356,10 +2398,19 @@ function renderTiers(v){
   $("tiers").innerHTML = all.map(function(t, n){
     var ent = t[0] === "Enterprise";
     var pop = n === 1;
+    // Only the entry tier carries a public number now. Everything above it,
+    // and the whole clinic vertical, is quoted on a call — the right price
+    // there depends on call volume and what a booking is worth, and a
+    // published figure anchors every conversation to the wrong one.
+    var pub = (n === 0 && !ent && key !== "clinic");
+    var priceHtml = pub
+      ? '<span class="from">From</span>' + esc(t[1]) + "<em>/mo + HST</em>"
+      : '<span class="quoted">Quoted on a call</span>';
+
     return '<div class="tier' + (ent ? " ent" : "") + '">' +
       '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
       (pop ? '<span class="pop">Most popular</span>' : "") + "</div>" +
-      '<div class="price">' + esc(t[1]) + (ent ? "" : "<em>/mo + HST</em>") + "</div>" +
+      '<div class="price' + (pub ? "" : " is-quoted") + '">' + priceHtml + "</div>" +
       '<div class="mins">' + esc(t[2]) + (ent ? "" : " included") + "</div>" +
       '<div class="bestfor"><span>Best for</span>' + esc(t[3]) + "</div>" +
       '<div class="feat">' + t[4].map(function(f){
@@ -2743,8 +2794,17 @@ window.addEventListener("popstate", function(){
   // home services rather than to a hidden section.
   var demoLink = document.getElementById("nav-demo");
   if (demoLink) {
-    demoLink.addEventListener("click", function(){
-      if (document.getElementById("demo").hidden) select("home");
+    demoLink.addEventListener("click", function(e){
+      // Switching the sector unhides #demo, but the browser has already
+      // resolved the anchor by then and lands nowhere. Do the scroll by hand,
+      // after the section exists.
+      e.preventDefault();
+      var sec = document.getElementById("demo");
+      if (!sec || sec.hidden) select("home");
+      setTimeout(function(){
+        var t = document.getElementById("demo");
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
     });
   }
 })();
@@ -3049,6 +3109,20 @@ if (!reduced && window.IntersectionObserver) {
       select(go.getAttribute("data-goto"));
       close();
       window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    var demo = e.target.closest("[data-demo]");
+    if (demo) {
+      // The demo section exists only on the business sectors; from the
+      // personal tab the anchor pointed at a hidden element and did nothing.
+      e.preventDefault();
+      var sec = document.getElementById("demo");
+      if (!sec || sec.hidden) select("home");
+      close();
+      setTimeout(function(){
+        var t = document.getElementById("demo");
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
       return;
     }
     // Anchor links need the panel out of the way before the scroll happens,

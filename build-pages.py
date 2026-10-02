@@ -350,6 +350,27 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
 .bar{{align-items:center}}
 .nav .nav-a{{height:38px;display:inline-flex;align-items:center;padding:0 13px;line-height:1}}
 .theme-btn{{width:38px;height:38px}}
+
+.mnav .btn-amber,header .mnav .btn-amber{{background:#F59E0B;color:#1a1205;
+  border:1px solid #F59E0B;box-shadow:none}}
+.mnav .btn-amber:hover,header .mnav .btn-amber:hover{{background:#FBBF24;color:#1a1205;
+  border-color:#FBBF24}}
+
+/* ---- Win-back ---- */
+.wb-hero{{padding-top:clamp(40px,5vw,62px)}}
+.wb-art{{display:block;margin-top:38px}}
+.wb-art img{{width:100%;height:auto;border-radius:16px;border:1px solid var(--line)}}
+html[data-theme="light"] .wb-art img{{box-shadow:0 18px 44px rgba(13,23,41,.10)}}
+.th-dark{{display:none}}
+html[data-theme="dark"] .th-light{{display:none}}
+html[data-theme="dark"] .th-dark{{display:block}}
+.btns-l{{display:flex;gap:12px;flex-wrap:wrap}}
+.wb-list{{margin:0;padding-left:20px}}
+.wb-list li{{font-size:15.5px;margin-bottom:10px;line-height:1.6}}
+.wb-list li:last-child{{margin-bottom:0}}
+.wb-faq .role summary h3{{font-size:17px;margin:0}}
+.wb-faq .role-body p{{font-size:15.5px;margin:0}}
+.center .badges{{justify-content:center}}
 </style>
 </head>
 <body>
@@ -362,6 +383,7 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
     </a>
     <nav class="nav" aria-label="Main">
       <a class="nav-a" href="/">Home</a>
+      <a class="nav-a" href="/win-back/"{cur_winback}>Win-back</a>
       <a class="nav-a" href="/about/"{cur_about}>About</a>
       <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
       <a class="nav-a" href="/about/#contact">Contact</a>
@@ -389,11 +411,12 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
         <em class="tag">New</em>
       </a>
       <a class="mnav-a" href="/">Home</a>
+      <a class="mnav-a" href="/win-back/">Win-back campaigns</a>
       <a class="mnav-a" href="/about/">About</a>
       <a class="mnav-a" href="/careers/">Careers</a>
       <a class="mnav-a" href="/about/#contact">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary" href="{cal}" target="_blank" rel="noopener">Book a call</a>
+        <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
   </div>
@@ -1080,6 +1103,247 @@ CAREERS_SCRIPT = f"""
 </script>
 """
 
+
+# -------------------------------------------------------------- win-back ----
+
+WINBACK_BODY = f"""
+<section class="wb-hero">
+  <div class="wrap">
+    <p class="eyebrow">Win-back campaigns</p>
+    <h1>Send us the customers you haven&rsquo;t seen in a year.<br>
+    <span class="hl">We call them. You pay per booking.</span></h1>
+    <p class="lede">You already have the list. Every business does &mdash; the
+    patients, clients and customers who were regulars and then quietly stopped
+    coming. We text them, call the ones who say yes, and book them back onto
+    your calendar. Nothing books, nothing to pay.</p>
+    <div class="btns-l">
+      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Run a free 50-contact pilot</a>
+      <a class="btn btn-ghost" href="#sample">Hear a sample call</a>
+    </div>
+    <div class="badges" style="margin-top:22px">
+      <span class="badge">No onboarding fee</span>
+      <span class="badge">Pay per booked appointment</span>
+      <span class="badge badge-live">First 50 names free</span>
+    </div>
+    <picture class="wb-art th-light">
+      <source srcset="/winback-light.webp" type="image/webp">
+      <img src="/winback-light.png" alt="A stack of past-customer records on the left, connected by text and call icons to booked appointments filling a calendar on the right." width="1400" height="788" loading="lazy" decoding="async">
+    </picture>
+    <picture class="wb-art th-dark">
+      <source srcset="/winback-dark.webp" type="image/webp">
+      <img src="/winback-dark.png" alt="" width="1400" height="788" loading="lazy" decoding="async">
+    </picture>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lede">Four steps. The only work on your side is the first one.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="ic">01</div>
+        <h3>You send a list</h3>
+        <p>A CSV export from your booking or practice software: name, phone,
+        and the date you last saw them. Most systems export this in a couple of
+        clicks.</p>
+      </div>
+      <div class="card">
+        <div class="ic">02</div>
+        <h3>We text first</h3>
+        <p>Everyone gets a text before anything else. We only call the people
+        who reply YES &mdash; nobody gets a cold call out of nowhere.</p>
+      </div>
+      <div class="card">
+        <div class="ic">03</div>
+        <h3>The agent books them</h3>
+        <p>It talks through what they&rsquo;re due for, finds a slot that works,
+        and puts the appointment straight on your real calendar.</p>
+      </div>
+      <div class="card">
+        <div class="ic">04</div>
+        <h3>You see all of it</h3>
+        <p>Every call, recording and booking shows up in your dashboard, with a
+        weekly itemized invoice you can check line by line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What it costs</h2>
+    <p class="lede">You pay per booked appointment. Nothing if nothing books.</p>
+    <div class="formwrap" style="max-width:720px">
+      <p style="font-size:16px;margin-bottom:14px">The per-booking price is set
+      against what a visit is actually worth in your business &mdash; a dental
+      hygiene recall and an HVAC tune-up are not the same number. We settle it
+      on a 15-minute call before anything runs.</p>
+      <p style="font-size:16px;margin:0"><strong>No onboarding fee for
+      campaigns.</strong> The $249 onboarding applies to the inbound answering
+      service, not to this.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>What counts as a booking</h2>
+    <p class="lede">Worth being precise about, since it is the only thing you
+    are charged for.</p>
+    <div class="formwrap" style="max-width:720px">
+      <ul class="wb-list">
+        <li>An appointment our agent creates on your calendar, for someone on
+            the list you sent.</li>
+        <li>Cancelled within 48 hours of being booked &mdash; <strong>not
+            billed</strong>.</li>
+        <li>A reschedule counts once. The same person booked twice counts
+            once.</li>
+        <li>Anyone who already had an upcoming appointment is not billed.</li>
+        <li>Every billed booking is itemized, and each one matches a call
+            recording you can listen to.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="sample">
+  <div class="wrap">
+    <h2>Hear a sample call</h2>
+    <p class="lede">A recorded win-back call, start to finish.</p>
+    <!-- PLACEHOLDER: drop the recording at /winback-sample.mp3 and this plays.
+         Until the file exists the player is hidden and the note shows instead. -->
+    <div class="formwrap" style="max-width:720px">
+      <p style="margin:0;color:var(--muted)">Sample recording coming shortly.
+      In the meantime the live demo line answers as a real business &mdash;
+      call <a href="tel:+16476921081">+1 647 692 1081</a> and try it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>How we handle consent</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Text before call</h3>
+        <p>Everyone on the list is contacted by text first. We only place a call
+        to someone who has replied YES.</p>
+      </div>
+      <div class="card">
+        <h3>Opt-outs stick</h3>
+        <p>A STOP reply is honoured immediately and permanently. That number is
+        not contacted again, on this campaign or a later one.</p>
+      </div>
+      <div class="card">
+        <h3>Calls identify you</h3>
+        <p>The agent names your business at the start of the call. Nobody is
+        left guessing who is calling or why.</p>
+      </div>
+    </div>
+    <p class="fine" style="max-width:720px;margin-top:20px">You know your own
+    obligations around contacting past customers better than we do. We will tell
+    you exactly what we send and when; whether your list is appropriate to
+    contact is your call to make.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap center">
+    <h2>Start with 50 names, free</h2>
+    <p class="sub">If it books people, we price the rest of the list. If it
+    doesn&rsquo;t, you have lost nothing but the export.</p>
+    <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book the 15-minute call</a>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <div class="wb-faq">
+      <details class="role">
+        <summary><div class="role-top"><div><h3>Will it sound robotic?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>Judge it yourself rather than taking our word
+        for it &mdash; the demo line is live on <a href="tel:+16476921081">+1 647
+        692 1081</a>. It answers as a real business and books a real slot.</p></div>
+      </details>
+
+      <details class="role">
+        <summary><div class="role-top"><div><h3>What do you need from me?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>A CSV with name, phone number and last visit
+        date, plus access to the calendar you want appointments to land on.
+        That is the whole setup.</p></div>
+      </details>
+
+      <details class="role">
+        <summary><div class="role-top"><div><h3>What about no-shows?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>A no-show is billed &mdash; the booking was
+        made, and confirming it is your front desk's job as it would be for any
+        other appointment. If you would rather pay only on attendance, a
+        show-based price is available; ask on the call.</p></div>
+      </details>
+
+      <details class="role">
+        <summary><div class="role-top"><div><h3>What happens to my customers&rsquo; data?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>The list is used for your campaign and nothing
+        else. We never store health details &mdash; the agent works from
+        &ldquo;due for a visit&rdquo;, not from anyone's record. Call recordings
+        and transcripts follow the same retention as the rest of the service;
+        see the <a href="/privacy/">privacy policy</a>.</p></div>
+      </details>
+
+      <details class="role">
+        <summary><div class="role-top"><div><h3>Can it answer my inbound calls too?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>Yes &mdash; that is the main product. An AI
+        receptionist answers every incoming call, qualifies it and books it.
+        <a href="/">See how inbound works</a>.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- PLACEHOLDER: proof / case study. Nothing goes here until there is a real
+     campaign with real numbers and the client's permission to quote them. -->
+
+<section>
+  <div class="wrap center">
+    <h2>Which businesses this fits</h2>
+    <p class="sub">Anything with a &ldquo;you&rsquo;re due&rdquo; cycle.</p>
+    <div class="badges" style="justify-content:center">
+      <span class="badge">Dental hygiene recall</span>
+      <span class="badge">HVAC tune-ups and maintenance plans</span>
+      <span class="badge">Physio and chiro lapsed patients</span>
+      <span class="badge">Vet annual exams</span>
+      <span class="badge">Pest control</span>
+      <span class="badge">Auto service</span>
+    </div>
+    <div style="margin-top:30px">
+      <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Run a free 50-contact pilot</a>
+    </div>
+  </div>
+</section>
+"""
+
 # ------------------------------------------------------------ legal text ----
 
 PRIVACY_BODY = f"""<main class="wrap doc">
@@ -1256,6 +1520,11 @@ federal laws of Canada that apply there.</p>
 # ---------------------------------------------------------------- build ----
 
 PAGES = [
+    ("win-back", "Win-back campaigns | VoiceCaptures",
+     "Send us the customers you haven't seen in a year. We text them, call the "
+     "ones who say yes, and book them onto your calendar. Pay per booked "
+     "appointment, nothing if nothing books.", WINBACK_BODY, ""),
+
     ("about", "About VoiceCaptures",
      "VoiceCaptures builds AI voice assistants that answer the phone for small "
      "businesses across Toronto and the GTA. Who we are, how we build, and how "
@@ -1286,6 +1555,7 @@ def main():
             title=title, desc=desc, slug=slug, body=body, script=script,
             email=EMAIL, cal=CAL,
             cur_about=' aria-current="page"' if slug == "about" else "",
+            cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
         )
         (folder / "index.html").write_text(html, encoding="utf-8")
