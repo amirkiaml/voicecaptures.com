@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Call Dashboard · VoiceCaptures</title>
+<script>
+  // Apply the saved theme (or the device's) before first paint — no flash.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("vc_theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --ink2: #374151; --muted: #6b7280;
+    --line: #e6e8ec; --grid: #eef0f3; --hover: #fafbfc; --field: #ffffff;
+    --accent: #3b6fd8; --accent-soft: #dfe8fb; --hero-from: #eef3fd;
+    --c-calls: #3b6fd8; --c-booked: #1f9d55; --neutral-bar: #c3c8d0; --crosshair: #9ca3af;
+    --good: #1f9d55; --warn: #b45309; --bad: #dc2626; --gray: #9ca3af;
+    --good-soft: #e3f5ea; --warn-soft: #fdf1de; --bad-soft: #fde4e4; --gray-soft: #eef0f3;
+    --tip-bg: #14181f; --tip-ink: #ffffff;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1217; --card: #171b22; --ink: #e7eaf0; --ink2: #c4c9d3; --muted: #8b93a1;
+    --line: #262c36; --grid: #1f252e; --hover: #1c2129; --field: #11151b;
+    --accent: #7ea4f2; --accent-soft: #1d2a45; --hero-from: #1a2540;
+    --c-calls: #5b8ae6; --c-booked: #2bae6a; --neutral-bar: #4a5260; --crosshair: #6b7280;
+    --good: #4cc98a; --warn: #f0a33a; --bad: #f37b7b; --gray: #6b7280;
+    --good-soft: #15301f; --warn-soft: #33250f; --bad-soft: #3a1a1a; --gray-soft: #232831;
+    --tip-bg: #e7eaf0; --tip-ink: #14181f;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.45 "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  h1, .hero .val, .kpi .val, .ins .v, .brandbar span { font-family: Manrope, "DM Sans", sans-serif; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .range { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  .range button { border: 0; background: none; padding: 6px 12px; border-radius: 7px; cursor: pointer; font: inherit; color: var(--muted); }
+  .range button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; min-width: 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+  .row2 { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; margin-bottom: 12px; }
+  .stack { margin-bottom: 12px; }
+
+  .hero { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+          background: linear-gradient(120deg, var(--hero-from), var(--card) 70%); margin-bottom: 12px; }
+  .hero .label { color: var(--ink2); font-size: 14px; }
+  .hero .val { font-size: 36px; font-weight: 650; letter-spacing: -0.02em; }
+  .hero .note { color: var(--muted); font-size: 13px; max-width: 360px; }
+
+  .kpi .label { color: var(--muted); font-size: 13px; }
+  .kpi .val { font-size: 28px; font-weight: 600; margin-top: 4px; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .kpi .note { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .delta { font-size: 12px; font-weight: 600; }
+  .delta.up { color: var(--good); } .delta.down { color: var(--bad); } .delta.flat { color: var(--muted); }
+  .bar { height: 8px; background: var(--grid); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+
+  .panel-title { font-weight: 600; margin: 0; }
+  .panel-sub { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin: 0 0 8px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 16px; height: 0; border-top: 2.5px solid var(--c-calls); vertical-align: middle; margin-right: 6px; }
+  .legend i.b { border-top: 2px dashed var(--c-booked); }
+  .legend i.sq { width: 10px; height: 10px; border: 0; border-radius: 2px; background: var(--c-calls); }
+  .legend i.sq.n { background: var(--neutral-bar); }
+
+  .chart-box { position: relative; }
+  svg.chart { width: 100%; display: block; overflow: visible; }
+  .xlabels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .ymax { position: absolute; top: -2px; left: 0; font-size: 11px; color: var(--muted); background: var(--card); padding-right: 4px; }
+
+  .hbars { display: grid; gap: 10px; margin-top: 6px; }
+  .hb-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink2); }
+  .hb-top b { color: var(--ink); font-weight: 600; }
+  .hb-track { height: 10px; background: var(--grid); border-radius: 99px; margin-top: 4px; overflow: hidden; }
+  .hb-track span { display: block; height: 100%; border-radius: 99px; }
+
+  .insights { display: grid; gap: 14px; margin-top: 6px; }
+  .ins .k { color: var(--muted); font-size: 13px; }
+  .ins .v { font-size: 20px; font-weight: 600; }
+
+  #tip { position: fixed; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); font-size: 12px; line-height: 1.4;
+         padding: 6px 9px; border-radius: 7px; opacity: 0; transition: opacity .08s; z-index: 10; white-space: nowrap; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: var(--hover); }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .p-booked { background: var(--good-soft); color: var(--good); }
+  .p-pending { background: var(--warn-soft); color: var(--warn); }
+  .p-emergency { background: var(--bad-soft); color: var(--bad); }
+  .p-abandoned { background: var(--gray-soft); color: var(--muted); }
+  .p-other { background: var(--accent-soft); color: var(--accent); }
+  .detail td { background: var(--hover); }
+  .msgs { display: grid; gap: 8px; margin-top: 6px; max-width: 640px; }
+  .msg { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--card); }
+  .msg-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--ink2); }
+  .msg-head b { color: var(--ink); }
+  .msg-head .t { color: var(--muted); margin-left: auto; font-size: 12px; }
+  .msg-body { white-space: pre-wrap; font-size: 13px; color: var(--ink2); margin-top: 6px; }
+  .msg.failed { border-color: var(--bad); }
+  .msg-err { color: var(--bad); font-size: 12px; margin-top: 4px; }
+  .ico { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+  .msgcount { color: var(--muted); font-size: 12px; margin-left: 6px; white-space: nowrap; }
+  .detail .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-top: 8px; }
+  .detail audio { width: 100%; max-width: 420px; margin-top: 6px; }
+  .muted { color: var(--muted); }
+  .empty, .err { padding: 40px 10px; text-align: center; color: var(--muted); }
+  .more { display: block; margin: 12px auto 0; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 7px 16px; font: inherit; cursor: pointer; color: var(--accent); }
+  .hdr-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .gear { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--ink2); cursor: pointer; }
+  .settings { margin-bottom: 12px; }
+  .set-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .set-grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .set-grid select, .set-grid input { font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); min-width: 0; }
+  .set-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; flex-wrap: wrap; }
+  .set-k { font-size: 13px; color: var(--muted); width: 80px; padding-top: 5px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 99px; padding: 4px 10px; margin: 0 6px 6px 0; font-size: 13px; cursor: pointer; user-select: none; }
+  .chip input { margin: 0; }
+  .set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
+  .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn-ghost { background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  .row2.single { grid-template-columns: 1fr; }
+  @media (max-width: 760px) { .set-grid { grid-template-columns: 1fr 1fr; } }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+
+  @media (max-width: 860px) { .row2 { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .hide-sm { display: none; } h1 { font-size: 22px; } .kpi .val { font-size: 22px; } .hero .val { font-size: 30px; } }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+  .brandbar { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; }
+  .brandbar img { width: 30px; height: auto; }
+  .brandbar span { font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+  .acct { position: relative; }
+  .acct-btn { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink2); border-radius: 999px; padding: 4px 12px 4px 4px; font: inherit; cursor: pointer; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; }
+  .acct-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 12px 30px -12px rgba(0,0,0,.25); z-index: 20; }
+  .acct-menu .em { padding: 8px 10px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); margin-bottom: 4px; word-break: break-all; }
+  .acct-menu button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 9px 10px; border-radius: 8px; font: inherit; color: var(--ink); cursor: pointer; }
+  .acct-menu button:hover { background: var(--hover); }
+  .biz-select { font: inherit; font-size: 14px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); margin-top: 6px; }
+  .pw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 520px; }
+  .pw-grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .pw-grid input { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
+  .admin-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin: 6px 8px 0 0; background: var(--warn-soft); color: var(--warn); }
+  .premium-switch { display: inline-flex; align-items: center; gap: 8px; margin: 6px 8px 0 0; font-size: 13px; color: var(--ink2); cursor: pointer; user-select: none;
+                    border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 4px; background: var(--card); }
+  .premium-switch input { appearance: none; width: 32px; height: 18px; border-radius: 99px; background: var(--neutral-bar); position: relative; margin: 0; cursor: pointer; transition: background .15s; }
+  .premium-switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .premium-switch input:checked { background: var(--good); }
+  .premium-switch input:checked::after { transform: translateX(14px); }
+  .tx { margin-top: 6px; max-width: 720px; max-height: 420px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--card); display: grid; gap: 8px; }
+  .turn { display: grid; grid-template-columns: 74px 1fr; gap: 8px; align-items: start; }
+  .turn .who { font-size: 12px; color: var(--muted); padding-top: 6px; }
+  .turn .who button { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; cursor: pointer; }
+  .turn .bub { padding: 7px 11px; border-radius: 12px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
+  .turn.assistant .bub { background: var(--accent-soft); color: var(--ink); }
+  .turn.caller .bub { background: var(--gray-soft); color: var(--ink); }
+  .tx-btn { margin-top: 6px; border: 1px solid var(--line); background: var(--card); color: var(--accent); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .locked { margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border: 1px dashed var(--line); border-radius: 12px; padding: 10px 12px; max-width: 640px; color: var(--ink2); font-size: 14px; }
+  .locked .pbadge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: var(--warn-soft); color: var(--warn); }
+  .locked a { color: var(--accent); font-weight: 600; }
+  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .status-sel { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
+  .manual { font-weight: 400; opacity: .8; }
+  .admin-note { color: var(--warn); font-size: 12px; margin-top: 4px; }
+  .gate { max-width: 460px; margin: 10vh auto; text-align: center; }
+  .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
+  .gate p { color: var(--muted); }
+  @media (max-width: 640px) { .acct-btn .em-short { display: none; } .pw-grid { grid-template-columns: 1fr; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="/vc-auth.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brandbar" href="/"><img src="/logo-mark.png" alt=""><span>VoiceCaptures</span></a>
+    <div class="acct" id="acct" hidden>
+      <button class="acct-btn" id="acctBtn" type="button" aria-haspopup="true"><span class="avatar" id="avatar"></span><span class="em-short" id="emShort"></span></button>
+      <div class="acct-menu" id="acctMenu" hidden>
+        <div class="em" id="acctEmail"></div>
+        <button type="button" id="toPw">Change password</button>
+        <button type="button" id="signOut">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card gate" id="gate" hidden></div>
+
+  <div id="app" hidden>
+  <header>
+    <div>
+      <h1 id="biz">Loading…</h1>
+      <div class="sub">Every call your receptionist handled</div>
+      <span class="admin-tag" id="adminTag" hidden>Admin view</span>
+      <label class="premium-switch" id="premiumWrap" hidden title="Only admins see this switch">
+        <input type="checkbox" id="premiumToggle"> <span>Premium: recordings &amp; transcripts</span>
+      </label>
+      <select class="biz-select" id="bizSelect" hidden aria-label="Choose business"></select>
+    </div>
+    <div class="hdr-right">
+    <button class="gear" id="theme" type="button" aria-label="Switch light or dark theme">☾ Dark</button>
+    <button class="gear" id="gear" type="button">⚙ Customize</button>
+    <div class="range" id="range">
+      <button data-d="7" class="on">7 days</button>
+      <button data-d="30">30 days</button>
+      <button data-d="90">90 days</button>
+    </div>
+    </div>
+  </header>
+
+  <div class="card settings" id="pwPanel" hidden>
+    <p class="panel-title" style="margin-bottom:10px">Change password</p>
+    <div class="pw-grid">
+      <label>New password <input id="pw1" type="password" autocomplete="new-password" minlength="8"></label>
+      <label>Confirm <input id="pw2" type="password" autocomplete="new-password" minlength="8"></label>
+    </div>
+    <div class="set-actions">
+      <span class="muted" id="pwMsg">At least 8 characters.</span>
+      <button type="button" class="btn-ghost" id="pwCancel">Cancel</button>
+      <button type="button" class="btn" id="pwSave">Save password</button>
+    </div>
+  </div>
+
+  <div class="card settings" id="settings" hidden>
+    <div class="set-grid">
+      <label>Open from
+        <select id="sOpen"></select></label>
+      <label>Close at
+        <select id="sClose"></select></label>
+      <label>What you book
+        <input id="sLabel" maxlength="30" placeholder="Appointments"></label>
+      <label>Average job value ($)
+        <input id="sValue" type="number" min="0" step="1" placeholder="e.g. 350"></label>
+    </div>
+    <div class="set-row"><span class="set-k">Open days</span><span id="sDays"></span></div>
+    <div class="set-row"><span class="set-k">Show</span><span id="sSections"></span></div>
+    <div class="set-actions">
+      <span class="muted" id="sMsg"></span>
+      <button type="button" class="btn-ghost" id="sCancel">Cancel</button>
+      <button type="button" class="btn" id="sSave">Save</button>
+    </div>
+  </div>
+
+  <div class="card hero" id="hero" data-section="revenue" hidden></div>
+  <div class="grid" id="kpis"></div>
+
+  <div class="card stack" data-section="daily">
+    <p class="panel-title">Calls per day</p>
+    <p class="panel-sub">Hover a day for details</p>
+    <div class="legend"><span><i></i>All calls</span><span><i class="b"></i><span class="bl">Booked</span></span></div>
+    <div class="chart-box"><span class="ymax" id="dailyMax"></span><svg class="chart" id="daily" height="190"></svg></div>
+    <div class="xlabels" id="dailyX"></div>
+  </div>
+
+  <div class="row2">
+    <div class="card" data-section="hours">
+      <p class="panel-title">When people call</p>
+      <p class="panel-sub" id="hoursSub">By hour of day</p>
+      <div class="legend"><span><i class="sq"></i>After hours</span><span><i class="sq n"></i>Business hours</span></div>
+      <div class="chart-box"><span class="ymax" id="hoursMax"></span><svg class="chart" id="hours" height="160"></svg></div>
+      <div class="xlabels"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
+    </div>
+    <div class="card" data-section="outcomes">
+      <p class="panel-title">Call outcomes</p>
+      <p class="panel-sub">What happened on each call</p>
+      <div class="hbars" id="outcomes"></div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card" data-section="week">
+      <p class="panel-title">Busiest days</p>
+      <p class="panel-sub">Calls by day of week</p>
+      <div class="chart-box"><span class="ymax" id="weekMax"></span><svg class="chart" id="week" height="160"></svg></div>
+      <div class="xlabels" id="weekX"></div>
+    </div>
+    <div class="card" data-section="highlights">
+      <p class="panel-title">Highlights</p>
+      <div class="insights" id="insights"></div>
+    </div>
+  </div>
+
+  <div class="card" data-section="log">
+    <p class="panel-title">Call log</p>
+    <p class="panel-sub">Tap a call for the summary and recording</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>When</th><th>Caller</th><th>Status</th>
+          <th class="hide-sm">Request</th><th class="hide-sm">Length</th>
+        </tr></thead>
+        <tbody id="log"></tbody>
+      </table>
+    </div>
+    <button class="more" id="more" hidden>Show more</button>
+  </div>
+
+  <footer>Powered by VoiceCaptures</footer>
+  </div>
+</div>
+<div id="tip"></div>
+
+<script>
+let days = 7, shown = 25, allCalls = [], last = null, S = null;
+const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const SECTION_NAMES = { revenue: "Revenue estimate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fmtDur = s => s == null ? "—" : s < 60 ? `${Math.round(s)} sec` : `${Math.floor(s/60)} min ${Math.round(s%60)} sec`;
+const fmtMoney = n => "$" + Math.round(n).toLocaleString();
+const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: "America/Toronto", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+const fmtHour = h => h === 0 ? "12am" : h < 12 ? `${h}am` : h === 12 ? "12pm" : `${h - 12}pm`;
+const pct = (a, b) => b ? Math.round((a / b) * 100) : 0;
+
+/* ---------- tooltip ---------- */
+const tip = $("tip");
+function showTip(e, html) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const w = tip.offsetWidth, x = Math.min(e.clientX + 12, innerWidth - w - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY - tip.offsetHeight - 10) + "px";
+}
+const hideTip = () => { tip.style.opacity = 0; };
+
+/* ---------- KPIs ---------- */
+function delta(cur, prev, unit = "%") {
+  if (prev == null) return "";
+  if (unit === "pts") {
+    const d = cur - prev;
+    return `<span class="delta ${d > 0 ? "up" : d < 0 ? "down" : "flat"}">${d > 0 ? "▲" : d < 0 ? "▼" : "–"} ${Math.abs(d)} pts</span>`;
+  }
+  if (!prev) return cur ? `<span class="delta up">new</span>` : "";
+  const d = Math.round(((cur - prev) / prev) * 100);
+  return `<span class="delta ${d > 0 ? "up" : d < 0 ? "down" : "flat"}">${d > 0 ? "▲" : d < 0 ? "▼" : "–"} ${Math.abs(d)}%</span>`;
+}
+
+function renderKpis(t, p) {
+  const hero = $("hero");
+  if (t.estRevenue != null) {
+    hero.hidden = false;
+    hero.innerHTML = `
+      <div><div class="label">Estimated revenue captured</div><div class="val">${esc(fmtMoney(t.estRevenue))}</div></div>
+      <div class="note">${esc(S.bookingLabel.toLowerCase())} booked + emergencies × your average job value of ${esc(fmtMoney(S.avgJobValue))}.</div>`;
+  } else hero.hidden = true;
+  if (S.hiddenSections.includes("revenue")) hero.hidden = true;
+
+  const cards = [
+    { label: "Calls answered", val: t.totalCalls, d: delta(t.totalCalls, p.totalCalls), note: `${t.abandoned} hung up early` },
+    { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked) },
+    { label: "Booking rate", val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
+    { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of calls came in while you were closed` },
+    { label: "Emergencies captured", val: t.emergencies },
+    { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) }
+  ];
+  $("kpis").innerHTML = cards.map(c => `
+    <div class="card kpi">
+      <div class="label">${esc(c.label)}</div>
+      <div class="val">${esc(c.val)} ${c.d || ""}</div>
+      ${c.bar != null ? `<div class="bar"><span style="width:${Math.min(100, c.bar)}%"></span></div>` : ""}
+      ${c.note ? `<div class="note">${esc(c.note)}</div>` : ""}
+    </div>`).join("");
+}
+
+/* ---------- daily line chart with crosshair ---------- */
+function renderDaily(series) {
+  const svg = $("daily");
+  const W = svg.clientWidth || 800, H = 190, padT = 10;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const max = Math.max(1, ...series.map(d => d.calls));
+  const n = series.length;
+  const x = i => n === 1 ? W / 2 : (i / (n - 1)) * W;
+  const y = v => padT + (1 - v / max) * (H - padT - 2);
+  const path = key => series.map((d, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(d[key]).toFixed(1)).join(" ");
+  const line = path("calls");
+  const grid = [0.5, 1].map(f => `<line x1="0" x2="${W}" y1="${y(max * f)}" y2="${y(max * f)}" style="stroke:var(--grid)"/>`).join("");
+  svg.innerHTML = `
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" style="stop-color:var(--c-calls);stop-opacity:.25"/><stop offset="1" style="stop-color:var(--c-calls);stop-opacity:0"/>
+    </linearGradient></defs>
+    ${grid}
+    <path d="${line} L ${x(n - 1)} ${H} L ${x(0)} ${H} Z" fill="url(#g)"/>
+    <path d="${line}" fill="none" style="stroke:var(--c-calls)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path("booked")}" fill="none" style="stroke:var(--c-booked)" stroke-width="2" stroke-dasharray="5 4"/>
+    <line id="xh" y1="0" y2="${H}" style="stroke:var(--crosshair)" stroke-width="1" opacity="0"/>
+    <circle id="dot" r="4" style="fill:var(--c-calls);stroke:var(--card)" stroke-width="2" opacity="0"/>
+    <rect width="${W}" height="${H}" fill="transparent" id="hit"/>`;
+  $("dailyMax").textContent = max;
+
+  const hit = svg.querySelector("#hit"), xh = svg.querySelector("#xh"), dot = svg.querySelector("#dot");
+  hit.onmousemove = e => {
+    const r = svg.getBoundingClientRect();
+    const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width) * (n - 1))));
+    const d = series[i];
+    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("opacity", 1);
+    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(d.calls)); dot.setAttribute("opacity", 1);
+    showTip(e, `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked`);
+  };
+  hit.onmouseleave = () => { hideTip(); xh.setAttribute("opacity", 0); dot.setAttribute("opacity", 0); };
+
+  const maxLabels = innerWidth < 640 ? 4 : 8, step = Math.ceil(n / maxLabels);
+  $("dailyX").innerHTML = series.filter((d, i) => i % step === 0 || i === n - 1).map(d => `<span>${esc(d.label)}</span>`).join("");
+}
+
+/* ---------- vertical bars ---------- */
+function renderBars(svgId, maxId, items, { color, tipFor }) {
+  const svg = $(svgId);
+  const W = svg.clientWidth || 600, H = Number(svg.getAttribute("height"));
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const max = Math.max(1, ...items.map(d => d.calls));
+  const n = items.length, gap = 2, bw = W / n - gap;
+  const r = Math.min(4, bw / 2);
+  const bars = items.map((d, i) => {
+    const h = d.calls ? Math.max(3, (d.calls / max) * (H - 4)) : 0;
+    const x = i * (W / n) + gap / 2, y = H - h;
+    // Rounded top, square base anchored to the baseline.
+    const shape = h ? `<path d="M${x},${H} V${y + r} Q${x},${y} ${x + r},${y} H${x + bw - r} Q${x + bw},${y} ${x + bw},${y + r} V${H} Z" style="fill:${color(d)}"/>` : "";
+    return `${shape}<rect x="${i * (W / n)}" y="0" width="${W / n}" height="${H}" fill="transparent" data-i="${i}"/>`;
+  }).join("");
+  svg.innerHTML = `<line x1="0" x2="${W}" y1="${H - (H - 4) / 2}" y2="${H - (H - 4) / 2}" style="stroke:var(--grid)"/>
+    <line x1="0" x2="${W}" y1="4" y2="4" style="stroke:var(--grid)"/>${bars}
+    <line x1="0" x2="${W}" y1="${H}" y2="${H}" style="stroke:var(--line)"/>`;
+  $(maxId).textContent = max;
+  svg.querySelectorAll("rect[data-i]").forEach(el => {
+    el.onmousemove = e => showTip(e, tipFor(items[el.dataset.i]));
+    el.onmouseleave = hideTip;
+  });
+}
+
+function renderHours(byHour, total) {
+  renderBars("hours", "hoursMax", byHour, {
+    color: d => d.afterHours ? "var(--c-calls)" : "var(--neutral-bar)",
+    tipFor: d => `<b>${fmtHour(d.hour)}–${fmtHour((d.hour + 1) % 24)}</b><br>${d.calls} calls${d.afterHours ? " · after hours" : ""}`
+  });
+}
+
+function renderWeek(byWeekday) {
+  renderBars("week", "weekMax", byWeekday, {
+    color: () => "var(--c-calls)",
+    tipFor: d => `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked`
+  });
+  $("weekX").innerHTML = byWeekday.map(d => `<span>${esc(d.label)}</span>`).join("");
+}
+
+/* ---------- outcomes ---------- */
+function renderOutcomes(o, total) {
+  const rows = [
+    ["Booked", o.booked, "var(--good)"],
+    ["Needs callback", o.pending, "var(--warn)"],
+    ["Emergency", o.emergency, "var(--bad)"],
+    ["Hung up early", o.abandoned, "var(--gray)"],
+    ["Inquiry", o.other, "var(--accent)"],
+    ["Spam / not a lead", o.spam || 0, "var(--neutral-bar)"]
+  ].filter(r => r[1] > 0 || !["Inquiry", "Spam / not a lead"].includes(r[0]));
+  $("outcomes").innerHTML = rows.map(([label, n, col]) => `
+    <div>
+      <div class="hb-top"><span>${label}</span><span><b>${n}</b> · ${pct(n, total)}%</span></div>
+      <div class="hb-track"><span style="width:${pct(n, total)}%;background:${col}"></span></div>
+    </div>`).join("");
+}
+
+/* ---------- highlights ---------- */
+function renderInsights(d) {
+  const t = d.totals;
+  const peak = d.byHour.reduce((a, b) => b.calls > a.calls ? b : a, d.byHour[0]);
+  const busiest = d.byWeekday.reduce((a, b) => b.calls > a.calls ? b : a, d.byWeekday[0]);
+  const items = t.totalCalls ? [
+    ["Peak hour", peak.calls ? `${fmtHour(peak.hour)}–${fmtHour((peak.hour + 1) % 24)}` : "—"],
+    ["Busiest day", busiest.calls ? busiest.label : "—"],
+    ["Answered while you were closed", `${t.afterHours} calls (${pct(t.afterHours, t.totalCalls)}%)`],
+    [`${S.bookingLabel} booked after hours`, String(t.bookedAfterHours)],
+    ["Repeat callers", t.uniqueCallers ? `${t.repeatCallers} of ${t.uniqueCallers} callers (${pct(t.repeatCallers, t.uniqueCallers)}%)` : "—"]
+  ] : [["No calls yet", "Your stats will appear here after the first call."]];
+  $("insights").innerHTML = items.map(([k, v]) => `<div class="ins"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
+  const od = S.openDays.length === 5 && S.openDays.join() === "0,1,2,3,4" ? "weekdays"
+    : S.openDays.length === 7 ? "every day" : S.openDays.map(i => DAY_NAMES[i]).join(", ") || "no days";
+  $("hoursSub").textContent = `By hour of day · open ${fmtHour(S.openHour)}–${fmtHour(S.closeHour % 24)} ${od}`;
+}
+
+/* ---------- call log ---------- */
+function statusPill(c) {
+  const map = {
+    emergency: ["p-emergency", "Emergency"],
+    booked: ["p-booked", c.tour_booking_id ? "Tour booked" : "Booked"],
+    pending: ["p-pending", "Needs callback"],
+    abandoned: ["p-abandoned", "Hung up early"],
+    other: ["p-other", "Inquiry"],
+    spam: ["p-abandoned", "Spam / not a lead"]
+  };
+  const [cls, label] = map[c.outcome] || map.other;
+  const manual = c.status_override ? ` <span class="manual" title="Changed by hand">✎</span>` : "";
+  return `<span class="pill ${cls}">${esc(label)}${manual}</span>`;
+}
+
+function renderMessages(list) {
+  if (!list || !list.length) return "";
+  const who = m => m.recipient === "caller" ? "caller" : "you";
+  const fmtT = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" });
+  return `<div class="k">Texts &amp; emails sent</div><div class="msgs">${list.map(m => `
+    <div class="msg ${m.status === "failed" ? "failed" : ""}">
+      <div class="msg-head">
+        <span class="ico">${m.channel === "email" ? "EMAIL" : "TEXT"}</span>
+        <b>To ${who(m)}</b><span>${esc(m.to_address || "")}</span>
+        <span class="t">${m.status === "failed" ? "Not delivered · " : ""}${esc(fmtT(m.created_at))}</span>
+      </div>
+      ${m.subject ? `<div class="msg-body"><b>${esc(m.subject)}</b></div>` : ""}
+      ${m.body ? `<div class="msg-body">${esc(m.body)}</div>` : ""}
+      ${m.status === "failed" && m.error ? `<div class="msg-err">${esc(m.error)}</div>` : ""}
+    </div>`).join("")}</div>`;
+}
+
+/* ---------- premium: recordings + transcripts ---------- */
+const fmtT = t => t == null ? "" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+
+function renderPremium(c, i) {
+  if (!last) return "";
+  if (!last.canSeeRecordings) {
+    if (!c.has_recording) return "";
+    return `<div class="locked"><span class="pbadge">PREMIUM</span>
+      <span>🔒 Listen to this call and read the full transcript.</span>
+      <a href="mailto:hello@voicecaptures.com?subject=Premium%20recordings%20%26%20transcripts">Upgrade</a></div>`;
+  }
+  const note = last.isAdmin && !last.features.recordings
+    ? `<div class="admin-note">Admin preview — this client can't see recordings or transcripts (Premium is off).</div>` : "";
+  const audio = c.recording_url
+    ? `<div class="k">Recording</div><audio controls preload="none" id="au${i}" src="${esc(c.recording_url)}"></audio>` : "";
+  const tx = c.vapi_call_id
+    ? `<div class="k">Transcript</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">Show transcript</button><div id="tx${i}"></div>` : "";
+  return note + audio + tx;
+}
+
+async function loadTranscript(btn) {
+  const box = $("tx" + btn.dataset.i);
+  btn.disabled = true; btn.textContent = "Loading…";
+  try {
+    const r = await api(`/api/dashboard/transcript/${encodeURIComponent(btn.dataset.call)}`);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not load the transcript");
+    btn.remove();
+    if (d.turns && d.turns.length) {
+      box.innerHTML = `<div class="tx">${d.turns.map(t => `
+        <div class="turn ${t.role === "caller" ? "caller" : "assistant"}">
+          <div class="who">${t.role === "caller" ? "Caller" : "Receptionist"}${t.t != null ? `<br><button type="button" data-t="${t.t}" title="Play from here">${fmtT(t.t)}</button>` : ""}</div>
+          <div class="bub">${esc(t.text)}</div>
+        </div>`).join("")}</div>`;
+      const audio = $("au" + btn.dataset.i);
+      box.querySelectorAll("button[data-t]").forEach(b => b.onclick = e => {
+        e.stopPropagation();
+        if (audio) { audio.currentTime = Number(b.dataset.t); audio.play(); }
+      });
+    } else if (d.text) {
+      box.innerHTML = `<div class="tx"><div class="turn"><div class="bub">${esc(d.text)}</div></div></div>`;
+    } else {
+      box.innerHTML = `<div class="muted" style="margin-top:6px">No transcript was saved for this call.</div>`;
+    }
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    btn.disabled = false; btn.textContent = "Show transcript";
+    box.innerHTML = `<div class="admin-note">${esc(e.message)}</div>`;
+  }
+}
+
+$("premiumToggle").onchange = async e => {
+  const on = e.target.checked;
+  e.target.disabled = true;
+  try {
+    const r = await api(`/api/dashboard/admin/features`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recordings: on })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not update");
+    await load();
+  } catch (err) {
+    e.target.checked = !on;
+    alertMsg(err.message);
+  } finally { e.target.disabled = false; }
+};
+function alertMsg(m) { $("biz").insertAdjacentHTML("afterend", `<div class="admin-note">${esc(m)}</div>`); }
+
+/* ---------- manual status ---------- */
+const openCalls = new Set(); // details stay open across re-renders
+const STATUS_LABELS = { booked: "Booked", pending: "Needs callback", emergency: "Emergency", other: "Inquiry",
+  abandoned: "Hung up early", spam: "Spam / not a lead" };
+
+function statusEditor(c) {
+  if (c.id == null) return "";
+  const autoLabel = STATUS_LABELS[c.auto_outcome] || "Inquiry";
+  const opts = [`<option value="auto" ${c.status_override ? "" : "selected"}>Automatic (${esc(autoLabel)})</option>`]
+    .concat(Object.entries(STATUS_LABELS).map(([k, v]) =>
+      `<option value="${k}" ${c.status_override === k ? "selected" : ""}>${esc(v)}</option>`)).join("");
+  return `<div class="status-row"><span class="k" style="margin:0">Status</span>
+    <select class="status-sel" data-id="${esc(c.id)}" aria-label="Change call status">${opts}</select>
+    <span class="status-msg muted"></span></div>`;
+}
+
+async function setStatus(sel) {
+  const msg = sel.parentElement.querySelector(".status-msg");
+  sel.disabled = true; msg.textContent = "Saving…";
+  try {
+    const r = await api(`/api/dashboard/calls/${encodeURIComponent(sel.dataset.id)}/status`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: sel.value })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not save");
+    await load(); // every number and chart recalculates from the new status
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    sel.disabled = false; msg.textContent = e.message;
+  }
+}
+
+function renderLog(all) {
+  const tb = $("log"), more = $("more");
+  const calls = all.slice(0, shown);
+  more.hidden = all.length <= shown;
+  more.textContent = `Show more (${all.length - shown} older)`;
+  if (!calls.length) { tb.innerHTML = `<tr><td colspan="5" class="empty">No calls in this period yet.</td></tr>`; return; }
+  tb.innerHTML = calls.map((c, i) => `
+    <tr class="row" data-i="${i}">
+      <td>${esc(fmtWhen(c.created_at))}</td>
+      <td>${esc(c.caller_name || "Unknown")}<div class="muted" style="font-size:12px">${esc(c.phone || c.caller_id || "")}</div></td>
+      <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}</td>
+      <td class="hide-sm">${esc((c.issue_description || "").slice(0, 70))}${(c.issue_description || "").length > 70 ? "…" : ""}</td>
+      <td class="hide-sm">${esc(fmtDur(c.call_duration_seconds))}</td>
+    </tr>
+    <tr class="detail" id="d${i}" data-id="${esc(c.id)}" ${openCalls.has(String(c.id)) ? "" : "hidden"}><td colspan="5">
+      ${statusEditor(c)}
+      ${c.address ? `<div class="k">Address</div><div>${esc(c.address)}</div>` : ""}
+      ${c.tour_start ? `<div class="k">Tour</div><div>${esc(c.tour_start)}</div>` : ""}
+      ${c.preferred_date ? `<div class="k">Appointment</div><div>${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : ""}
+      ${c.caller_email ? `<div class="k">Email</div><div>${esc(c.caller_email)}</div>` : ""}
+      <div class="k">Request</div><div>${esc(c.issue_description || "—")}</div>
+      ${c.summary ? `<div class="k">Call summary</div><div>${esc(c.summary)}</div>` : ""}
+      ${renderPremium(c, i)}
+      ${renderMessages(c.messages)}
+    </td></tr>`).join("");
+  tb.querySelectorAll("tr.row").forEach(r => r.onclick = () => {
+    const d = $("d" + r.dataset.i); d.hidden = !d.hidden;
+    if (d.hidden) openCalls.delete(d.dataset.id); else openCalls.add(d.dataset.id);
+  });
+  tb.querySelectorAll(".status-sel").forEach(sel => {
+    sel.onclick = e => e.stopPropagation();
+    sel.onchange = () => setStatus(sel);
+  });
+  tb.querySelectorAll(".tx-btn").forEach(b => b.onclick = e => { e.stopPropagation(); loadTranscript(b); });
+}
+
+function applySections() {
+  document.querySelectorAll("[data-section]").forEach(el => {
+    if (el.id === "hero") return; // hero has its own visibility rule
+    el.hidden = S.hiddenSections.includes(el.dataset.section);
+  });
+  document.querySelectorAll(".row2").forEach(row => {
+    const visible = [...row.children].filter(c => !c.hidden).length;
+    row.hidden = visible === 0;
+    row.classList.toggle("single", visible === 1);
+  });
+  document.querySelectorAll(".bl").forEach(el => el.textContent = `${S.bookingLabel} booked`);
+}
+
+function renderAll(data) {
+  S = data.settings;
+  applySections();
+  renderKpis(data.totals, data.previous || {});
+  renderDaily(data.daily);
+  renderHours(data.byHour, data.totals.totalCalls);
+  renderWeek(data.byWeekday);
+  renderOutcomes(data.outcomes, data.totals.totalCalls);
+  renderInsights(data);
+}
+
+/* ---------- auth ---------- */
+let SB = null, business = null;
+try { business = localStorage.getItem("vc_business"); } catch (e) {}
+const toLogin = () => location.replace("/login/?next=/dashboard/");
+
+async function api(path, opts = {}) {
+  const { data: { session } } = await SB.auth.getSession(); // refreshes the token when needed
+  if (!session) { toLogin(); throw new Error("Signed out"); }
+  const sep = path.includes("?") ? "&" : "?";
+  const url = vcAuth.API + path + (business ? `${sep}business=${encodeURIComponent(business)}` : "");
+  const r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${session.access_token}` } });
+  if (r.status === 401) { await SB.auth.signOut(); toLogin(); throw new Error("Signed out"); }
+  return r;
+}
+
+function showGate(html) {
+  $("app").hidden = true;
+  $("gate").hidden = false;
+  $("gate").innerHTML = html;
+}
+
+function renderAccount(email) {
+  $("acct").hidden = false;
+  $("avatar").textContent = (email || "?").charAt(0).toUpperCase();
+  $("emShort").textContent = email;
+  $("acctEmail").textContent = `Signed in as ${email}`;
+}
+
+function renderBusinesses(list, current, isAdmin) {
+  const sel = $("bizSelect");
+  $("adminTag").hidden = !isAdmin;
+  sel.hidden = !list || (list.length < 2 && !isAdmin);
+  if (sel.hidden) return;
+  sel.innerHTML = list.map(b => `<option value="${esc(b.id)}" ${b.id === current ? "selected" : ""}>${esc(b.name)}</option>`).join("");
+}
+
+async function load() {
+  try {
+    const r = await api(`/api/dashboard?days=${days}`);
+    const data = await r.json();
+    if (r.status === 403) {
+      return showGate(`<h2>No business linked yet</h2>
+        <p>You're signed in as <b>${esc(data.email || "")}</b>, but that email isn't connected to a VoiceCaptures account.
+        Ask us to add it, or log in with the email we set you up with.</p>
+        <button class="btn" type="button" onclick="signOut()">Log out</button>`);
+    }
+    if (!r.ok) throw new Error(data.error || "Could not load dashboard");
+    $("gate").hidden = true; $("app").hidden = false;
+    last = data;
+    business = data.businessId;
+    renderBusinesses(data.businesses, data.businessId, data.isAdmin);
+    $("premiumWrap").hidden = !data.isAdmin;
+    $("premiumToggle").checked = !!(data.features && data.features.recordings);
+    $("biz").textContent = data.businessName;
+    document.title = `${data.businessName} · Calls`;
+    renderAll(data);
+    allCalls = data.calls;
+    renderLog(allCalls);
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    $("app").hidden = false;
+    $("biz").textContent = "Dashboard unavailable";
+    $("kpis").innerHTML = `<div class="card err">${esc(e.message)}</div>`;
+  }
+}
+
+/* ---------- owner settings ---------- */
+function openSettings() {
+  const hourOpts = (sel, from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
+    .map(h => `<option value="${h}" ${h === sel ? "selected" : ""}>${h === 24 ? "12am (midnight)" : fmtHour(h)}</option>`).join("");
+  $("sOpen").innerHTML = hourOpts(S.openHour, 0, 23);
+  $("sClose").innerHTML = hourOpts(S.closeHour, 1, 24);
+  $("sLabel").value = S.bookingLabel;
+  $("sValue").value = S.avgJobValue ?? "";
+  $("sDays").innerHTML = DAY_NAMES.map((d, i) =>
+    `<label class="chip"><input type="checkbox" value="${i}" ${S.openDays.includes(i) ? "checked" : ""}>${d}</label>`).join("");
+  $("sSections").innerHTML = Object.entries(SECTION_NAMES).map(([k, v]) =>
+    `<label class="chip"><input type="checkbox" value="${k}" ${S.hiddenSections.includes(k) ? "" : "checked"}>${v}</label>`).join("");
+  $("sMsg").textContent = "";
+  $("settings").hidden = false;
+}
+
+async function saveSettings() {
+  const openHour = Number($("sOpen").value), closeHour = Number($("sClose").value);
+  if (closeHour <= openHour) { $("sMsg").textContent = "Closing time must be after opening time."; return; }
+  const body = {
+    openHour, closeHour,
+    openDays: [...$("sDays").querySelectorAll("input:checked")].map(i => Number(i.value)),
+    bookingLabel: $("sLabel").value.trim() || "Appointments",
+    avgJobValue: $("sValue").value === "" ? null : Number($("sValue").value),
+    hiddenSections: [...$("sSections").querySelectorAll("input:not(:checked)")].map(i => i.value)
+  };
+  $("sMsg").textContent = "Saving…";
+  try {
+    const r = await api(`/api/dashboard/settings`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Could not save");
+    $("settings").hidden = true;
+    load();
+  } catch (e) { $("sMsg").textContent = e.message; }
+}
+
+/* ---------- theme ---------- */
+function syncThemeButton() {
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  $("theme").textContent = dark ? "☀ Light" : "☾ Dark";
+}
+$("theme").onclick = () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("vc_theme", next); } catch (e) {}
+  syncThemeButton();
+};
+syncThemeButton();
+
+$("gear").onclick = () => S && ($("settings").hidden ? openSettings() : ($("settings").hidden = true));
+$("sCancel").onclick = () => { $("settings").hidden = true; };
+$("sSave").onclick = saveSettings;
+
+$("range").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  days = Number(b.dataset.d); shown = 25;
+  document.querySelectorAll("#range button").forEach(x => x.classList.toggle("on", x === b));
+  load();
+};
+$("more").onclick = () => { shown += 50; renderLog(allCalls); };
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => last && renderAll(last), 150); });
+
+/* ---------- account menu ---------- */
+let leaving = false;
+async function signOut() { leaving = true; try { await SB.auth.signOut(); } catch (e) {} location.replace("/login/"); }
+$("acctBtn").onclick = e => { e.stopPropagation(); $("acctMenu").hidden = !$("acctMenu").hidden; };
+document.addEventListener("click", e => { if (!$("acct").contains(e.target)) $("acctMenu").hidden = true; });
+$("signOut").onclick = signOut;
+$("toPw").onclick = () => { $("acctMenu").hidden = true; $("pw1").value = $("pw2").value = ""; $("pwMsg").textContent = "At least 8 characters."; $("pwPanel").hidden = false; $("pw1").focus(); };
+$("pwCancel").onclick = () => { $("pwPanel").hidden = true; };
+$("pwSave").onclick = async () => {
+  const a = $("pw1").value, b = $("pw2").value;
+  if (a.length < 8) return void ($("pwMsg").textContent = "Use at least 8 characters.");
+  if (a !== b) return void ($("pwMsg").textContent = "The passwords don't match.");
+  $("pwMsg").textContent = "Saving…";
+  const { error } = await SB.auth.updateUser({ password: a });
+  if (error) return void ($("pwMsg").textContent = error.message);
+  $("pwMsg").textContent = "Password updated.";
+  setTimeout(() => { $("pwPanel").hidden = true; }, 1200);
+};
+$("bizSelect").onchange = e => {
+  business = e.target.value;
+  try { localStorage.setItem("vc_business", business); } catch (err) {}
+  shown = 25; load();
+};
+
+vcAuth.client().then(async ({ sb }) => {
+  SB = sb;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return toLogin();
+  renderAccount(session.user.email);
+  // Signed out in another tab, or the session expired: go to log in.
+  sb.auth.onAuthStateChange((event) => { if (event === "SIGNED_OUT" && !leaving) toLogin(); });
+  await load();
+  // Auto-refresh, but never while someone has a call open (it would close it mid-listen).
+  setInterval(() => { if (!document.querySelector("tr.detail:not([hidden])")) load(); }, 60000);
+}).catch(err => showGate(`<h2>Can't reach the dashboard</h2><p>${esc(err.message)}</p>`));
+</script>
+</body>
+</html>
