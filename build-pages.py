@@ -272,13 +272,14 @@ html[data-theme="light"] .nav-a.nav-cal{{box-shadow:0 4px 14px rgba(245,158,11,.
 html .nav-a.nav-dash,
 html[data-theme="light"] .nav-a.nav-dash,
 html[data-theme="dark"] .nav-a.nav-dash{{
-  background:#E24B4A;color:#fff;font-weight:700;border-color:#E24B4A;
+  background:none;color:var(--text);font-weight:600;
+  border:1px solid color-mix(in srgb,var(--blue) 42%,transparent);
   display:inline-flex;align-items:center;gap:7px}}
 html .nav-a.nav-dash:hover,
 html[data-theme="light"] .nav-a.nav-dash:hover,
 html[data-theme="dark"] .nav-a.nav-dash:hover{{
-  background:#D13B3A;color:#fff;border-color:#D13B3A}}
-html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.28)}}
+  background:var(--blue-glow);color:var(--text);
+  border-color:color-mix(in srgb,var(--blue) 70%,transparent)}}
 .nav-dash .dot{{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
   box-shadow:0 0 0 0 rgba(56,189,248,.8);animation:dashblip 1.9s ease-out infinite}}
 @keyframes dashblip{{
@@ -286,8 +287,9 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
   70% {{box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}}
   100%{{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}}
 }}
-.nav-dash .tag{{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;background:rgba(255,255,255,.22);border-radius:4px;padding:2px 6px}}
+.nav-dash .tag{{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
+  border-radius:4px;padding:2px 5px}}
 @media (prefers-reduced-motion:reduce){{ .nav-dash .dot{{animation:none}} }}
 
 /* Between the nav's hide breakpoint and ~1180px the bar is now one item
@@ -321,15 +323,19 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
   font-weight:600;color:var(--text);background:none;border:0;cursor:pointer;margin:0;
   padding:11px 12px;border-radius:10px;text-decoration:none;line-height:1.4}}
 .mnav-a:hover{{background:rgba(127,127,127,.09);color:var(--text)}}
-.mnav-dash{{display:flex;align-items:center;gap:9px;font-size:15.5px;font-weight:700;
-  color:#fff;background:#E24B4A;border-radius:10px;padding:12px 14px;margin-bottom:6px;
-  text-decoration:none}}
-.mnav-dash:hover{{background:#D13B3A;color:#fff}}
+.mnav-dash{{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:700;
+  color:var(--text);background:var(--bg3);
+  border:1px solid color-mix(in srgb,var(--blue) 40%,transparent);
+  border-radius:12px;padding:13px 14px;margin-bottom:10px;text-decoration:none}}
+.mnav-dash:hover{{background:var(--blue-glow);color:var(--text)}}
+.mnav-dash .mnav-dash-t{{display:block;line-height:1.3}}
+.mnav-dash .mnav-dash-s{{display:block;font-size:12.5px;font-weight:500;color:var(--muted);
+  line-height:1.35;margin-top:1px}}
 .mnav-dash .dot{{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
   animation:dashblip 1.9s ease-out infinite}}
-.mnav-dash .tag{{margin-left:auto;font-style:normal;font-size:10px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.22);
-  border-radius:4px;padding:2px 6px}}
+.mnav-dash .tag{{margin-left:auto;align-self:flex-start;font-style:normal;font-size:9.5px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);
+  background:var(--blue-glow);border-radius:4px;padding:2px 5px}}
 .mnav-foot{{display:flex;flex-direction:column;gap:9px;margin-top:16px;
   padding-top:16px;border-top:1px solid var(--line)}}
 .mnav-foot .btn{{width:100%;font-size:14.5px;padding:12px 18px}}
@@ -339,6 +345,11 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
   .theme-btn{{margin-left:0}}
 }}
 @media (min-width:901px){{ .mnav{{display:none}} }}
+
+/* One shared height for every control in the bar. */
+.bar{{align-items:center}}
+.nav .nav-a{{height:38px;display:inline-flex;align-items:center;padding:0 13px;line-height:1}}
+.theme-btn{{width:38px;height:38px}}
 </style>
 </head>
 <body>
@@ -355,7 +366,7 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
       <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
       <a class="nav-a" href="/about/#contact">Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
             aria-expanded="false" aria-controls="mnav">
@@ -370,7 +381,11 @@ html[data-theme="light"] .nav-a.nav-dash{{box-shadow:0 4px 14px rgba(226,75,74,.
   <div class="mnav" id="mnav" hidden>
     <div class="mnav-in">
       <a class="mnav-dash" href="/login">
-        <span class="dot" aria-hidden="true"></span>Members dashboard
+        <span class="dot" aria-hidden="true"></span>
+        <span>
+          <span class="mnav-dash-t">Members dashboard</span>
+          <span class="mnav-dash-s">For VoiceCaptures client businesses</span>
+        </span>
         <em class="tag">New</em>
       </a>
       <a class="mnav-a" href="/">Home</a>
