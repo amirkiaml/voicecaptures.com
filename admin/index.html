@@ -89,6 +89,22 @@
   .err { color: var(--bad); font-size: 13px; }
   .empty { padding: 40px 10px; text-align: center; color: var(--muted); }
   .more { display: block; margin: 12px auto 0; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .tabs button { border: 0; background: none; font: inherit; font-size: 14px; color: var(--muted); padding: 9px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .good-t { color: var(--good); } .warn-t { color: var(--warn); } .bad-t { color: var(--bad); }
+  .price { display: flex; gap: 6px; align-items: center; }
+  .price input { width: 90px; font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
+  .bars { display: grid; gap: 6px; max-width: 520px; }
+  .bars .b { display: grid; grid-template-columns: 90px 1fr 110px; gap: 8px; align-items: center; font-size: 13px; }
+  .bars .t { height: 8px; background: var(--gray-soft); border-radius: 99px; overflow: hidden; }
+  .bars .t span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .check { display: grid; grid-template-columns: 24px 1fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .check:last-child { border-bottom: 0; }
+  .tagok { color: var(--good); font-weight: 700; } .tagbad { color: var(--bad); font-weight: 700; }
+  .sub-table { width: 100%; font-size: 13px; margin-top: 6px; }
+  .sub-table td, .sub-table th { padding: 6px 8px; }
   label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px) { .hide-sm { display: none; } }
@@ -111,6 +127,13 @@
   <div id="gate" class="card empty" hidden></div>
 
   <div id="app" hidden>
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="calls" class="on">All calls</button>
+    <button type="button" data-tab="money">Costs &amp; margin</button>
+    <button type="button" data-tab="notif">Notifications</button>
+    <button type="button" data-tab="health">System check</button>
+  </nav>
+  <section id="tab-calls">
     <h1>All calls</h1>
     <div class="sub">Every call on every assistant, straight from Vapi. Shows what Vapi still keeps (about 14 days).</div>
 
@@ -143,6 +166,42 @@
       </div>
       <button class="btn more" id="more" type="button" hidden>Load older calls</button>
     </div>
+  </section>
+
+  <section id="tab-money" hidden>
+    <h1>Costs &amp; margin</h1>
+    <div class="sub">What each client's calls cost you (Vapi), per minute and per month, against what they pay. This month is projected to month-end.</div>
+    <div class="filters">
+      <select id="mMonths" aria-label="Months"><option value="1">This month</option><option value="3" selected>Last 3 months</option><option value="6">Last 6 months</option><option value="12">Last 12 months</option></select>
+      <button class="btn" id="mRefresh" type="button">↻ Refresh</button>
+    </div>
+    <div class="stats" id="mStats"></div>
+    <div class="card"><div class="table-wrap"><table>
+      <thead><tr><th>Client</th><th>Plan / month</th><th>This month (projected)</th><th>Margin</th><th>Cost / min</th><th class="hide-sm">Minutes</th><th class="hide-sm">Calls</th></tr></thead>
+      <tbody id="mBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table></div></div>
+    <div class="muted small" id="mNotes" style="margin-top:10px"></div>
+  </section>
+
+  <section id="tab-notif" hidden>
+    <h1>Notifications</h1>
+    <div class="sub">Did the owner get a text or email for every real conversation? Silent hang-ups are left out.</div>
+    <div class="filters">
+      <select id="nDays" aria-label="Period"><option value="7">Last 7 days</option><option value="14" selected>Last 14 days</option><option value="30">Last 30 days</option></select>
+      <button class="btn" id="nRefresh" type="button">↻ Refresh</button>
+    </div>
+    <div class="muted small" id="nNote" style="margin-bottom:10px"></div>
+    <div class="card"><div class="table-wrap"><table>
+      <thead><tr><th>Client</th><th>Conversations</th><th>Owner notified</th><th>Failed</th><th>Nothing sent</th><th class="hide-sm">Set up</th></tr></thead>
+      <tbody id="nBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table></div></div>
+  </section>
+
+  <section id="tab-health" hidden>
+    <h1>System check</h1>
+    <div class="sub">Live check against your database and Railway settings.</div>
+    <div class="card" id="hBody"><div class="muted">Checking…</div></div>
+  </section>
   </div>
 </div>
 
@@ -157,10 +216,10 @@ const money = n => n == null ? "—" : "$" + n.toFixed(2);
 let SB = null, calls = [], open = new Set();
 const toLogin = () => location.replace("/login/?next=/admin/");
 
-async function api(path) {
+async function api(path, opts = {}) {
   const { data: { session } } = await SB.auth.getSession();
   if (!session) { toLogin(); throw new Error("Signed out"); }
-  const r = await fetch(vcAuth.API + path, { headers: { Authorization: `Bearer ${session.access_token}` } });
+  const r = await fetch(vcAuth.API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${session.access_token}` } });
   if (r.status === 401) { await SB.auth.signOut(); toLogin(); throw new Error("Signed out"); }
   const d = await r.json().catch(() => ({}));
   if (!r.ok) { const e = new Error(d.error || `Error ${r.status}`); e.status = r.status; throw e; }
@@ -353,6 +412,130 @@ $("fSearch").oninput = render;
 $("fHideShort").onchange = render;
 $("more").onclick = () => load(true);
 
+
+/* ---------------- tabs ---------------- */
+const loaded = {};
+function showTab(name) {
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  ["calls", "money", "notif", "health"].forEach(t => $("tab-" + t).hidden = t !== name);
+  history.replaceState(null, "", name === "calls" ? location.pathname : "#" + name);
+  if (!loaded[name]) { loaded[name] = true; ({ money: loadMoney, notif: loadNotif, health: loadHealth }[name] || (() => {}))(); }
+}
+$("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); };
+
+/* ---------------- costs & margin ---------------- */
+const perMinClass = v => v == null ? "" : v > 0.2 ? "bad-t" : v > 0.15 ? "warn-t" : "good-t";
+const fmtMonth = m => { const [y, mo] = m.split("-"); return new Date(Date.UTC(+y, +mo - 1, 15)).toLocaleString("en-CA", { month: "short", year: "numeric", timeZone: "UTC" }); };
+let moneyData = null;
+async function loadMoney() {
+  $("mBody").innerHTML = `<tr><td colspan="7" class="empty">Loading…</td></tr>`;
+  try {
+    moneyData = await api(`/api/dashboard/admin/economics?months=${$("mMonths").value}`);
+    renderMoney();
+  } catch (e) { if (e.message !== "Signed out") $("mBody").innerHTML = `<tr><td colspan="7" class="empty err">${esc(e.message)}</td></tr>`; }
+}
+function renderMoney() {
+  const d = moneyData, o = d.overall;
+  const cur = t => t.months.find(m => m.current) || null;
+  const mrr = d.tenants.reduce((a, t) => a + (t.planPrice || 0), 0);
+  const proj = d.tenants.reduce((a, t) => a + ((cur(t) || {}).projectedCost || 0), 0);
+  $("mStats").innerHTML = [
+    ["Cost per minute (all clients)", o.costPerMinute == null ? "—" : `<span class="${perMinClass(o.costPerMinute)}">$${o.costPerMinute.toFixed(3)}</span>`],
+    ["Spend in period", money_(o.cost)],
+    ["This month, projected", money_(proj)],
+    ["Plan revenue / month", mrr ? money_(mrr) : "—"]
+  ].map(([k, v]) => `<div class="card stat"><div class="k">${k}</div><div class="v num">${v}</div></div>`).join("");
+  $("mBody").innerHTML = d.tenants.length ? d.tenants.map(t => {
+    const m = cur(t) || {};
+    const marginCls = m.margin == null ? "" : m.margin < 0 ? "bad-t" : (m.marginPct ?? 100) < 50 ? "warn-t" : "good-t";
+    return `<tr class="row" data-id="${esc(t.id)}">
+      <td>${esc(t.name)}<div class="muted small">${esc(t.timezone)}</div></td>
+      <td><div class="price"><span>$</span><input type="number" min="0" step="1" value="${t.planPrice ?? ""}" placeholder="—" data-price="${esc(t.id)}" aria-label="Plan price for ${esc(t.name)}"><button class="btn" type="button" data-save="${esc(t.id)}">Save</button></div></td>
+      <td class="num">${m.projectedCost != null ? money_(m.projectedCost) : "—"}<div class="muted small">${m.cost != null ? money_(m.cost) + " so far" : ""}</div></td>
+      <td class="num ${marginCls}">${m.margin != null ? money_(m.margin) + (m.marginPct != null ? ` <span class="small">(${m.marginPct}%)</span>` : "") : t.planPrice == null ? '<span class="muted small">set a price</span>' : "—"}</td>
+      <td class="num ${perMinClass(t.costPerMinute)}">${t.costPerMinute != null ? "$" + t.costPerMinute.toFixed(3) : "—"}</td>
+      <td class="num hide-sm">${m.minutes ?? 0}</td>
+      <td class="num hide-sm">${m.calls ?? 0}${m.silent ? `<div class="muted small">${m.silent} silent</div>` : ""}</td>
+    </tr>
+    <tr class="detail" id="m-${esc(t.id)}" hidden><td colspan="7">${moneyDetail(t)}</td></tr>`;
+  }).join("") : `<tr><td colspan="7" class="empty">No client calls in this period.</td></tr>`;
+  $("mNotes").innerHTML = d.notes.map(n => `• ${esc(n)}`).join("<br>");
+  $("mBody").querySelectorAll("tr.row").forEach(r => r.onclick = e => {
+    if (e.target.closest("input,button")) return;
+    const x = $("m-" + r.dataset.id); x.hidden = !x.hidden;
+  });
+  $("mBody").querySelectorAll("[data-save]").forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    const id = b.dataset.save, v = $("mBody").querySelector(`[data-price="${CSS.escape(id)}"]`).value;
+    b.disabled = true; b.textContent = "…";
+    try {
+      await api(`/api/dashboard/admin/plan-price?business=${encodeURIComponent(id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ price: v === "" ? null : Number(v) }) });
+      await loadMoney();
+    } catch (err) { b.disabled = false; b.textContent = "Save"; alert(err.message); }
+  });
+}
+const money_ = n => n == null ? "—" : (n < 0 ? "−$" : "$") + Math.abs(n).toFixed(2);
+function moneyDetail(t) {
+  const months = `<table class="sub-table"><thead><tr><th>Month</th><th>Calls</th><th>Minutes</th><th>Cost</th><th>Cost / min</th><th>Margin</th><th>Cost recorded on</th></tr></thead><tbody>${
+    t.months.map(m => `<tr><td>${esc(fmtMonth(m.month))}${m.current ? ' <span class="muted small">(so far)</span>' : ""}</td>
+      <td class="num">${m.calls}${m.silent ? ` <span class="muted small">(${m.silent} silent)</span>` : ""}</td><td class="num">${m.minutes}</td>
+      <td class="num">${money_(m.cost)}${m.current && m.projectedCost != null ? ` <span class="muted small">→ ${money_(m.projectedCost)}</span>` : ""}</td>
+      <td class="num ${perMinClass(m.costPerMinute)}">${m.costPerMinute != null ? "$" + m.costPerMinute.toFixed(3) : "—"}</td>
+      <td class="num">${m.margin != null ? money_(m.margin) : "—"}</td><td class="num">${m.costCoverage ?? "—"}% of calls</td></tr>`).join("")}</tbody></table>`;
+  const b = t.breakdown;
+  const parts = b ? `<div class="k2">Where the money goes (${b.calls} calls with a breakdown)</div><div class="bars">${
+    ["transport", "stt", "llm", "tts", "vapi"].map(k => `<div class="b"><span>${{ transport: "Telephony", stt: "Speech-to-text", llm: "LLM", tts: "Voice (TTS)", vapi: "Vapi fee" }[k]}</span>
+      <div class="t"><span style="width:${b.share[k] || 0}%"></span></div><span class="num small">${b.perMinute[k] != null ? "$" + b.perMinute[k].toFixed(3) + "/min" : "—"} · ${b.share[k] ?? 0}%</span></div>`).join("")}</div>`
+    : `<div class="muted small" style="margin-top:8px">No cost breakdown stored yet — it's saved for new calls; use "Fetch past recordings" on the client's dashboard to fill the last ~14 days.</div>`;
+  return months + parts;
+}
+$("mMonths").onchange = loadMoney;
+$("mRefresh").onclick = loadMoney;
+
+/* ---------------- notifications ---------------- */
+async function loadNotif() {
+  $("nBody").innerHTML = `<tr><td colspan="6" class="empty">Loading…</td></tr>`;
+  try {
+    const d = await api(`/api/dashboard/admin/notifications?days=${$("nDays").value}`);
+    $("nNote").textContent = !d.messagesAvailable ? `Message log unavailable: ${d.messagesError}`
+      : d.loggingSince ? `Message logging started ${fmtWhen(d.loggingSince)} (Toronto time). Calls before that aren't audited.` : "No messages logged yet.";
+    $("nBody").innerHTML = d.tenants.length ? d.tenants.map(t => {
+      const cls = t.notifiedPct == null ? "" : t.notifiedPct >= 95 ? "good-t" : t.notifiedPct >= 75 ? "warn-t" : "bad-t";
+      return `<tr class="row" data-id="${esc(t.id)}">
+        <td>${esc(t.name)}${t.silentSkipped ? `<div class="muted small">${t.silentSkipped} silent skipped</div>` : ""}${t.beforeLogging ? `<div class="muted small">${t.beforeLogging} before logging</div>` : ""}</td>
+        <td class="num">${t.conversations}</td>
+        <td class="num ${cls}">${t.notified}${t.notifiedPct != null ? ` (${t.notifiedPct}%)` : ""}</td>
+        <td class="num ${t.failed ? "bad-t" : ""}">${t.failed}</td>
+        <td class="num ${t.none ? "warn-t" : ""}">${t.none}</td>
+        <td class="hide-sm small">${t.ownerEmail ? "✉ email" : '<span class="bad-t">no email</span>'} · ${t.smsToOwner ? "📱 SMS" : '<span class="muted">no SMS</span>'}</td>
+      </tr>
+      <tr class="detail" id="n-${esc(t.id)}" hidden><td colspan="6">${t.problems.length ? `<table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Outcome</th><th>Length</th><th>Ended</th><th>Problem</th></tr></thead><tbody>${
+        t.problems.map(p => `<tr><td>${esc(fmtWhen(p.at))}</td><td>${esc(p.caller)}</td><td>${esc(p.outcome)}</td><td class="num">${esc(fmtDur(p.seconds))}</td><td class="small">${esc(p.endedReason || "—")}</td>
+          <td class="${p.state === "failed" ? "bad-t" : "warn-t"} small">${p.state === "failed" ? "Failed: " + esc(p.ownerFailed.join("; ")) : "Nothing sent to owner"}${p.callerTexted ? '<div class="muted">caller was texted</div>' : ""}</td></tr>`).join("")
+      }</tbody></table>` : `<div class="good-t small">Every audited conversation got an owner notification.</div>`}</td></tr>`;
+    }).join("") : `<tr><td colspan="6" class="empty">No client conversations in this period.</td></tr>`;
+    $("nBody").querySelectorAll("tr.row").forEach(r => r.onclick = () => { const x = $("n-" + r.dataset.id); x.hidden = !x.hidden; });
+  } catch (e) { if (e.message !== "Signed out") $("nBody").innerHTML = `<tr><td colspan="6" class="empty err">${esc(e.message)}</td></tr>`; }
+}
+$("nDays").onchange = loadNotif;
+$("nRefresh").onclick = loadNotif;
+
+/* ---------------- system check ---------------- */
+async function loadHealth() {
+  $("hBody").innerHTML = `<div class="muted">Checking…</div>`;
+  try {
+    const d = await api(`/api/dashboard/admin/health`);
+    const a = d.activity;
+    $("hBody").innerHTML = `<div style="margin-bottom:10px"><b class="${d.ok ? "tagok" : "tagbad"}">${d.ok ? "All good" : "Needs attention"}</b></div>`
+      + d.checks.map(c => `<div class="check"><span class="${c.ok ? "tagok" : "tagbad"}">${c.ok ? "✓" : "✗"}</span>
+          <div>${esc(c.label)}<div class="muted small">${esc(c.ok ? c.detail : c.detail + " — " + (c.fix || ""))}</div></div></div>`).join("")
+      + `<div class="k2">Data flowing</div><div class="kv">
+          <div class="k">Latest call</div><div>${a.lastCall ? esc(fmtWhen(a.lastCall)) : "—"}</div>
+          <div class="k">Latest text/email logged</div><div>${a.lastMessage ? esc(fmtWhen(a.lastMessage)) : "none yet"}</div>
+          <div class="k">Last ${a.recentCalls} calls</div><div>${a.withTranscript} with transcript · ${a.withRecordingCopy} with a saved recording</div></div>`;
+  } catch (e) { if (e.message !== "Signed out") $("hBody").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+
 vcAuth.client().then(async ({ sb }) => {
   SB = sb;
   const { data: { session } } = await sb.auth.getSession();
@@ -360,6 +543,8 @@ vcAuth.client().then(async ({ sb }) => {
   sb.auth.onAuthStateChange(ev => { if (ev === "SIGNED_OUT" && !leaving) toLogin(); });
   $("app").hidden = false;
   load();
+  const want = (location.hash || "").replace("#", "");
+  if (["money", "notif", "health"].includes(want)) showTab(want);
 }).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>

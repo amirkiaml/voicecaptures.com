@@ -130,7 +130,7 @@
   .hdr-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .gear { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--ink2); cursor: pointer; }
   .settings { margin-bottom: 12px; }
-  .set-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .set-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
   .set-grid label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
   .set-grid select, .set-grid input { font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); min-width: 0; }
   .set-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; flex-wrap: wrap; }
@@ -195,6 +195,9 @@
   .scoring .kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 14px; }
   .scoring .kv .k { color: var(--muted); margin: 0; text-transform: none; letter-spacing: 0; font-size: 14px; }
   .small { font-size: 12px; }
+  .p-silent { background: transparent; color: var(--muted); border: 1px dashed var(--line); font-weight: 500; }
+  tr.silent-row td { color: var(--muted); }
+  tr.silent-row td:first-child { opacity: .8; }
   .admin-note { color: var(--warn); font-size: 12px; margin-top: 4px; }
   .gate { max-width: 460px; margin: 10vh auto; text-align: center; }
   .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
@@ -224,7 +227,7 @@
   <header>
     <div>
       <h1 id="biz">Loading…</h1>
-      <div class="sub">Every call your receptionist handled</div>
+      <div class="sub">Every call your receptionist handled · <span id="tzNote"></span></div>
       <span class="admin-tag" id="adminTag" hidden>Admin view</span>
       <label class="premium-switch" id="premiumWrap" hidden title="Only admins see this switch">
         <input type="checkbox" id="premiumToggle"> <span>Premium: recordings &amp; transcripts</span>
@@ -271,6 +274,8 @@
         <input id="sLabel" maxlength="30" placeholder="Appointments"></label>
       <label>Average job value ($)
         <input id="sValue" type="number" min="0" step="1" placeholder="e.g. 350"></label>
+      <label>Your timezone
+        <select id="sTz"></select></label>
     </div>
     <div class="set-row"><span class="set-k">Open days</span><span id="sDays"></span></div>
     <div class="set-row"><span class="set-k">Show</span><span id="sSections"></span></div>
@@ -339,7 +344,8 @@
 
   <div class="card" data-section="log">
     <p class="panel-title">Call log</p>
-    <p class="panel-sub">Tap a call for the summary and recording</p>
+    <p class="panel-sub">Tap a call for the summary and recording
+      <label class="chk-inline" id="silentWrap" hidden style="margin-left:10px"><input type="checkbox" id="silentToggle"> <span id="silentCount"></span></label></p>
     <div class="table-wrap">
       <table>
         <thead><tr>
@@ -366,7 +372,20 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const fmtDur = s => s == null ? "—" : s < 60 ? `${Math.round(s)} sec` : `${Math.floor(s/60)} min ${Math.round(s%60)} sec`;
 const fmtMoney = n => "$" + Math.round(n).toLocaleString();
-const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: "America/Toronto", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+// Every time on this page is shown in the business's own timezone (Customize).
+const TZ = () => (typeof S !== "undefined" && S && S.timezone) || "America/Toronto";
+const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: TZ(), month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+function tzLabel(tz) {
+  try {
+    const name = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "long" })
+      .formatToParts(new Date()).find(p => p.type === "timeZoneName").value;
+    return `${name} (${tz.split("/").pop().replace(/_/g, " ")})`;
+  } catch (e) { return tz; }
+}
+const TZ_CHOICES = ["America/St_Johns", "America/Halifax", "America/Toronto", "America/New_York", "America/Winnipeg",
+  "America/Chicago", "America/Regina", "America/Edmonton", "America/Denver", "America/Phoenix", "America/Vancouver",
+  "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu", "Europe/London"];
+let showSilent = false;
 const fmtHour = h => h === 0 ? "12am" : h < 12 ? `${h}am` : h === 12 ? "12pm" : `${h - 12}pm`;
 const pct = (a, b) => b ? Math.round((a / b) * 100) : 0;
 
@@ -402,10 +421,11 @@ function renderKpis(t, p) {
   if (S.hiddenSections.includes("revenue")) hero.hidden = true;
 
   const cards = [
-    { label: "Calls answered", val: t.totalCalls, d: delta(t.totalCalls, p.totalCalls), note: `${t.abandoned} hung up early` },
+    { label: "Conversations", val: t.totalCalls, d: delta(t.totalCalls, p.totalCalls),
+      note: [t.silent ? `${t.silent} silent hang-up${t.silent === 1 ? "" : "s"} not counted` : "", t.abandoned ? `${t.abandoned} hung up early` : ""].filter(Boolean).join(" · ") || "real calls with a person on the line" },
     { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked) },
     { label: "Booking rate", val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
-    { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of calls came in while you were closed` },
+    { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of conversations came in while you were closed` },
     { label: "Emergencies captured", val: t.emergencies },
     { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) }
   ];
@@ -508,8 +528,9 @@ function renderOutcomes(o, total) {
     ["Emergency", o.emergency, "var(--bad)"],
     ["Hung up early", o.abandoned, "var(--gray)"],
     ["Inquiry", o.other, "var(--accent)"],
-    ["Spam / not a lead", o.spam || 0, "var(--neutral-bar)"]
-  ].filter(r => r[1] > 0 || !["Inquiry", "Spam / not a lead"].includes(r[0]))
+    ["Spam / not a lead", o.spam || 0, "var(--neutral-bar)"],
+    ["Silent hang-up (nobody spoke)", o.silent || 0, "var(--neutral-bar)"]
+  ].filter(r => r[1] > 0 || !["Inquiry", "Spam / not a lead", "Silent hang-up (nobody spoke)"].includes(r[0]))
    .concat((S.customStatuses || []).filter(cs => (last.customOutcomes || {})[cs.id] > 0)
      .map(cs => [cs.label, last.customOutcomes[cs.id], COUNTS_COLOR[cs.countsAs] || "var(--accent)"]));
   $("outcomes").innerHTML = rows.map(([label, n, col]) => `
@@ -527,7 +548,7 @@ function renderInsights(d) {
   const items = t.totalCalls ? [
     ["Peak hour", peak.calls ? `${fmtHour(peak.hour)}–${fmtHour((peak.hour + 1) % 24)}` : "—"],
     ["Busiest day", busiest.calls ? busiest.label : "—"],
-    ["Answered while you were closed", `${t.afterHours} calls (${pct(t.afterHours, t.totalCalls)}%)`],
+    ["Answered while you were closed", `${t.afterHours} of ${t.totalCalls} conversations (${pct(t.afterHours, t.totalCalls)}%)`],
     [`${S.bookingLabel} booked after hours`, String(t.bookedAfterHours)],
     ["Repeat callers", t.uniqueCallers ? `${t.repeatCallers} of ${t.uniqueCallers} callers (${pct(t.repeatCallers, t.uniqueCallers)}%)` : "—"]
   ] : [["No calls yet", "Your stats will appear here after the first call."]];
@@ -545,7 +566,8 @@ function statusPill(c) {
     pending: ["p-pending", "Needs callback"],
     abandoned: ["p-abandoned", "Hung up early"],
     other: ["p-other", "Inquiry"],
-    spam: ["p-abandoned", "Spam / not a lead"]
+    spam: ["p-abandoned", "Spam / not a lead"],
+    silent: ["p-silent", "Silent — nobody spoke"]
   };
   let [cls, label] = map[c.outcome] || map.other;
   if (c.custom_status) label = c.custom_status.label;
@@ -556,7 +578,7 @@ function statusPill(c) {
 function renderMessages(list) {
   if (!list || !list.length) return "";
   const who = m => m.recipient === "caller" ? "caller" : "you";
-  const fmtT = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" });
+  const fmtT = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: TZ(), hour: "numeric", minute: "2-digit" });
   return `<div class="k">Texts &amp; emails sent</div><div class="msgs">${list.map(m => `
     <div class="msg ${m.status === "failed" ? "failed" : ""}">
       <div class="msg-head">
@@ -705,10 +727,11 @@ function alertMsg(m) { $("biz").insertAdjacentHTML("afterend", `<div class="admi
 const openCalls = new Set(); // details stay open across re-renders
 const STATUS_LABELS = { booked: "Booked", pending: "Needs callback", emergency: "Emergency", other: "Inquiry",
   abandoned: "Hung up early", spam: "Spam / not a lead" };
+const AUTO_LABELS = { ...STATUS_LABELS, silent: "Silent hang-up" };
 
 function statusEditor(c) {
   if (c.id == null) return "";
-  const autoLabel = STATUS_LABELS[c.auto_outcome] || "Inquiry";
+  const autoLabel = AUTO_LABELS[c.auto_outcome] || "Inquiry";
   const opts = [`<option value="auto" ${c.status_override ? "" : "selected"}>Automatic (${esc(autoLabel)})</option>`]
     .concat(Object.entries(STATUS_LABELS).map(([k, v]) =>
       `<option value="${k}" ${c.status_override === k ? "selected" : ""}>${esc(v)}</option>`))
@@ -736,14 +759,18 @@ async function setStatus(sel) {
   }
 }
 
-function renderLog(all) {
+function renderLog(everything) {
+  const silentN = everything.filter(c => c.silent).length;
+  $("silentWrap").hidden = !silentN;
+  $("silentCount").textContent = `Show ${silentN} silent hang-up${silentN === 1 ? "" : "s"}`;
+  const all = showSilent ? everything : everything.filter(c => !c.silent);
   const tb = $("log"), more = $("more");
   const calls = all.slice(0, shown);
   more.hidden = all.length <= shown;
   more.textContent = `Show more (${all.length - shown} older)`;
   if (!calls.length) { tb.innerHTML = `<tr><td colspan="5" class="empty">No calls in this period yet.</td></tr>`; return; }
   tb.innerHTML = calls.map((c, i) => `
-    <tr class="row" data-i="${i}">
+    <tr class="row${c.silent ? " silent-row" : ""}" data-i="${i}">
       <td>${esc(fmtWhen(c.created_at))}</td>
       <td>${esc(c.caller_name || "Unknown")}<div class="muted" style="font-size:12px">${esc(c.phone || c.caller_id || "")}</div></td>
       <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}</td>
@@ -793,7 +820,8 @@ function renderAll(data) {
   renderDaily(data.daily);
   renderHours(data.byHour, data.totals.totalCalls);
   renderWeek(data.byWeekday);
-  renderOutcomes(data.outcomes, data.totals.totalCalls);
+  renderOutcomes(data.outcomes, data.totals.totalCalls + (data.totals.silent || 0));
+  $("tzNote").textContent = `times in ${tzLabel(TZ())}`;
   renderInsights(data);
 }
 
@@ -875,6 +903,8 @@ function openSettings() {
   $("sClose").innerHTML = hourOpts(S.closeHour, 1, 24);
   $("sLabel").value = S.bookingLabel;
   $("sValue").value = S.avgJobValue ?? "";
+  const tzs = TZ_CHOICES.includes(S.timezone) ? TZ_CHOICES : [S.timezone, ...TZ_CHOICES];
+  $("sTz").innerHTML = tzs.map(z => `<option value="${esc(z)}" ${z === S.timezone ? "selected" : ""}>${esc(tzLabel(z))}</option>`).join("");
   $("sDays").innerHTML = DAY_NAMES.map((d, i) =>
     `<label class="chip"><input type="checkbox" value="${i}" ${S.openDays.includes(i) ? "checked" : ""}>${d}</label>`).join("");
   $("sSections").innerHTML = Object.entries(SECTION_NAMES).map(([k, v]) =>
@@ -913,6 +943,7 @@ async function saveSettings() {
     openDays: [...$("sDays").querySelectorAll("input:checked")].map(i => Number(i.value)),
     bookingLabel: $("sLabel").value.trim() || "Appointments",
     avgJobValue: $("sValue").value === "" ? null : Number($("sValue").value),
+    timezone: $("sTz").value,
     hiddenSections: [...$("sSections").querySelectorAll("input:not(:checked)")].map(i => i.value),
     customStatuses: statusDraft
   };
@@ -952,6 +983,7 @@ $("range").onclick = e => {
   load();
 };
 $("more").onclick = () => { shown += 50; renderLog(allCalls); };
+$("silentToggle").onchange = e => { showSilent = e.target.checked; renderLog(allCalls); };
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => last && renderAll(last), 150); });
 
 /* ---------- account menu ---------- */
