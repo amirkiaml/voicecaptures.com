@@ -72,6 +72,13 @@
   .delta.up { color: var(--good); } .delta.down { color: var(--bad); } .delta.flat { color: var(--muted); }
   .bar { height: 8px; background: var(--grid); border-radius: 99px; margin-top: 10px; overflow: hidden; }
   .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .usage { margin-bottom: 12px; display: grid; gap: 8px; }
+  .usage .u-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .usage .u-val { font-family: Manrope, "DM Sans", sans-serif; font-size: 20px; font-weight: 700; }
+  .usage .u-track { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .usage .u-track > span { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
+  .usage.warn .u-track > span { background: #d97706; }
+  .usage.over .u-track > span { background: #dc2626; }
 
   .panel-title { font-weight: 600; margin: 0; }
   .panel-sub { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
@@ -303,6 +310,7 @@
     </div>
   </div>
 
+  <div class="card usage" id="usageCard" hidden></div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
   <div class="grid" id="kpis"></div>
 
@@ -813,9 +821,24 @@ function applySections() {
   document.querySelectorAll(".bl").forEach(el => el.textContent = `${S.bookingLabel} booked`);
 }
 
+/* Minutes this period — minutes only, never cost. Hidden until a plan is set. */
+function renderUsage(u) {
+  const el = $("usageCard");
+  if (!u || !u.minutesAllowed) { el.hidden = true; return; }
+  const pct = Math.max(0, u.percent || 0);
+  const fmtD = s => new Date(s + "T12:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" });
+  el.className = "card usage" + (pct >= 100 ? " over" : pct >= 80 ? " warn" : "");
+  el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))} of ${esc(u.minutesAllowed)}</span>
+      <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
+    <div class="u-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(pct, 100)}" aria-label="Minutes used"><span style="width:${Math.min(pct, 100)}%"></span></div>
+    <div class="muted" style="font-size:12px">${pct >= 100 ? "You've used this period's minutes. Calls are still being answered — we'll be in touch about adding more." : pct >= 80 ? `${pct}% used.` : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`}</div>`;
+  el.hidden = false;
+}
+
 function renderAll(data) {
   S = data.settings;
   applySections();
+  renderUsage(data.usage);
   renderKpis(data.totals, data.previous || {});
   renderDaily(data.daily);
   renderHours(data.byHour, data.totals.totalCalls);
@@ -1019,7 +1042,12 @@ vcAuth.client().then(async ({ sb }) => {
   sb.auth.onAuthStateChange((event) => { if (event === "SIGNED_OUT" && !leaving) toLogin(); });
   await load();
   // Auto-refresh, but never while someone has a call open (it would close it mid-listen).
-  setInterval(() => { if (!document.querySelector("tr.detail:not([hidden])")) load(); }, 60000);
+  // Auto-refresh every 5 minutes while the tab is visible, never while someone
+  // has a call open (it would close it mid-listen). Was every 60s even in
+  // background tabs — the main source of dashboard database reads.
+  setInterval(() => {
+    if (document.visibilityState === "visible" && !document.querySelector("tr.detail:not([hidden])")) load();
+  }, 5 * 60000);
 }).catch(err => showGate(`<h2>Can't reach the dashboard</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>
