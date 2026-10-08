@@ -106,7 +106,55 @@
   .sub-table { width: 100%; font-size: 13px; margin-top: 6px; }
   .sub-table td, .sub-table th { padding: 6px 8px; }
   label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
-  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } }
+  /* USD sits under the CAD figure; inline (with a dot) only inside list rows. */
+  .usd { color: var(--muted); font-size: 12px; font-weight: 500; white-space: nowrap; display: block; }
+  .stat .v .usd { font-family: "DM Sans", sans-serif; font-size: 13px; margin-top: 2px; }
+  .it .usd, .kv .usd, .sub-table .usd, .bars .usd { display: inline; }
+  .it .usd::before, .kv .usd::before, .sub-table .usd::before { content: " · "; }
+  .stat .note { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .stats.six { grid-template-columns: repeat(4, 1fr); }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .card h3 { margin: 0 0 8px; font-size: 15px; font-family: Manrope, "DM Sans", sans-serif; }
+  .mb { margin-bottom: 12px; }
+  th.sort { cursor: pointer; user-select: none; }
+  th.sort:hover { color: var(--ink); }
+  th.sort.on::after { content: " ▾"; } th.sort.on.asc::after { content: " ▴"; }
+  .pct { display: inline-block; min-width: 46px; text-align: center; }
+  .chart-svg { width: 100%; height: auto; display: block; }
+  .chart-svg text { fill: var(--muted); font-size: 11px; font-family: "DM Sans", sans-serif; }
+  .chart-svg .grid { stroke: var(--line); }
+  .legend2 { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink2); margin-top: 6px; }
+  .legend2 i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .list { display: grid; gap: 6px; }
+  .list .it { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .list .it:last-child { border-bottom: 0; }
+  .form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
+  .form-grid label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+  .form-grid input, .form-grid select, .form-grid textarea, .inline-in { font: inherit; font-size: 14px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); min-width: 0; }
+  .inline-in { width: 70px; padding: 4px 7px; }
+  .linkbtn { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; }
+  .crumb { margin-bottom: 8px; }
+  dialog#callView { width: min(1000px, 96vw); max-height: 90vh; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
+  dialog#callView::backdrop { background: rgba(0,0,0,.45); }
+  .cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .pie { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; }
+  .pie svg { width: 150px; height: 150px; }
+  .pie svg text { fill: var(--ink); font-family: Manrope, "DM Sans", sans-serif; }
+  .pie .pl { display: grid; gap: 5px; font-size: 13px; min-width: 0; }
+  .pie .pl div { display: grid; grid-template-columns: 12px 1fr auto; gap: 7px; align-items: baseline; }
+  .pie .pl i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .pie .pl span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pie .pl b { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cols3 .pie { grid-template-columns: 130px minmax(0, 1fr); }
+  .cols3 .pie svg { width: 130px; height: 130px; }
+  @media (max-width: 1250px) { .cols3 .pie { grid-template-columns: 1fr; justify-items: center; } .cols3 .pie .pl { width: 100%; } }
+  @media (max-width: 1100px) { .cols3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) { .cols3 { grid-template-columns: 1fr; } }
+  .bars2 { display: grid; gap: 6px; }
+  .bars2 .b { display: grid; grid-template-columns: 130px 1fr 90px; gap: 8px; align-items: center; font-size: 13px; }
+  .bars2 .t { height: 10px; background: var(--gray-soft); border-radius: 99px; overflow: hidden; }
+  .bars2 .t span { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats, .stats.six { grid-template-columns: repeat(2, 1fr); } .cols2 { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 640px) { .hide-sm { display: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -128,26 +176,91 @@
 
   <div id="app" hidden>
   <nav class="tabs" id="tabs">
-    <button type="button" data-tab="calls" class="on">All calls</button>
-    <button type="button" data-tab="money">Costs &amp; margin</button>
+    <button type="button" data-tab="overview" class="on">Overview</button>
+    <button type="button" data-tab="quality">Quality</button>
+    <button type="button" data-tab="calls">All calls</button>
+    <button type="button" data-tab="money">Vapi cost detail</button>
     <button type="button" data-tab="notif">Notifications</button>
     <button type="button" data-tab="health">System check</button>
   </nav>
-  <section id="tab-calls">
+  <section id="tab-overview">
+    <h1>Overview</h1>
+    <div class="sub">Usage, revenue and cost across every client. CAD first, USD underneath. Twilio figures are estimates (est.).</div>
+    <div class="filters">
+      <select id="oPreset" aria-label="Period">
+        <option value="current" selected>Each client's current billing period</option><option value="this_month">This month</option>
+        <option value="last_month">Last month</option><option value="last_90">Last 90 days</option><option value="custom">Custom range…</option>
+      </select>
+      <input type="date" id="oFrom" class="btn" hidden aria-label="From"><input type="date" id="oTo" class="btn" hidden aria-label="To">
+      <button class="btn" id="oRefresh" type="button">↻ Refresh</button>
+      <button class="btn" id="oCsv" type="button">⇩ Export CSV</button>
+      <button class="btn" id="oSetBtn" type="button">⚙ Rates &amp; fixed costs</button>
+    </div>
+    <div id="oMsg"></div>
+    <div class="card mb" id="oSettings" hidden></div>
+    <div class="stats six" id="oCards"></div>
+    <div class="cols3">
+      <div class="card"><h3>Revenue by client</h3><div id="pieRev"></div></div>
+      <div class="card"><h3>Where the cost goes</h3><div id="pieCost"></div></div>
+      <div class="card"><h3>Minutes by client</h3><div id="pieMin"></div></div>
+    </div>
+    <div class="cols2">
+      <div class="card"><h3>Needs action</h3><div id="oNeeds" class="list"><div class="muted small">Loading…</div></div></div>
+      <div class="card"><h3>To invoice in Stripe</h3><div id="oInvoice" class="list"><div class="muted small">Loading…</div></div></div>
+    </div>
+    <div class="card mb"><h3>Minutes per day, by client</h3><div id="chDaily"></div></div>
+    <div class="cols2">
+      <div class="card"><h3>Cost vs revenue per month (CAD)</h3><div id="chMonthly"></div></div>
+      <div class="card"><h3>Cost per minute (CAD)</h3><div id="chCpm"></div></div>
+    </div>
+    <div class="card"><div class="table-wrap"><table id="oTable">
+      <thead><tr>
+        <th class="sort" data-k="business">Client</th><th class="sort" data-k="status">Plan · status</th><th class="sort" data-k="periodEnd">Period</th>
+        <th class="sort" data-k="pctUsed">Minutes</th><th class="sort" data-k="calls">Calls</th><th class="sort" data-k="extraBlocks">Extras</th>
+        <th class="sort" data-k="revenue">Revenue</th><th class="sort" data-k="vapi">Vapi</th><th class="sort" data-k="twilio">Twilio (est.)</th>
+        <th class="sort" data-k="total">Total cost</th><th class="sort on" data-k="margin">Margin</th><th class="sort" data-k="cpm">Cost / min</th><th>Alerts</th>
+      </tr></thead>
+      <tbody id="oBody"><tr><td colspan="13" class="empty">Loading…</td></tr></tbody>
+    </table></div></div>
+    <div class="muted small" id="oNotes" style="margin-top:10px"></div>
+  </section>
+
+  <section id="tab-client" hidden>
+    <div class="crumb"><button class="linkbtn" id="cBack" type="button">← Overview</button></div>
+    <div id="cBody"><div class="muted">Loading…</div></div>
+  </section>
+
+  <section id="tab-quality" hidden>
+    <h1>Quality</h1>
+    <div class="sub">How calls end, per client and overall. Same rules as everywhere: aggregates only, by date range.</div>
+    <div class="filters">
+      <select id="qPreset" aria-label="Period"><option value="this_month" selected>This month</option><option value="last_month">Last month</option><option value="last_90">Last 90 days</option><option value="custom">Custom range…</option></select>
+      <input type="date" id="qFrom" class="btn" hidden aria-label="From"><input type="date" id="qTo" class="btn" hidden aria-label="To">
+      <select id="qClient" aria-label="Client"><option value="">All clients</option></select>
+      <button class="btn" id="qRefresh" type="button">↻ Refresh</button>
+    </div>
+    <div id="qBody"><div class="muted">Loading…</div></div>
+  </section>
+
+  <dialog id="callView"><div id="cvBody"></div><div style="text-align:right;margin-top:10px"><button class="btn" id="cvClose" type="button">Close</button></div></dialog>
+
+  <section id="tab-calls" hidden>
     <h1>All calls</h1>
-    <div class="sub">Every call on every assistant, straight from Vapi. Shows what Vapi still keeps (about 14 days).</div>
+    <div class="sub">Every call on every assistant. The last 14 days come live from Vapi; older calls come from our own saved copies (client calls), so any range works.</div>
 
     <div class="filters">
       <select id="fAssistant" aria-label="Assistant"><option value="">All assistants</option></select>
       <select id="fDays" aria-label="Period">
         <option value="1">Last 24 hours</option><option value="3">Last 3 days</option>
         <option value="7" selected>Last 7 days</option><option value="14">Last 14 days</option><option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option><option value="365">Last 12 months</option>
       </select>
       <input id="fSearch" type="search" placeholder="Filter by caller, business, summary, ended reason…">
       <label class="chk"><input type="checkbox" id="fHideShort"> Hide calls under 10s</label>
       <button class="btn" id="refresh" type="button">↻ Refresh</button>
     </div>
 
+    <div class="muted small" id="callsNote" style="margin:-6px 0 10px"></div>
     <div class="stats">
       <div class="card stat"><div class="k">Calls</div><div class="v" id="sCalls">–</div></div>
       <div class="card stat"><div class="k">Total talk time</div><div class="v" id="sMin">–</div></div>
@@ -170,7 +283,7 @@
 
   <section id="tab-money" hidden>
     <h1>Costs &amp; margin</h1>
-    <div class="sub">What each client's calls cost you (Vapi), per minute and per month, against what they pay. This month is projected to month-end.</div>
+    <div class="sub">Vapi's cost per call, split by component (telephony, speech-to-text, LLM, voice, Vapi fee), per minute and per month. This month is projected to month-end. Plan prices and full margins now live in Overview.</div>
     <div class="filters">
       <select id="mMonths" aria-label="Months"><option value="1">This month</option><option value="3" selected>Last 3 months</option><option value="6">Last 6 months</option><option value="12">Last 12 months</option></select>
       <button class="btn" id="mRefresh" type="button">↻ Refresh</button>
@@ -211,7 +324,14 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&l
 const fmtDur = s => s == null ? "—" : s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${String(Math.round(s%60)).padStart(2,"0")}s`;
 const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: "America/Toronto", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 const fmtT = t => t == null ? "" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
-const money = n => n == null ? "—" : "$" + n.toFixed(2);
+// Every cost shows in CAD and USD. Vapi/Twilio bill in USD; RATE comes from
+// the server's settings (usd_to_cad), editable under Overview → Rates.
+let RATE = 1.37, RATE_FROM_SERVER = false;
+const fmtCur = (n, cur, dp = 2) => n == null || !isFinite(n) ? "—" : (n < 0 ? "−" : "") + cur + "$" + Math.abs(n).toFixed(dp);
+const bothM = (m, dp = 2) => m == null || m.usd == null && m.cad == null ? "—"
+  : `${fmtCur(m.cad, "CA", dp)}<span class="usd">${fmtCur(m.usd, "US", dp)}</span>`;
+const fromUsd = usd => usd == null ? null : { usd, cad: usd * RATE };
+const money = n => bothM(fromUsd(n));
 
 let SB = null, calls = [], open = new Set();
 const toLogin = () => location.replace("/login/?next=/admin/");
@@ -246,7 +366,7 @@ function renderStats(list) {
   $("sCalls").textContent = list.length;
   $("sMin").textContent = `${Math.round(total / 60)} min`;
   $("sAvg").textContent = list.length ? fmtDur(total / list.length) : "—";
-  $("sCost").textContent = money(list.reduce((a, c) => a + (c.cost || 0), 0));
+  $("sCost").innerHTML = money(list.reduce((a, c) => a + (c.cost || 0), 0));
 }
 
 function render() {
@@ -261,7 +381,7 @@ function render() {
       <td>${esc(c.callerName || c.caller || "—")}${c.callerName && c.caller ? `<div class="muted small">${esc(c.caller)}</div>` : ""}${c.messageCount ? `<div class="muted small">✉ ${c.messageCount} sent</div>` : ""}</td>
       <td>${esc(fmtDur(c.durationSeconds))}</td>
       <td class="hide-sm">${endedPill(c.endedReason)}</td>
-      <td class="hide-sm">${esc(money(c.cost))}</td>
+      <td class="hide-sm num">${money(c.cost)}${c.source === "db" ? `<div class="muted small" title="From our saved copy (older than Vapi keeps)">saved copy</div>` : ""}</td>
     </tr>
     <tr class="detail" id="d-${esc(c.id)}" ${open.has(c.id) ? "" : "hidden"}><td colspan="6"><div class="dbody" data-id="${esc(c.id)}">${open.has(c.id) ? "" : ""}</div></td></tr>`).join("");
   tb.querySelectorAll("tr.row").forEach(r => r.onclick = () => toggle(r.dataset.id));
@@ -331,7 +451,7 @@ async function loadDetail(id) {
         <div class="kv">
           <div class="k">Vapi call id</div><div class="small">${esc(id)}</div>
           <div class="k">Ended reason</div><div>${esc(c.endedReason || "—")}</div>
-          <div class="k">Cost</div><div>${esc(money(c.cost))}</div>
+          <div class="k">Cost</div><div>${money(c.cost)}</div>
         </div>
         ${messagesBlock(d.messages)}
       </div>
@@ -384,6 +504,7 @@ async function load(append = false) {
       sel.value = cur;
     }
     $("more").hidden = !d.more;
+    $("callsNote").textContent = d.note || "";
     render();
   } catch (e) {
     if (e.message === "Signed out") return;
@@ -417,9 +538,9 @@ $("more").onclick = () => load(true);
 const loaded = {};
 function showTab(name) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
-  ["calls", "money", "notif", "health"].forEach(t => $("tab-" + t).hidden = t !== name);
-  history.replaceState(null, "", name === "calls" ? location.pathname : "#" + name);
-  if (!loaded[name]) { loaded[name] = true; ({ money: loadMoney, notif: loadNotif, health: loadHealth }[name] || (() => {}))(); }
+  ["overview", "quality", "calls", "money", "notif", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
+  if (name !== "client") history.replaceState(null, "", name === "overview" ? location.pathname : "#" + name);
+  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), money: loadMoney, notif: loadNotif, health: loadHealth }[name] || (() => {}))(); }
 }
 $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); };
 
@@ -440,7 +561,7 @@ function renderMoney() {
   const mrr = d.tenants.reduce((a, t) => a + (t.planPrice || 0), 0);
   const proj = d.tenants.reduce((a, t) => a + ((cur(t) || {}).projectedCost || 0), 0);
   $("mStats").innerHTML = [
-    ["Cost per minute (all clients)", o.costPerMinute == null ? "—" : `<span class="${perMinClass(o.costPerMinute)}">$${o.costPerMinute.toFixed(3)}</span>`],
+    ["Cost per minute (all clients)", o.costPerMinute == null ? "—" : `<span class="${perMinClass(o.costPerMinute)}">${cpm_(o.costPerMinute)}</span>`],
     ["Spend in period", money_(o.cost)],
     ["This month, projected", money_(proj)],
     ["Plan revenue / month", mrr ? money_(mrr) : "—"]
@@ -453,7 +574,7 @@ function renderMoney() {
       <td><div class="price"><span>$</span><input type="number" min="0" step="1" value="${t.planPrice ?? ""}" placeholder="—" data-price="${esc(t.id)}" aria-label="Plan price for ${esc(t.name)}"><button class="btn" type="button" data-save="${esc(t.id)}">Save</button></div></td>
       <td class="num">${m.projectedCost != null ? money_(m.projectedCost) : "—"}<div class="muted small">${m.cost != null ? money_(m.cost) + " so far" : ""}</div></td>
       <td class="num ${marginCls}">${m.margin != null ? money_(m.margin) + (m.marginPct != null ? ` <span class="small">(${m.marginPct}%)</span>` : "") : t.planPrice == null ? '<span class="muted small">set a price</span>' : "—"}</td>
-      <td class="num ${perMinClass(t.costPerMinute)}">${t.costPerMinute != null ? "$" + t.costPerMinute.toFixed(3) : "—"}</td>
+      <td class="num ${perMinClass(t.costPerMinute)}">${cpm_(t.costPerMinute)}</td>
       <td class="num hide-sm">${m.minutes ?? 0}</td>
       <td class="num hide-sm">${m.calls ?? 0}${m.silent ? `<div class="muted small">${m.silent} silent</div>` : ""}</td>
     </tr>
@@ -474,18 +595,19 @@ function renderMoney() {
     } catch (err) { b.disabled = false; b.textContent = "Save"; alert(err.message); }
   });
 }
-const money_ = n => n == null ? "—" : (n < 0 ? "−$" : "$") + Math.abs(n).toFixed(2);
+const money_ = n => n == null ? "—" : bothM(fromUsd(n));
+const cpm_ = n => n == null ? "—" : bothM(fromUsd(n), 3);
 function moneyDetail(t) {
   const months = `<table class="sub-table"><thead><tr><th>Month</th><th>Calls</th><th>Minutes</th><th>Cost</th><th>Cost / min</th><th>Margin</th><th>Cost recorded on</th></tr></thead><tbody>${
     t.months.map(m => `<tr><td>${esc(fmtMonth(m.month))}${m.current ? ' <span class="muted small">(so far)</span>' : ""}</td>
       <td class="num">${m.calls}${m.silent ? ` <span class="muted small">(${m.silent} silent)</span>` : ""}</td><td class="num">${m.minutes}</td>
       <td class="num">${money_(m.cost)}${m.current && m.projectedCost != null ? ` <span class="muted small">→ ${money_(m.projectedCost)}</span>` : ""}</td>
-      <td class="num ${perMinClass(m.costPerMinute)}">${m.costPerMinute != null ? "$" + m.costPerMinute.toFixed(3) : "—"}</td>
+      <td class="num ${perMinClass(m.costPerMinute)}">${cpm_(m.costPerMinute)}</td>
       <td class="num">${m.margin != null ? money_(m.margin) : "—"}</td><td class="num">${m.costCoverage ?? "—"}% of calls</td></tr>`).join("")}</tbody></table>`;
   const b = t.breakdown;
   const parts = b ? `<div class="k2">Where the money goes (${b.calls} calls with a breakdown)</div><div class="bars">${
     ["transport", "stt", "llm", "tts", "vapi"].map(k => `<div class="b"><span>${{ transport: "Telephony", stt: "Speech-to-text", llm: "LLM", tts: "Voice (TTS)", vapi: "Vapi fee" }[k]}</span>
-      <div class="t"><span style="width:${b.share[k] || 0}%"></span></div><span class="num small">${b.perMinute[k] != null ? "$" + b.perMinute[k].toFixed(3) + "/min" : "—"} · ${b.share[k] ?? 0}%</span></div>`).join("")}</div>`
+      <div class="t"><span style="width:${b.share[k] || 0}%"></span></div><span class="num small">${b.perMinute[k] != null ? fmtCur(b.perMinute[k], "US", 3) + "/min" : "—"} · ${b.share[k] ?? 0}%</span></div>`).join("")}</div>`
     : `<div class="muted small" style="margin-top:8px">No cost breakdown stored yet — it's saved for new calls; use "Fetch past recordings" on the client's dashboard to fill the last ~14 days.</div>`;
   return months + parts;
 }
@@ -536,15 +658,474 @@ async function loadHealth() {
   } catch (e) { if (e.message !== "Signed out") $("hBody").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 }
 
+/* ================= usage, billing, quality (admin-billing.js) ================= */
+const B = "/api/dashboard/admin/billing";
+const fmtDay = s => s ? new Date(s + "T12:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" }) : "—";
+const fmtMin = n => n == null ? "—" : n >= 100 ? Math.round(n).toLocaleString("en-CA") : (Math.round(n * 10) / 10).toString();
+const pctCls = p => p == null ? "" : p >= 100 ? "bad" : p >= 80 ? "warn" : "good";
+const PLAN_LABEL = { home_starter: "Home Starter", home_growth: "Home Growth", home_pro: "Home Pro", cafe_starter: "Café Starter",
+  restaurant_growth: "Restaurant Growth", multi_location: "Multi-location", clinic_essentials: "Clinic Essentials", clinic_growth: "Clinic Growth",
+  clinic_pro: "Clinic Pro", custom: "Custom" };
+const STATUS_CLS = { trialing: "warn", active: "good", past_due: "bad", cancelled: "" };
+const PALETTE = ["#3b6fd8", "#1f9d55", "#d97706", "#a855f7", "#dc2626", "#0891b2", "#db2777", "#65a30d", "#7c3aed", "#ea580c", "#0d9488", "#64748b"];
+const needsMigration = e => e && e.status === 503;
+const migrationNote = msg => `<div class="card empty"><b>Usage tables aren't installed yet.</b><div class="muted small" style="margin-top:6px">${esc(msg)}</div></div>`;
+
+async function loadRate() {
+  try { const d = await api(`${B}/settings`); if (d.settings?.usd_to_cad) { RATE = Number(d.settings.usd_to_cad); RATE_FROM_SERVER = true; } } catch (e) { /* default 1.37 */ }
+}
+
+function presetQs(prefix) {
+  const p = $(prefix + "Preset").value, qs = new URLSearchParams({ preset: p });
+  if (p === "custom") { if ($(prefix + "From").value) qs.set("from", $(prefix + "From").value); if ($(prefix + "To").value) qs.set("to", $(prefix + "To").value); }
+  return qs;
+}
+function wirePreset(prefix, reload) {
+  const sync = () => { const c = $(prefix + "Preset").value === "custom"; $(prefix + "From").hidden = !c; $(prefix + "To").hidden = !c; };
+  $(prefix + "Preset").onchange = () => { sync(); if ($(prefix + "Preset").value !== "custom") reload(); };
+  $(prefix + "From").onchange = $(prefix + "To").onchange = () => { if ($(prefix + "From").value && $(prefix + "To").value) reload(); };
+  sync();
+}
+
+async function downloadCsv(path, fallbackName) {
+  const { data: { session } } = await SB.auth.getSession();
+  const r = await fetch(vcAuth.API + path, { headers: { Authorization: `Bearer ${session.access_token}` } });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || `Error ${r.status}`); }
+  const blob = await r.blob();
+  const name = (/filename="([^"]+)"/.exec(r.headers.get("content-disposition") || "") || [])[1] || fallbackName;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ---------- tiny SVG charts ---------- */
+function niceMax(v) { if (!(v > 0)) return 1; const p = 10 ** Math.floor(Math.log10(v)); return Math.ceil(v / p) * p; }
+function stackedBars(el, labels, series, fmtY = fmtMin) {
+  if (!labels.length) { el.innerHTML = `<div class="muted small">No calls in this range.</div>`; return; }
+  const W = 900, H = 220, L = 40, R = 8, T = 10, Bm = 26, n = labels.length, bw = (W - L - R) / n;
+  const tot = labels.map((_, i) => series.reduce((a, s) => a + (s.values[i] || 0), 0));
+  const max = niceMax(Math.max(...tot));
+  const y = v => T + (H - T - Bm) * (1 - v / max);
+  let g = "";
+  for (let k = 0; k <= 4; k++) { const v = max * k / 4; g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`; }
+  let bars = "";
+  labels.forEach((lab, i) => {
+    let acc = 0;
+    series.forEach((s, si) => { const v = s.values[i] || 0; if (!v) return;
+      bars += `<rect x="${L + i * bw + bw * 0.12}" width="${Math.max(1, bw * 0.76)}" y="${y(acc + v)}" height="${Math.max(0.5, y(acc) - y(acc + v))}" fill="${s.color || PALETTE[si % PALETTE.length]}"><title>${esc(lab)} · ${esc(s.name)}: ${fmtY(v)}</title></rect>`; acc += v; });
+  });
+  const every = Math.ceil(n / 12);
+  const xl = labels.map((lab, i) => i % every ? "" : `<text x="${L + i * bw + bw / 2}" y="${H - 8}" text-anchor="middle">${esc(lab)}</text>`).join("");
+  el.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" role="img">${g}${bars}${xl}</svg>
+    <div class="legend2">${series.map((s, si) => `<span><i style="background:${s.color || PALETTE[si % PALETTE.length]}"></i>${esc(s.name)}</span>`).join("")}</div>`;
+}
+function groupedBars(el, labels, series, fmtY) {
+  const W = 540, H = 220, L = 52, R = 8, T = 10, Bm = 26, n = labels.length, gw = (W - L - R) / n, k = series.length;
+  const max = niceMax(Math.max(0, ...series.flatMap(s => s.values.filter(v => v != null))));
+  const y = v => T + (H - T - Bm) * (1 - v / max);
+  let g = "";
+  for (let j = 0; j <= 4; j++) { const v = max * j / 4; g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`; }
+  let bars = "";
+  labels.forEach((lab, i) => series.forEach((s, si) => { const v = s.values[i]; if (v == null) return;
+    const bw = gw * 0.8 / k; bars += `<rect x="${L + i * gw + gw * 0.1 + si * bw}" width="${Math.max(1, bw - 1)}" y="${y(v)}" height="${Math.max(0.5, y(0) - y(v))}" fill="${s.color}"><title>${esc(lab)} · ${esc(s.name)}: ${fmtY(v)}</title></rect>`; }));
+  const xl = labels.map((lab, i) => `<text x="${L + i * gw + gw / 2}" y="${H - 8}" text-anchor="middle">${esc(lab)}</text>`).join("");
+  el.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}">${g}${bars}${xl}</svg>
+    <div class="legend2">${series.map(s => `<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join("")}</div>`;
+}
+function lineChart(el, labels, values, fmtY, color = "#3b6fd8") {
+  const pts = values.map((v, i) => [i, v]).filter(p => p[1] != null);
+  if (!pts.length) { el.innerHTML = `<div class="muted small">Not enough data yet.</div>`; return; }
+  const W = 540, H = 220, L = 52, R = 12, T = 12, Bm = 26, n = labels.length;
+  const max = niceMax(Math.max(...pts.map(p => p[1])) * 1.1);
+  const x = i => L + (W - L - R) * (n === 1 ? 0.5 : i / (n - 1)), y = v => T + (H - T - Bm) * (1 - v / max);
+  let g = "";
+  for (let j = 0; j <= 4; j++) { const v = max * j / 4; g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`; }
+  const path = pts.map((p, j) => `${j ? "L" : "M"}${x(p[0])},${y(p[1])}`).join(" ");
+  const dots = pts.map(p => `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="3.5" fill="${color}"><title>${esc(labels[p[0]])}: ${fmtY(p[1])}</title></circle>`).join("");
+  const xl = labels.map((lab, i) => `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${esc(lab)}</text>`).join("");
+  el.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}">${g}<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${dots}${xl}</svg>`;
+}
+/* Donut with a legend (value + share). items: [{ label, value, color, text? }] */
+function pieChart(el, items, fmtV = v => String(v), center = null) {
+  const list = items.filter(x => x.value > 0);
+  const total = list.reduce((a, x) => a + x.value, 0);
+  if (!total) { el.innerHTML = `<div class="muted small">Nothing in this range.</div>`; return; }
+  const R = 70, r = 44, C = 75;
+  let a0 = -Math.PI / 2, arcs = "";
+  const pt = (rad, a) => `${(C + rad * Math.cos(a)).toFixed(2)},${(C + rad * Math.sin(a)).toFixed(2)}`;
+  for (const x of list) {
+    const frac = x.value / total;
+    if (frac >= 0.9999) { arcs += `<circle cx="${C}" cy="${C}" r="${(R + r) / 2}" fill="none" stroke="${x.color}" stroke-width="${R - r}"><title>${esc(x.label)}: ${esc(fmtV(x.value))} (100%)</title></circle>`; break; }
+    const a1 = a0 + frac * Math.PI * 2, big = frac > 0.5 ? 1 : 0;
+    arcs += `<path d="M${pt(R, a0)} A${R},${R} 0 ${big} 1 ${pt(R, a1)} L${pt(r, a1)} A${r},${r} 0 ${big} 0 ${pt(r, a0)} Z" fill="${x.color}"><title>${esc(x.label)}: ${esc(fmtV(x.value))} (${Math.round(frac * 100)}%)</title></path>`;
+    a0 = a1;
+  }
+  const mid = center ? `<text x="${C}" y="${C + 5}" text-anchor="middle" font-size="15" font-weight="700">${esc(center)}</text>` : "";
+  el.innerHTML = `<div class="pie"><svg viewBox="0 0 150 150" role="img">${arcs}${mid}</svg><div class="pl">${list.map(x =>
+    `<div><i style="background:${x.color}"></i><span title="${esc(x.label)}">${esc(x.label)}</span><b>${x.text || esc(fmtV(x.value))} <span class="muted small">${Math.round(x.value / total * 100)}%</span></b></div>`).join("")}</div></div>`;
+}
+const monLabel = k => { const [y, m] = k.split("-"); return new Date(Date.UTC(+y, +m - 1, 15)).toLocaleString("en-CA", { month: "short", timeZone: "UTC" }); };
+
+/* ---------- overview ---------- */
+let OV = null, oSort = { k: "margin", asc: false };
+const sortVal = (r, k) => ({ business: r.business, status: r.status, periodEnd: r.periodEnd, pctUsed: r.pctUsed ?? -1, calls: r.calls, extraBlocks: r.extraBlocks,
+  revenue: r.revenue.cad, vapi: r.vapiCost.cad, twilio: r.twilioCost.cad, total: r.totalCost.cad, margin: r.marginPct ?? -1e9, cpm: r.costPerMinute?.cad ?? -1 }[k]);
+
+async function loadOverview() {
+  $("oBody").innerHTML = `<tr><td colspan="13" class="empty">Loading…</td></tr>`;
+  $("oMsg").innerHTML = "";
+  try {
+    OV = await api(`${B}/overview?${presetQs("o")}`);
+    RATE = OV.settings.usdToCad; RATE_FROM_SERVER = true;
+    renderOverview();
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    if (e.status === 403) return showGate(`<h2>Admins only</h2><p>This page is for VoiceCaptures admins. <a href="/dashboard/">Go to your dashboard</a>.</p>`);
+    if (needsMigration(e)) { $("oMsg").innerHTML = migrationNote(e.message); $("oBody").innerHTML = ""; ["oCards", "oNeeds", "oInvoice", "chDaily", "chMonthly", "chCpm"].forEach(id => $(id).innerHTML = ""); return; }
+    $("oBody").innerHTML = `<tr><td colspan="13" class="empty err">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function card(k, v, note) { return `<div class="card stat"><div class="k">${k}</div><div class="v num">${v}</div>${note ? `<div class="note">${note}</div>` : ""}</div>`; }
+function marginCls(p, m) { return p == null ? (m && m.cad < 0 ? "bad-t" : "") : p < 0 ? "bad-t" : p < 30 ? "warn-t" : "good-t"; }
+
+function renderOverview() {
+  const d = OV, s = d.summary;
+  const range = `${fmtDay(d.range.start)} – ${fmtDay(d.range.end)}`;
+  $("oCards").innerHTML = [
+    card("Minutes", fmtMin(s.minutes), `${s.calls} calls · avg ${fmtDur(s.avgSeconds)}${s.spamCalls ? ` · ${s.spamCalls} spam not counted` : ""}`),
+    card("Revenue", bothM(s.revenue), `${s.trialClients ? `${s.trialClients} on trial ($0) · ` : ""}${range}`),
+    card("Variable cost", bothM(s.variableCost), `Vapi ${fmtCur(s.vapiCost.cad, "CA")} · Twilio est. ${fmtCur(s.twilioCost.cad, "CA")}`),
+    card("Fixed costs", bothM(s.fixedCost), "from Rates & fixed costs"),
+    card("Gross margin", `<span class="${marginCls(s.grossMarginPct)}">${bothM(s.grossMargin)}</span>`, s.grossMarginPct != null ? `${s.grossMarginPct}% of revenue` : "no revenue in range"),
+    card("Net margin", `<span class="${marginCls(s.netMarginPct)}">${bothM(s.netMargin)}</span>`, s.netMarginPct != null ? `${s.netMarginPct}% after fixed costs` : ""),
+    card("Cost per minute", s.costPerMinute ? bothM(s.costPerMinute, 4) : "—", "variable cost ÷ billable minutes"),
+    card("Clients", `${s.statusCounts.active} active`, `${s.statusCounts.trialing} trialing · ${s.statusCounts.past_due} past due · ${s.statusCounts.cancelled} cancelled<br>MRR ${bothM(s.mrr)}`)
+  ].join("");
+
+  $("oNeeds").innerHTML = d.needsAction.length ? d.needsAction.map(n => `<div class="it"><button class="linkbtn" data-client="${esc(n.id)}">${esc(n.business)}</button>
+    <span>${n.why.map(w => `<span class="pill ${/over|cap|past|ended/.test(w) ? "bad" : "warn"}">${esc(w)}</span>`).join(" ")}</span></div>`).join("")
+    : `<div class="muted small">Nothing needs action.</div>`;
+  $("oInvoice").innerHTML = d.toInvoice.length ? d.toInvoice.map(x => `<div class="it">
+      <span><button class="linkbtn" data-client="${esc(x.customerId)}">${esc(x.business)}</button><div class="muted small">${fmtDay(x.periodStart)} – ${fmtDay(x.periodEnd)} · ${fmtMin(x.minutes)} of ${x.allowance} min${x.ended ? "" : " · period still open"}${x.stripeCustomerId ? ` · ${esc(x.stripeCustomerId)}` : ""}</div></span>
+      <span class="num"><b>${x.blocks} × 100 min</b> = ${bothM(x.amount)} <button class="btn" type="button" data-invoice="${x.periodId}" data-blocks="${x.blocks}" ${x.ended ? "" : 'title="Period still open; usage may grow"'}>Billed ✓</button></span></div>`).join("")
+    : `<div class="muted small">No client is over their allowance.</div>`;
+
+  // Minutes per day, stacked by client
+  const lastDay = d.range.end < d.range.today ? d.range.end : d.range.today; // no empty future days
+  const days = []; for (let t = new Date(d.range.start + "T12:00:00Z"); t <= new Date(lastDay + "T12:00:00Z"); t = new Date(t.getTime() + 86400000)) days.push(t.toISOString().slice(0, 10));
+  const ids = [...new Set(d.charts.daily.map(x => x.customerId))];
+  const cIdx = id => Math.max(0, d.clients.findIndex(r => r.id === id));
+  stackedBars($("chDaily"), days.map(fmtDay), ids.map(id => ({ name: d.charts.clientNames[id] || "Unknown", color: PALETTE[cIdx(id) % PALETTE.length],
+    values: days.map(day => (d.charts.daily.find(x => x.customerId === id && x.day === day) || {}).minutes || 0) })));
+  const ms = d.charts.months;
+  groupedBars($("chMonthly"), ms.map(m => monLabel(m.month)), [
+    { name: "Revenue (on record)", color: "#1f9d55", values: ms.map(m => m.revenue ? m.revenue.cad : null) },
+    { name: "Variable cost", color: "#dc2626", values: ms.map(m => m.variableCost.cad) }], v => "$" + Math.round(v));
+  lineChart($("chCpm"), ms.map(m => monLabel(m.month)), ms.map(m => m.costPerMinute ? m.costPerMinute.cad : null), v => "$" + v.toFixed(3));
+
+  // Pies
+  const colorOf = id => PALETTE[Math.max(0, d.clients.findIndex(r => r.id === id)) % PALETTE.length];
+  pieChart($("pieRev"), d.clients.map(r => ({ label: r.business, value: r.revenue.cad, color: colorOf(r.id) })), v => fmtCur(v, "CA", 0), fmtCur(s.revenue.cad, "CA", 0));
+  const tw = k => d.clients.reduce((a, r) => a + (r.twilioParts[k]?.cad || 0), 0);
+  pieChart($("pieCost"), [
+    { label: "Vapi (AI + telephony)", value: s.vapiCost.cad, color: "#3b6fd8" },
+    { label: "Twilio SMS (est.)", value: tw("sms"), color: "#0891b2" },
+    { label: "Twilio voice (est.)", value: tw("voice"), color: "#a855f7" },
+    { label: "Twilio numbers (est.)", value: tw("numbers"), color: "#d97706" },
+    { label: "Fixed costs", value: s.fixedCost.cad, color: "#64748b" }], v => fmtCur(v, "CA"), fmtCur(s.variableCost.cad + s.fixedCost.cad, "CA", 0));
+  pieChart($("pieMin"), d.clients.map(r => ({ label: r.business, value: r.minutes, color: colorOf(r.id) })), v => fmtMin(v) + " min", fmtMin(s.minutes));
+
+  renderOTable();
+  $("oNotes").innerHTML = d.notes.map(n => `• ${esc(n)}`).join("<br>");
+  document.querySelectorAll("#tab-overview [data-client]").forEach(b => b.onclick = () => openClient(b.dataset.client));
+  document.querySelectorAll("#oInvoice [data-invoice]").forEach(b => b.onclick = async () => {
+    if (!confirmInline(b)) return;
+    try { await api(`${B}/period/${b.dataset.invoice}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice_blocks: Number(b.dataset.blocks) }) }); loadOverview(); }
+    catch (e) { b.textContent = e.message; }
+  });
+}
+// Two-click confirm without a browser dialog.
+function confirmInline(b) { if (b.dataset.armed) return true; b.dataset.armed = "1"; const t = b.textContent; b.textContent = "Click again to confirm"; setTimeout(() => { delete b.dataset.armed; b.textContent = t; }, 3000); return false; }
+
+function renderOTable() {
+  const rows = [...OV.clients].sort((a, b) => { const x = sortVal(a, oSort.k), y = sortVal(b, oSort.k); return (x > y ? 1 : x < y ? -1 : 0) * (oSort.asc ? 1 : -1); });
+  document.querySelectorAll("#oTable th.sort").forEach(th => { th.classList.toggle("on", th.dataset.k === oSort.k); th.classList.toggle("asc", th.dataset.k === oSort.k && oSort.asc); });
+  $("oBody").innerHTML = rows.length ? rows.map(r => `<tr class="row" data-client="${esc(r.id)}">
+    <td><b>${esc(r.business)}</b><div class="muted small">${esc(r.vertical || "no plan set")}</div></td>
+    <td>${esc(PLAN_LABEL[r.plan] || "—")}<div><span class="pill ${STATUS_CLS[r.status] || ""}">${esc(String(r.status).replace("_", " "))}</span></div></td>
+    <td class="small">${fmtDay(r.periodStart)} – ${fmtDay(r.periodEnd)}${r.trialDaysLeft != null ? `<div class="${r.trialDaysLeft <= 3 ? "warn-t" : "muted"}">${r.trialDaysLeft} trial day${r.trialDaysLeft === 1 ? "" : "s"} left</div>` : ""}</td>
+    <td class="num">${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}${r.pctUsed != null ? `<div><span class="pill pct ${pctCls(r.pctUsed)}">${r.pctUsed}%</span></div>` : ""}</td>
+    <td class="num">${r.calls}<div class="muted small">avg ${fmtDur(r.avgSeconds)}</div></td>
+    <td class="small">${r.extraBlocks ? `${r.extraBlocks} block${r.extraBlocks > 1 ? "s" : ""}` : "—"}${Object.keys(r.addons || {}).length ? `<div class="muted" title="${esc(JSON.stringify(r.addons))}">add-ons ${fmtCur(r.addonsMonthly.cad, "CA")}/mo</div>` : ""}</td>
+    <td class="num">${bothM(r.revenue)}${r.revenueEstimated ? `<div class="muted small">est.</div>` : ""}</td>
+    <td class="num">${bothM(r.vapiCost)}${r.costCoverage != null && r.costCoverage < 100 ? `<div class="warn-t small">${r.costCoverage}% of calls costed</div>` : ""}</td>
+    <td class="num" title="SMS ${r.twilioParts.smsSent} × est · voice est · ${r.twilioParts.lines} number(s)">${bothM(r.twilioCost)}</td>
+    <td class="num">${bothM(r.totalCost)}</td>
+    <td class="num ${marginCls(r.marginPct, r.margin)}">${bothM(r.margin)}${r.marginPct != null ? `<div class="small">${r.marginPct}%</div>` : ""}</td>
+    <td class="num">${r.costPerMinute ? bothM(r.costPerMinute, 4) : "—"}</td>
+    <td class="small">${alertPills(r.alerts)}</td></tr>`).join("")
+    : `<tr><td colspan="13" class="empty">No clients yet.</td></tr>`;
+  $("oBody").querySelectorAll("tr.row").forEach(tr => tr.onclick = () => openClient(tr.dataset.client));
+}
+const alertPills = a => [a.at80 && `<span class="pill warn" title="${esc(fmtWhen(a.at80))}">80%</span>`, a.at100 && `<span class="pill bad" title="${esc(fmtWhen(a.at100))}">100%</span>`,
+  a.trialCap && `<span class="pill bad" title="${esc(fmtWhen(a.trialCap))}">trial cap</span>`].filter(Boolean).join(" ") || `<span class="muted">—</span>`;
+
+document.querySelectorAll("#oTable th.sort").forEach(th => th.onclick = () => {
+  oSort = { k: th.dataset.k, asc: oSort.k === th.dataset.k ? !oSort.asc : ["business", "status", "periodEnd"].includes(th.dataset.k) };
+  if (OV) renderOTable();
+});
+wirePreset("o", loadOverview);
+$("oRefresh").onclick = loadOverview;
+$("oCsv").onclick = async () => { try { await downloadCsv(`${B}/clients.csv?${presetQs("o")}`, "clients.csv"); } catch (e) { $("oMsg").innerHTML = `<div class="err">${esc(e.message)}</div>`; } };
+$("oSetBtn").onclick = () => { const el = $("oSettings"); el.hidden = !el.hidden; if (!el.hidden) loadSettings(); };
+
+/* ---------- rates, fixed costs, retention ---------- */
+async function loadSettings() {
+  const el = $("oSettings");
+  el.innerHTML = `<div class="muted">Loading…</div>`;
+  try {
+    const [d, f] = await Promise.all([api(`${B}/settings`), api(`${B}/fixed-costs`)]);
+    const st = d.settings || {};
+    const lastRun = d.cleanupRuns[0];
+    el.innerHTML = `<h3>Rates</h3>
+      <div class="form-grid">
+        <label>USD → CAD<input id="stRate" type="number" step="0.0001" value="${esc(st.usd_to_cad)}"></label>
+        <label>SMS cost (USD, est.)<input id="stSms" type="number" step="0.0001" value="${esc(st.sms_cost_estimate_usd)}"></label>
+        <label>Number cost / month (USD, est.)<input id="stNum" type="number" step="0.01" value="${esc(st.number_cost_usd_monthly)}"></label>
+        <label>Inbound voice / min (USD, est.)<input id="stVoice" type="number" step="0.0001" value="${esc(st.voice_cost_per_min_usd)}"></label>
+        <label>Admin alert phone<input id="stPhone" type="tel" placeholder="+1…" value="${esc(st.admin_alert_phone || "")}"></label>
+        <label>&nbsp;<button class="btn" id="stSave" type="button">Save rates</button></label>
+      </div>
+      <div class="muted small" style="margin-top:6px">Alerts are sent from ADMIN_SMS_FROM: <b class="${d.adminSmsFrom ? "good-t" : "bad-t"}">${d.adminSmsFrom ? "set" : "not set on Railway — alerts are skipped"}</b>.</div>
+      <h3 style="margin-top:16px">Fixed costs</h3>
+      <div class="filters">
+        <input id="fcMonth" type="month" class="btn" value="${new Date().toISOString().slice(0, 7)}" aria-label="Month">
+        <select id="fcItem" aria-label="Item">${f.choices.map(c => `<option>${esc(c)}</option>`).join("")}</select>
+        <input id="fcAmount" type="number" step="0.01" min="0" placeholder="Amount" class="btn" style="width:110px" aria-label="Amount">
+        <select id="fcCur" aria-label="Currency"><option>CAD</option><option>USD</option></select>
+        <input id="fcNote" type="search" placeholder="Note (optional)" aria-label="Note">
+        <button class="btn" id="fcAdd" type="button">Add</button>
+      </div>
+      <table class="sub-table"><thead><tr><th>Month</th><th>Item</th><th>Amount</th><th>Note</th><th></th></tr></thead><tbody>${
+        f.items.length ? f.items.map(x => `<tr><td>${esc(String(x.month).slice(0, 7))}</td><td>${esc(x.item)}</td><td class="num">${bothM(x.both)} <span class="muted small">(entered ${esc(x.currency)})</span></td><td class="small">${esc(x.note || "")}</td>
+          <td><button class="linkbtn" data-delfc="${x.id}">remove</button></td></tr>`).join("") : `<tr><td colspan="5" class="muted">None entered.</td></tr>`}</tbody></table>
+      <h3 style="margin-top:16px">Retention cleanup</h3>
+      <div class="small">Mode: <b>${d.cleanupMode === "delete" ? "deleting expired transcripts and recordings daily" : "dry run (counts only) — set RETENTION_CLEANUP=on on Railway to delete"}</b>.
+        ${lastRun ? `Last run ${esc(fmtWhen(lastRun.ran_at))}: ${lastRun.artifacts_expired} expired, ${lastRun.artifacts_deleted} deleted, ${lastRun.recordings_deleted} recordings removed.` : "Not run yet."}
+        <button class="btn" id="clDry" type="button">Dry run now</button></div>
+      <div id="stMsg" class="small" style="margin-top:6px"></div>`;
+    $("stSave").onclick = async () => {
+      try { await api(`${B}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        usd_to_cad: Number($("stRate").value), sms_cost_estimate_usd: Number($("stSms").value), number_cost_usd_monthly: Number($("stNum").value),
+        voice_cost_per_min_usd: Number($("stVoice").value), admin_alert_phone: $("stPhone").value.trim() }) });
+        $("stMsg").innerHTML = `<span class="good-t">Saved.</span>`; loadOverview(); } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    };
+    $("fcAdd").onclick = async () => {
+      try { await api(`${B}/fixed-costs`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        month: $("fcMonth").value, item: $("fcItem").value, amount: Number($("fcAmount").value), currency: $("fcCur").value, note: $("fcNote").value }) });
+        loadSettings(); loadOverview(); } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    };
+    el.querySelectorAll("[data-delfc]").forEach(b => b.onclick = async () => { if (!confirmInline(b)) return;
+      try { await api(`${B}/fixed-costs/${b.dataset.delfc}`, { method: "DELETE" }); loadSettings(); loadOverview(); } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; } });
+    $("clDry").onclick = async () => { try { const r = await api(`${B}/cleanup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "dry-run" }) });
+      $("stMsg").textContent = `Dry run: ${r.artifacts_expired} record(s) past their retention date.`; } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; } };
+  } catch (e) { el.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
+}
+
+/* ---------- client drill-down ---------- */
+let CL = { id: null, page: 0 };
+function openClient(id) {
+  CL = { id, page: 0 };
+  showTab("client");
+  history.replaceState(null, "", "#client/" + encodeURIComponent(id));
+  loadClient();
+}
+$("cBack").onclick = () => { showTab("overview"); };
+
+async function loadClient() {
+  const box = $("cBody");
+  box.innerHTML = `<div class="muted">Loading…</div>`;
+  const qs = presetQs("o"); qs.set("page", CL.page);
+  try {
+    const d = await api(`${B}/client/${encodeURIComponent(CL.id)}?${qs}`);
+    const r = d.client;
+    const pages = d.total != null ? Math.max(1, Math.ceil(d.total / d.pageSize)) : null;
+    box.innerHTML = `<h1>${esc(r.business)} <span class="pill ${STATUS_CLS[r.status] || ""}" style="vertical-align:middle">${esc(String(r.status).replace("_", " "))}</span></h1>
+      <div class="sub">${esc(PLAN_LABEL[r.plan] || "No plan set")} · ${fmtDay(d.range.start)} – ${fmtDay(d.range.end)} · retention ${r.retentionDays} days · recordings ${r.recordingEnabled ? "kept" : "<b>off</b>"}</div>
+      <div class="stats six">
+        ${card("Minutes", `${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}`, r.pctUsed != null ? `<span class="pill ${pctCls(r.pctUsed)}">${r.pctUsed}% used</span>` : "")}
+        ${card("Calls", r.calls, `avg ${fmtDur(r.avgSeconds)}${r.spamCalls ? ` · ${r.spamCalls} spam` : ""}`)}
+        ${card("Revenue", bothM(r.revenue), r.revenueEstimated ? "est. from current plan" : "")}
+        ${card("Margin", `<span class="${marginCls(r.marginPct)}">${bothM(r.margin)}</span>`, r.marginPct != null ? `${r.marginPct}% · cost ${fmtCur(r.totalCost.cad, "CA")}` : `cost ${fmtCur(r.totalCost.cad, "CA")}`)}
+      </div>
+      <div class="cols2">
+        <div class="card"><h3>Minutes per day</h3><div id="cDaily"></div></div>
+        <div class="card"><h3>Revenue vs cost</h3><div id="cPie"></div></div>
+      </div>
+      <div class="card mb"><h3>Plan &amp; billing <span class="muted small">(entered by hand until Stripe sync)</span></h3>
+        <div class="form-grid">
+          <label>Plan<select id="pfPlan"><option value="">—</option>${Object.entries(PLAN_LABEL).map(([k, v]) => `<option value="${k}" ${r.plan === k ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+          <label>Status<select id="pfStatus">${["trialing", "active", "past_due", "cancelled"].map(x => `<option ${r.status === x ? "selected" : ""}>${x}</option>`).join("")}</select></label>
+          <label>Plan price (CAD / month)<input id="pfPrice" type="number" step="1" min="0" value="${r.planPrice.cad || ""}"></label>
+          <label>Minutes included<input id="pfMin" type="number" step="1" min="0" value="${r.planMinutes ?? ""}"></label>
+          <label>Billing day (1–31)<input id="pfAnchor" type="number" min="1" max="31" value="${r.billingAnchorDay ?? ""}"></label>
+          <label>Stripe customer<input id="pfStripe" placeholder="cus_…" value="${esc(r.stripeCustomerId || "")}"></label>
+          <label>Trial start<input id="pfTs" type="date" value="${esc(r.trialStart || "")}"></label>
+          <label>Trial end<input id="pfTe" type="date" value="${esc(r.trialEnd || "")}"></label>
+          <label>Trial minutes cap<input id="pfCap" type="number" min="0" value="${r.trialMinutesCap ?? 100}"></label>
+          <label>Retention (days)<input id="pfRet" type="number" min="1" max="3650" value="${r.retentionDays}"></label>
+          <label>Keep recordings<select id="pfRec"><option value="true" ${r.recordingEnabled ? "selected" : ""}>Yes</option><option value="false" ${!r.recordingEnabled ? "selected" : ""}>No (clinics)</option></select></label>
+          <label>Alert phone (else owner phone)<input id="pfAlert" type="tel" placeholder="+1…" value="${esc(r.alertPhone || "")}"></label>
+          <label style="grid-column:1/-1">Add-ons (JSON; keys ending _cad are monthly CAD revenue)<textarea id="pfAddons" rows="2">${esc(JSON.stringify(r.addons || {}))}</textarea></label>
+        </div>
+        <div style="margin-top:8px"><button class="btn" id="pfSave" type="button">Save</button> <span id="pfMsg" class="small"></span></div>
+      </div>
+      <div class="card mb"><h3>Billing periods</h3><div class="table-wrap"><table class="sub-table">
+        <thead><tr><th>Period</th><th>Minutes</th><th>Allowance</th><th>Extra blocks</th><th>Charged</th><th>Alerts</th><th>Invoiced</th></tr></thead><tbody>${
+        d.periods.map(p => `<tr><td>${fmtDay(p.start)} – ${fmtDay(p.end)}${p.kind === "trial" ? ' <span class="pill warn">trial</span>' : ""}</td>
+          <td class="num">${fmtMin(p.minutes)}</td><td class="num">${p.allowance}</td>
+          <td>${p.kind === "trial" ? "—" : `<input class="inline-in" type="number" min="0" value="${p.extraBlocks}" data-blocks="${p.id}"> <button class="linkbtn" data-saveblocks="${p.id}">save</button>`}</td>
+          <td class="num">${p.kind === "trial" ? "$0" : bothM(p.price)}</td>
+          <td>${alertPills({ at80: p.at80, at100: p.at100, trialCap: p.trialCap })}</td><td class="small">${p.invoicedAt ? esc(fmtWhen(p.invoicedAt)) : "—"}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">No periods yet.</td></tr>`}</tbody></table></div></div>
+      <div class="card mb"><h3>Calls <span class="muted small">${d.total ?? ""} in range</span> <button class="btn" id="cCsv" type="button" style="float:right">⇩ CSV</button></h3>
+        <div class="table-wrap"><table><thead><tr><th>When</th><th>Caller</th><th>Length</th><th>Cost</th><th>Outcome</th><th class="hide-sm">Ended</th><th></th></tr></thead><tbody>${
+        d.calls.map(c => `<tr><td>${esc(fmtWhen(c.at))}</td><td>${esc(c.caller)}${c.spam ? ' <span class="pill bad">spam</span>' : ""}</td><td class="num">${fmtDur(c.seconds)}</td>
+          <td class="num">${c.cost ? bothM(c.cost, 3) : "—"}</td><td><span class="pill">${esc(c.outcome.replace("_", " "))}</span></td><td class="hide-sm">${endedPill(c.endedReason)}</td>
+          <td><button class="linkbtn" data-view="${esc(c.vapiCallId)}">transcript${c.hasRecording ? " &amp; recording" : ""}</button>${c.deleteAfter ? `<div class="muted small">kept until ${esc(fmtDay(c.deleteAfter.slice(0, 10)))}</div>` : ""}</td></tr>`).join("")
+          || `<tr><td colspan="7" class="empty">No calls in this range.</td></tr>`}</tbody></table></div>
+        ${pages && pages > 1 ? `<div style="margin-top:8px"><button class="btn" id="cPrev" ${CL.page ? "" : "disabled"}>← Newer</button> <span class="small muted">page ${CL.page + 1} of ${pages}</span> <button class="btn" id="cNext" ${CL.page + 1 < pages ? "" : "disabled"}>Older →</button></div>` : ""}
+      </div>
+      <div class="cols2">
+        <div class="card"><h3>Alert history</h3><div class="list">${d.alerts.map(a => `<div class="it"><span>${esc(a.kind === "trial_cap" ? "Trial cap" : a.kind + "%")} → ${esc(a.recipient)} <span class="muted small">${esc(a.to_number || "")}</span></span>
+          <span class="small ${a.status === "sent" ? "good-t" : "bad-t"}" title="${esc(a.body || "")}">${esc(a.status)}${a.error ? ": " + esc(a.error) : ""} · ${esc(fmtWhen(a.created_at))}</span></div>`).join("") || `<div class="muted small">No alerts yet.</div>`}</div></div>
+        <div class="card"><h3>Tool failures</h3><div class="list">${d.toolErrors.map(t => `<div class="it"><span>/${esc(t.tool)} · ${t.errors}×</span><span class="small muted">${esc(t.sample_error || "")}</span></div>`).join("") || `<div class="muted small">None in this range.</div>`}</div></div>
+      </div>`;
+    stackedBars($("cDaily"), d.daily.map(x => fmtDay(x.day)), [{ name: "Minutes", color: PALETTE[0], values: d.daily.map(x => x.minutes) }]);
+    pieChart($("cPie"), [
+      { label: "Vapi", value: r.vapiCost.cad, color: "#3b6fd8" },
+      { label: "Twilio SMS (est.)", value: r.twilioParts.sms.cad, color: "#0891b2" },
+      { label: "Twilio voice (est.)", value: r.twilioParts.voice.cad, color: "#a855f7" },
+      { label: "Twilio numbers (est.)", value: r.twilioParts.numbers.cad, color: "#d97706" },
+      { label: "Margin", value: Math.max(0, r.margin.cad), color: "#1f9d55" }], v => fmtCur(v, "CA"), r.revenue.cad ? fmtCur(r.revenue.cad, "CA", 0) : "trial");
+    $("pfSave").onclick = saveClient;
+    box.querySelectorAll("[data-saveblocks]").forEach(b => b.onclick = async () => {
+      const v = Number(box.querySelector(`[data-blocks="${b.dataset.saveblocks}"]`).value);
+      try { await api(`${B}/period/${b.dataset.saveblocks}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ extra_blocks: v }) }); loadClient(); loaded.overview = false; }
+      catch (e) { b.textContent = e.message; }
+    });
+    box.querySelectorAll("[data-view]").forEach(b => b.onclick = () => viewCall(b.dataset.view));
+    $("cCsv").onclick = async () => { try { await downloadCsv(`${B}/client/${encodeURIComponent(CL.id)}/calls.csv?${presetQs("o")}`, "calls.csv"); } catch (e) { $("cCsv").textContent = e.message; } };
+    if ($("cPrev")) $("cPrev").onclick = () => { CL.page--; loadClient(); };
+    if ($("cNext")) $("cNext").onclick = () => { CL.page++; loadClient(); };
+  } catch (e) { if (e.message !== "Signed out") box.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
+}
+
+async function saveClient() {
+  let addons;
+  try { addons = JSON.parse($("pfAddons").value || "{}"); } catch { $("pfMsg").innerHTML = `<span class="err">Add-ons must be JSON, e.g. {"extra_lines":1,"integration_monthly_cad":39}</span>`; return; }
+  const body = { plan_name: $("pfPlan").value || null, status: $("pfStatus").value, plan_price_cad: $("pfPrice").value, plan_minutes: $("pfMin").value,
+    billing_anchor_day: $("pfAnchor").value, stripe_customer_id: $("pfStripe").value, trial_start: $("pfTs").value, trial_end: $("pfTe").value,
+    trial_minutes_cap: $("pfCap").value, retention_days: $("pfRet").value, recording_enabled: $("pfRec").value === "true", alert_phone: $("pfAlert").value, addons };
+  try { await api(`${B}/client/${encodeURIComponent(CL.id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    loaded.overview = false; await loadClient(); $("pfMsg").innerHTML = `<span class="good-t">Saved.</span>`; }
+  catch (e) { $("pfMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+}
+
+/* ---------- one call (our copies) ---------- */
+async function viewCall(id) {
+  const dlg = $("callView"), box = $("cvBody");
+  box.innerHTML = `<div class="muted">Loading…</div>`;
+  if (!dlg.open) dlg.showModal();
+  try {
+    const d = await api(`${B}/call/${encodeURIComponent(id)}`);
+    const turns = Array.isArray(d.turns) ? d.turns : [];
+    const c = d.call || {};
+    box.innerHTML = `<h3>${esc(c.caller_name || c.caller_id || "Call")} · ${esc(c.created_at ? fmtWhen(c.created_at) : "")}</h3>
+      <div class="cols"><div>
+        <div class="k2">Recording</div>${d.recordingUrl ? `<audio controls preload="none" src="${esc(d.recordingUrl)}"></audio><div class="muted small">Private link, expires in 15 minutes.</div>` : `<div class="muted small">${esc(d.recordingError || "No saved recording.")}</div>`}
+        <div class="k2">Transcript</div>
+        ${turns.length ? `<div class="tx">${turns.map(t => `<div class="turn ${t.role === "caller" ? "caller" : t.role === "tool" ? "tool" : "assistant"}"><div class="who">${t.role === "caller" ? "Caller" : t.role === "tool" ? "Tool" : "Assistant"}${t.t != null ? `<br>${fmtT(t.t)}` : ""}</div><div class="bub">${esc(t.text)}</div></div>`).join("")}</div>`
+          : d.text ? `<div class="tx"><div class="bub">${esc(d.text)}</div></div>` : `<div class="muted small">No transcript saved${d.deleteAfter ? "" : " (or it passed its retention date)"}.</div>`}
+      </div><div>
+        ${kvBlock("Summary", d.summary)}
+        <div class="k2">Call</div><div class="kv">
+          <div class="k">Vapi call id</div><div class="small">${esc(id)}</div>
+          <div class="k">Length</div><div>${fmtDur(c.call_duration_seconds)}</div>
+          <div class="k">Cost</div><div>${c.cost ? bothM(c.cost, 3) : "—"}</div>
+          <div class="k">Outcome</div><div>${esc(c.outcome || "—")}</div>
+          <div class="k">Ended</div><div>${endedPill(c.ended_reason)}</div>
+          ${d.deleteAfter ? `<div class="k">Kept until</div><div>${esc(fmtWhen(d.deleteAfter))}</div>` : ""}
+          ${d.report ? `<div class="k">Assistant</div><div>${esc(d.report.assistant_name || d.report.assistant_id || "—")}</div>` : ""}
+        </div>
+        ${d.events.length ? `<div class="k2">Events</div>` + d.events.map(e => `<div class="small">${esc(fmtWhen(e.created_at))} · ${esc(e.kind.replace("_", " "))}${e.detail?.error ? ": " + esc(e.detail.error) : ""}</div>`).join("") : ""}
+        ${d.toolErrors.length ? `<div class="k2">Tool failures</div>` + d.toolErrors.map(e => `<div class="small bad-t">/${esc(e.tool)}: ${esc(e.error)}</div>`).join("") : ""}
+        ${messagesBlock(d.messages)}
+      </div></div>`;
+  } catch (e) { box.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+$("cvClose").onclick = () => $("callView").close();
+
+/* ---------- quality ---------- */
+async function loadQuality() {
+  const box = $("qBody");
+  box.innerHTML = `<div class="muted">Loading…</div>`;
+  const qs = presetQs("q"); if ($("qClient").value) qs.set("customer", $("qClient").value);
+  try {
+    const d = await api(`${B}/quality?${qs}`);
+    const sel = $("qClient");
+    if (sel.options.length <= 1 && d.clients.length) { const cur = sel.value; sel.innerHTML = `<option value="">All clients</option>` + d.clients.map(c => `<option value="${esc(c.id)}">${esc(c.business)}</option>`).join(""); sel.value = cur; }
+    const o = d.overall, pc = v => v == null ? "—" : v + "%";
+    const OUTL = { booked: "Booked", message_taken: "Message taken", transferred: "Transferred", abandoned: "Abandoned", spam: "Spam" };
+    const OUTC = { booked: "#1f9d55", message_taken: "#3b6fd8", transferred: "#0891b2", abandoned: "#d97706", spam: "#9ca3af" };
+    box.innerHTML = `<div class="sub">${fmtDay(d.range.start)} – ${fmtDay(d.range.end)} · ${o.calls} calls (${o.nonSpam} not spam)</div>
+      <div class="stats six">
+        ${card("Booking rate", pc(o.bookingRate), "booked ÷ non-spam calls")}
+        ${card("Transfer success", pc(o.transfers.successRate), `${o.transfers.succeeded} of ${o.transfers.attempted} transfers`)}
+        ${card("Abandonment", pc(o.abandonmentRate), o.avgSecondsBeforeHangup != null ? `avg ${fmtDur(o.avgSecondsBeforeHangup)} before hang-up` : "")}
+        ${card("After hours", pc(o.afterHoursShare), "of non-spam calls, by each client's hours")}
+      </div>
+      <div class="cols2">
+        <div class="card"><h3>Outcome mix</h3><div id="pieOut"></div></div>
+        <div class="card"><h3>How calls ended</h3><div id="pieEnd"></div></div>
+      </div>
+      <div class="card mb"><h3>Average length by outcome</h3><div class="bars2">${(() => { const mx = Math.max(1, ...Object.values(o.avgSecondsByOutcome).filter(Boolean));
+          return Object.keys(OUTL).map(k => `<div class="b"><span>${OUTL[k]}</span><div class="t"><span style="width:${(o.avgSecondsByOutcome[k] || 0) / mx * 100}%;background:${OUTC[k]}"></span></div><span class="num small">${fmtDur(o.avgSecondsByOutcome[k])}</span></div>`).join(""); })()}</div></div>
+      <div class="card mb"><h3>Worst calls <span class="muted small">10 most recent abandoned or failed</span></h3><div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Client</th><th>Length</th><th>Why</th><th>Ended</th><th></th></tr></thead><tbody>${
+        d.worstCalls.map(w => `<tr><td>${esc(fmtWhen(w.at))}</td><td>${esc(w.business)}</td><td class="num">${fmtDur(w.seconds)}</td><td class="small">${esc(w.why)}</td><td>${endedPill(w.endedReason)}</td>
+          <td>${w.vapiCallId ? `<button class="linkbtn" data-view="${esc(w.vapiCallId)}">${w.hasTranscript ? "transcript" : "details"}</button>` : ""}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">None. 🎉</td></tr>`}</tbody></table></div></div>
+      <div class="cols2">
+        <div class="card"><h3>Failed transfers</h3><div class="list">${d.failedTransfers.map(t => `<div class="it"><span>${esc(fmtWhen(t.at))} · ${esc(t.business)}<div class="muted small">${t.error ? esc(t.error) : esc(t.endedReason || "")}</div></span>
+          <span class="small">then: <b>${esc((t.fallbackOutcome || "").replace("_", " "))}</b> <button class="linkbtn" data-view="${esc(t.vapiCallId)}">view</button></span></div>`).join("") || `<div class="muted small">No failed transfers.</div>`}</div></div>
+        <div class="card"><h3>Tool failures</h3><div class="list">${d.toolFailures.map(t => `<div class="it"><span>/${esc(t.tool)} · ${esc(t.business)}<div class="muted small">${esc(t.sample || "")}</div></span><span class="num small">${t.errors}× on ${t.callsAffected} call(s)</span></div>`).join("") || `<div class="muted small">No tool returned ok:false.</div>`}</div></div>
+      </div>
+      <div class="card mb"><h3>How calls ended</h3><div class="table-wrap"><table class="sub-table"><thead><tr><th>Ended reason</th><th>Calls</th><th></th></tr></thead><tbody>${
+        d.endedReasons.map(e => `<tr><td>${endedPill(e.reason)}</td><td class="num">${e.calls}</td><td>${e.isError ? '<span class="pill bad">error / pipeline failure</span>' : ""}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">No calls.</td></tr>`}</tbody></table></div></div>
+      <div class="card"><h3>By client</h3><div class="table-wrap"><table class="sub-table"><thead><tr><th>Client</th><th>Calls</th><th>Booked</th><th>Message</th><th>Transferred</th><th>Abandoned</th><th>Spam</th><th>Booking rate</th><th>Transfer success</th><th>After hours</th></tr></thead><tbody>${
+        d.clients.map(c => `<tr><td>${esc(c.business)}</td><td class="num">${c.calls}</td>${Object.keys(OUTL).map(k => `<td class="num">${c.outcomes[k].calls}</td>`).join("")}
+          <td class="num">${pc(c.bookingRate)}</td><td class="num">${c.transfers.attempted ? `${pc(c.transfers.successRate)} <span class="muted small">(${c.transfers.succeeded}/${c.transfers.attempted})</span>` : "—"}</td><td class="num">${pc(c.afterHoursShare)}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="muted small" style="margin-top:10px">${d.notes.map(n => "• " + esc(n)).join("<br>")}</div>`;
+    pieChart($("pieOut"), Object.keys(OUTL).map(k => ({ label: OUTL[k], value: o.outcomes[k].calls, color: OUTC[k] })), v => `${v} calls`, `${o.calls}`);
+    const er = d.endedReasons.slice(0, 6), rest = d.endedReasons.slice(6).reduce((a, e) => a + e.calls, 0);
+    const ERC = ["#1f9d55", "#0891b2", "#3b6fd8", "#a855f7", "#d97706", "#db2777"];
+    pieChart($("pieEnd"), er.map((e, i) => ({ label: e.reason.replace(/-/g, " "), value: e.calls, color: e.isError ? "#dc2626" : ERC[i % ERC.length] }))
+      .concat(rest ? [{ label: "other", value: rest, color: "#9ca3af" }] : []), v => `${v} calls`, `${o.calls}`);
+    box.querySelectorAll("[data-view]").forEach(b => b.onclick = () => viewCall(b.dataset.view));
+  } catch (e) { if (e.message !== "Signed out") box.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
+}
+wirePreset("q", loadQuality);
+$("qClient").onchange = loadQuality;
+$("qRefresh").onclick = loadQuality;
+
 vcAuth.client().then(async ({ sb }) => {
   SB = sb;
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return toLogin();
   sb.auth.onAuthStateChange(ev => { if (ev === "SIGNED_OUT" && !leaving) toLogin(); });
   $("app").hidden = false;
-  load();
+  await loadRate();
   const want = (location.hash || "").replace("#", "");
-  if (["money", "notif", "health"].includes(want)) showTab(want);
+  if (want.startsWith("client/")) { loaded.overview = false; openClient(decodeURIComponent(want.slice(7))); }
+  else showTab(["quality", "calls", "money", "notif", "health"].includes(want) ? want : "overview");
 }).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>
