@@ -702,9 +702,10 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     <p class="fine" style="margin-top:16px">All prices in CAD, plus HST. Most
     reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
 
-    <p class="fine" style="margin-top:10px">The free 100-contact pilot applies to
-    Per booking and Per campaign. Custom is a build, so it starts with a scoping
-    call instead.</p>
+    <p class="fine" style="margin-top:10px">The free pilot is the first 20% of
+    your list, up to 100 names and never fewer than 25. It applies to Per booking
+    and Per campaign. Custom is a build, so it starts with a scoping call
+    instead.</p>
 
     <details class="role" style="margin-top:22px">
       <summary><div class="role-top"><div><h3>Is Custom right for you?</h3>
@@ -793,7 +794,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
 
       <div class="calc2-out" aria-live="polite">
         <p class="co-big" id="co-bookings">About 20 bookings</p>
-        <p class="co-sub" id="co-pilot">including about 4 from the free first 100</p>
+        <p class="co-sub" id="co-pilot">including about 4 from the free first 100 names</p>
         <p class="co-rev">Estimated revenue to you: <b id="co-rev">$3,000</b>
           <span class="co-note">before no-shows</span></p>
 
@@ -818,7 +819,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
         CAD, plus HST. Per booking applies to customers seen in the last 18 months.
         Add-ons not included.</p>
 
-        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Start with 100 names, free</a>
+        <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Start with a free pilot</a>
       </div>
     </div>
   </div>
@@ -892,10 +893,10 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
 
 <section>
   <div class="wrap center">
-    <h2>Start with 100 names, free</h2>
-    <p class="sub">We work the first 100 names at no cost. If it books people,
-    you continue at the rates above. If it doesn&rsquo;t, you&rsquo;ve lost nothing
-    but the export.</p>
+    <h2>Start with a free pilot</h2>
+    <p class="sub">We work the first 20% of your list at no cost &mdash; up to 100
+    names, and never fewer than 25. If it books people, you continue at the rates
+    above. If it doesn&rsquo;t, you&rsquo;ve lost nothing but the export.</p>
     <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a 30-minute chat</a>
   </div>
 </section>
@@ -1100,8 +1101,11 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     var V = clamp(val,  parseFloat(val.value));
     var R = clamp(rate, parseFloat(rate.value)) / 100;
 
-    var pilot    = Math.min(N, 100);
-    var billable = Math.max(N - 100, 0);
+    // The pilot scales with the list. A flat 100 was half a 200-name list and
+    // a rounding error on a 2,000-name one; 20% is the same gesture at any size.
+    // The floor keeps it big enough to mean something on a short list.
+    var pilot    = Math.min(N, Math.max(25, Math.min(100, Math.round(N * 0.2))));
+    var billable = N - pilot;
     var pilotBk  = Math.round(pilot * R);
     var paidBk   = Math.round(billable * R);
     var total    = pilotBk + paidBk;
@@ -1111,7 +1115,8 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     var costCampaign = billable > 0 ? Math.max(billable * 2.5, 500) : 0;
 
     $("co-bookings").textContent = "About " + total + (total === 1 ? " booking" : " bookings");
-    $("co-pilot").textContent = "including about " + pilotBk + " from the free first 100";
+    $("co-pilot").textContent = "including about " + pilotBk
+      + " from the free first " + pilot + (pilot === 1 ? " name" : " names");
     $("co-rev").textContent = money(revenue);
 
     var free = billable === 0;
