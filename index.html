@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoiceCaptures — AI voice agent that answers and books every call</title>
-<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, no credit card.">
+<meta name="description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. Built for home services, restaurants and clinics. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.">
 <meta name="theme-color" content="#f6f8fc">
 <link rel="canonical" href="https://voicecaptures.com/">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -17,7 +17,7 @@
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/">
 <meta property="og:title" content="VoiceCaptures — never lose another call to voicemail">
-<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
+<meta property="og:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.">
 <meta property="og:image" content="https://voicecaptures.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,7 +25,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="VoiceCaptures — never lose another call to voicemail">
 <meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
-<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, no credit card.">
+<meta name="twitter:description" content="An AI voice agent answers every call, qualifies the caller, books into your real calendar and texts you the summary. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1262,16 +1262,7 @@ header .btn.nav-cta::before{width:36px;height:36px}
 .mnav .btn-amber:hover,header .mnav .btn-amber:hover{background:#FBBF24;color:#1a1205;
   border-color:#FBBF24}
 
-/* ---- Pricing display ---------------------------------------------------
-   The entry tier stays public as an anchor; everything above it is quoted.
-   "Quoted on a call" cannot sit at the 38px price size without wrapping, so
-   it gets its own scale. ---- */
-.price .from{display:block;font-family:var(--body);font-size:11.5px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
-.price.is-quoted{font-size:20px;letter-spacing:-.01em;line-height:1.3}
-.price .quoted{color:var(--text)}
-.tier.ent .price.is-quoted{font-size:20px}
-.tier.ent .price.is-quoted .quoted{color:inherit}
+
 
 /* Win-back band: a second product, so it gets its own ground rather than
    reading as another pricing row. */
@@ -1296,6 +1287,24 @@ html[data-theme="light"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover,
 html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
   background:none;border-color:transparent;color:var(--text)}
 .nav{gap:2px}
+
+/* ---- Pricing supporting blocks: what's included, add-ons, setup. These used
+   to be a run of <p> in .terms, which buried the three things a buyer most
+   wants to scan. ---- */
+.pblocks{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin:26px 0 0}
+@media (max-width:860px){ .pblocks{grid-template-columns:1fr} }
+.pblock{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+html[data-theme="light"] .pblock{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.pblock h3{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pblock ul{margin:0;padding-left:18px}
+.pblock li{font-size:14px;line-height:1.55;margin-bottom:8px}
+.pblock li:last-child{margin-bottom:0}
+.pcta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+@media (max-width:520px){ .pcta{flex-direction:column} .pcta .btn{width:100%} }
+
+/* Approximate call count next to the minute allowance. */
+.mins .approx{color:var(--muted);font-weight:400}
 </style>
 </head>
 <body>
@@ -1348,7 +1357,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
           <a href="/about/#contact"><i></i><b>Contact</b><em>Send us a message</em></a>
         </div>
       </div>
-      <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
+      <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a>
       <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
@@ -1389,7 +1398,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
       <a class="mnav-a sub" href="/about/#contact">Contact</a>
       <div class="mnav-foot">
         <a class="btn btn-ghost" href="#demo" data-demo>Try the demo line</a>
-        <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures"
+        <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
            target="_blank" rel="noopener">Book a call</a>
         <a class="btn btn-primary" href="#yourline" data-close>Try it on your business</a>
       </div>
@@ -1416,7 +1425,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
         <a class="btn btn-primary btn-arrow" id="hero-cta" href="#intake">Tell us about your line</a>
         <a class="btn btn-ghost btn-arrow hero-try" id="hero-try" href="#yourline">Hear it answer as your business</a>
       </div>
-      <p class="fine" id="hero-fine">14 days free. No credit card. Setup takes 10 minutes.</p>
+      <p class="fine" id="hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.</p>
 
       <div class="stats" id="stats">
         <div class="stat"><b>14%</b><div class="lbl">Missed-call rate in home services</div><div class="src">CallRail benchmark report, 2025</div></div>
@@ -1530,7 +1539,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
         <div id="nb-clips"></div>
         <p class="nb-note">Generated just now from your public Google listing. Your real agent uses your own greeting, hours, services and calendar &mdash; this is the stock version.</p>
         <div class="center" style="margin-top:18px">
-          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Set this up on my number</a>
+          <a class="btn btn-primary" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Set this up on my number</a>
         </div>
       </div>
     </div>
@@ -1599,7 +1608,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
       <p id="d-body">Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.</p>
       <div class="demonote" id="d-note">This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.</div>
       <div style="margin-top:20px">
-        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a demo</a>
+        <a class="btn btn-primary" id="d-cta" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a demo</a>
       </div>
     </div>
   </div>
@@ -1668,7 +1677,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
     <h2 class="center">Call forwarding — your way</h2>
     <p class="sub">Keep your existing number. Choose when the AI picks up.</p>
     <div class="grid g4">
-      <div class="card"><span class="tag">Most popular</span><h3>When you don't answer</h3><p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over.</p></div>
+      <div class="card"><span class="tag">Recommended</span><h3>When you don't answer</h3><p>Your phone rings first. If you don't pick up within 15–20 seconds, the AI takes over.</p></div>
       <div class="card"><span class="tag">After hours</span><h3>Always forward</h3><p>Send all calls to the AI. Toggle on for evenings, weekends, holidays. Toggle off when available.</p></div>
       <div class="card"><span class="tag">Busy on a job</span><h3>When you're on another call</h3><p>Already on the phone? The AI catches the second call so you never miss a lead.</p></div>
       <div class="card"><span class="tag">Dead zone</span><h3>When your phone is off</h3><p>In a basement or out of service? Calls forward automatically when your phone can't be reached.</p></div>
@@ -1702,16 +1711,47 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
     <div class="grid gp" id="tiers"></div>
 
     <div class="offer">
-      <b>14 days free, no credit card.</b> Full setup, real calls, your actual number. If it doesn't book you work, you walk. Month-to-month after that — cancel anytime.
+      <b>14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.</b> On your real business number, with full setup and real calls. Billed on day 15; we email you a reminder before then. Month to month after that — cancel anytime.
+    </div>
+
+    <div class="pblocks">
+      <div class="pblock">
+        <h3>Included in every plan</h3>
+        <ul>
+          <li>Spam calls are never counted.</li>
+          <li>We text you when you reach 80% of your minutes.</li>
+          <li>Need more? Add 100 minutes for $100, only after we&rsquo;ve let you know.</li>
+        </ul>
+      </div>
+      <div class="pblock">
+        <h3>Add-ons</h3>
+        <ul>
+          <li>Extra line or calendar &mdash; $29/mo</li>
+          <li>90-day history &mdash; $19/mo</li>
+          <li>1-year history &mdash; $49/mo</li>
+          <li>Practice-software, field-service or POS integration &mdash; from $500 + $39/mo, quoted</li>
+        </ul>
+      </div>
+      <div class="pblock">
+        <h3>Setup</h3>
+        <ul>
+          <li>Standard setup is free.</li>
+          <li>Multi-location or custom call flows &mdash; $249 one-time.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pcta">
+      <a class="btn btn-primary" href="#intake">Start free trial</a>
+      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a 30-minute call</a>
     </div>
 
     <div class="terms">
-      <p>All prices CAD, plus HST. Additional minutes $1.25.</p>
-      <p id="setup-line">Onboarding $249 one-time — your number, your greeting, hours, services and calendar, configured for you.</p>
-      <p><b style="color:var(--text)">Custom integration from $500</b>, quoted per job. Your CRM, PMS or field-service software, custom call flows, multiple calendars. Starter is the stock build; anything shaped around your systems is scoped on a call and billed separately.</p>
-      <p>Every tier answers 24/7 — after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
-      <p>Call history, recordings and transcripts are kept for 14 days on every plan. Extended retention is quoted separately.</p>
-      <p>Live booking on the call is included at every tier — never gated behind an upgrade.</p>
+      <p>All prices CAD, plus HST. Month to month, cancel anytime.</p>
+      <p>Every plan answers 24/7 &mdash; after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
+      <p>Call history, recordings and transcripts are kept for 14 days on every plan. Longer history is an add-on.</p>
+      <p>Live booking on the call is included at every plan &mdash; never gated behind an upgrade.</p>
+      <p>Hear it yourself. Call our demo line: <a href="tel:+16476921081">(647) 692-1081</a>.</p>
     </div>
   </div>
 </section>
@@ -1778,9 +1818,12 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
       <div class="card"><h3>Will it sound robotic?</h3><p>It runs on current conversational voice models, and most callers don't register that it isn't a person. Call the live demo line and judge it for yourself before you commit to anything.</p></div>
       <div class="card"><h3>What if I already have a receptionist?</h3><p>It takes overflow and after-hours rather than replacing anyone. Your team keeps the calls they can reach, and nothing rings out when they can't.</p></div>
       <div class="card"><h3>How long does setup take?</h3><p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar.</p></div>
-      <div class="card"><h3>Can I keep my number?</h3><p>Yes — your published number never changes. You forward it to us, and callers only ever see the number they already had.</p></div>
+      <div class="card"><h3>Do I keep my number?</h3><p>Yes. Your calls forward to us when you don't pick up, or after hours. Nothing changes for your customers.</p></div>
       <div class="card"><h3>Can I cancel anytime?</h3><p>Yes, it's month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p></div>
-      <div class="card"><h3>What happens after the free trial?</h3><p>You pick a tier and billing starts, or you do nothing and the line simply stops answering. We don't take a card up front, so nothing charges automatically.</p></div>
+      <div class="card"><h3>What happens after the trial?</h3><p>Your plan starts on day 15. We email you a reminder before then. Cancel before day 15 and you pay nothing.</p></div>      <div class="card"><h3>What counts as a minute?</h3><p>Time the assistant spends on a live call, including transfers. Spam calls are free.</p></div>
+      <div class="card"><h3>What if I go over?</h3><p>We text you at 80%. If you go over, you can add 100 minutes for $100, or move up a plan. You won't get surprise charges.</p></div>
+      <div class="card"><h3>How do you handle patient information?</h3><p>Our assistant collects only contact details and the general reason for the call. Recording is off by default for clinics, and transcripts are deleted after 14 days unless you choose longer. We'll work with your clinic on any privacy agreement your practice requires.</p></div>
+      <div class="card"><h3>Is win-back cold calling?</h3><p>No. We only contact your own past customers, people who have already bought from you, and every message identifies your business and lets them opt out.</p></div>
       <div class="card"><h3>Can I use it for after-hours only?</h3><p>Yes — that's exactly what the entry tier is. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p></div>
       <div class="card"><h3>What about my sector?</h3><p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free trial and we'll tell you honestly whether it fits before you pay anything.</p></div>
     </div>
@@ -1793,7 +1836,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
     <p>Set up takes 10 minutes. Hear it first, then run it free for two weeks.</p>
     <div class="btns">
       <a class="btn btn-primary" href="#intake">Tell us about your line</a>
-      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Or book a call</a>
+      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Or book a call</a>
     </div>
   </div>
 </div>
@@ -1858,7 +1901,7 @@ html[data-theme="dark"] .nav .nav-a:not(.nav-cal):not(.nav-dash):hover{
 (function(){
 "use strict";
 
-var CAL = "https://calendly.com/hello-voicecaptures";
+var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
 // Each vertical has its own URL. The path is the source of truth on load,
 // and the switcher keeps it in step afterwards so any tab can be shared.
@@ -1895,10 +1938,10 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
+    headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaFine: "Setup takes about 10 minutes, and we do it for you. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.",
     short: "home service businesses", setup: "$149",
     ring: 5.15,
     audio: "/sample-call.mp3",
@@ -1940,7 +1983,7 @@ var V = {
     demoBody: "Pretend you're a customer with a burst pipe, or someone booking a routine service call. You'll get a text summary when you hang up.",
     demoNote: "This line is wired to the live calendar below — it checks real availability and books real appointments. On your account it connects to your own calendar.",
     demoCta: "Tell us about your line",
-    lede: "An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details \u2014 on the number you already use.",
+    lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Plumbing \u00b7 HVAC \u00b7 Electrical \u00b7 Locksmith \u00b7 Garage door",
     stats: [
       ["14%","Missed-call rate in home services","CallRail benchmark report, 2025"],
@@ -1948,9 +1991,9 @@ var V = {
       ["$500\u2013$1,200","Typical value of one missed service call","answeringagent.com, 2026"]
     ],
     tiers: [
-      ["Starter","$179","150 minutes","Solo operator",["Emergency vs. routine triage","Live calendar booking","SMS dispatch to you and the caller","Call log and summaries"]],
-      ["Growth","$349","320 minutes","Small crew",["Everything in Starter","Call transfer to you or your team","Two calendars","Custom greeting and service list","Priority support"]],
-      ["Pro","$599","570 minutes","Multi-truck",["Everything in Growth","Multiple calendars and technicians","Custom call flows","Dedicated onboarding"]]
+      ["Starter","$179","Up to 150 minutes","about 100 calls",["After-hours or overflow answering","Live Google Calendar booking","Emergency detection with instant transfer to you","SMS summary to you with the caller's real number","Caller confirmation text","Missed-call text-back","Spam filtering","Dashboard with transcripts","14-day call history"]],
+      ["Growth","$349","Up to 300 minutes","about 200 calls",["Everything in Starter","All-day coverage","Transfer rules for any call","2 calendars","Appointment reminders","Review-request texts","Monthly performance report"]],
+      ["Pro","$599","Up to 550 minutes","about 365 calls",["Everything in Growth","Up to 3 lines and 5 calendars","Priority same-day support","Quarterly win-back texts and calls to your own past customers (never cold lists or purchased leads)"]]
     ]
   },
   food: {
@@ -1963,10 +2006,10 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
+    headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaFine: "Setup takes about 10 minutes, and we do it for you. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.",
     short: "restaurants and cafés", setup: "$249",
     ring: 1.1, audio: null, biz: "Kettle Row Coffee", len: null,
     smsBody: '<b>Catering lead</b><br>Priya S. \u00b7 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>40 people \u00b7 Thu 9 AM<br>250 University Ave, 12th floor<br>Coffee + pastries \u2014 call back to quote',
@@ -1992,7 +2035,7 @@ var V = {
     demoBody: "We'll set up a demo line so you can call in as a guest booking a table for four on Friday, or ordering pickup.",
     demoNote: "The restaurant agent is a pilot. Menu, hours and cover limits are configured per venue, and it books and takes callback details — it does not process payments or write to a POS.",
     demoCta: "Request a restaurant demo",
-    lede: "An AI voice agent picks up every call, answers hours and menu questions, takes the reservation, and texts you every catering and large-order lead \u2014 on the number you already use.",
+    lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Caf\u00e9s \u00b7 Restaurants \u00b7 Takeout",
     stats: [
       ["59.9%","Answer rate across 12,091 analyzed restaurant calls","Revmo, State of Restaurant Calls, 2026"],
@@ -2000,9 +2043,9 @@ var V = {
       ["69%","Of guests give up if no one answers the phone","Hostie, 2025"]
     ],
     tiers: [
-      ["Starter","$199","170 minutes","Caf\u00e9 or takeout",["Reservations and takeout enquiries","Hours and menu questions","Catering leads texted to you","Call log and summaries"]],
-      ["Growth","$329","300 minutes","Full-service venue",["Everything in Starter","Large-party and catering routing","Call transfer to the floor","Custom menu and hours configuration","Priority support"]],
-      ["Multi-location","$549","520 minutes","Small group",["Everything in Growth","Per-venue configuration","Custom call flows","Dedicated onboarding"]]
+      ["Caf\u00e9 Starter","$199","Up to 160 minutes","about 80 calls",["Answers hours, menu, catering and order questions","Captures catering and booking requests","Everything in Home Starter"]],
+      ["Restaurant Growth","$349","Up to 300 minutes","about 100 calls",["Reservations into your calendar","Transfers during service","Everything in Home Growth"]],
+      ["Multi-Location","$549","Up to 500 minutes per location","",["Everything in Pro"],"per location"]
     ]
   },
   other: {
@@ -2018,7 +2061,7 @@ var V = {
     headline: "Not on the list?<br><span class=\"hl\">It probably still fits.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
-    ctaFine: "No obligation. If it isn't a fit, we'll say so.",
+    ctaFine: "Setup takes about 10 minutes, and we do it for you. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.",
     short: "businesses like yours", setup: "$249", consumer: true,
     ring: 1.1, audio: null, biz: "Over The Vines", len: null,
     agentLabel: "Your agent",
@@ -2040,13 +2083,13 @@ var V = {
     demoBody: "Every line is configured for the business \u2014 what it asks, what it books, what it escalates. If your work arrives by phone, it almost certainly fits.",
     demoNote: "Salons, studios, tutors, venues, trades not listed above. We'll tell you honestly on a call whether it's a fit before you pay anything.",
     demoCta: "Tell us about your line",
-    lede: "Salons, studios, tutors, venues, contractors we haven't listed \u2014 the mechanics are the same anywhere the phone is how work arrives. Someone calls, needs qualifying, and needs a slot booked.",
+    lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Salons \u00b7 Studios \u00b7 Tutors \u00b7 Venues \u00b7 Trades",
     priceNote: "Priced like home services until we know your call volume.",
     stats: [
       ["85%","Of callers whose call goes unanswered never call back","CallRail benchmark report, 2025"],
       ["10 min","To get a line live once we've spoken","Configured per business, not a template"],
-      ["$249","Onboarding, then from $179/mo","Custom integrations quoted separately"]
+      ["Free","Standard setup, then from $179/mo","Integrations quoted separately"]
     ],
     tiers: "home"
   },
@@ -2143,10 +2186,10 @@ var V = {
     },
 
     eyebrow: "AI voice agents for businesses that live on the phone",
-    headline: "You're missing calls.<br><span class=\"hl\">We answer them.</span>",
+    headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
     ctaLabel: "Tell us about your line",
     ctaHref: "#intake",
-    ctaFine: "No obligation. 14 days free when you start, and no card up front.",
+    ctaFine: "Setup takes about 10 minutes, and we do it for you. 14 days free, up to 100 minutes. Card on file; cancel before day 15 and you pay nothing.",
     short: "clinics and dental practices", setup: "$349",
     ring: 1.1, audio: null, biz: "Lakeshore Dental", len: null,
     smsBody: '<b>New patient</b><br>Sarah Chen \u00b7 905 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>Cleaning \u00b7 Thu 10:00 AM<br>Booked',
@@ -2172,7 +2215,7 @@ var V = {
     demoBody: "We stand up a demo line configured for your specialty, your providers and your booking rules, then hand you the number to call.",
     demoNote: "The clinic agent is a pilot, scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
     demoCta: "Request a clinic demo",
-    lede: "An AI voice agent picks up every call, sorts new patients from returning ones, books into your real calendar, and texts your front desk the callback details \u2014 on the number you already use.",
+    lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Dental \u00b7 Vet \u00b7 Physio \u00b7 Chiro",
     stats: [
       ["32%","Missed-call rate in healthcare, the highest of any industry","CallRail benchmark report, 2025"],
@@ -2181,15 +2224,12 @@ var V = {
     ],
     priceNote: "No caller health information is stored or logged.",
     tiers: [
-      ["Starter","$349","320 minutes","Single practitioner",["New vs. returning patient routing","Live calendar booking","Callback details texted to your front desk","Call log and summaries"]],
-      ["Growth","$549","520 minutes","Multi-practitioner",["Everything in Starter","Multiple providers and calendars","Escalation rules configured per practice","Call transfer to your front desk","Priority support"]],
-      ["Pro","$899","870 minutes","Group practice",["Everything in Growth","Multiple locations","Custom booking rules","Dedicated onboarding"]]
+      ["Essentials","$349","Up to 300 minutes","about 120 calls",["Message-taking","Appointment requests booked to Google Calendar","Urgent-call transfer to staff","Recording off by default","Transcripts deleted after 14 days","Collects contact details and the general reason for the call, never symptoms, diagnoses or health card numbers"]],
+      ["Growth","$599","Up to 550 minutes","",["Everything in Essentials","Reminders","2 calendars","Monthly report"]],
+      ["Pro","$899","Up to 850 minutes","",["Everything in Growth","Multiple practitioners or locations","Priority support"]]
     ]
   }
 };
-
-var ENTERPRISE = ["Enterprise","Custom","Tailored to your volume","Larger operations",
-  ["Multi-location deployments","Custom integrations","Dedicated onboarding","SLA"]];
 
 var $ = function(id){ return document.getElementById(id); };
 var esc = function(s){ var d = document.createElement("div"); d.textContent = s; return d.innerHTML; };
@@ -2222,7 +2262,7 @@ function renderIntake(key, cfg, tiers){
   // not leak them back.
   fill($("in-plan"),
     (tiers || []).map(function(t, n){
-      return (n === 0 && key !== "clinic") ? t[0] + " (from " + t[1] + "/mo)" : t[0];
+      return t[0] + " (" + t[1] + "/mo)";
     }).concat(["Win-back campaign", "Not sure yet"]),
     "Select\u2026");
 }
@@ -2413,30 +2453,20 @@ function renderTiers(v){
   // A vertical can point at another's tiers instead of repeating them.
   var tiers = typeof v.tiers === "string" ? V[v.tiers].tiers : v.tiers;
   if (!tiers || !tiers.length) return;
-  var all = tiers.concat([ENTERPRISE]);
-  $("tiers").innerHTML = all.map(function(t, n){
-    var ent = t[0] === "Enterprise";
-    var pop = n === 1;
-    // Only the entry tier carries a public number now. Everything above it,
-    // and the whole clinic vertical, is quoted on a call — the right price
-    // there depends on call volume and what a booking is worth, and a
-    // published figure anchors every conversation to the wrong one.
-    var pub = (n === 0 && !ent && key !== "clinic");
-    var priceHtml = pub
-      ? '<span class="from">From</span>' + esc(t[1]) + "<em>/mo + HST</em>"
-      : '<span class="quoted">Quoted on a call</span>';
-
-    return '<div class="tier' + (ent ? " ent" : "") + '">' +
+  $("tiers").innerHTML = tiers.map(function(t, n){
+    var rec = n === 1;
+    // t = [name, price, minutes, approx calls, features, price suffix]
+    return '<div class="tier">' +
       '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
-      (pop ? '<span class="pop">Most popular</span>' : "") + "</div>" +
-      '<div class="price' + (pub ? "" : " is-quoted") + '">' + priceHtml + "</div>" +
-      '<div class="mins">' + esc(t[2]) + (ent ? "" : " included") + "</div>" +
-      '<div class="bestfor"><span>Best for</span>' + esc(t[3]) + "</div>" +
+      (rec ? '<span class="pop">Recommended</span>' : "") + "</div>" +
+      '<div class="price">' + esc(t[1]) + "<em>/mo" +
+        (t[5] ? " " + esc(t[5]) : "") + " + HST</em></div>" +
+      '<div class="mins">' + esc(t[2]) +
+        (t[3] ? ' <span class="approx">(' + esc(t[3]) + ")</span>" : "") + "</div>" +
       '<div class="feat">' + t[4].map(function(f){
         return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
       }).join("") + "</div>" +
-      '<a class="btn ' + (pop ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
-      '" target="_blank" rel="noopener">' + (ent ? "Talk to us" : "Book a call") + "</a>" +
+      '<a class="btn ' + (rec ? "btn-primary" : "btn-ghost") + '" href="#intake">Start free trial</a>' +
       "</div>";
   }).join("");
   $("p-trades").textContent = v.trades;
