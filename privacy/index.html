@@ -376,6 +376,77 @@ html[data-theme="light"] .pay{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 .pay-badge{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
   border-radius:5px;padding:4px 8px;margin-bottom:12px}
+
+/* ---- Price line on the pay cards ---- */
+.pay-p{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.1;margin:0 0 6px}
+.pay-p em{display:block;font-style:normal;font-family:var(--body);font-size:13px;
+  font-weight:500;color:var(--muted);letter-spacing:0;margin-top:4px}
+.pay-p-q{font-size:20px;color:var(--text)}
+
+/* ---- Campaign cost calculator -------------------------------------------
+   Two columns on desktop: the inputs stay put while the numbers to their
+   right change, so the cause and the effect are visible at once. ---- */
+.calc2{display:grid;gap:20px;grid-template-columns:1fr 1fr;margin-top:30px;align-items:start}
+@media (max-width:860px){ .calc2{grid-template-columns:1fr} }
+.calc2-in,.calc2-out{background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:24px}
+html[data-theme="light"] .calc2-in,html[data-theme="light"] .calc2-out{
+  box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.cf{margin-bottom:22px}
+.cf:last-child{margin-bottom:0}
+.cf label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.cf-row{display:flex;align-items:center;gap:12px}
+.cf-row input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--blue);height:26px}
+.cf-row input[type=number]{flex:0 0 92px;width:92px;font-family:var(--body);font-size:15px;
+  color:var(--text);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;
+  padding:9px 10px;text-align:right}
+html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
+.cf-row input[type=number]:focus{border-color:var(--blue);outline:none}
+.cf-help{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);
+  background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;
+  cursor:pointer;transition:color .15s,border-color .15s}
+.chip:hover{color:var(--text);border-color:color-mix(in srgb,var(--blue) 55%,transparent)}
+
+.co-big{font-family:var(--display);font-size:clamp(26px,4vw,34px);font-weight:700;
+  letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
+.co-sub{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+.co-rev{font-size:15px;margin-bottom:20px}
+.co-rev b{font-family:var(--display);font-size:19px}
+.co-note{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.co-cards{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media (max-width:420px){ .co-cards{grid-template-columns:1fr} }
+.co-cards[hidden]{display:none}
+.co-card{position:relative;background:var(--bg3);border:1px solid var(--line);
+  border-radius:12px;padding:16px}
+.co-card.is-low{border-color:color-mix(in srgb,var(--blue) 55%,transparent)}
+.co-tag{display:block;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.co-tag[hidden]{display:none}
+.co-k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:4px}
+.co-v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.co-x{font-size:13px;color:var(--muted);margin-top:2px}
+.co-free{background:var(--bg3);border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
+  border-radius:12px;padding:16px;font-size:15px;font-weight:600}
+.co-free[hidden]{display:none}
+.calc2-out .fine{margin:16px 0 18px}
+.calc2-out .btn{width:100%}
+
+/* ---- Add-ons: a price list, not a card grid ---- */
+.addons{margin:28px 0 0;max-width:860px}
+.addons > div{display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  padding:13px 0;border-bottom:1px solid var(--line)}
+.addons > div:first-child{border-top:1px solid var(--line)}
+.addons dt{font-size:15px;line-height:1.5}
+.addons dd{margin:0;flex:0 0 auto;font-size:15px;font-weight:700;white-space:nowrap;
+  color:var(--text)}
+@media (max-width:600px){
+  .addons > div{flex-direction:column;gap:3px}
+  .addons dd{font-size:14.5px;color:var(--blue)}
+}
 </style>
 </head>
 <body>

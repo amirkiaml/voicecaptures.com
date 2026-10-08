@@ -405,6 +405,77 @@ html[data-theme="light"] .pay{{box-shadow:0 6px 20px rgba(13,23,41,.06)}}
 .pay-badge{{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
   border-radius:5px;padding:4px 8px;margin-bottom:12px}}
+
+/* ---- Price line on the pay cards ---- */
+.pay-p{{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.1;margin:0 0 6px}}
+.pay-p em{{display:block;font-style:normal;font-family:var(--body);font-size:13px;
+  font-weight:500;color:var(--muted);letter-spacing:0;margin-top:4px}}
+.pay-p-q{{font-size:20px;color:var(--text)}}
+
+/* ---- Campaign cost calculator -------------------------------------------
+   Two columns on desktop: the inputs stay put while the numbers to their
+   right change, so the cause and the effect are visible at once. ---- */
+.calc2{{display:grid;gap:20px;grid-template-columns:1fr 1fr;margin-top:30px;align-items:start}}
+@media (max-width:860px){{ .calc2{{grid-template-columns:1fr}} }}
+.calc2-in,.calc2-out{{background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:24px}}
+html[data-theme="light"] .calc2-in,html[data-theme="light"] .calc2-out{{
+  box-shadow:0 6px 20px rgba(13,23,41,.06)}}
+.cf{{margin-bottom:22px}}
+.cf:last-child{{margin-bottom:0}}
+.cf label{{display:block;font-size:13px;font-weight:700;margin-bottom:8px}}
+.cf-row{{display:flex;align-items:center;gap:12px}}
+.cf-row input[type=range]{{flex:1 1 auto;min-width:0;accent-color:var(--blue);height:26px}}
+.cf-row input[type=number]{{flex:0 0 92px;width:92px;font-family:var(--body);font-size:15px;
+  color:var(--text);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;
+  padding:9px 10px;text-align:right}}
+html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
+.cf-row input[type=number]:focus{{border-color:var(--blue);outline:none}}
+.cf-help{{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}}
+.chips{{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}}
+.chip{{font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);
+  background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;
+  cursor:pointer;transition:color .15s,border-color .15s}}
+.chip:hover{{color:var(--text);border-color:color-mix(in srgb,var(--blue) 55%,transparent)}}
+
+.co-big{{font-family:var(--display);font-size:clamp(26px,4vw,34px);font-weight:700;
+  letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}}
+.co-sub{{font-size:13.5px;color:var(--muted);margin-bottom:16px}}
+.co-rev{{font-size:15px;margin-bottom:20px}}
+.co-rev b{{font-family:var(--display);font-size:19px}}
+.co-note{{display:block;font-size:12px;color:var(--muted);margin-top:2px}}
+.co-cards{{display:grid;gap:12px;grid-template-columns:1fr 1fr}}
+@media (max-width:420px){{ .co-cards{{grid-template-columns:1fr}} }}
+.co-cards[hidden]{{display:none}}
+.co-card{{position:relative;background:var(--bg3);border:1px solid var(--line);
+  border-radius:12px;padding:16px}}
+.co-card.is-low{{border-color:color-mix(in srgb,var(--blue) 55%,transparent)}}
+.co-tag{{display:block;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:6px}}
+.co-tag[hidden]{{display:none}}
+.co-k{{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:4px}}
+.co-v{{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}}
+.co-x{{font-size:13px;color:var(--muted);margin-top:2px}}
+.co-free{{background:var(--bg3);border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
+  border-radius:12px;padding:16px;font-size:15px;font-weight:600}}
+.co-free[hidden]{{display:none}}
+.calc2-out .fine{{margin:16px 0 18px}}
+.calc2-out .btn{{width:100%}}
+
+/* ---- Add-ons: a price list, not a card grid ---- */
+.addons{{margin:28px 0 0;max-width:860px}}
+.addons > div{{display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  padding:13px 0;border-bottom:1px solid var(--line)}}
+.addons > div:first-child{{border-top:1px solid var(--line)}}
+.addons dt{{font-size:15px;line-height:1.5}}
+.addons dd{{margin:0;flex:0 0 auto;font-size:15px;font-weight:700;white-space:nowrap;
+  color:var(--text)}}
+@media (max-width:600px){{
+  .addons > div{{flex-direction:column;gap:3px}}
+  .addons dd{{font-size:14.5px;color:var(--blue)}}
+}}
 </style>
 </head>
 <body>
@@ -1189,8 +1260,8 @@ WINBACK_BODY = f"""
       </div>
       <div class="card">
         <h3>Real estate &amp; staging</h3>
-        <p>Follow up with past clients and partners who have moved on and
-        would come back if prompted.</p>
+        <p>Follow up with past clients who have moved on and would come back
+        if prompted.</p>
       </div>
       <div class="card">
         <h3>Mortgage &amp; finance</h3>
@@ -1245,11 +1316,13 @@ WINBACK_BODY = f"""
       <div class="pay">
         <span class="pay-badge">Pay for results</span>
         <h3>Per booking</h3>
+        <p class="pay-p">$59<em> per booked appointment</em></p>
         <p class="pay-d">Pay only for appointments that land on your calendar.</p>
         <p class="pay-h">What&rsquo;s included</p>
         <ul class="pay-l">
           <li>All calling and AI usage</li>
           <li>No onboarding fee</li>
+          <li>For customers you&rsquo;ve seen in the last 18 months</li>
           <li>Billing follows the <a href="#booking">booking rules below</a></li>
         </ul>
         <p class="pay-b"><span>Best for</span>Seeing results before committing.</p>
@@ -1259,7 +1332,9 @@ WINBACK_BODY = f"""
       <div class="pay">
         <span class="pay-badge">Simplest</span>
         <h3>Per campaign</h3>
-        <p class="pay-d">One flat price per campaign, start to finish.</p>
+        <p class="pay-p">$2.50<em> per customer on your list</em></p>
+        <p class="pay-d">$500 minimum (covers 200 customers). One flat price,
+        start to finish.</p>
         <p class="pay-h">What&rsquo;s included</p>
         <ul class="pay-l">
           <li>A call script tailored to your business</li>
@@ -1277,6 +1352,7 @@ WINBACK_BODY = f"""
       <div class="pay">
         <span class="pay-badge">Own it</span>
         <h3>Custom</h3>
+        <p class="pay-p pay-p-q">Priced on a call</p>
         <p class="pay-d">We build the system and hand it over, running on phone
         and AI accounts you own.</p>
         <p class="pay-h">What&rsquo;s included</p>
@@ -1291,7 +1367,10 @@ WINBACK_BODY = f"""
       </div>
     </div>
 
-    <p class="fine" style="margin-top:16px">The free 100-contact pilot applies to
+    <p class="fine" style="margin-top:16px">All prices in CAD, plus HST. Most
+    reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
+
+    <p class="fine" style="margin-top:10px">The free 100-contact pilot applies to
     Per booking and Per campaign. Custom is a build, so it starts with a scoping
     call instead.</p>
 
@@ -1329,6 +1408,115 @@ WINBACK_BODY = f"""
         </div>
       </div>
     </details>
+  </div>
+</section>
+
+<section id="calculator">
+  <div class="wrap">
+    <h2>What would a campaign cost you?</h2>
+    <p class="lede">Enter your list size and what a visit is worth. We&rsquo;ll
+    show both ways to pay.</p>
+
+    <div class="calc2">
+      <div class="calc2-in">
+        <div class="cf">
+          <label for="c-list">Customers on your list</label>
+          <div class="cf-row">
+            <input id="c-list" type="range" min="50" max="5000" step="50" value="500"
+                   aria-describedby="c-list-n">
+            <input id="c-list-n" type="number" min="50" max="5000" step="50" value="500"
+                   aria-label="Customers on your list">
+          </div>
+        </div>
+
+        <div class="cf">
+          <label for="c-val">Average value of one booked visit ($)</label>
+          <div class="cf-row">
+            <input id="c-val" type="range" min="50" max="2000" step="10" value="150"
+                   aria-describedby="c-val-n">
+            <input id="c-val-n" type="number" min="50" max="2000" step="10" value="150"
+                   aria-label="Average value of one booked visit in dollars">
+          </div>
+          <div class="chips">
+            <button type="button" class="chip" data-val="150">HVAC tune-up $150</button>
+            <button type="button" class="chip" data-val="200">Dental cleaning $200</button>
+            <button type="button" class="chip" data-val="100">Physio visit $100</button>
+            <button type="button" class="chip" data-val="150">Vet exam $150</button>
+          </div>
+          <p class="cf-help">Examples only. Change to your own.</p>
+        </div>
+
+        <div class="cf">
+          <label for="c-rate">Expected booking rate (%)</label>
+          <div class="cf-row">
+            <input id="c-rate" type="range" min="1" max="15" step="0.5" value="4"
+                   aria-describedby="c-rate-n">
+            <input id="c-rate-n" type="number" min="1" max="15" step="0.5" value="4"
+                   aria-label="Expected booking rate, percent">
+          </div>
+          <p class="cf-help">Results vary with how recent your list is and what
+          you&rsquo;re offering. The free pilot shows your real rate.</p>
+        </div>
+      </div>
+
+      <div class="calc2-out" aria-live="polite">
+        <p class="co-big" id="co-bookings">About 20 bookings</p>
+        <p class="co-sub" id="co-pilot">including about 4 from the free first 100</p>
+        <p class="co-rev">Estimated revenue to you: <b id="co-rev">$3,000</b>
+          <span class="co-note">before no-shows</span></p>
+
+        <div class="co-cards" id="co-cards">
+          <div class="co-card" id="co-c-booking">
+            <span class="co-tag" hidden>Lower cost for this list</span>
+            <p class="co-k">Per booking</p>
+            <p class="co-v" id="co-v-booking">$944</p>
+            <p class="co-x" id="co-x-booking">3.2&times; return</p>
+          </div>
+          <div class="co-card" id="co-c-campaign">
+            <span class="co-tag" hidden>Lower cost for this list</span>
+            <p class="co-k">Per campaign</p>
+            <p class="co-v" id="co-v-campaign">$1,000</p>
+            <p class="co-x" id="co-x-campaign">3.0&times; return</p>
+          </div>
+        </div>
+        <p class="co-free" id="co-free" hidden>Your whole list fits in the free
+        pilot. No charge.</p>
+
+        <p class="fine" id="co-disc">Estimates only, not a quote or a guarantee.
+        CAD, plus HST. Per booking applies to customers seen in the last 18 months.
+        Add-ons not included.</p>
+
+        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Start with 100 names, free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="add-ons">
+  <div class="wrap">
+    <h2>Add-ons</h2>
+    <p class="lede">Every campaign includes a CSV upload, basic list cleanup, one
+    call script, booking into Google Calendar, and a results report. Anything
+    beyond that is listed here, priced upfront.</p>
+
+    <dl class="addons">
+      <div><dt>Pull your list straight from your software (Jobber, Housecall Pro, Jane, your CRM)</dt><dd>from $500</dd></div>
+      <div><dt>Record each call&rsquo;s outcome back in your software</dt><dd>from $500, or $750 with the list pull</dd></div>
+      <div><dt>Book into your scheduling software instead of Google Calendar</dt><dd>from $1,000</dd></div>
+      <div><dt>Integration upkeep</dt><dd>$39/mo per integration</dd></div>
+      <div><dt>Extra script for a different customer group</dt><dd>$99 each</dd></div>
+      <div><dt>Calls in another language</dt><dd>$99 per language, per campaign</dd></div>
+      <div><dt>Live transfer of interested customers to your staff</dt><dd>$149 setup</dd></div>
+      <div><dt>Always-on campaign: each customer called automatically when they&rsquo;re due</dt><dd>your per-booking rate plus $99/mo</dd></div>
+      <div><dt>Results sent to your own spreadsheet or report format</dt><dd>$150 one-time</dd></div>
+      <div><dt>Extra list cleanup</dt><dd>first hour free, then $125/hr</dd></div>
+    </dl>
+
+    <p class="fine" style="margin-top:18px;max-width:760px">Software connections
+    are a fixed price agreed in writing before work starts. Some software only
+    opens its connections to approved partners. If yours doesn&rsquo;t, we use a
+    CSV export and Google Calendar instead, and we&rsquo;ll tell you before you
+    pay. CAD, plus HST.</p>
   </div>
 </section>
 
@@ -1374,8 +1562,8 @@ WINBACK_BODY = f"""
   <div class="wrap center">
     <h2>Start with 100 names, free</h2>
     <p class="sub">We work the first 100 names at no cost. If it books people,
-    we price the rest of the list. If it doesn&rsquo;t, you have lost nothing but
-    the export.</p>
+    you continue at the rates above. If it doesn&rsquo;t, you&rsquo;ve lost nothing
+    but the export.</p>
     <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
   </div>
 </section>
@@ -1398,7 +1586,39 @@ WINBACK_BODY = f"""
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>A CSV with name, phone number and last visit date, plus access to the calendar you want appointments to land on. That is the whole setup.</p><p>We&rsquo;ll go over how we contact your customers on the setup call.</p></div>
+        <div class="role-body"><p>A CSV with name, phone number and last visit date, plus access to the calendar you want appointments to land on. That is the whole setup.</p></div>
+      </details>
+      <details class="role">
+        <summary><div class="role-top"><div><h3>Will my customers know it&rsquo;s an AI?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>Yes. Every call opens by saying it&rsquo;s an AI assistant calling on behalf of your business. Anyone can ask not to be called again, and we remove them right away.</p></div>
+      </details>
+      <details class="role">
+        <summary><div class="role-top"><div><h3>How often do you contact each customer?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>Up to 3 calls and 1 text per customer per campaign, on weekdays 9am&ndash;9:30pm and weekends 10am&ndash;6pm, in your customer&rsquo;s local time.</p></div>
+      </details>
+      <details class="role">
+        <summary><div class="role-top"><div><h3>Can I include customers I haven&rsquo;t seen in over 18 months?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>Yes, on Per campaign. We check them against the National Do Not Call List first, and any registry fees are passed through at cost. Per booking is for customers seen in the last 18 months.</p></div>
+      </details>
+      <details class="role">
+        <summary><div class="role-top"><div><h3>Do you need access to my practice or business software?</h3></div>
+          <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></div></summary>
+        <div class="role-body"><p>No. A CSV export is enough. If you&rsquo;d rather we connect directly, see <a href="#add-ons">Add-ons</a>. For clinics, we only take name, phone number and last visit date, and a privacy agreement is signed before anything connects.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>Who pays for the calling and AI costs?</h3></div>
@@ -1464,6 +1684,94 @@ WINBACK_BODY = f"""
     </div>
   </div>
 </section>
+"""
+
+
+WINBACK_SCRIPT = """
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var list = $("c-list"), listN = $("c-list-n"),
+      val  = $("c-val"),  valN  = $("c-val-n"),
+      rate = $("c-rate"), rateN = $("c-rate-n");
+  if (!list) return;
+
+  function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+
+  // One decimal, and never "Infinity" when there is nothing to pay.
+  function mult(rev, cost){ return cost > 0 ? (Math.round(rev / cost * 10) / 10).toFixed(1) : null; }
+
+  function clamp(el, v){
+    var lo = parseFloat(el.min), hi = parseFloat(el.max);
+    if (isNaN(v)) v = parseFloat(el.defaultValue || lo);
+    return Math.min(hi, Math.max(lo, v));
+  }
+
+  function render(){
+    var N = clamp(list, parseFloat(list.value));
+    var V = clamp(val,  parseFloat(val.value));
+    var R = clamp(rate, parseFloat(rate.value)) / 100;
+
+    var pilot    = Math.min(N, 100);
+    var billable = Math.max(N - 100, 0);
+    var pilotBk  = Math.round(pilot * R);
+    var paidBk   = Math.round(billable * R);
+    var total    = pilotBk + paidBk;
+    var revenue  = total * V;
+
+    var costBooking  = paidBk * 59;
+    var costCampaign = billable > 0 ? Math.max(billable * 2.5, 500) : 0;
+
+    $("co-bookings").textContent = "About " + total + (total === 1 ? " booking" : " bookings");
+    $("co-pilot").textContent = "including about " + pilotBk + " from the free first 100";
+    $("co-rev").textContent = money(revenue);
+
+    var free = billable === 0;
+    $("co-cards").hidden = free;
+    $("co-free").hidden = !free;
+
+    if (!free) {
+      $("co-v-booking").textContent  = money(costBooking);
+      $("co-v-campaign").textContent = money(costCampaign);
+      var mb = mult(revenue, costBooking), mc = mult(revenue, costCampaign);
+      $("co-x-booking").innerHTML  = mb ? mb + "\\u00d7 return" : "\\u2014";
+      $("co-x-campaign").innerHTML = mc ? mc + "\\u00d7 return" : "\\u2014";
+
+      // Tag the cheaper option, neither on a tie.
+      var tb = $("co-c-booking").querySelector(".co-tag");
+      var tc = $("co-c-campaign").querySelector(".co-tag");
+      tb.hidden = !(costBooking < costCampaign);
+      tc.hidden = !(costCampaign < costBooking);
+      $("co-c-booking").classList.toggle("is-low", costBooking < costCampaign);
+      $("co-c-campaign").classList.toggle("is-low", costCampaign < costBooking);
+    }
+  }
+
+  // Keep each slider and its number box in step, in both directions.
+  function pair(a, b){
+    a.addEventListener("input", function(){ b.value = a.value; render(); });
+    b.addEventListener("input", function(){
+      var v = clamp(a, parseFloat(b.value));
+      a.value = v; render();
+    });
+    b.addEventListener("blur", function(){
+      var v = clamp(a, parseFloat(b.value));
+      b.value = v; a.value = v; render();
+    });
+  }
+  pair(list, listN); pair(val, valN); pair(rate, rateN);
+
+  document.querySelectorAll(".chip").forEach(function(c){
+    c.addEventListener("click", function(){
+      val.value = c.getAttribute("data-val");
+      valN.value = val.value;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
 """
 
 # ------------------------------------------------------------ legal text ----
@@ -1644,8 +1952,8 @@ federal laws of Canada that apply there.</p>
 PAGES = [
     ("win-back", "Outbound campaigns | VoiceCaptures",
      "Bring back customers you already have. We call your past customers, book "
-     "them on your calendar, and send you the results. Per campaign, per booking, "
-     "or built on your own accounts.", WINBACK_BODY, ""),
+     "them on your calendar, and send you the results. From $59 per booking or "
+     "$2.50 per customer.", WINBACK_BODY, WINBACK_SCRIPT),
 
     ("about", "About VoiceCaptures",
      "VoiceCaptures builds AI voice assistants that answer the phone for small "
