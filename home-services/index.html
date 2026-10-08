@@ -1305,6 +1305,24 @@ html[data-theme="light"] .pblock{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 
 /* Approximate call count next to the minute allowance. */
 .mins .approx{color:var(--muted);font-weight:400}
+
+/* ---- Past the top plan -------------------------------------------------
+   The old Enterprise card said "Custom / tailored to your volume" and nothing
+   else, so it taught a prospect nothing and cost the row a quarter of its
+   width. The same job done as a band: it names what falls outside the plans
+   and leaves the three real choices as three. ---- */
+.beyond{display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:space-between;
+  background:var(--bg2);border:1px solid var(--line);border-radius:14px;
+  padding:22px 26px;margin-top:16px}
+html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
+.beyond-t{flex:1 1 420px}
+.beyond h3{font-size:16.5px;margin-bottom:4px}
+.beyond p{font-size:14px;color:var(--muted);line-height:1.6;margin:0;max-width:620px}
+.beyond .btn{flex:0 0 auto;white-space:nowrap}
+@media (max-width:620px){
+  .beyond{padding:20px}
+  .beyond .btn{width:100%}
+}
 </style>
 </head>
 <body>
@@ -1709,6 +1727,16 @@ html[data-theme="light"] .pblock{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     <p class="sub" id="p-note" hidden style="margin-bottom:34px;font-size:13px">No caller health information is stored or logged.</p>
     <p class="payback">One booked job pays for the month.</p>
     <div class="grid gp" id="tiers"></div>
+
+    <div class="beyond">
+      <div class="beyond-t">
+        <h3>Past the top plan?</h3>
+        <p>More minutes than Pro, several locations on one account, or software we
+        need to write into the call flow &mdash; practice management, field service,
+        a POS or a CRM. We scope those and quote them.</p>
+      </div>
+      <a class="btn btn-ghost" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a 30-minute call</a>
+    </div>
 
     <div class="offer">
       <b>14 days free, up to 100 minutes. Cancel before day 15 and you pay nothing.</b> On your real business number, with full setup and real calls. Billed on day 15; we email you a reminder before then. Month to month after that — cancel anytime.
