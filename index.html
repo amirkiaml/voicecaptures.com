@@ -37,6 +37,7 @@
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
   --cyan:#22D3EE; --cyan-lt:#67E8F9;
   --red:#E24B4A;
+  --wb:#A78BFA; --wb-dk:#C4B5FD; --wb-glow:rgba(167,139,250,.14);
   --display:'Manrope',sans-serif; --body:'DM Sans',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;min-width:0}
@@ -216,6 +217,7 @@ html[data-theme="light"]{
   --line:rgba(13,23,41,.10); --line2:rgba(13,23,41,.18);
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,.12);
   --cyan:#0E93B8; --cyan-lt:#0B7C9C;
+  --wb:#7C3AED; --wb-dk:#6D28D9; --wb-glow:rgba(124,58,237,.10);
 }
 html[data-theme="light"] body{background:var(--bg)}
 html[data-theme="light"] .alt{background:#eef2f9}
@@ -327,6 +329,7 @@ html[data-theme="dark"]{
   --line:rgba(160,200,255,.10); --line2:rgba(160,200,255,.20);
   --blue:#3B82F6; --blue-dk:#60A5FA; --blue-glow:rgba(59,130,246,.16);
   --cyan:#7DD3FC; --cyan-lt:#BAE6FD;
+  --wb:#A78BFA; --wb-dk:#C4B5FD; --wb-glow:rgba(167,139,250,.16);
 }
 html[data-theme="dark"] body{background:var(--bg)}
 html[data-theme="dark"] .alt{background:#080b12}
@@ -1271,6 +1274,53 @@ header .btn.nav-cta::before{width:36px;height:36px}
 html[data-theme="light"] .wb-band{background:linear-gradient(180deg,#eef2f9,var(--bg))}
 .wb-band .sub{margin-bottom:28px}
 
+/* ---- Win-back accent -----------------------------------------------------
+   Outbound is a different product from the receptionist, sold at a different
+   moment, so it carries its own colour everywhere it appears. Violet is the
+   one hue nothing else uses: links are blue, the primary CTA cyan, Book a
+   call amber, Members a blue outline. ---- */
+html .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash),
+html[data-theme="light"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash),
+html[data-theme="dark"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash){
+  color:var(--wb);font-weight:600}
+html .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="light"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="dark"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover{
+  color:var(--wb-dk);background:var(--wb-glow)}
+.mnav-a.mnav-wb{display:flex;align-items:center;gap:9px;color:var(--wb);
+  font-weight:600;font-size:16px;padding-left:12px}
+.mnav-a.mnav-wb:hover{background:var(--wb-glow);color:var(--wb)}
+.mnav-wb .wbdot{width:7px;height:7px;border-radius:50%;background:var(--wb);flex:0 0 auto}
+.foot-legal a.f-wb{color:var(--wb)}
+.foot-legal a.f-wb:hover{color:var(--wb-dk)}
+
+/* The band is the product's shopfront on this page, so it wears the accent
+   rather than borrowing the blue used by everything above it. */
+.wb-band{border-top:1px solid color-mix(in srgb,var(--wb) 30%,transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--wb) 30%,transparent)}
+html .wb-band h2 .hl,
+html[data-theme="light"] .wb-band h2 .hl,
+html[data-theme="dark"] .wb-band h2 .hl{color:var(--wb)}
+.wb-band .wb-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--wb);background:var(--wb-glow);border-radius:999px;
+  padding:6px 13px;margin-bottom:16px}
+.wb-band .wb-eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--wb)}
+html .wb-band .btn-primary,
+html[data-theme="light"] .wb-band .btn-primary,
+html[data-theme="dark"] .wb-band .btn-primary{background:var(--wb);color:#120a24;
+  border-color:var(--wb)}
+html .wb-band .btn-primary:hover,
+html[data-theme="light"] .wb-band .btn-primary:hover,
+html[data-theme="dark"] .wb-band .btn-primary:hover{background:var(--wb-dk);color:#120a24;
+  border-color:var(--wb-dk)}
+html[data-theme="light"] .wb-band .btn-primary,
+html[data-theme="light"] .wb-band .btn-primary:hover{color:#fff}
+html[data-theme="dark"] .wb-band{background:linear-gradient(180deg,
+  color-mix(in srgb,var(--wb) 9%,var(--bg2)),var(--bg))}
+html[data-theme="light"] .wb-band{background:linear-gradient(180deg,
+  color-mix(in srgb,var(--wb) 7%,#eef2f9),var(--bg))}
+
 /* ---- Nav, unboxed -------------------------------------------------------
    Every item was a bordered pill, so seven of them read as a wall of boxes
    and the bar had no hierarchy: the two that matter (Book a call, Members)
@@ -1357,7 +1407,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
           <button type="button" data-goto="other"><i data-h="other"></i><b>Something else</b><em>Salons, studios, venues</em></button>
         </div>
       </div>
-      <a class="nav-a" href="/win-back/">Win-back</a>
+      <a class="nav-a nav-wb" href="/win-back/">Win-back</a>
       <a class="nav-a nav-live" href="#demo" id="nav-demo">
         <span class="nav-pulse" aria-hidden="true"></span>Demo line
       </a>
@@ -1409,7 +1459,8 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <button type="button" class="mnav-a sub" data-goto="food">Restaurants &amp; caf&eacute;s</button>
       <button type="button" class="mnav-a sub" data-goto="clinic">Clinics &amp; dental</button>
       <button type="button" class="mnav-a sub" data-goto="other">Something else</button>
-      <a class="mnav-a sub" href="/win-back/">Win-back campaigns</a>
+      <p class="mnav-h">Outbound</p>
+      <a class="mnav-a mnav-wb" href="/win-back/"><span class="wbdot" aria-hidden="true"></span>Win-back campaigns</a>
       <p class="mnav-h">Company</p>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
@@ -1786,11 +1837,11 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 
 <section class="wb-band">
   <div class="wrap center">
+    <p class="wb-eyebrow"><i aria-hidden="true"></i>Outbound win-back</p>
     <h2>Already have a customer list? <span class="hl">Turn it into bookings.</span></h2>
     <p class="sub">We call the customers you haven&rsquo;t seen in a year and book
     the ones who are ready back onto your calendar.<br>
-    Per campaign &middot; per booking &middot; or built on your own accounts &mdash;
-    contact us for pricing.</p>
+    $59 per booking, or $2.50 per customer called &mdash; your pick.</p>
     <a class="btn btn-primary" href="/win-back/">See how outbound works</a>
   </div>
 </section>
@@ -1914,6 +1965,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     </div>
     <div class="foot-legal">
       <a href="/login">Client dashboard</a>
+      <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>

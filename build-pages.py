@@ -63,6 +63,7 @@ SHELL = """<!DOCTYPE html>
   --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.15);
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
   --cyan:#22D3EE; --cyan-lt:#67E8F9;
+  --wb:#A78BFA; --wb-dk:#C4B5FD; --wb-glow:rgba(167,139,250,.14);
   --display:'Manrope',sans-serif; --body:'DM Sans',sans-serif;
 }}
 html[data-theme="light"]{{
@@ -71,6 +72,7 @@ html[data-theme="light"]{{
   --line:rgba(13,23,41,.10); --line2:rgba(13,23,41,.18);
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,.12);
   --cyan:#0E93B8; --cyan-lt:#0B7C9C;
+  --wb:#7C3AED; --wb-dk:#6D28D9; --wb-glow:rgba(124,58,237,.10);
 }}
 *{{margin:0;padding:0;box-sizing:border-box;min-width:0}}
 html{{overflow-x:clip}}
@@ -355,6 +357,41 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
 .mnav .btn-amber:hover,header .mnav .btn-amber:hover{{background:#FBBF24;color:#1a1205;
   border-color:#FBBF24}}
 
+/* ---- Win-back accent -----------------------------------------------------
+   Outbound is a different product from the receptionist, sold to a different
+   moment, so it carries its own colour wherever it shows up. Violet is the one
+   hue nothing else in the palette uses: links are blue, the primary CTA is
+   cyan, Book a call is amber. ---- */
+html .nav-a.nav-wb,
+html[data-theme="light"] .nav-a.nav-wb{{color:var(--wb);font-weight:600}}
+html .nav-a.nav-wb:hover,
+html[data-theme="light"] .nav-a.nav-wb:hover{{color:var(--wb-dk);background:var(--wb-glow)}}
+html .nav-a.nav-wb[aria-current="page"]{{color:var(--wb);font-weight:700}}
+.mnav-a.mnav-wb{{display:flex;align-items:center;gap:9px;color:var(--wb);font-weight:600}}
+.mnav-a.mnav-wb:hover{{background:var(--wb-glow);color:var(--wb)}}
+.mnav-wb .wbdot{{width:7px;height:7px;border-radius:50%;background:var(--wb);flex:0 0 auto}}
+.foot-legal a.f-wb{{color:var(--wb)}}
+.foot-legal a.f-wb:hover{{color:var(--wb-dk)}}
+
+/* Panel headings and the indented sector rows, matching the main site. */
+.mnav-h{{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:14px 0 4px;padding:0 12px}}
+.mnav-a.sub{{font-weight:500;font-size:15px;color:var(--muted);padding-left:20px}}
+.mnav-a.sub:hover{{color:var(--text)}}
+
+/* The outbound page itself runs on the accent -- links, highlights and primary
+   buttons -- so landing there feels like a different room of the same house. */
+body[data-page="win-back"]{{--blue:var(--wb);--blue-dk:var(--wb-dk);
+  --blue-glow:var(--wb-glow);--cyan:var(--wb);--cyan-lt:var(--wb-dk)}}
+/* Members keeps its blue there: it belongs to the receptionist product. */
+body[data-page="win-back"] .nav-a.nav-dash,
+body[data-page="win-back"] .mnav-dash{{border-color:rgba(59,130,246,.42)}}
+body[data-page="win-back"] .nav-a.nav-dash:hover,
+body[data-page="win-back"] .mnav-dash:hover{{background:rgba(59,130,246,.14);
+  border-color:rgba(59,130,246,.7)}}
+body[data-page="win-back"] .mnav-dash .tag{{color:#3B82F6;background:rgba(59,130,246,.14)}}
+body[data-page="win-back"] .eyebrow{{color:var(--wb)}}
+
 /* ---- Win-back ---- */
 .wb-hero{{padding-top:clamp(40px,5vw,62px)}}
 .wb-art{{display:block;margin-top:38px}}
@@ -478,7 +515,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
 }}
 </style>
 </head>
-<body>
+<body data-page="{slug}">
 
 <header>
   <div class="bar">
@@ -488,7 +525,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
     </a>
     <nav class="nav" aria-label="Main">
       <a class="nav-a" href="/">Home</a>
-      <a class="nav-a" href="/win-back/"{cur_winback}>Win-back</a>
+      <a class="nav-a nav-wb" href="/win-back/"{cur_winback}>Win-back</a>
       <a class="nav-a" href="/about/"{cur_about}>About</a>
       <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
       <a class="nav-a" href="/about/#contact">Contact</a>
@@ -516,10 +553,18 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
         <em class="tag">New</em>
       </a>
       <a class="mnav-a" href="/">Home</a>
-      <a class="mnav-a" href="/win-back/">Win-back campaigns</a>
-      <a class="mnav-a" href="/about/">About</a>
-      <a class="mnav-a" href="/careers/">Careers</a>
-      <a class="mnav-a" href="/about/#contact">Contact</a>
+      <p class="mnav-h">AI receptionist</p>
+      <a class="mnav-a sub" href="/personal/">Personal line</a>
+      <a class="mnav-a sub" href="/home-services/">Home services</a>
+      <a class="mnav-a sub" href="/restaurants-cafes/">Restaurants &amp; caf&eacute;s</a>
+      <a class="mnav-a sub" href="/clinics-dental/">Clinics &amp; dental</a>
+      <a class="mnav-a sub" href="/other-businesses/">Something else</a>
+      <p class="mnav-h">Outbound</p>
+      <a class="mnav-a mnav-wb" href="/win-back/"><span class="wbdot" aria-hidden="true"></span>Win-back campaigns</a>
+      <p class="mnav-h">Company</p>
+      <a class="mnav-a sub" href="/about/">About</a>
+      <a class="mnav-a sub" href="/careers/">Careers</a>
+      <a class="mnav-a sub" href="/about/#contact">Contact</a>
       <div class="mnav-foot">
         <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
@@ -537,6 +582,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
     </div>
     <div class="foot-legal">
       <a href="/login">Client dashboard</a>
+      <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
       <a href="/privacy/">Privacy Policy</a>
