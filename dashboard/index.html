@@ -311,6 +311,7 @@
   </div>
 
   <div class="card usage" id="usageCard" hidden></div>
+  <div class="muted" id="retentionNote" style="font-size:12px;margin:-4px 2px 12px" hidden></div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
   <div class="grid" id="kpis"></div>
 
@@ -835,9 +836,20 @@ function renderUsage(u) {
   el.hidden = false;
 }
 
+/* Read-only: retention is a paid add-on set by VoiceCaptures. */
+function renderRetention(r) {
+  const el = $("retentionNote");
+  if (!r || !r.days) { el.hidden = true; return; }
+  const label = r.days === 365 ? "1 year" : `${r.days} days`;
+  const next = r.nextCleanup ? new Date(r.nextCleanup).toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: TZ() }) : null;
+  el.textContent = `Call history: ${label} — transcripts and recordings older than that are removed${next ? ` · next cleanup ${next}` : ""}.`;
+  el.hidden = false;
+}
+
 function renderAll(data) {
   S = data.settings;
   applySections();
+  renderRetention(data.retention);
   renderUsage(data.usage);
   renderKpis(data.totals, data.previous || {});
   renderDaily(data.daily);
