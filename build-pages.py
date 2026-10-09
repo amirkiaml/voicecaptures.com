@@ -496,7 +496,8 @@ html[data-theme="dark"] .th-dark{{display:block}}
    Three cards of unequal length, so they stretch to a shared height and the
    CTA pins to the bottom; otherwise the buttons stagger and the row reads as
    broken rather than as three choices. ---- */
-.pays{{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin-top:30px}}
+.pays{{display:grid;gap:16px;grid-template-columns:repeat(2,1fr);margin-top:30px;
+  max-width:760px}}
 @media (max-width:900px){{ .pays{{grid-template-columns:1fr}} }}
 .pay{{display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--line);
   border-radius:16px;padding:24px}}
@@ -566,15 +567,10 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
 .co-rev{{font-size:15px;margin-bottom:20px}}
 .co-rev b{{font-family:var(--display);font-size:19px}}
 .co-note{{display:block;font-size:12px;color:var(--muted);margin-top:2px}}
-.co-cards{{display:grid;gap:12px;grid-template-columns:1fr 1fr}}
-@media (max-width:420px){{ .co-cards{{grid-template-columns:1fr}} }}
+.co-cards{{display:grid;gap:12px;grid-template-columns:1fr}}
 .co-cards[hidden]{{display:none}}
 .co-card{{position:relative;background:var(--bg3);border:1px solid var(--line);
   border-radius:12px;padding:16px}}
-.co-card.is-low{{border-color:color-mix(in srgb,var(--blue) 55%,transparent)}}
-.co-tag{{display:block;font-size:9.5px;font-weight:700;letter-spacing:.07em;
-  text-transform:uppercase;color:var(--blue);margin-bottom:6px}}
-.co-tag[hidden]{{display:none}}
 .co-k{{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);margin-bottom:4px}}
 .co-v{{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}}
@@ -582,6 +578,8 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
 .co-free{{background:var(--bg3);border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
   border-radius:12px;padding:16px;font-size:15px;font-weight:600}}
 .co-free[hidden]{{display:none}}
+.co-more{{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.55}}
+.co-more-s{{font-size:12px;color:var(--faint);margin-top:6px}}
 .calc2-out .fine{{margin:16px 0 18px}}
 .calc2-out .btn{{width:100%}}
 
@@ -1302,7 +1300,7 @@ WINBACK_BODY = f"""
     <p class="eyebrow">Outbound campaigns</p>
     <h1>Send us the customers you haven&rsquo;t seen in a year.<br>
     <span class="hl">We call them and book them back in.</span></h1>
-    <p class="lede">Pay per booking, per campaign, or own the system outright.</p>
+    <p class="lede">One flat price per campaign, or own the system outright.</p>
     <p class="lede">You already have the list. Every business does &mdash; the
     clients who were regulars and then quietly stopped coming, the ones due for a
     seasonal service, the renewals nobody chased. We work through it and book the
@@ -1313,7 +1311,7 @@ WINBACK_BODY = f"""
     <div class="badges" style="margin-top:22px">
       <span class="badge">Bookings on your calendar</span>
       <span class="badge">Results report after every campaign</span>
-      <span class="badge badge-live">Three ways to pay</span>
+      <span class="badge badge-live">One price, or own it</span>
     </div>
     <picture class="wb-art th-light">
       <source srcset="/winback-light.webp" type="image/webp">
@@ -1392,26 +1390,10 @@ WINBACK_BODY = f"""
 <section class="alt" id="pay">
   <div class="wrap">
     <h2>Choose how you pay</h2>
-    <p class="lede">Three ways to run it. Which one fits depends on how much you
+    <p class="lede">Two ways to run it. Which one fits depends on how much you
     want to own, and how much you want handled.</p>
 
     <div class="pays">
-      <div class="pay">
-        <span class="pay-badge">Pay for results</span>
-        <h3>Per booking</h3>
-        <p class="pay-p">$59<em> per booked appointment</em></p>
-        <p class="pay-d">Pay only for appointments that land on your calendar.</p>
-        <p class="pay-h">What&rsquo;s included</p>
-        <ul class="pay-l">
-          <li>All calling and AI usage</li>
-          <li>No onboarding fee</li>
-          <li>For customers you&rsquo;ve seen in the last 18 months</li>
-          <li>Billing follows the <a href="#booking">booking rules below</a></li>
-        </ul>
-        <p class="pay-b"><span>Best for</span>Seeing results before committing.</p>
-        <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
-      </div>
-
       <div class="pay">
         <span class="pay-badge">Simplest</span>
         <h3>Per campaign</h3>
@@ -1454,9 +1436,8 @@ WINBACK_BODY = f"""
     reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
 
     <p class="fine" style="margin-top:10px">The free pilot is the first 20% of
-    your list, up to 100 names and never fewer than 25. It applies to Per booking
-    and Per campaign. Custom is a build, so it starts with a scoping call
-    instead.</p>
+    your list, up to 100 names and never fewer than 25. Custom is a build, so it
+    starts with a scoping call instead.</p>
 
     <details class="role" style="margin-top:22px">
       <summary><div class="role-top"><div><h3>Is Custom right for you?</h3>
@@ -1498,8 +1479,8 @@ WINBACK_BODY = f"""
 <section id="calculator">
   <div class="wrap">
     <h2>What would a campaign cost you?</h2>
-    <p class="lede">Enter your list size and what a visit is worth. We&rsquo;ll
-    show both ways to pay.</p>
+    <p class="lede">Enter your list size and what a visit is worth, and
+    we&rsquo;ll price the campaign.</p>
 
     <div class="calc2">
       <div class="calc2-in">
@@ -1550,14 +1531,7 @@ WINBACK_BODY = f"""
           <span class="co-note">before no-shows</span></p>
 
         <div class="co-cards" id="co-cards">
-          <div class="co-card" id="co-c-booking">
-            <span class="co-tag" hidden>Lower cost for this list</span>
-            <p class="co-k">Per booking</p>
-            <p class="co-v" id="co-v-booking">$944</p>
-            <p class="co-x" id="co-x-booking">3.2&times; return</p>
-          </div>
           <div class="co-card" id="co-c-campaign">
-            <span class="co-tag" hidden>Lower cost for this list</span>
             <p class="co-k">Per campaign</p>
             <p class="co-v" id="co-v-campaign">$1,000</p>
             <p class="co-x" id="co-x-campaign">3.0&times; return</p>
@@ -1567,10 +1541,13 @@ WINBACK_BODY = f"""
         pilot. No charge.</p>
 
         <p class="fine" id="co-disc">Estimates only, not a quote or a guarantee.
-        CAD, plus HST. Per booking applies to customers seen in the last 18 months.
-        Add-ons not included.</p>
+        CAD, plus HST. Add-ons not included.</p>
 
         <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Start with a free pilot</a>
+
+        <p class="co-more">Lists over 2,000, multiple locations, or ongoing
+        campaigns? <a href="{CAL}" target="_blank" rel="noopener">Let&rsquo;s talk &rarr;</a></p>
+        <p class="co-more co-more-s">Prefer to pay per booking? Ask us after your pilot.</p>
       </div>
     </div>
   </div>
@@ -1591,7 +1568,7 @@ WINBACK_BODY = f"""
       <div><dt>Extra script for a different customer group</dt><dd>$99 each</dd></div>
       <div><dt>Calls in another language</dt><dd>$99 per language, per campaign</dd></div>
       <div><dt>Live transfer of interested customers to your staff</dt><dd>$149 setup</dd></div>
-      <div><dt>Always-on campaign: each customer called automatically when they&rsquo;re due</dt><dd>your per-booking rate plus $99/mo</dd></div>
+      <div><dt>Always-on campaign: each customer called automatically when they&rsquo;re due</dt><dd>$2.50 per customer called, plus $99/mo</dd></div>
       <div><dt>Results sent to your own spreadsheet or report format</dt><dd>$150 one-time</dd></div>
       <div><dt>Extra list cleanup</dt><dd>first hour free, then $125/hr</dd></div>
     </dl>
@@ -1607,8 +1584,8 @@ WINBACK_BODY = f"""
 <section id="booking">
   <div class="wrap">
     <h2>What counts as a booking</h2>
-    <p class="lede">Worth being precise about, since on Per booking it is the only
-    thing you are charged for.</p>
+    <p class="lede">Worth being precise about, since it is what the results
+    report counts.</p>
     <div class="formwrap" style="max-width:720px">
       <ul class="wb-list">
         <li>An appointment our agent creates on your calendar, for someone on
@@ -1673,12 +1650,12 @@ WINBACK_BODY = f"""
         <div class="role-body"><p>Up to 3 calls and 1 text per customer per campaign, on weekdays 9am&ndash;9:30pm and weekends 10am&ndash;6pm, in your customer&rsquo;s local time.</p></div>
       </details>
       <details class="role">
-        <summary><div class="role-top"><div><h3>Can I include customers I haven&rsquo;t seen in over 18 months?</h3></div>
+        <summary><div class="role-top"><div><h3>Can I include customers I haven&rsquo;t seen in years?</h3></div>
           <span class="role-toggle"><span class="lbl-more">Answer</span><span class="lbl-less">Close</span>
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>Yes, on Per campaign. We check them against the National Do Not Call List first, and any registry fees are passed through at cost. Per booking is for customers seen in the last 18 months.</p></div>
+        <div class="role-body"><p>Yes. We check them against the National Do Not Call List first, and any registry fees are passed through at cost.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>Do you need access to my practice or business software?</h3></div>
@@ -1694,7 +1671,7 @@ WINBACK_BODY = f"""
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>Per booking and Per campaign: included &mdash; all calling and AI usage is covered.</p><p>Custom: you pay the providers directly, at cost. We put no markup on usage.</p></div>
+        <div class="role-body"><p>Per campaign: included &mdash; all calling and AI usage is covered.</p><p>Custom: you pay the providers directly, at cost. We put no markup on usage.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>Do you provide support?</h3></div>
@@ -1702,7 +1679,7 @@ WINBACK_BODY = f"""
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none"
             stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span></div></summary>
-        <div class="role-body"><p>Included for Per booking and Per campaign.</p><p>Custom: optional. Either a monthly maintenance plan &mdash; updates when providers change their platforms, script changes, fixes &mdash; or hourly.</p></div>
+        <div class="role-body"><p>Included for Per campaign.</p><p>Custom: optional. Either a monthly maintenance plan &mdash; updates when providers change their platforms, script changes, fixes &mdash; or hourly.</p></div>
       </details>
       <details class="role">
         <summary><div class="role-top"><div><h3>What about no-shows?</h3></div>
@@ -1790,7 +1767,6 @@ WINBACK_SCRIPT = """
     var total    = pilotBk + paidBk;
     var revenue  = total * V;
 
-    var costBooking  = paidBk * 59;
     var costCampaign = billable > 0 ? Math.max(billable * 2.5, 500) : 0;
 
     $("co-bookings").textContent = "About " + total + (total === 1 ? " booking" : " bookings");
@@ -1803,19 +1779,9 @@ WINBACK_SCRIPT = """
     $("co-free").hidden = !free;
 
     if (!free) {
-      $("co-v-booking").textContent  = money(costBooking);
       $("co-v-campaign").textContent = money(costCampaign);
-      var mb = mult(revenue, costBooking), mc = mult(revenue, costCampaign);
-      $("co-x-booking").innerHTML  = mb ? mb + "\\u00d7 return" : "\\u2014";
+      var mc = mult(revenue, costCampaign);
       $("co-x-campaign").innerHTML = mc ? mc + "\\u00d7 return" : "\\u2014";
-
-      // Tag the cheaper option, neither on a tie.
-      var tb = $("co-c-booking").querySelector(".co-tag");
-      var tc = $("co-c-campaign").querySelector(".co-tag");
-      tb.hidden = !(costBooking < costCampaign);
-      tc.hidden = !(costCampaign < costBooking);
-      $("co-c-booking").classList.toggle("is-low", costBooking < costCampaign);
-      $("co-c-campaign").classList.toggle("is-low", costCampaign < costBooking);
     }
   }
 
@@ -2155,8 +2121,8 @@ PAGES = [
 
     ("win-back", "Outbound campaigns | VoiceCaptures",
      "Bring back customers you already have. We call your past customers, book "
-     "them on your calendar, and send you the results. From $59 per booking or "
-     "$2.50 per customer.", WINBACK_BODY, WINBACK_SCRIPT),
+     "them on your calendar, and send you the results. $2.50 per customer "
+     "called, with a free pilot first.", WINBACK_BODY, WINBACK_SCRIPT),
 
     ("about", "About VoiceCaptures",
      "VoiceCaptures builds AI voice assistants that answer the phone for small "
