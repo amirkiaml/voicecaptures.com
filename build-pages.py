@@ -15,7 +15,7 @@ Replaces the older build-legal.py. Delete that file; deploy.ps1 calls this one.
 import pathlib
 
 ROOT = pathlib.Path(__file__).parent
-UPDATED = "30 September 2026"
+UPDATED = "9 October 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 # The legal owner's name is deliberately not published. Carriers and
@@ -24,6 +24,8 @@ ADDR = "Toronto, Ontario, Canada"
 BRAND = "VoiceCaptures"
 API = "https://torontoleads-production.up.railway.app"
 CAL = "https://calendly.com/hello-voicecaptures"
+# The 30-minute event, for pages that should skip the chooser.
+CAL30 = CAL + "/30min"
 
 # ---------------------------------------------------------------- shell ----
 
@@ -806,8 +808,8 @@ ABOUT_BODY = f"""
     worse product.</p>
 
     <h2>Where we are</h2>
-    <p>We are an early-stage team based in {ADDR}, working with businesses
-    across the city and the wider GTA. Being local matters more than it sounds:
+    <p>We are based in {ADDR}, and work with businesses across the city and the
+    wider GTA. Being local matters more than it sounds:
     we know the neighbourhoods callers name, the trades that get seasonal
     spikes, and the difference between a slow Tuesday and a phone that has been
     ringing out for a week.</p>
@@ -837,9 +839,10 @@ ABOUT_BODY = f"""
       <div class="card">
         <div class="ic">03</div>
         <h3>Careful with what callers say</h3>
-        <p>Recordings and transcripts are kept 14 days and then deleted, and
-        recording storage is off by default. A clinic line hears things that
-        should not sit on a server indefinitely.</p>
+        <p>Recordings and transcripts are kept 14 days and then deleted unless
+        a business chooses longer, and for clinics, call recording is off by
+        default. A clinic line hears things that should not sit on a server
+        indefinitely.</p>
       </div>
     </div>
   </div>
@@ -851,7 +854,7 @@ ABOUT_BODY = f"""
     <p class="lede">Questions about the product, pricing, or whether it fits how
     your calls actually work &mdash; send us the details and we will come back to
     you within a day. If you would rather talk it through,
-    <a href="{CAL}" target="_blank" rel="noopener">book a 30-minute call</a>.</p>
+    <a href="{CAL30}" target="_blank" rel="noopener">book a 30-minute call</a>.</p>
     <div class="pcta" style="margin-top:22px">
       <a class="btn btn-primary" href="/contact/">Contact us</a>
       <a class="btn btn-ghost" href="mailto:{EMAIL}">{EMAIL}</a>
@@ -1843,6 +1846,11 @@ assistant rather than a person.</p>
       number and message you send us through a form on this website.</li>
   <li><strong>Job applications</strong> &mdash; if you apply through our careers page,
       the details, resume and cover letter you submit.</li>
+  <li><strong>Customer lists for win-back campaigns</strong> &mdash; names, phone
+      numbers and last visit dates that a business client gives us, so we can
+      contact their past customers on their behalf.</li>
+  <li><strong>Billing details for our business clients</strong> &mdash; handled by
+      Stripe. We never see or store full card numbers.</li>
 </ul>
 
 <h2>How we use it</h2>
@@ -1867,42 +1875,63 @@ assistant rather than a person.</p>
   shared with any third parties.</strong></p>
 </div>
 
-<p>Callers opt in verbally during a phone call by agreeing when our assistant
-offers to send a text. Messages are transactional and sent only in response to
-that request &mdash; typically one message per call. Message and data rates may
-apply. Reply <strong>STOP</strong> to opt out, or <strong>HELP</strong> for help.
-Our terms of service are at <a href="/terms/">voicecaptures.com/terms</a> and this
-privacy policy is at <a href="/privacy/">voicecaptures.com/privacy</a>.</p>
+<p>Texts to callers are sent as part of handling their call: confirmations,
+information they asked for, missed-call text-backs and appointment reminders.
+Promotional texts, such as review requests or win-back messages, are sent only on
+behalf of a business the person has bought from, and always allow opting out. We
+do not sell or share mobile numbers or SMS consent with third parties for their
+marketing.</p>
+<p>Message and data rates may apply. Reply <strong>STOP</strong> to opt out, or
+<strong>HELP</strong> for help. Our terms of service are at
+<a href="/terms/">voicecaptures.com/terms</a> and this privacy policy is at
+<a href="/privacy/">voicecaptures.com/privacy</a>.</p>
 
 <h2>Call recording</h2>
-<p>Callers are told at the start of the call that it may be recorded. Calls
-answered by the assistant are recorded and transcribed. The recording and
-transcript are used to produce the summary the business owner receives, and to
-improve how the assistant handles calls for that business. Recordings and
-transcripts are deleted after 14 days. If you would prefer your recording deleted
-sooner, email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p>Callers are told at the start of the call that it may be recorded. For most
+businesses, calls are recorded and transcribed; for clinics, recording is off by
+default and only a transcript is kept. Recordings and transcripts are used to
+produce the summary for the business, to show it in their dashboard, and to
+improve how the assistant handles their calls.</p>
+
+<h2>Clinics</h2>
+<p>When we answer calls for a clinic, the assistant collects only contact details
+and the general reason for the call, such as booking a cleaning or a billing
+question. It does not ask for symptoms, diagnoses or health card numbers. We
+handle this information only on the clinic&rsquo;s instructions and for the
+clinic&rsquo;s purposes.</p>
 
 <h2>How long we keep it</h2>
 <p>Recordings, transcripts and call details are kept for <strong>14 days</strong>
-and then deleted. Extended retention is available on request where a business
-client needs a longer record. Job applications are kept while we consider them
-and for future opportunities, until you ask us to delete them.</p>
+and then deleted. A business client can choose to keep them for 90 days or one
+year. Win-back lists are used only for that business&rsquo;s campaigns and are
+deleted when the business asks, or when they stop working with us. To have your
+own record deleted sooner, email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p>Job applications are kept while we consider them and for future opportunities,
+until you ask us to delete them.</p>
+
+<h2>Where your information is stored and processed</h2>
+<p>Call records we keep are stored in Canada. To run calls and texts, our voice
+and phone providers process call audio and messages in the United States, where
+they may be subject to US law.</p>
 
 <h2>Service providers</h2>
 <p>We use the following providers to operate the service. Your information is
 shared with them only so that the service can run, and for no other purpose.</p>
 <dl>
-  <dt>Twilio</dt><dd>Telephony and messaging &mdash; carrying the call and sending the text.</dd>
-  <dt>Vapi</dt><dd>Voice &mdash; running the assistant's side of the conversation.</dd>
-  <dt>Supabase</dt><dd>Data storage &mdash; where call records are stored.</dd>
+  <dt>Twilio</dt><dd>Phone calls and text messages.</dd>
+  <dt>Vapi</dt><dd>Running the assistant&rsquo;s side of the conversation.</dd>
+  <dt>Supabase</dt><dd>Data storage, in Canada.</dd>
+  <dt>Railway</dt><dd>Hosting our servers.</dd>
+  <dt>Stripe</dt><dd>Billing for our business clients.</dd>
   <dt>Google Calendar</dt><dd>Where a business client has connected one, so bookings
-      land on their real calendar.</dd>
+      land on their calendar.</dd>
 </dl>
+<p>Each provider receives only what it needs to run the service.</p>
 
-<h2>Requesting deletion</h2>
-<p>To have your information deleted, email
-<a href="mailto:{EMAIL}">{EMAIL}</a>. Tell us the phone number you called from and
-roughly when you called, so we can find the record.</p>
+<h2>Your rights</h2>
+<p>You can ask to see, correct or delete the information we hold about you. Email
+<a href="mailto:{EMAIL}">{EMAIL}</a> with the number you called from and roughly
+when you called. We will reply within 30 days.</p>
 
 <h2>Contact</h2>
 <p><strong>{BRAND}</strong><br>
@@ -1915,73 +1944,121 @@ TERMS_BODY = f"""<main class="wrap doc">
 <h1>Terms of Service</h1>
 <p class="updated">Last updated: {UPDATED}</p>
 
-<p class="intro">These terms cover the use of <strong>{BRAND}</strong>, a
-registered business based in {ADDR}.</p>
+<p class="intro">These terms cover your <strong>{BRAND}</strong> subscription and
+any campaign you run with us. By ticking the box at checkout, or by signing a
+quote with us, you agree to them. {BRAND} is a registered business in Ontario,
+Canada.</p>
 
 <h2>The service</h2>
-<p>VoiceCaptures provides an AI voice assistant that answers inbound phone calls
-for a business. The assistant greets the caller, answers questions about the
-business, takes down the caller's details, books appointments where a calendar is
-connected, and sends the business owner a summary of the call. Where a caller asks
-for information by text, the assistant sends it as a single SMS.</p>
+<p>We provide an AI phone assistant that answers calls your business forwards to
+it. Depending on your plan, it answers questions, takes callers&rsquo; details,
+books appointments into your calendar, transfers calls to you, and sends text
+messages to you and to your callers. We set it up for you. AI can mishear or
+misunderstand a caller, so check your bookings and messages. It is not an
+emergency service; callers with emergencies are told to call 911.</p>
 
-<h2>Acceptable use</h2>
-<p>You may not use the service to break the law, to harass anyone, to send
-unsolicited marketing, or to impersonate another business. You are responsible for
-the accuracy of the information you give us to put in the assistant's script, and
-for holding any licence or registration your own business needs.</p>
+<h2>Plans and locations</h2>
+<p>Each plan covers one business location, with the minutes, lines and calendars
+shown on our pricing page. Two or more locations need a plan for each location,
+or a quote from us.</p>
 
-<h2>Billing and cancellation</h2>
-<p>Plans are billed monthly, month to month. You can cancel at any time; the
-service runs to the end of the period you have already paid for, and is not
-renewed after that. One-off setup and integration work is quoted and charged
-separately.</p>
+<h2>Free trial</h2>
+<p>Your first 14 days are free, up to 100 minutes of calls, on your real business
+number. We take a card when you sign up. If you don&rsquo;t cancel before the
+trial ends, your plan starts automatically on day 15 and we charge that card. We
+email you a reminder before the trial ends. Cancel during the trial and you pay
+nothing.</p>
 
-<h2>No warranty</h2>
-<p>The service is provided as is. We do not warrant that the AI assistant is
-error-free. It can mishear a caller, misunderstand a request, or be unavailable
-because of a fault at one of the providers the service depends on. It is not a
-substitute for a person where a call is urgent or an emergency.</p>
+<h2>Billing and taxes</h2>
+<p>Plans are billed monthly in Canadian dollars, in advance, on the same date each
+month, to the card you gave us. Prices are before HST and other applicable taxes,
+which are added to your bill. Add-ons are billed with your plan. One-time setup
+and integration work is quoted in writing and billed separately. You can update
+your card or download invoices at any time from your billing portal.</p>
 
-<h2>Limitation of liability</h2>
-<p>To the extent permitted by law, our total liability for any claim arising out of
-the service is limited to the fees you paid us in the three months before the
-claim. We are not liable for indirect or consequential loss, including lost
-business, lost bookings or lost revenue.</p>
+<h2>Minutes</h2>
+<p>A minute is time our assistant spends on a live call, including transfers. Spam
+calls are not counted. Unused minutes don&rsquo;t carry over. We text you when you
+reach 80% of your monthly minutes. If you go over, we will offer you extra
+minutes, at $100 per 100 minutes, or a larger plan. We will not charge you for
+extra minutes without telling you first.</p>
 
-<h2>SMS Terms</h2>
+<h2>Missed payments</h2>
+<p>If a payment fails, we retry it and email you. If it still hasn&rsquo;t gone
+through after about two weeks, your subscription is cancelled and the line stops
+answering.</p>
 
-<h3>What we send</h3>
-<p>A single text message, sent in response to a caller's request during a phone
-call, containing the information they asked for.</p>
+<h2>Cancelling</h2>
+<p>Cancel anytime from your billing portal or by emailing
+<a href="mailto:{EMAIL}">{EMAIL}</a>. After the trial, your service runs to the end
+of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. When
+you leave, turn off call forwarding on your phone so calls ring through to you
+again.</p>
 
-<h3>How consent is obtained</h3>
-<p>Verbally, during an inbound call that the caller initiated. The assistant asks
-the caller whether they would like the information by text, and a message is sent
-only if they say yes. The message goes to the number the caller is calling from.</p>
-
-<h3>Frequency</h3>
-<p>Messages are sent only in response to a caller's request. There are no recurring
-messages and no marketing messages.</p>
+<h2>Text messages</h2>
+<p>Our assistant sends texts that are part of handling a call: a summary to you; a
+confirmation, booking details or information to a caller who asks for it; a
+text-back to a caller whose call was missed; and appointment reminders. We also
+text you about your account, such as usage alerts.</p>
+<p>Some plans include texts or calls that promote your business, such as review
+requests and win-back messages. These go only to your own customers, on your
+behalf and under your business name, and every one identifies your business and
+lets the person opt out. You are responsible for having the consent Canadian
+anti-spam law requires to contact them; generally, that means they bought from you
+in the last two years, or they agreed to hear from you.</p>
+<p>Anyone can reply <strong>STOP</strong> to any text to opt out, or
+<strong>HELP</strong> for help.</p>
 
 <div class="box">
   <p><strong>Message and data rates may apply.</strong></p>
 </div>
 
-<h3>Opting out and getting help</h3>
-<p>Reply <strong>STOP</strong> to any message to opt out. Reply <strong>HELP</strong>
-for help, or email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
-
-<h3>Delivery</h3>
 <p>Carriers are not liable for delayed or undelivered messages.</p>
 
+<h2>Win-back calls and campaigns</h2>
+<p>We only contact your own past customers, people who have already bought from
+you, from a list you give us. We never use cold lists or purchased leads. Every
+call opens by saying it&rsquo;s an AI assistant calling for your business. We check
+numbers against Canada&rsquo;s National Do Not Call List where the law requires it,
+call only during permitted hours, and remove anyone who asks not to be contacted.
+You confirm that you collected the list lawfully and may contact the people on it.
+Campaign prices and what counts as a booking are set out in your quote.</p>
+
+<h2>Your responsibilities</h2>
+<p>Give us accurate information for your assistant&rsquo;s script, use the service
+lawfully, and hold any licence your own business needs. Don&rsquo;t use the service
+to harass anyone, impersonate another business, or collect information we
+haven&rsquo;t agreed to handle.</p>
+
+<h2>Call records</h2>
+<p>We keep call recordings, transcripts and call details for 14 days, then delete
+them, unless your plan includes longer history. For clinics, call recording is off
+by default, and our assistant collects only contact details and the general reason
+for the call &mdash; never symptoms, diagnoses or health card numbers. If your
+practice needs a privacy agreement with us, we will work through it with you
+before going live. Our <a href="/privacy/">Privacy Policy</a> explains how we
+handle this information.</p>
+
+<h2>No warranty</h2>
+<p>The service is provided as is. We don&rsquo;t promise the assistant will be
+error-free or always available; it depends on phone, AI and internet providers we
+don&rsquo;t control.</p>
+
+<h2>Limitation of liability</h2>
+<p>To the extent the law allows, our total liability for any claim is limited to
+the fees you paid us in the three months before the claim. We are not liable for
+indirect or consequential loss, including lost business, bookings or revenue.</p>
+
+<h2>Changes</h2>
+<p>We will email you at least 30 days before we change these terms or your price.
+If you don&rsquo;t agree, you can cancel before the change takes effect.</p>
+
 <h2>Governing law</h2>
-<p>These terms are governed by the laws of the Province of Ontario, Canada, and the
-federal laws of Canada that apply there.</p>
+<p>These terms are governed by the laws of Ontario and the federal laws of Canada
+that apply there.</p>
 
 <h2>Contact</h2>
-<p><strong>{BRAND}</strong><br>
-{ADDR}<br>
+<p><strong>{BRAND}</strong> &middot;
 <a href="mailto:{EMAIL}">{EMAIL}</a></p>
 </main>
 """
@@ -2153,9 +2230,10 @@ def main():
         folder.mkdir(exist_ok=True)
         html = SHELL.format(
             title=title, desc=desc, slug=slug, body=body, script=script,
-            email=EMAIL, cal=CAL,
+            email=EMAIL,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",
+            cal=CAL30 if slug == "about" else CAL,
             cta="" if slug == "win-back" else
                 '<a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>',
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
