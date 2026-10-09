@@ -499,9 +499,9 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="nav-a nav-wb" href="/win-back/">Win-back</a>
       <a class="nav-a" href="/about/" aria-current="page">About</a>
       <a class="nav-a" href="/careers/">Careers</a>
-      <a class="nav-a" href="/about/#contact">Contact</a>
+      <a class="nav-a" href="/#intake">Contact</a>
       <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
             aria-expanded="false" aria-controls="mnav">
@@ -535,7 +535,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <p class="mnav-h">Company</p>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
-      <a class="mnav-a sub" href="/about/#contact">Contact</a>
+      <a class="mnav-a sub" href="/#intake">Contact</a>
       <div class="mnav-foot">
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
       </div>
@@ -630,46 +630,12 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
   <div class="wrap">
     <h2>Get in touch</h2>
     <p class="lede">Questions about the product, pricing, or whether it fits how
-    your calls actually work &mdash; send a note and we will come back to you.
-    If you would rather talk it through,
-    <a href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">book a call</a>.</p>
-
-    <div class="formwrap">
-      <form id="contact-form" novalidate>
-        <div class="grid2">
-          <div class="f">
-            <label for="c-name">Your name</label>
-            <input id="c-name" name="name" type="text" autocomplete="name" required>
-          </div>
-          <div class="f">
-            <label for="c-email">Email</label>
-            <input id="c-email" name="email" type="email" autocomplete="email" required>
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="f">
-            <label for="c-phone">Phone <span class="opt">optional</span></label>
-            <input id="c-phone" name="phone" type="tel" autocomplete="tel">
-          </div>
-          <div class="f">
-            <label for="c-business">Business <span class="opt">optional</span></label>
-            <input id="c-business" name="business" type="text" autocomplete="organization">
-          </div>
-        </div>
-        <div class="f">
-          <label for="c-message">Message</label>
-          <textarea id="c-message" name="message" required
-            placeholder="What you'd like to know, or what your calls look like today."></textarea>
-        </div>
-        <button class="btn btn-primary" type="submit" id="c-submit" style="width:100%">Send message</button>
-        <div class="f-msg" id="c-msg" role="alert"></div>
-      </form>
-
-      <div class="f-ok" id="c-ok">
-        <div class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg></div>
-        <h3>Message sent</h3>
-        <p>Thanks &mdash; we have it, and we will get back to you at the email you gave.</p>
-      </div>
+    your calls actually work &mdash; send us the details and we will come back to
+    you within a day. If you would rather talk it through,
+    <a href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">book a 30-minute call</a>.</p>
+    <div class="pcta" style="margin-top:22px">
+      <a class="btn btn-primary" href="/#intake">Contact us</a>
+      <a class="btn btn-ghost" href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     </div>
   </div>
 </section>
@@ -686,6 +652,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
+      <a href="/#intake">Contact</a>
       <a href="/privacy/">Privacy Policy</a>
       <a href="/terms/">Terms of Service</a>
     </div>
@@ -729,58 +696,6 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
   window.addEventListener("resize", function(){
     if (window.innerWidth > 900 && !panel.hidden) close();
-  });
-})();
-</script>
-
-<script>
-(function(){
-  var API = "https://torontoleads-production.up.railway.app";
-  var form = document.getElementById("contact-form"),
-      msg  = document.getElementById("c-msg"),
-      ok   = document.getElementById("c-ok"),
-      btn  = document.getElementById("c-submit");
-  if (!form) return;
-
-  function fail(t){ msg.textContent = t; msg.className = "f-msg err"; }
-
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    msg.className = "f-msg";
-
-    var body = {
-      name:     form.name.value.trim(),
-      email:    form.email.value.trim(),
-      phone:    form.phone.value.trim(),
-      business: form.business.value.trim(),
-      message:  form.message.value.trim(),
-      source:   "about"
-    };
-    if (!body.name || !body.email || !body.message) {
-      return fail("Name, email and a message are needed.");
-    }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(body.email)) {
-      return fail("That email doesn't look right.");
-    }
-
-    btn.disabled = true;
-    btn.textContent = "Sending...";
-
-    fetch(API + "/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    })
-    .then(function(r){ return r.json().catch(function(){ return { ok:false }; }); })
-    .then(function(d){
-      if (d && d.ok) { form.style.display = "none"; ok.style.display = "block"; return; }
-      fail((d && d.error) || "Couldn't send that. Try again, or email hello@voicecaptures.com.");
-      btn.disabled = false; btn.textContent = "Send message";
-    })
-    .catch(function(){
-      fail("Couldn't reach the server. Try again, or email hello@voicecaptures.com.");
-      btn.disabled = false; btn.textContent = "Send message";
-    });
   });
 })();
 </script>

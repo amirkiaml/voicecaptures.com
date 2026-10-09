@@ -180,6 +180,9 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
 :is(.nav-menu button,.nav-menu a) em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}
 :is(.nav-menu button,.nav-menu a)[aria-current="true"] b{color:var(--cyan)}
 .nav-sep{height:1px;background:var(--line);margin:8px 7px}
+.nav-menu .nm-h{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:10px 0 2px;padding:0 13px;
+  border-top:1px solid var(--line);padding-top:10px}
 
 /* ---- Arrow buttons: the circle carries the affordance, the label stays
    readable. One solid, one outlined, nothing else. ---- */
@@ -1279,12 +1282,14 @@ html[data-theme="light"] .wb-band{background:linear-gradient(180deg,#eef2f9,var(
    moment, so it carries its own colour everywhere it appears. Violet is the
    one hue nothing else uses: links are blue, the primary CTA cyan, Book a
    call amber, Members a blue outline. ---- */
-html .nav .nav-a.nav-wb,
-html[data-theme="light"] .nav .nav-a.nav-wb,
-html[data-theme="dark"] .nav .nav-a.nav-wb{color:var(--wb);font-weight:600}
-html .nav .nav-a.nav-wb:hover,
-html[data-theme="light"] .nav .nav-a.nav-wb:hover,
-html[data-theme="dark"] .nav .nav-a.nav-wb:hover{color:var(--wb-dk);background:var(--wb-glow)}
+html .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash),
+html[data-theme="light"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash),
+html[data-theme="dark"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash){
+  color:var(--wb);font-weight:600}
+html .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="light"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover,
+html[data-theme="dark"] .nav .nav-a.nav-wb:not(.nav-cal):not(.nav-dash):hover{
+  color:var(--wb-dk);background:var(--wb-glow)}
 .mnav-a.mnav-wb{display:flex;align-items:center;gap:9px;color:var(--wb);
   font-weight:600;font-size:16px;padding-left:12px}
 .mnav-a.mnav-wb:hover{background:var(--wb-glow);color:var(--wb)}
@@ -1296,7 +1301,9 @@ html[data-theme="dark"] .nav .nav-a.nav-wb:hover{color:var(--wb-dk);background:v
    rather than borrowing the blue used by everything above it. */
 .wb-band{border-top:1px solid color-mix(in srgb,var(--wb) 30%,transparent);
   border-bottom:1px solid color-mix(in srgb,var(--wb) 30%,transparent)}
-.wb-band h2 .hl{color:var(--wb)}
+html .wb-band h2 .hl,
+html[data-theme="light"] .wb-band h2 .hl,
+html[data-theme="dark"] .wb-band h2 .hl{color:var(--wb)}
 .wb-band .wb-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   color:var(--wb);background:var(--wb-glow);border-radius:999px;
@@ -1387,16 +1394,17 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <span>VoiceCaptures</span>
     </a>
     <nav class="nav" aria-label="Main">
-      <button type="button" class="nav-a" data-goto="personal">Personal</button>
       <div class="nav-drop">
         <button type="button" class="nav-a nav-trigger" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
-          Businesses
+          AI receptionist
           <svg class="nav-car" viewBox="0 0 12 12" aria-hidden="true">
             <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor"
                   stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
         <div class="nav-menu" id="nav-menu" hidden>
+          <button type="button" data-goto="personal"><i data-h="personal"></i><b>Personal line</b><em>Screens calls to your own phone</em></button>
+          <p class="nm-h">Businesses</p>
           <button type="button" data-goto="home"><i data-h="home"></i><b>Home services</b><em>Plumbing, HVAC, electrical</em></button>
           <button type="button" data-goto="food"><i data-h="food"></i><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, takeout, catering</em></button>
           <button type="button" data-goto="clinic"><i data-h="clinic"></i><b>Clinics &amp; dental</b><em>Patients, bookings, overflow</em></button>
@@ -1418,11 +1426,11 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
         <div class="nav-menu" id="nav-company-menu" hidden>
           <a href="/about/"><i></i><b>About</b><em>Who we are, what we build</em></a>
           <a href="/careers/"><i></i><b>Careers</b><em>Rolling applications</em></a>
-          <a href="/about/#contact"><i></i><b>Contact</b><em>Send us a message</em></a>
         </div>
       </div>
+      <a class="nav-a" href="#intake" id="nav-contact">Contact</a>
       <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Members<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
             aria-expanded="false" aria-controls="mnav">
@@ -1460,7 +1468,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <p class="mnav-h">Company</p>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
-      <a class="mnav-a sub" href="/about/#contact">Contact</a>
+      <a class="mnav-a sub" href="#intake" data-close>Contact</a>
       <div class="mnav-foot">
         <a class="btn btn-ghost" href="#demo" data-demo>Try the demo line</a>
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
@@ -1919,7 +1927,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 <section id="intake" class="alt">
   <div class="wrap">
     <h2 class="center" id="in-title">Tell us about <span class="hl">your line.</span></h2>
-    <p class="sub" id="in-sub">A few quick questions and we'll come back with what your setup would look like. No obligation.</p>
+    <p class="sub" id="in-sub">One form for everything &mdash; a receptionist, a win-back campaign, or a question. A few details and we'll come back within a day. No obligation.</p>
 
     <form class="in-card" id="in-form">
       <p class="in-leg">Contact</p>
@@ -1932,9 +1940,9 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
         <label class="in-f"><span>Phone</span><input id="in-phone" type="tel" required autocomplete="tel"></label>
       </div>
 
-      <p class="in-leg" id="in-leg2">About your business</p>
+      <p class="in-leg" id="in-leg2">About you</p>
       <div class="in-row">
-        <label class="in-f"><span id="in-l-name">Business name</span><input id="in-business" required autocomplete="organization"></label>
+        <label class="in-f"><span id="in-l-name">Business name</span><input id="in-business" required autocomplete="organization" placeholder="Or your own name"></label>
         <label class="in-f"><span id="in-l-type">Type</span><select id="in-type"></select></label>
       </div>
       <div class="in-row">
@@ -1964,6 +1972,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
+      <a href="#intake">Contact</a>
       <a href="/privacy/">Privacy Policy</a>
       <a href="/terms/">Terms of Service</a>
     </div>
@@ -2003,15 +2012,55 @@ function keyFromPath(){
   return null;
 }
 
+// One intake form serves the whole site, so the option lists have to cover
+// anyone who lands on it -- including someone who came in through Contact
+// rather than through a sector page.
+var INTAKE = {
+  title: "Tell us what you <span class=\"hl\">need.</span>",
+  nameLabel: "Business name",
+  typeLabel: "What you do",
+  sysLabel: "Software you use",
+  types: [
+    "Home services \u2014 plumbing, HVAC, electrical",
+    "Trades & contracting",
+    "Restaurant, caf\u00e9 or bar",
+    "Clinic, dental or medical",
+    "Health & wellness",
+    "Veterinary",
+    "Salon, spa or barber",
+    "Fitness studio or gym",
+    "Auto services",
+    "Real estate or property",
+    "Legal, accounting or consulting",
+    "Education or tutoring",
+    "Events or venue",
+    "Retail or e-commerce",
+    "A personal line, not a business",
+    "Something else"
+  ],
+  systems: [
+    "None \u2014 phone and calendar",
+    "Google Calendar",
+    "Outlook or Microsoft 365",
+    "Calendly",
+    "Jobber",
+    "Housecall Pro",
+    "ServiceTitan",
+    "Square",
+    "Acuity or Squarespace Scheduling",
+    "Mindbody",
+    "Jane",
+    "Dentrix, Open Dental or Eaglesoft",
+    "OpenTable, Resy or Toast",
+    "HubSpot or another CRM",
+    "Something else",
+    "Not sure"
+  ]
+};
+
 var V = {
   home: {
-    intake: {
-      title: "Tell us about <span class=\"hl\">your line.</span>",
-      nameLabel: "Business name", typeLabel: "Trade",
-      sysLabel: "Scheduling or job software",
-      types: ["Plumbing","HVAC","Electrical","Locksmith","Garage door","Roofing","General contracting","Other"],
-      systems: ["None \u2014 phone and calendar","Jobber","Housecall Pro","ServiceTitan","Google Calendar only","Other"]
-    },
+    intake: INTAKE,
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
@@ -2073,13 +2122,7 @@ var V = {
     ]
   },
   food: {
-    intake: {
-      title: "Tell us about <span class=\"hl\">your line.</span>",
-      nameLabel: "Venue name", typeLabel: "Type of venue",
-      sysLabel: "POS system",
-      types: ["Caf\u00e9","Takeout","Casual dining","Fine dining","Bakery","Catering","Other"],
-      systems: ["None","Toast","Square","TouchBistro","Lightspeed","Clover","Other"]
-    },
+    intake: INTAKE,
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
@@ -2125,13 +2168,7 @@ var V = {
     ]
   },
   other: {
-    intake: {
-      title: "Tell us about <span class=\"hl\">your line.</span>",
-      nameLabel: "Business name", typeLabel: "What you do",
-      sysLabel: "Booking or CRM software",
-      types: ["Salon or spa","Studio","Tutoring","Venue or events","Auto","Professional services","Other"],
-      systems: ["None","Google Calendar only","Square","HubSpot","Other"]
-    },
+    intake: INTAKE,
 
     eyebrow: "Any business where the work arrives by phone",
     headline: "Not on the list?<br><span class=\"hl\">It probably still fits.</span>",
@@ -2170,7 +2207,7 @@ var V = {
     tiers: "home"
   },
   personal: {
-    intake: null,
+    intake: INTAKE,
     variants: [
       {
         key: "spam", label: "A scam robocall",
@@ -2253,13 +2290,7 @@ var V = {
     tiers: []
   },
   clinic: {
-    intake: {
-      title: "Tell us about <span class=\"hl\">your practice.</span>",
-      nameLabel: "Practice name", typeLabel: "Type of practice",
-      sysLabel: "Practice management software",
-      types: ["Dental","Physiotherapy","Chiropractic","Veterinary","Medical clinic","Optometry","Other"],
-      systems: ["None","Dentrix","Open Dental","Eaglesoft","Jane","Other"]
-    },
+    intake: INTAKE,
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
