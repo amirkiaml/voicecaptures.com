@@ -135,7 +135,9 @@
   .linkbtn { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; }
   .crumb { margin-bottom: 8px; }
   dialog#callView { width: min(1000px, 96vw); max-height: 90vh; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
-  dialog#callView::backdrop { background: rgba(0,0,0,.45); }
+  dialog#callView::backdrop, dialog#rtConfirm::backdrop { background: rgba(0,0,0,.45); }
+  dialog#rtConfirm { width: min(520px, 94vw); border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
+  code { font-size: 12px; background: var(--gray-soft); padding: 1px 5px; border-radius: 5px; }
   .cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
   .pie { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; }
   .pie svg { width: 150px; height: 150px; }
@@ -242,6 +244,8 @@
     <div id="qBody"><div class="muted">Loading…</div></div>
   </section>
 
+  <dialog id="rtConfirm"><div id="rtcBody"></div>
+    <div style="text-align:right;margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="rtcCancel" type="button">Cancel</button><button class="btn" id="rtcGo" type="button" style="border-color:var(--bad);color:var(--bad)">Lower retention</button></div></dialog>
   <dialog id="callView"><div id="cvBody"></div><div style="text-align:right;margin-top:10px"><button class="btn" id="cvClose" type="button">Close</button></div></dialog>
 
   <section id="tab-calls" hidden>
@@ -973,12 +977,21 @@ async function loadClient() {
           <label>Trial start<input id="pfTs" type="date" value="${esc(r.trialStart || "")}"></label>
           <label>Trial end<input id="pfTe" type="date" value="${esc(r.trialEnd || "")}"></label>
           <label>Trial minutes cap<input id="pfCap" type="number" min="0" value="${r.trialMinutesCap ?? 100}"></label>
-          <label>Retention (days)<input id="pfRet" type="number" min="1" max="3650" value="${r.retentionDays}"></label>
-          <label>Keep recordings<select id="pfRec"><option value="true" ${r.recordingEnabled ? "selected" : ""}>Yes</option><option value="false" ${!r.recordingEnabled ? "selected" : ""}>No (clinics)</option></select></label>
           <label>Alert phone (else owner phone)<input id="pfAlert" type="tel" placeholder="+1…" value="${esc(r.alertPhone || "")}"></label>
           <label style="grid-column:1/-1">Add-ons (JSON; keys ending _cad are monthly CAD revenue)<textarea id="pfAddons" rows="2">${esc(JSON.stringify(r.addons || {}))}</textarea></label>
         </div>
         <div style="margin-top:8px"><button class="btn" id="pfSave" type="button">Save</button> <span id="pfMsg" class="small"></span></div>
+        <h3 style="margin-top:18px">Data retention &amp; recordings</h3>
+        <div class="form-grid">
+          <label>Data retention (paid add-on)<select id="rtDays">
+            <option value="14">14 days — included</option><option value="90">90 days — $19/mo</option><option value="365">1 year — $49/mo</option></select></label>
+          <label>&nbsp;<button class="btn" id="rtSave" type="button">Save retention</button></label>
+          <label>Keep a copy of the audio<select id="pfRec"><option value="true" ${r.recordingEnabled ? "selected" : ""}>Yes</option><option value="false" ${!r.recordingEnabled ? "selected" : ""}>No (clinics)</option></select></label>
+        </div>
+        <div id="rtInfo" class="small muted" style="margin-top:6px">Loading…</div>
+        <div class="small muted" style="margin-top:4px">“Keep a copy of the audio” only controls <b>our</b> copy. Vapi records separately: <code>artifactPlan.recordingEnabled</code> on the client's Vapi assistant. For clinics, both must be off.</div>
+        <div id="rtMsg" class="small" style="margin-top:4px"></div>
+        <div id="rtHist" class="list" style="margin-top:8px"></div>
       </div>
       <div class="card mb"><h3>Billing periods</h3><div class="table-wrap"><table class="sub-table">
         <thead><tr><th>Period</th><th>Minutes</th><th>Allowance</th><th>Extra blocks</th><th>Charged</th><th>Alerts</th><th>Invoiced</th></tr></thead><tbody>${
@@ -1008,6 +1021,7 @@ async function loadClient() {
       { label: "Twilio numbers (est.)", value: r.twilioParts.numbers.cad, color: "#d97706" },
       { label: "Margin", value: Math.max(0, r.margin.cad), color: "#1f9d55" }], v => fmtCur(v, "CA"), r.revenue.cad ? fmtCur(r.revenue.cad, "CA", 0) : "trial");
     $("pfSave").onclick = saveClient;
+    wireRetention();
     box.querySelectorAll("[data-saveblocks]").forEach(b => b.onclick = async () => {
       const v = Number(box.querySelector(`[data-blocks="${b.dataset.saveblocks}"]`).value);
       try { await api(`${B}/period/${b.dataset.saveblocks}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ extra_blocks: v }) }); loadClient(); loaded.overview = false; }
@@ -1020,12 +1034,65 @@ async function loadClient() {
   } catch (e) { if (e.message !== "Signed out") box.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
 }
 
+/* ---------- data retention (admin only; paid add-on) ---------- */
+const RT_LABEL = { 14: "14 days", 90: "90 days", 365: "1 year" };
+const RT_PRICE = { 14: "included", 90: "$19/mo", 365: "$49/mo" };
+async function wireRetention() {
+  const id = CL.id, base = `${B}/client/${encodeURIComponent(id)}/retention`;
+  const show = st => {
+    $("rtDays").value = String(st.current);
+    $("rtInfo").innerHTML = `Now: <b>${RT_LABEL[st.current] || st.current + " days"}</b> (${RT_PRICE[st.current] || "custom"}) · ${st.artifacts} saved call record${st.artifacts === 1 ? "" : "s"} · next cleanup ${esc(fmtWhen(st.nextCleanup))}`
+      + (st.cleanupMode === "delete" ? "" : ` · <span class="warn-t">cleanup is in dry-run mode (RETENTION_CLEANUP not on): nothing is deleted yet</span>`);
+    $("rtHist").innerHTML = st.history.length ? `<div class="k2" style="margin-top:0">Changes</div>` + st.history.map(h => `<div class="it"><span>${RT_LABEL[h.from_days] || h.from_days + " d"} → <b>${RT_LABEL[h.to_days] || h.to_days + " d"}</b> <span class="muted small">by ${esc(h.changed_by)}</span></span>
+      <span class="small muted">${h.artifacts_rescheduled} rescheduled${h.newly_eligible ? ` · ${h.newly_eligible} made due` : ""} · ${esc(fmtWhen(h.created_at))}</span></div>`).join("") : "";
+  };
+  try { show(await api(base)); } catch (e) { $("rtInfo").innerHTML = `<span class="err">${esc(e.message)}</span>`; $("rtSave").disabled = true; return; }
+
+  const post = body => api(base, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const done = async r => {
+    $("rtMsg").innerHTML = `<span class="good-t">Saved: ${RT_LABEL[r.fromDays]} → ${RT_LABEL[r.toDays]}. ${r.artifactsRescheduled} record${r.artifactsRescheduled === 1 ? "" : "s"} rescheduled; add-on ${r.addonAfterCad ? "$" + r.addonAfterCad + "/mo" : "removed"}.</span>`;
+    loaded.overview = false; show(await api(base));
+  };
+  $("rtSave").onclick = async () => {
+    const days = Number($("rtDays").value);
+    $("rtMsg").textContent = "";
+    try {
+      const r = await post({ days });
+      if (r.unchanged) { $("rtMsg").textContent = "Already set."; return; }
+      await done(r);
+    } catch (e) {
+      if (e.status !== 409) { $("rtMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; return; }
+      // Lowering: the server wants an explicit confirmation. Show what it costs.
+      const st = await api(`${base}?days=${days}`);
+      $("rtcBody").innerHTML = `<h3>Lower retention to ${RT_LABEL[days]}?</h3>
+        <p><b>${st.newlyEligible}</b> saved call record${st.newlyEligible === 1 ? "" : "s"} (transcripts and recordings) will become eligible for deletion on the next cleanup run (${esc(fmtWhen(st.nextCleanup))})${st.dueNow ? `, on top of ${st.dueNow} already due` : ""}.</p>
+        <p><b>This cannot be undone.</b> Raising retention again later does not bring back anything already deleted.</p>
+        ${st.cleanupMode === "delete" ? "" : `<p class="small muted">Cleanup is currently a dry run, so nothing will actually be deleted until RETENTION_CLEANUP is turned on — but the new dates apply from now.</p>`}
+        <p class="small muted">Call rows, minutes, costs, texts sent and any consent/opt-out records are never deleted by cleanup.</p>`;
+      const dlg = $("rtConfirm");
+      $("rtcCancel").onclick = () => { dlg.close(); $("rtDays").value = String(st.current); };
+      $("rtcGo").onclick = async () => {
+        $("rtcGo").disabled = true;
+        try { const r = await post({ days, confirm: true }); dlg.close(); await done(r); }
+        catch (err) { $("rtcBody").insertAdjacentHTML("beforeend", `<p class="err">${esc(err.message)}</p>`); }
+        finally { $("rtcGo").disabled = false; }
+      };
+      dlg.showModal();
+    }
+  };
+  $("pfRec").onchange = async () => {
+    try { await api(`${B}/client/${encodeURIComponent(id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recording_enabled: $("pfRec").value === "true" }) });
+      $("rtMsg").innerHTML = `<span class="good-t">Recording copy ${$("pfRec").value === "true" ? "on" : "off"}. Remember the Vapi assistant's own setting.</span>`; }
+    catch (e) { $("rtMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  };
+}
+
 async function saveClient() {
   let addons;
   try { addons = JSON.parse($("pfAddons").value || "{}"); } catch { $("pfMsg").innerHTML = `<span class="err">Add-ons must be JSON, e.g. {"extra_lines":1,"integration_monthly_cad":39}</span>`; return; }
   const body = { plan_name: $("pfPlan").value || null, status: $("pfStatus").value, plan_price_cad: $("pfPrice").value, plan_minutes: $("pfMin").value,
     billing_anchor_day: $("pfAnchor").value, stripe_customer_id: $("pfStripe").value, trial_start: $("pfTs").value, trial_end: $("pfTe").value,
-    trial_minutes_cap: $("pfCap").value, retention_days: $("pfRet").value, recording_enabled: $("pfRec").value === "true", alert_phone: $("pfAlert").value, addons };
+    trial_minutes_cap: $("pfCap").value, alert_phone: $("pfAlert").value, addons };
   try { await api(`${B}/client/${encodeURIComponent(CL.id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     loaded.overview = false; await loadClient(); $("pfMsg").innerHTML = `<span class="good-t">Saved.</span>`; }
   catch (e) { $("pfMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
