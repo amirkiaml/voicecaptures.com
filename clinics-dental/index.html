@@ -1189,9 +1189,12 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav > *{flex:0 0 auto}
 .nav-a{white-space:nowrap}
 .brand span{white-space:nowrap}
-.brand{margin-right:auto}
-.nav{margin-left:0;margin-right:4px}
-.nav{margin-left:0}
+/* The bar is wider than its contents here, and whichever element carries the
+   auto margin collects every pixel of that slack. On the brand it opened a
+   185px hole between the logo and the first menu item. The nav takes it, so
+   the slack lands where it belongs: before the theme button and the CTA. */
+.brand{margin-right:0}
+.nav{margin-left:0;margin-right:auto}
 
 .burger{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
   background:none;border:1px solid var(--line2);
