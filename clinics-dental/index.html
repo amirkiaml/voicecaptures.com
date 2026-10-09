@@ -1263,7 +1263,10 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav{gap:1px}
 .nav-dash .dot,.nav-live .nav-pulse{flex:0 0 auto}
 .theme-btn{width:38px;height:38px}
-header .btn.nav-cta{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px}
+/* .btn is display:inline-block, so a fixed height just made a 38px box with
+   the label sitting at the top of it. The flex centring is what holds it. */
+header .btn.nav-cta{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px;
+  display:inline-flex;align-items:center;justify-content:center;line-height:1}
 header .btn.nav-cta::before{display:none}
 
 /* The demo line belongs to home services, so it is signposted there rather
