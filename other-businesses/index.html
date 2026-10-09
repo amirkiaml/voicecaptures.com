@@ -1247,7 +1247,10 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 @media (max-width:1020px){
   .nav{display:none}
   .burger{display:flex}
-  .nav-cta{display:none}
+  /* Specific enough to beat header .btn.nav-cta, which sets display to make
+     the label sit centred. Without that weight the CTA stayed in the bar on a
+     phone and ran off the right edge. */
+  header .bar .btn.nav-cta{display:none}
   .theme-btn{margin-left:0;margin-right:0}
 }
 @media (min-width:1021px){ .mnav{display:none} }
