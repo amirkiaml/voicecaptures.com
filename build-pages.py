@@ -64,6 +64,7 @@ SHELL = """<!DOCTYPE html>
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,0.15);
   --cyan:#22D3EE; --cyan-lt:#67E8F9;
   --wb:#A78BFA; --wb-dk:#C4B5FD; --wb-glow:rgba(167,139,250,.14);
+  --red:#E24B4A;
   --display:'Manrope',sans-serif; --body:'DM Sans',sans-serif;
 }}
 html[data-theme="light"]{{
@@ -73,6 +74,7 @@ html[data-theme="light"]{{
   --blue:#2563EB; --blue-dk:#1D4ED8; --blue-glow:rgba(37,99,235,.12);
   --cyan:#0E93B8; --cyan-lt:#0B7C9C;
   --wb:#7C3AED; --wb-dk:#6D28D9; --wb-glow:rgba(124,58,237,.10);
+  --red:#D13B3A;
 }}
 *{{margin:0;padding:0;box-sizing:border-box;min-width:0}}
 html{{overflow-x:clip}}
@@ -390,7 +392,83 @@ body[data-page="win-back"] .nav-a.nav-dash:hover,
 body[data-page="win-back"] .mnav-dash:hover{{background:rgba(59,130,246,.14);
   border-color:rgba(59,130,246,.7)}}
 body[data-page="win-back"] .mnav-dash .tag{{color:#3B82F6;background:rgba(59,130,246,.14)}}
+/* The receptionist CTA is not part of this product either. */
+body[data-page="win-back"] .nav-stack .btn-primary{{background:#2563EB;border-color:#2563EB;color:#fff}}
+body[data-page="win-back"] .nav-stack .btn-primary:hover{{background:#1D4ED8;border-color:#1D4ED8;color:#fff}}
 body[data-page="win-back"] .eyebrow{{color:var(--wb)}}
+
+/* ---- The one contact form. Lifted from the home page, where it used to sit
+   inside the sector flow; the markup and class names are unchanged so the two
+   do not drift apart. ---- */
+.in-card{{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
+  border-radius:16px;padding:clamp(24px,4vw,36px)}}
+html[data-theme="light"] .in-card{{box-shadow:0 6px 20px rgba(13,23,41,.06)}}
+.in-leg{{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}}
+.in-leg + .in-row{{margin-top:0}}
+.in-card .in-leg:not(:first-child){{margin-top:26px}}
+.in-row{{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));
+  gap:14px;margin-bottom:14px}}
+.in-f{{display:block}}
+.in-f > span{{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}}
+.in-f > span em{{font-style:normal;color:var(--faint)}}
+.in-f input,.in-f select,.in-f textarea{{width:100%;background:var(--bg2);
+  border:1px solid var(--line2);border-radius:9px;padding:12px 14px;color:var(--text);
+  font-family:var(--body);font-size:14.5px}}
+.in-f textarea{{resize:vertical;line-height:1.55}}
+.in-f input:focus,.in-f select:focus,.in-f textarea:focus{{outline:2px solid var(--cyan);
+  outline-offset:1px}}
+.in-f select{{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
+                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}}
+.in-note{{font-size:11.5px;color:var(--faint);margin:18px 0 14px;line-height:1.6}}
+.in-go{{width:100%;padding:15px}}
+.in-msg{{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;min-height:18px}}
+.in-msg.err{{color:var(--red)}}
+.in-msg.ok{{color:var(--cyan)}}
+.in-alt{{text-align:center;margin-top:26px;font-size:14px;color:var(--muted)}}
+
+/* ---- Sector dropdown, so the bar is the same one the home page has ---- */
+.nav-drop{{position:relative;display:flex;align-items:center}}
+.nav-trigger{{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  background:none;border:1px solid var(--line2);border-radius:9px}}
+.nav-trigger:hover{{border-color:color-mix(in srgb,var(--cyan) 50%,transparent)}}
+.nav-trigger[aria-expanded="true"]{{border-color:var(--cyan);color:var(--cyan)}}
+html[data-theme="light"] .nav-trigger{{border-color:rgba(18,35,63,.22);color:#12233f}}
+html[data-theme="light"] .nav-trigger:hover{{border-color:#2563EB;color:#1D4ED8}}
+.nav-car{{width:12px;height:12px;opacity:.75;transition:transform .2s}}
+.nav-trigger[aria-expanded="true"] .nav-car{{transform:rotate(180deg);opacity:1}}
+.nav-menu{{position:absolute;left:0;top:calc(100% + 12px);min-width:292px;padding:8px;
+  border-radius:14px;background:var(--bg2);border:1px solid var(--line);
+  box-shadow:0 22px 52px rgba(0,0,0,.45);z-index:60}}
+html[data-theme="light"] .nav-menu{{box-shadow:0 22px 52px rgba(13,23,41,.14)}}
+.nav-menu[hidden]{{display:none}}
+.nav-menu a{{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
+  align-items:center;padding:11px 13px;border-radius:11px;text-decoration:none}}
+.nav-menu a:hover{{background:rgba(127,127,127,.09)}}
+.nav-menu a i{{grid-row:1/span 2;width:4px;height:26px;border-radius:2px;display:block;
+  background:var(--line2);transition:background .16s}}
+.nav-menu a:hover i{{background:var(--cyan)}}
+.nav-menu a b{{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}}
+.nav-menu a em{{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}}
+.nav-menu .nm-h{{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:10px 0 2px;padding:10px 13px 0;border-top:1px solid var(--line)}}
+
+/* ---- The paired "try it" actions, stacked, as on the home page ---- */
+.nav-stack{{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-left:4px}}
+.nav-stack .btn{{height:32px;padding:0 15px;font-size:12.5px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:999px;box-shadow:none}}
+.nav-stack .nav-pulse{{width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  flex:0 0 auto;box-shadow:0 0 10px var(--cyan)}}
+@media (max-width:1240px){{
+  .nav{{display:none}}
+  .nav-stack{{display:none}}
+  .burger{{display:flex}}
+}}
+@media (min-width:1241px){{ .mnav{{display:none}} }}
 
 /* ---- Win-back ---- */
 .wb-hero{{padding-top:clamp(40px,5vw,62px)}}
@@ -524,13 +602,27 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <span>VoiceCaptures</span>
     </a>
     <nav class="nav" aria-label="Main">
-      <a class="nav-a" href="/">Home</a>
+      <div class="nav-drop">
+        <button type="button" class="nav-a nav-trigger" id="nav-sectors" aria-expanded="false" aria-haspopup="true">
+          AI receptionist
+          <svg class="nav-car" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor"
+                  stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="nav-menu" id="nav-menu" hidden>
+          <a href="/personal/"><i></i><b>Personal line</b><em>Screens calls to your own phone</em></a>
+          <p class="nm-h">Businesses</p>
+          <a href="/home-services/"><i></i><b>Home services</b><em>Plumbing, HVAC, electrical</em></a>
+          <a href="/restaurants-cafes/"><i></i><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, takeout, catering</em></a>
+          <a href="/clinics-dental/"><i></i><b>Clinics &amp; dental</b><em>Patients, bookings, overflow</em></a>
+          <a href="/other-businesses/"><i></i><b>Something else</b><em>Salons, studios, venues</em></a>
+        </div>
+      </div>
       <a class="nav-a nav-wb" href="/win-back/"{cur_winback}>Win-back</a>
-      <a class="nav-a" href="/about/"{cur_about}>About</a>
-      <a class="nav-a" href="/careers/"{cur_careers}>Careers</a>
-      <a class="nav-a" href="/#intake">Contact</a>
+      <a class="nav-a" href="/contact/"{cur_contact}>Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login" title="Members dashboard — for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
+      <a class="nav-a nav-dash" href="/login" title="Members dashboard &mdash; for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
             aria-expanded="false" aria-controls="mnav">
@@ -540,6 +632,10 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
+    <div class="nav-stack">
+      <a class="btn btn-primary" href="/#yourline">Try it on your business</a>
+      <a class="btn btn-ghost" href="/#demo"><span class="nav-pulse" aria-hidden="true"></span>Try our demo line</a>
+    </div>
   </div>
 
   <div class="mnav" id="mnav" hidden>
@@ -564,7 +660,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <p class="mnav-h">Company</p>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
-      <a class="mnav-a sub" href="/#intake">Contact</a>
+      <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
         <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
@@ -585,15 +681,32 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
-      <a href="/#intake">Contact</a>
+      <a href="/contact/">Contact</a>
       <a href="/privacy/">Privacy Policy</a>
       <a href="/terms/">Terms of Service</a>
     </div>
     <a href="mailto:{email}">{email}</a>
+    <span class="desc">A human-sounding AI receptionist, configured for your business</span>
   </div>
 </footer>
 
 <script>
+(function(){{
+  var d = document.querySelector(".nav-drop");
+  if (d) {{
+    var t = d.querySelector(".nav-trigger"), m = d.querySelector(".nav-menu");
+    function shut(){{ m.hidden = true; t.setAttribute("aria-expanded", "false"); }}
+    t.addEventListener("click", function(e){{
+      e.stopPropagation();
+      if (m.hidden) {{ m.hidden = false; t.setAttribute("aria-expanded", "true"); }}
+      else shut();
+    }});
+    m.addEventListener("click", function(e){{ e.stopPropagation(); }});
+    document.addEventListener("click", shut);
+    document.addEventListener("keydown", function(e){{ if (e.key === "Escape") shut(); }});
+  }}
+}})();
+
 (function(){{
   var btn = document.getElementById("theme-btn");
   if (!btn) return;
@@ -731,7 +844,7 @@ ABOUT_BODY = f"""
     you within a day. If you would rather talk it through,
     <a href="{CAL}" target="_blank" rel="noopener">book a 30-minute call</a>.</p>
     <div class="pcta" style="margin-top:22px">
-      <a class="btn btn-primary" href="/#intake">Contact us</a>
+      <a class="btn btn-primary" href="/contact/">Contact us</a>
       <a class="btn btn-ghost" href="mailto:{EMAIL}">{EMAIL}</a>
     </div>
   </div>
@@ -1186,7 +1299,6 @@ WINBACK_BODY = f"""
     ones who are ready.</p>
     <div class="btns-l">
       <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Book a 30-minute chat</a>
-      <a class="btn btn-ghost" href="#sample">Hear a sample call</a>
     </div>
     <div class="badges" style="margin-top:22px">
       <span class="badge">Bookings on your calendar</span>
@@ -1503,22 +1615,6 @@ WINBACK_BODY = f"""
   </div>
 </section>
 
-<section class="alt" id="sample">
-  <div class="wrap">
-    <h2>Hear a sample call</h2>
-    <p class="lede">A recorded outbound call, start to finish.</p>
-    <!-- PLACEHOLDER: drop the recording at /winback-sample.mp3 and swap this
-         note for the player. -->
-    <div class="formwrap" style="max-width:720px">
-      <p style="margin:0 0 12px">Sample recording coming shortly.</p>
-      <p style="margin:0;color:var(--muted)">In the meantime, the demo line on
-      <a href="tel:+16476921081">+1 (647) 692-1081</a> is the <strong>inbound
-      receptionist</strong> &mdash; call it and you will hear the voice quality.
-      Outbound campaigns run on the same engine; the voice, tone, pacing and
-      script are set per business.</p>
-    </div>
-  </div>
-</section>
 
 <section>
   <div class="wrap center">
@@ -1915,7 +2011,138 @@ federal laws of Canada that apply there.</p>
 
 # ---------------------------------------------------------------- build ----
 
+CONTACT_BODY = f"""
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Contact</p>
+    <h1>Tell us what you <span class="hl">need.</span></h1>
+    <p class="lede">One form for everything &mdash; a receptionist, a win-back
+    campaign, or a question. A few details and we will come back within a day.
+    No obligation.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <form class="in-card" id="in-form">
+      <p class="in-leg">Contact</p>
+      <div class="in-row">
+        <label class="in-f"><span>First name</span><input id="in-first" required autocomplete="given-name"></label>
+        <label class="in-f"><span>Last name</span><input id="in-last" autocomplete="family-name"></label>
+      </div>
+      <div class="in-row">
+        <label class="in-f"><span>Email</span><input id="in-email" type="email" required autocomplete="email"></label>
+        <label class="in-f"><span>Phone</span><input id="in-phone" type="tel" required autocomplete="tel"></label>
+      </div>
+
+      <p class="in-leg">About you</p>
+      <div class="in-row">
+        <label class="in-f"><span>Business name</span><input id="in-business" required autocomplete="organization" placeholder="Or your own name"></label>
+        <label class="in-f"><span>What you do</span><select id="in-type"></select></label>
+      </div>
+      <div class="in-row">
+        <label class="in-f"><span>Software you use</span><select id="in-system"></select></label>
+        <label class="in-f"><span>What you&rsquo;re after</span><select id="in-plan"></select></label>
+      </div>
+
+      <label class="in-f"><span>Anything else <em>optional</em></span>
+        <textarea id="in-comments" rows="3" placeholder="How calls reach you today, what you&rsquo;d want it to handle, anything unusual."></textarea>
+      </label>
+
+      <p class="in-note">Whatever you pick here shapes the onboarding. Nothing is locked in.</p>
+      <button class="btn btn-primary in-go" type="submit" id="in-go">Send it over</button>
+      <p class="in-msg" id="in-msg"></p>
+    </form>
+
+    <p class="in-alt">Would rather talk it through?
+      <a href="{CAL}" target="_blank" rel="noopener">Book a 30-minute call</a>,
+      or email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+  </div>
+</section>
+"""
+
+CONTACT_SCRIPT = f"""
+<script>
+(function(){{
+  var API = "{API}";
+  var TYPES = ["Home services & trades","Restaurant, caf\u00e9 or bar",
+    "Clinic, dental or medical","Health, wellness or veterinary",
+    "Salon, spa or fitness","Professional services \u2014 legal, real estate, consulting",
+    "A personal line, not a business","Something else"];
+  var SYSTEMS = ["None \u2014 phone and calendar","Google Calendar",
+    "Outlook or Microsoft 365","Calendly","Jobber","Housecall Pro","ServiceTitan",
+    "Square","Acuity or Squarespace Scheduling","Mindbody","Jane",
+    "Dentrix, Open Dental or Eaglesoft","OpenTable, Resy or Toast",
+    "HubSpot or another CRM","Something else","Not sure"];
+  var PLANS = ["AI receptionist for my business","Personal line (beta)",
+    "Win-back campaign","A custom build we own","Not sure yet"];
+
+  function $(id){{ return document.getElementById(id); }}
+  function esc(t){{ return String(t).replace(/[&<>"]/g, function(c){{
+    return {{ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }}[c]; }}); }}
+  function fill(el, opts){{
+    el.innerHTML = '<option value="">Select\u2026</option>' + opts.map(function(o){{
+      return '<option value="' + esc(o) + '">' + esc(o) + "</option>"; }}).join("");
+  }}
+  fill($("in-type"), TYPES); fill($("in-system"), SYSTEMS); fill($("in-plan"), PLANS);
+
+  var form = $("in-form");
+  form.addEventListener("submit", function(e){{
+    e.preventDefault();
+    var btn = $("in-go"), m = $("in-msg");
+    var payload = {{
+      first_name:    $("in-first").value.trim(),
+      last_name:     $("in-last").value.trim(),
+      email:         $("in-email").value.trim(),
+      phone:         $("in-phone").value.trim(),
+      business_name: $("in-business").value.trim(),
+      business_type: $("in-type").value,
+      system:        $("in-system").value,
+      plan:          $("in-plan").value,
+      comments:      $("in-comments").value.trim(),
+      vertical:      "contact",
+      source:        "site"
+    }};
+    if (!payload.first_name || !payload.email || !payload.business_name) {{
+      m.className = "in-msg err";
+      m.textContent = "Name, email and business name, and we can take it from there.";
+      return;
+    }}
+    // This is a phone product; a number is how the conversation starts.
+    if (payload.phone.replace(/\D/g, "").length < 10) {{
+      m.className = "in-msg err";
+      m.textContent = "A phone number too \u2014 it's the quickest way to sort the setup.";
+      return;
+    }}
+    m.className = "in-msg"; m.textContent = "Sending\u2026"; btn.disabled = true;
+
+    fetch(API + "/intake-form", {{
+      method: "POST", headers: {{ "Content-Type": "application/json" }},
+      body: JSON.stringify(payload)
+    }})
+    .then(function(r){{ return r.json(); }})
+    .then(function(d){{
+      if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't send that.");
+      m.className = "in-msg ok";
+      m.textContent = "Got it \u2014 we'll come back to you within a day.";
+      form.reset();
+      fill($("in-type"), TYPES); fill($("in-system"), SYSTEMS); fill($("in-plan"), PLANS);
+    }})
+    .catch(function(err){{
+      m.className = "in-msg err";
+      m.textContent = (err.message || "Couldn't send that.") + " Or email {EMAIL}.";
+    }})
+    .then(function(){{ btn.disabled = false; }});
+  }});
+}})();
+</script>
+"""
+
 PAGES = [
+    ("contact", "Contact VoiceCaptures",
+     "Tell us what you need \u2014 an AI receptionist, a win-back campaign, or a "
+     "question. One form, and we come back within a day.", CONTACT_BODY, CONTACT_SCRIPT),
+
     ("win-back", "Outbound campaigns | VoiceCaptures",
      "Bring back customers you already have. We call your past customers, book "
      "them on your calendar, and send you the results. From $59 per booking or "
@@ -1951,6 +2178,7 @@ def main():
             title=title, desc=desc, slug=slug, body=body, script=script,
             email=EMAIL, cal=CAL,
             cur_about=' aria-current="page"' if slug == "about" else "",
+            cur_contact=' aria-current="page"' if slug == "contact" else "",
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
         )
