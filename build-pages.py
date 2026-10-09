@@ -770,9 +770,9 @@ ABOUT_BODY = f"""
     <p class="eyebrow">About us</p>
     <h1>Every call answered. <span class="hl">Every lead captured.</span></h1>
     <p class="lede">VoiceCaptures builds AI voice assistants that answer the phone
-    for small and mid-sized businesses across Toronto and the GTA &mdash; so the
-    calls that arrive while you are on a job, mid-service or closed for the night
-    still turn into booked work.</p>
+    for small and mid-sized businesses, wherever they are &mdash; so the calls
+    that arrive while you are on a job, mid-service or closed for the night still
+    turn into booked work.</p>
   </div>
 </section>
 
@@ -808,11 +808,10 @@ ABOUT_BODY = f"""
     worse product.</p>
 
     <h2>Where we are</h2>
-    <p>We are based in {ADDR}, and work with businesses across the city and the
-    wider GTA. Being local matters more than it sounds:
-    we know the neighbourhoods callers name, the trades that get seasonal
-    spikes, and the difference between a slow Tuesday and a phone that has been
-    ringing out for a week.</p>
+    <p>We are headquartered in {ADDR}, and we work with businesses wherever they
+    are. The assistant answers on your existing number, so nothing about the
+    setup depends on where you or we happen to be: numbers, time zones, hours,
+    currency and the way the assistant speaks are configured per business.</p>
   </div>
 </section>
 
@@ -1910,23 +1909,14 @@ own record deleted sooner, email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 until you ask us to delete them.</p>
 
 <h2>Where your information is stored and processed</h2>
-<p>Call records we keep are stored in Canada. To run calls and texts, our voice
-and phone providers process call audio and messages in the United States, where
-they may be subject to US law.</p>
-
-<h2>Service providers</h2>
-<p>We use the following providers to operate the service. Your information is
-shared with them only so that the service can run, and for no other purpose.</p>
-<dl>
-  <dt>Twilio</dt><dd>Phone calls and text messages.</dd>
-  <dt>Vapi</dt><dd>Running the assistant&rsquo;s side of the conversation.</dd>
-  <dt>Supabase</dt><dd>Data storage, in Canada.</dd>
-  <dt>Railway</dt><dd>Hosting our servers.</dd>
-  <dt>Stripe</dt><dd>Billing for our business clients.</dd>
-  <dt>Google Calendar</dt><dd>Where a business client has connected one, so bookings
-      land on their calendar.</dd>
-</dl>
-<p>Each provider receives only what it needs to run the service.</p>
+<p>The call records we keep &mdash; recordings, transcripts and call details
+&mdash; are stored in Canada. To place and answer calls and to run the
+assistant&rsquo;s side of the conversation, we use telephony and AI providers
+that process call audio and messages in the United States and keep their own
+short-lived copy, typically for up to 14 days, before deleting it. While that
+information is with them it may be subject to US law. We use service providers
+only to run the service, and each one receives only what it needs to do its
+part.</p>
 
 <h2>Your rights</h2>
 <p>You can ask to see, correct or delete the information we hold about you. Email
@@ -2204,7 +2194,7 @@ PAGES = [
 
     ("about", "About VoiceCaptures",
      "VoiceCaptures builds AI voice assistants that answer the phone for small "
-     "businesses across Toronto and the GTA. Who we are, how we build, and how "
+     "businesses wherever they are. Who we are, how we build, and how "
      "to reach us.", ABOUT_BODY, ABOUT_SCRIPT),
 
     ("careers", "Careers | VoiceCaptures",
