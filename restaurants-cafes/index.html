@@ -1190,6 +1190,7 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav-a{white-space:nowrap}
 .brand span{white-space:nowrap}
 .brand{margin-right:auto}
+.nav{margin-left:0;margin-right:4px}
 .nav{margin-left:0}
 
 .burger{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
@@ -1242,7 +1243,7 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 @media (max-width:1240px){
   .nav{display:none}
   .burger{display:flex}
-  header .bar .nav-stack{display:none}
+  .nav-cta{display:none}
   .theme-btn{margin-left:0;margin-right:0}
 }
 @media (min-width:1241px){ .mnav{display:none} }
@@ -1258,19 +1259,21 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav{gap:1px}
 .nav-dash .dot,.nav-live .nav-pulse{flex:0 0 auto}
 .theme-btn{width:38px;height:38px}
-/* The two "try it" actions are one pair, so they sit as a pair: stacked, the
-   same width, at a size that keeps the header the height it already was. */
-.nav-stack{display:flex;flex-direction:column;align-items:stretch;gap:6px}
-header .nav-stack .btn.nav-cta{height:32px;padding:0 15px 0 3px;font-size:12.5px;gap:8px}
-header .nav-stack .btn.nav-cta::before{width:26px;height:26px}
-header .nav-stack .btn.nav-cta2{height:32px;padding:0 15px;font-size:12.5px;
-  font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  background:none;border:1px solid var(--line2);color:var(--text);border-radius:999px;
-  box-shadow:none}
-header .nav-stack .btn.nav-cta2:hover{border-color:color-mix(in srgb,var(--cyan) 55%,transparent);
-  color:var(--text);background:none}
-html[data-theme="light"] header .nav-stack .btn.nav-cta2{border-color:rgba(18,35,63,.22)}
-html[data-theme="light"] header .nav-stack .btn.nav-cta2:hover{border-color:#2563EB;color:#12233f}
+header .btn.nav-cta{height:44px;padding:0 18px 0 4px;font-size:13.5px;gap:9px}
+header .btn.nav-cta::before{width:36px;height:36px}
+
+/* The demo line belongs to home services, so it is signposted there rather
+   than sold as a separate button in the bar. */
+.nm-demo{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
+  font-family:var(--body);font-style:normal;font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;cursor:pointer;
+  color:var(--cyan);background:color-mix(in srgb,var(--cyan) 15%,transparent);
+  border-radius:999px;padding:3px 9px;margin-left:8px}
+.nm-demo:hover{background:color-mix(in srgb,var(--cyan) 26%,transparent)}
+.nm-demo .pulse{width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);animation:nmblip 1.7s ease-in-out infinite}
+@keyframes nmblip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){ .nm-demo .pulse{animation:none} }
 
 /* Amber in the panel too, so "Book a call" reads the same whichever nav the
    visitor is using. */
@@ -1416,7 +1419,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
         <div class="nav-menu" id="nav-menu" hidden>
           <button type="button" data-goto="personal"><i data-h="personal"></i><b>Personal line</b><em>Screens calls to your own phone</em></button>
           <p class="nm-h">Businesses</p>
-          <button type="button" data-goto="home"><i data-h="home"></i><b>Home services</b><em>Plumbing, HVAC, electrical</em></button>
+          <button type="button" data-goto="home"><i data-h="home"></i><b>Home services <span class="nm-demo" data-demo-go><span class="pulse" aria-hidden="true"></span>Try the demo</span></b><em>Plumbing, HVAC, electrical</em></button>
           <button type="button" data-goto="food"><i data-h="food"></i><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, takeout, catering</em></button>
           <button type="button" data-goto="clinic"><i data-h="clinic"></i><b>Clinics &amp; dental</b><em>Patients, bookings, overflow</em></button>
           <button type="button" data-goto="other"><i data-h="other"></i><b>Something else</b><em>Salons, studios, venues</em></button>
@@ -1435,10 +1438,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <div class="nav-stack">
-      <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
-      <a class="btn nav-cta2" id="nav-demo" href="#demo"><span class="nav-pulse" aria-hidden="true"></span>Try our demo line</a>
-    </div>
+    <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
   </div>
 
   <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
@@ -1457,7 +1457,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       </a>
       <button type="button" class="mnav-a sub" data-goto="personal">Personal line</button>
       <p class="mnav-h">Businesses</p>
-      <button type="button" class="mnav-a sub" data-goto="home">Home services</button>
+      <button type="button" class="mnav-a sub" data-goto="home">Home services <span class="nm-demo" data-demo-go><span class="pulse" aria-hidden="true"></span>Try the demo</span></button>
       <button type="button" class="mnav-a sub" data-goto="food">Restaurants &amp; caf&eacute;s</button>
       <button type="button" class="mnav-a sub" data-goto="clinic">Clinics &amp; dental</button>
       <button type="button" class="mnav-a sub" data-goto="other">Something else</button>
@@ -1468,7 +1468,6 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-ghost" href="#demo" data-demo>Try the demo line</a>
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
            target="_blank" rel="noopener">Book a call</a>
         <a class="btn btn-primary" href="#yourline" data-close>Try it on your business</a>
@@ -2803,6 +2802,17 @@ window.addEventListener("popstate", function(){
   menu.addEventListener("click", function(e){
     var b = e.target.closest("button[data-goto]");
     if (!b) return;
+    // The demo badge sits inside the Home services row; clicking it means the
+    // demo, not the sector page it is pinned to.
+    if (e.target.closest("[data-demo-go]")) {
+      select("home");
+      close();
+      setTimeout(function(){
+        var t = document.getElementById("demo");
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+      return;
+    }
     select(b.getAttribute("data-goto"));
     close();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2828,23 +2838,6 @@ window.addEventListener("popstate", function(){
   document.addEventListener("click", close);
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
 
-  // "Demo line" only exists on the sectors that have one; send the others to
-  // home services rather than to a hidden section.
-  var demoLink = document.getElementById("nav-demo");
-  if (demoLink) {
-    demoLink.addEventListener("click", function(e){
-      // Switching the sector unhides #demo, but the browser has already
-      // resolved the anchor by then and lands nowhere. Do the scroll by hand,
-      // after the section exists.
-      e.preventDefault();
-      var sec = document.getElementById("demo");
-      if (!sec || sec.hidden) select("home");
-      setTimeout(function(){
-        var t = document.getElementById("demo");
-        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 60);
-    });
-  }
 })();
 
 /* ---- Hear it answer your line + waitlist -------------------------------
@@ -3091,6 +3084,15 @@ if (!reduced && window.IntersectionObserver) {
 
   panel.addEventListener("click", function(e){
     var go = e.target.closest("[data-goto]");
+    if (go && e.target.closest("[data-demo-go]")) {
+      select("home");
+      close();
+      setTimeout(function(){
+        var t = document.getElementById("demo");
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+      return;
+    }
     if (go) {
       select(go.getAttribute("data-goto"));
       close();

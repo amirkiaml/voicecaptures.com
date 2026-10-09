@@ -427,16 +427,22 @@ html[data-theme="light"] .nav-menu{box-shadow:0 22px 52px rgba(13,23,41,.14)}
 .nav-menu .nm-h{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   color:var(--faint);margin:10px 0 2px;padding:10px 13px 0;border-top:1px solid var(--line)}
 
-/* ---- The paired "try it" actions, stacked, as on the home page ---- */
-.nav-stack{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-left:4px}
-.nav-stack .btn{height:32px;padding:0 15px;font-size:12.5px;font-weight:600;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border-radius:999px;box-shadow:none}
-.nav-stack .nav-pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);
-  flex:0 0 auto;box-shadow:0 0 10px var(--cyan)}
+header .btn.nav-cta{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px}
+
+/* The demo line belongs to home services, so it is signposted there rather
+   than sold as a separate button in the bar. */
+.nm-demo{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
+  font-family:var(--body);font-style:normal;font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;
+  color:var(--cyan);background:color-mix(in srgb,var(--cyan) 15%,transparent);
+  border-radius:999px;padding:3px 9px;margin-left:8px}
+.nm-demo .pulse{width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);animation:nmblip 1.7s ease-in-out infinite}
+@keyframes nmblip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){ .nm-demo .pulse{animation:none} }
 @media (max-width:1240px){
   .nav{display:none}
-  .nav-stack{display:none}
+  header .bar .btn.nav-cta{display:none}
   .burger{display:flex}
 }
 @media (min-width:1241px){ .mnav{display:none} }
@@ -584,7 +590,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
         <div class="nav-menu" id="nav-menu" hidden>
           <a href="/personal/"><i></i><b>Personal line</b><em>Screens calls to your own phone</em></a>
           <p class="nm-h">Businesses</p>
-          <a href="/home-services/"><i></i><b>Home services</b><em>Plumbing, HVAC, electrical</em></a>
+          <a href="/home-services/"><i></i><b>Home services <span class="nm-demo" data-demo-go><span class="pulse" aria-hidden="true"></span>Try the demo</span></b><em>Plumbing, HVAC, electrical</em></a>
           <a href="/restaurants-cafes/"><i></i><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, takeout, catering</em></a>
           <a href="/clinics-dental/"><i></i><b>Clinics &amp; dental</b><em>Patients, bookings, overflow</em></a>
           <a href="/other-businesses/"><i></i><b>Something else</b><em>Salons, studios, venues</em></a>
@@ -603,10 +609,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <div class="nav-stack">
-      <a class="btn btn-primary" href="/#yourline">Try it on your business</a>
-      <a class="btn btn-ghost" href="/#demo"><span class="nav-pulse" aria-hidden="true"></span>Try our demo line</a>
-    </div>
+    <a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>
   </div>
 
   <div class="mnav" id="mnav" hidden>
@@ -622,7 +625,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="mnav-a" href="/">Home</a>
       <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a sub" href="/personal/">Personal line</a>
-      <a class="mnav-a sub" href="/home-services/">Home services</a>
+      <a class="mnav-a sub" href="/home-services/">Home services <span class="nm-demo" data-demo-go><span class="pulse" aria-hidden="true"></span>Try the demo</span></a>
       <a class="mnav-a sub" href="/restaurants-cafes/">Restaurants &amp; caf&eacute;s</a>
       <a class="mnav-a sub" href="/clinics-dental/">Clinics &amp; dental</a>
       <a class="mnav-a sub" href="/other-businesses/">Something else</a>
@@ -772,6 +775,13 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     document.addEventListener("click", shut);
     document.addEventListener("keydown", function(e){ if (e.key === "Escape") shut(); });
   }
+  // The badge sits inside the Home services row; clicking it means the demo,
+  // not the sector page it is pinned to.
+  document.addEventListener("click", function(e){
+    if (!e.target.closest("[data-demo-go]")) return;
+    e.preventDefault();
+    location.href = "/home-services/#demo";
+  }, true);
 })();
 
 (function(){
