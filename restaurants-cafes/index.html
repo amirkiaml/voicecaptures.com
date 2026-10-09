@@ -1947,7 +1947,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       </div>
       <div class="in-row">
         <label class="in-f"><span id="in-l-sys">Software you use</span><select id="in-system"></select></label>
-        <label class="in-f"><span>Plan you're considering</span><select id="in-plan"></select></label>
+        <label class="in-f"><span>What you're after</span><select id="in-plan"></select></label>
       </div>
 
       <label class="in-f"><span>Anything else <em>optional</em></span>
@@ -2021,20 +2021,12 @@ var INTAKE = {
   typeLabel: "What you do",
   sysLabel: "Software you use",
   types: [
-    "Home services \u2014 plumbing, HVAC, electrical",
-    "Trades & contracting",
+    "Home services & trades",
     "Restaurant, caf\u00e9 or bar",
     "Clinic, dental or medical",
-    "Health & wellness",
-    "Veterinary",
-    "Salon, spa or barber",
-    "Fitness studio or gym",
-    "Auto services",
-    "Real estate or property",
-    "Legal, accounting or consulting",
-    "Education or tutoring",
-    "Events or venue",
-    "Retail or e-commerce",
+    "Health, wellness or veterinary",
+    "Salon, spa or fitness",
+    "Professional services \u2014 legal, real estate, consulting",
     "A personal line, not a business",
     "Something else"
   ],
@@ -2365,13 +2357,13 @@ function renderIntake(key, cfg, tiers){
   }
   fill($("in-type"), c.types, "Select\u2026");
   fill($("in-system"), c.systems, "Select\u2026");
-  // The tier prices are no longer public above Starter, so the dropdown must
-  // not leak them back.
-  fill($("in-plan"),
-    (tiers || []).map(function(t, n){
-      return t[0] + " (" + t[1] + "/mo)";
-    }).concat(["Win-back campaign", "Not sure yet"]),
-    "Select\u2026");
+  fill($("in-plan"), [
+    "AI receptionist for my business",
+    "Personal line (beta)",
+    "Win-back campaign",
+    "A custom build we own",
+    "Not sure yet"
+  ], "Select\u2026");
 }
 
 function renderStats(v){
