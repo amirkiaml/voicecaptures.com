@@ -115,9 +115,8 @@ html[data-theme="light"] .nav-a:hover{{background:rgba(13,23,41,.05)}}
    CTA and the cyan demo-line dot, so the three don't compete. ---- */
 .theme-btn{{flex:0 0 auto;width:38px;height:38px;border-radius:10px;cursor:pointer;
   background:none;border:1px solid var(--line2);color:var(--muted);
-  display:flex;align-items:center;justify-content:center;margin-left:auto;
+  display:flex;align-items:center;justify-content:center;margin-left:0;
   transition:color .18s,border-color .18s}}
-.nav + .theme-btn{{margin-left:0}}
 .theme-btn:hover{{color:var(--text)}}
 .theme-btn svg{{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;
   stroke-linecap:round;stroke-linejoin:round}}
@@ -307,8 +306,10 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{{
    still reach Members, Careers and the rest. ---- */
 .bar > *{{flex:0 0 auto}}
 .nav > *{{flex:0 0 auto}}
-.brand{{margin-right:auto}}
-.nav{{margin-left:0}}
+/* The auto margin goes on the nav, not the brand: on the brand it collects
+   the bar's slack right after the logo and opens a hole there. */
+.brand{{margin-right:0}}
+.nav{{margin-left:0;margin-right:0}}
 .burger{{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
   background:none;border:1px solid var(--line2);
   align-items:center;justify-content:center;flex-direction:column;gap:4px;margin-left:auto}}
@@ -392,9 +393,6 @@ body[data-page="win-back"] .nav-a.nav-dash:hover,
 body[data-page="win-back"] .mnav-dash:hover{{background:rgba(59,130,246,.14);
   border-color:rgba(59,130,246,.7)}}
 body[data-page="win-back"] .mnav-dash .tag{{color:#3B82F6;background:rgba(59,130,246,.14)}}
-/* The receptionist CTA is not part of this product either. */
-body[data-page="win-back"] .nav-stack .btn-primary{{background:#2563EB;border-color:#2563EB;color:#fff}}
-body[data-page="win-back"] .nav-stack .btn-primary:hover{{background:#1D4ED8;border-color:#1D4ED8;color:#fff}}
 body[data-page="win-back"] .eyebrow{{color:var(--wb)}}
 
 /* ---- The one contact form. Lifted from the home page, where it used to sit
@@ -456,7 +454,10 @@ html[data-theme="light"] .nav-menu{{box-shadow:0 22px 52px rgba(13,23,41,.14)}}
 .nav-menu .nm-h{{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   color:var(--faint);margin:10px 0 2px;padding:10px 13px 0;border-top:1px solid var(--line)}}
 
-header .btn.nav-cta{{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px}}
+/* A fixed height with the button's own padding still in play pushed the label
+   off centre; the flex centring is what actually holds it. */
+header .btn.nav-cta{{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px;
+  display:inline-flex;align-items:center;justify-content:center;line-height:1}}
 
 /* The demo line belongs to home services, so it is signposted there rather
    than sold as a separate button in the bar. */
@@ -469,12 +470,12 @@ header .btn.nav-cta{{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px
   box-shadow:0 0 8px var(--cyan);animation:nmblip 1.7s ease-in-out infinite}}
 @keyframes nmblip{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:.3;transform:scale(.8)}}}}
 @media (prefers-reduced-motion:reduce){{ .nm-demo .pulse{{animation:none}} }}
-@media (max-width:1240px){{
+@media (max-width:1020px){{
   .nav{{display:none}}
   header .bar .btn.nav-cta{{display:none}}
   .burger{{display:flex}}
 }}
-@media (min-width:1241px){{ .mnav{{display:none}} }}
+@media (min-width:1021px){{ .mnav{{display:none}} }}
 
 /* ---- Win-back ---- */
 .wb-hero{{padding-top:clamp(40px,5vw,62px)}}
@@ -636,7 +637,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>
+{cta}
   </div>
 
   <div class="mnav" id="mnav" hidden>
@@ -2155,6 +2156,8 @@ def main():
             email=EMAIL, cal=CAL,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",
+            cta="" if slug == "win-back" else
+                '<a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>',
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
         )

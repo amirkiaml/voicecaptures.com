@@ -1189,12 +1189,13 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav > *{flex:0 0 auto}
 .nav-a{white-space:nowrap}
 .brand span{white-space:nowrap}
-/* The bar is wider than its contents here, and whichever element carries the
-   auto margin collects every pixel of that slack. On the brand it opened a
-   185px hole between the logo and the first menu item. The nav takes it, so
-   the slack lands where it belongs: before the theme button and the CTA. */
+/* The page body runs on a 1240px rail, but the bar's contents need about a
+   thousand, so 200px of slack had to live somewhere and wherever it went it
+   read as a hole. The bar gets the same 1060px rail the other pages use, and
+   the CTA the same plain pill, so everything sits together. */
+.bar{max-width:1060px}
 .brand{margin-right:0}
-.nav{margin-left:0;margin-right:auto}
+.nav{margin-left:0;margin-right:0}
 
 .burger{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
   background:none;border:1px solid var(--line2);
@@ -1243,13 +1244,13 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 
 /* Swap to the burger while the inline bar still fits comfortably, rather than
    at the point where it starts to break. */
-@media (max-width:1240px){
+@media (max-width:1020px){
   .nav{display:none}
   .burger{display:flex}
   .nav-cta{display:none}
   .theme-btn{margin-left:0;margin-right:0}
 }
-@media (min-width:1241px){ .mnav{display:none} }
+@media (min-width:1021px){ .mnav{display:none} }
 
 /* ---- Bar rhythm --------------------------------------------------------
    The controls had measured 34, 43, 51 and 58px tall side by side, which is
@@ -1262,8 +1263,8 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .nav{gap:1px}
 .nav-dash .dot,.nav-live .nav-pulse{flex:0 0 auto}
 .theme-btn{width:38px;height:38px}
-header .btn.nav-cta{height:44px;padding:0 18px 0 4px;font-size:13.5px;gap:9px}
-header .btn.nav-cta::before{width:36px;height:36px}
+header .btn.nav-cta{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px}
+header .btn.nav-cta::before{display:none}
 
 /* The demo line belongs to home services, so it is signposted there rather
    than sold as a separate button in the bar. */
@@ -1441,7 +1442,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <a class="btn btn-primary btn-arrow nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
+    <a class="btn btn-primary nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
   </div>
 
   <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
