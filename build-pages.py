@@ -1952,13 +1952,26 @@ emergency service; callers with emergencies are told to call 911.</p>
 <p>Each plan covers one business location, with the minutes, lines and calendars
 shown on our pricing page. Two or more locations need a plan for each location,
 or a quote from us.</p>
+<p>When locations go live on different dates, each one is billed from the day its
+line goes live, prorated to a single billing date for the account. Your quote
+names the planned go-live date for each location.</p>
 
 <h2>Free trial</h2>
-<p>Your first 14 days are free, up to 100 minutes of calls, on your real business
-number. We take a card when you sign up. If you don&rsquo;t cancel before the
-trial ends, your plan starts automatically on day 15 and we charge that card. We
-email you a reminder before the trial ends. Cancel during the trial and you pay
-nothing.</p>
+<p>Your first 14 days are free, up to 100 minutes of calls, at one location, on
+your real business number. We take a card when you sign up. If you don&rsquo;t
+cancel before the trial ends, your plan starts automatically on day 15 and we
+charge that card. We email you a reminder before the trial ends. Cancel during
+the trial and you pay nothing.</p>
+<p><strong>The 14 days start when your line goes live</strong> &mdash; the day
+calls begin reaching the assistant &mdash; not the day you sign up. Setup time
+does not come out of your trial.</p>
+<p><strong>If you reach 100 minutes before the trial ends</strong>, the line keeps
+answering. We call you and start your plan early rather than letting calls go
+unanswered.</p>
+<p><strong>More than one location:</strong> the trial covers one location, which
+is enough to show you how the assistant handles your calls. Your remaining
+locations go live on the paid plan. Multi-location trials run 21 days, since more
+people are usually involved in the decision.</p>
 
 <h2>Billing and taxes</h2>
 <p>Plans are billed monthly in Canadian dollars, in advance, on the same date each
@@ -1994,7 +2007,9 @@ least 30 days before your term ends &mdash; in practice, during its final month,
 3-month term hears from us in month 2, a 6-month term in month 5 and a 12-month term in
 month 11.</p>
 <p><strong>If you cancel part-way through a prepaid term</strong>, we refund what you
-paid less our standard monthly rate for each month you were live. The discount applies
+paid less our standard monthly rate for each month you were live. Cancellation
+takes effect at the end of the month it is requested in, and that month counts as
+used, so you keep the service you have paid for. The discount applies
 only to a completed term, so leaving early means you simply paid the normal monthly
 price for the months you used. Refunds go back to the original payment method within
 10 business days.</p>
