@@ -1987,6 +1987,12 @@ plan is 300 minutes each month, not 3,600 to spend at will.</p>
 <p><strong>Extra minutes are billed as they happen</strong>, at $100 per 100 minutes,
 and are not taken out of your prepayment. As with any plan, we tell you before adding
 them.</p>
+<p><strong>When a term ends</strong>, your plan carries on month to month at our
+current monthly price. It does not renew automatically into another prepaid term, and
+we never charge you for a new term unless you ask for one. We email you the rate at
+least 30 days before your term ends &mdash; in practice, during its final month, so a
+3-month term hears from us in month 2, a 6-month term in month 5 and a 12-month term in
+month 11.</p>
 <p><strong>If you cancel part-way through a prepaid term</strong>, we refund what you
 paid less our standard monthly rate for each month you were live. The discount applies
 only to a completed term, so leaving early means you simply paid the normal monthly
@@ -2062,9 +2068,12 @@ indirect or consequential loss, including lost business, bookings or revenue.</p
 
 <h2>Changes</h2>
 <p>We will email you at least 30 days before we change these terms or your price.
-If you don&rsquo;t agree, you can cancel before the change takes effect. A price
-change never applies to a prepaid term that is already running: your rate holds
-until that term ends.</p>
+That applies whether you pay monthly or by prepaid term. If you don&rsquo;t agree,
+you can cancel before the change takes effect.</p>
+<p>A price change never applies to a prepaid term that is already running: your rate
+holds until that term ends. You hear the new rate at least 30 days before then, during
+the final month of your term, so you can renew, move to monthly or leave with the
+numbers in front of you.</p>
 
 <h2>Governing law</h2>
 <p>These terms are governed by the laws of Ontario and the federal laws of Canada
