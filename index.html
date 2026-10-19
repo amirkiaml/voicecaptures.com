@@ -1402,6 +1402,15 @@ html[data-theme="light"] .tswitch{background:#eef2f9}
   color:var(--muted);background:none;border:0;border-radius:10px;cursor:pointer;
   padding:9px 16px;transition:background .16s,color .16s}
 .tswitch button em{font-style:normal;font-size:11px;font-weight:500;color:var(--faint)}
+/* The deepest saving carries the badge: a visitor who decides a year is too
+   much steps down to six months, not back to monthly. */
+.tswitch button.best{position:relative;padding-top:14px}
+.tswitch button.best i{position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  font-style:normal;font-size:9px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;white-space:nowrap;color:#fff;background:var(--blue);
+  border-radius:999px;padding:3px 8px}
+html[data-theme="dark"] .tswitch button.best i{background:var(--cyan);color:#05070c}
+.tswitch{padding-top:14px}
 .tswitch button:hover{color:var(--text)}
 .tswitch button[aria-pressed="true"]{background:var(--bg3);color:var(--text);
   box-shadow:0 1px 3px rgba(0,0,0,.18)}
@@ -1413,7 +1422,9 @@ html[data-theme="dark"] .tswitch button[aria-pressed="true"] em{color:var(--cyan
   margin:0 auto 24px}
 .tswitch-note[hidden]{display:none}
 @media (max-width:620px){
-  .tswitch{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  /* Two rows means the badge needs a gutter above its row to sit in. */
+  .tswitch{display:grid;grid-template-columns:1fr 1fr;width:100%;
+    gap:16px 4px;padding-top:16px}
 }
 
 /* The total, under the effective monthly price. */
@@ -1832,7 +1843,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <button type="button" data-term="1"  aria-pressed="true">Monthly<em>pay as you go</em></button>
       <button type="button" data-term="3"  aria-pressed="false">3 months<em>save 5%</em></button>
       <button type="button" data-term="6"  aria-pressed="false">6 months<em>save 10%</em></button>
-      <button type="button" data-term="12" aria-pressed="false">12 months<em>2 months free</em></button>
+      <button type="button" data-term="12" aria-pressed="false" class="best"><i>Best value</i>12 months<em>2 months free</em></button>
     </div>
     <p class="tswitch-note" id="term-note" hidden>Paid once, up front. Cancel early and
       we refund what you paid less the standard monthly rate for the months you used
