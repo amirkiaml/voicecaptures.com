@@ -2278,6 +2278,7 @@ var V = {
     tiers: []
   },
   clinic: {
+    rec: 2,
 
     eyebrow: "AI voice agents for businesses that live on the phone",
     headline: "Every call answered. Every job booked.<br><span class=\"hl\">Details texted to you.</span>",
@@ -2532,8 +2533,11 @@ function renderTiers(v){
   var tiers = typeof v.tiers === "string" ? V[v.tiers].tiers : v.tiers;
   if (!tiers || !tiers.length) return;
   var T = TERMS[term] || TERMS[1];
+  // Most ladders recommend the middle rung; a clinic with several
+  // practitioners outgrows it, so that vertical points at the top one.
+  var recIdx = typeof v.rec === "number" ? v.rec : 1;
   $("tiers").innerHTML = tiers.map(function(t, n){
-    var rec = n === 1;
+    var rec = n === recIdx;
     // t = [name, price, minutes, approx calls, features, price suffix, opts]
     // opts: {from, scope, note, cta:[label, href]} -- a plan priced per
     // location needs a different price line and footnote from the rest.
