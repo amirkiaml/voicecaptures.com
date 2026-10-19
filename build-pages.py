@@ -1936,8 +1936,8 @@ TERMS_BODY = f"""<main class="wrap doc">
 <p class="updated">Last updated: {UPDATED}</p>
 
 <p class="intro">These terms cover your <strong>{BRAND}</strong> subscription and
-any campaign you run with us. By ticking the box at checkout, or by signing a
-quote with us, you agree to them. {BRAND} is a registered business in Ontario,
+any campaign you run with us. By starting your free trial, adding a payment
+method, or signing a quote with us, you agree to them. {BRAND} is a registered business in Ontario,
 Canada.</p>
 
 <h2>The service</h2>
