@@ -1981,8 +1981,8 @@ and integration work is quoted in writing and billed separately. You can update
 your card or download invoices at any time from your billing portal.</p>
 
 <h2>Minutes</h2>
-<p>A minute is time our assistant spends on a live call, including transfers. Spam
-calls are not counted. Unused minutes don&rsquo;t carry over. We text you when you
+<p>A minute is time our assistant spends on a live call, including transfers.
+Unused minutes don&rsquo;t carry over. We text you when you
 reach 80% of your monthly minutes. If you go over, we will offer you extra
 minutes, at $100 per 100 minutes, or a larger plan. We will not charge you for
 extra minutes without telling you first.</p>
