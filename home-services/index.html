@@ -2109,7 +2109,7 @@ var V = {
     ring: 1.1, audio: null, biz: "Kettle Row Coffee", len: null,
     smsBody: '<b>Catering lead</b><br>Priya S. \u00b7 647 \u2022\u2022\u2022-\u2022\u2022\u2022\u2022<br>40 people \u00b7 Thu 9 AM<br>250 University Ave, 12th floor<br>Coffee + pastries \u2014 call back to quote',
     smsAt: 8.6,
-    callNote: "Illustration of a hospitality call. The restaurant agent is a pilot.",
+    callNote: "Illustration of a hospitality call.",
     convo: [
       [1.1,"caller","Do you do catering? I need coffee and pastries for about 40 people Thursday morning."],
       [3.1,"agent","We do. Forty people, Thursday \u2014 what time and where should we deliver?"],
@@ -2128,7 +2128,7 @@ var V = {
     demoTag: "Pilot — demo on request",
     demoTitle: "Hear the hospitality agent",
     demoBody: "We'll set up a demo line so you can call in as a guest booking a table for four on Friday, or ordering pickup.",
-    demoNote: "The restaurant agent is a pilot. Menu, hours and cover limits are configured per venue, and it books and takes callback details — it does not process payments or write to a POS.",
+    demoNote: "Menu, hours and cover limits are configured per venue. It books and takes callback details \u2014 it does not process payments or write to a POS.",
     demoCta: "Request a restaurant demo",
     lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Caf\u00e9s \u00b7 Restaurants \u00b7 Takeout",
@@ -2236,7 +2236,7 @@ var V = {
     agentLabel: "Your line \u00b7 screening",
     smsBody: '<b>Screened</b><br>Caller said: BMO, about your credit card<br>Left a callback number<br>Not spam \u2014 worth returning',
     smsAt: 8.4,
-    callNote: "Placeholder \u2014 real recordings from the beta go here.",
+    callNote: "Recordings go up when the personal line opens.",
     convo: [
       [1.1,"caller","Hi, I'm calling from an unknown number about an urgent matter."],
       [3.1,"agent","Sure \u2014 who's calling, and what's it regarding?"],
@@ -2296,7 +2296,7 @@ var V = {
     demoTag: "Pilot — demo on request",
     demoTitle: "Clinic agent, built per practice",
     demoBody: "We stand up a demo line configured for your specialty, your providers and your booking rules, then hand you the number to call.",
-    demoNote: "The clinic agent is a pilot, scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
+    demoNote: "The clinic agent is scoped to booking and callback details only. It does not take health information, does not give clinical advice, and escalates clinical questions to your staff. We do not claim HIPAA or PHIPA compliance and it does not write to an EMR.",
     demoCta: "Request a clinic demo",
     lede: "An AI receptionist that answers on your existing number, books into your calendar live on the call, and texts you and your caller the details.",
     trades: "Dental \u00b7 Vet \u00b7 Physio \u00b7 Chiro",
@@ -2359,7 +2359,7 @@ var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: r
 
 /* ---- Hero call card ------------------------------------------------------
    Home services plays the real recording and reveals the transcript against
-   audio.currentTime. The pilot verticals have no recording, so the same
+   audio.currentTime. Some verticals have no recording, so the same
    renderer runs on a clock instead. One component, two clocks. ------------ */
 var MK = {
   phone: null, tick: null, els: [], v: null, playing: false, t0: 0

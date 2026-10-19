@@ -993,7 +993,7 @@ CAREERS_BODY = f"""
     <h1>Build with <span class="hl">VoiceCaptures</span></h1>
     <p class="lede">We're building AI voice systems that help businesses answer
     every call, qualify customers, and capture more opportunities.</p>
-    <p class="lede">We're a small, early-stage team looking for people who want
+    <p class="lede">We're a small team looking for people who want
     real ownership, direct exposure to customers, and the chance to help shape
     how the company grows.</p>
     <div class="badges">
