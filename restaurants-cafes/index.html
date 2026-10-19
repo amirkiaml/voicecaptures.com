@@ -1388,6 +1388,40 @@ html[data-theme="light"] .pblock{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 .tier .loc{font-size:13px;color:var(--muted);margin-top:3px}
 .tier-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0 0 14px}
 
+/* ---- Billing term switch ------------------------------------------------
+   Four terms, not two, so a segmented control beats a toggle: a switch with
+   more than two positions has to show every position at once. ---- */
+.tswitch{display:inline-flex;flex-wrap:wrap;gap:4px;margin:0 auto 10px;padding:5px;
+  background:var(--bg2);border:1px solid var(--line);border-radius:14px}
+html[data-theme="light"] .tswitch{background:#eef2f9}
+#pricing-section .wrap{text-align:center}
+#pricing-section .grid,#pricing-section .pblocks,#pricing-section .terms,
+#pricing-section .offer,#pricing-section .beyond{text-align:left}
+.tswitch button{display:flex;flex-direction:column;align-items:center;gap:1px;
+  font-family:var(--body);font-size:14px;font-weight:700;line-height:1.25;
+  color:var(--muted);background:none;border:0;border-radius:10px;cursor:pointer;
+  padding:9px 16px;transition:background .16s,color .16s}
+.tswitch button em{font-style:normal;font-size:11px;font-weight:500;color:var(--faint)}
+.tswitch button:hover{color:var(--text)}
+.tswitch button[aria-pressed="true"]{background:var(--bg3);color:var(--text);
+  box-shadow:0 1px 3px rgba(0,0,0,.18)}
+html[data-theme="light"] .tswitch button[aria-pressed="true"]{background:#fff;
+  box-shadow:0 2px 6px rgba(13,23,41,.10)}
+.tswitch button[aria-pressed="true"] em{color:var(--blue)}
+html[data-theme="dark"] .tswitch button[aria-pressed="true"] em{color:var(--cyan)}
+.tswitch-note{font-size:12.5px;color:var(--muted);line-height:1.6;max-width:620px;
+  margin:0 auto 24px}
+.tswitch-note[hidden]{display:none}
+@media (max-width:620px){
+  .tswitch{display:grid;grid-template-columns:1fr 1fr;width:100%}
+}
+
+/* The total, under the effective monthly price. */
+.tier .billed{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+.tier .billed b{color:var(--text);font-weight:700}
+.tier .billed .save{color:var(--blue);font-weight:600}
+html[data-theme="dark"] .tier .billed .save{color:var(--cyan)}
+
 /* ---- Past the top plan -------------------------------------------------
    The old Enterprise card said "Custom / tailored to your volume" and nothing
    else, so it taught a prospect nothing and cost the row a quarter of its
@@ -1793,6 +1827,17 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     <p class="sub" id="p-trades" style="margin-bottom:10px">Plumbing · HVAC · Electrical · Locksmith · Garage door</p>
     <p class="sub" id="p-note" hidden style="margin-bottom:34px;font-size:13px">No caller health information is stored or logged.</p>
     <p class="payback">One booked job pays for the month.</p>
+
+    <div class="tswitch" id="term-switch" role="group" aria-label="Billing term">
+      <button type="button" data-term="1"  aria-pressed="true">Monthly<em>pay as you go</em></button>
+      <button type="button" data-term="3"  aria-pressed="false">3 months<em>save 5%</em></button>
+      <button type="button" data-term="6"  aria-pressed="false">6 months<em>save 10%</em></button>
+      <button type="button" data-term="12" aria-pressed="false">12 months<em>2 months free</em></button>
+    </div>
+    <p class="tswitch-note" id="term-note" hidden>Paid once, up front. Cancel early and
+      we refund what you paid less the standard monthly rate for the months you used
+      &mdash; see the <a href="/terms/">Terms</a>.</p>
+
     <div class="grid gp" id="tiers"></div>
 
     <div class="beyond">
@@ -2459,21 +2504,44 @@ function renderDemo(v){
 
 }
 
+// Prepaid terms. The discount climbs with the term; 12 months is the same
+// arithmetic as "two months free", which is the version people understand.
+var TERMS = {
+  1:  { months: 1,  off: 0 },
+  3:  { months: 3,  off: 0.05 },
+  6:  { months: 6,  off: 0.10 },
+  12: { months: 12, off: 1 - 10 / 12 }
+};
+var term = 1;
+
+function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+
 function renderTiers(v){
   // A vertical can point at another's tiers instead of repeating them.
   var tiers = typeof v.tiers === "string" ? V[v.tiers].tiers : v.tiers;
   if (!tiers || !tiers.length) return;
+  var T = TERMS[term] || TERMS[1];
   $("tiers").innerHTML = tiers.map(function(t, n){
     var rec = n === 1;
     // t = [name, price, minutes, approx calls, features, price suffix, opts]
     // opts: {from, scope, note, cta:[label, href]} -- a plan priced per
-    // location needs a different price line, CTA and footnote from the rest.
+    // location needs a different price line and footnote from the rest.
     var o = t[6] || {};
+    var monthly = parseFloat(String(t[1]).replace(/[^0-9.]/g, "")) || 0;
+    var total   = Math.round(monthly * T.months * (1 - T.off));
+    var perMo   = T.months > 1 ? Math.round(total / T.months) : monthly;
+    var saved   = Math.round(monthly * T.months) - total;
+
     return '<div class="tier">' +
       '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
       (rec ? '<span class="pop">Recommended</span>' : "") + "</div>" +
-      '<div class="price">' + (o.from ? "From " : "") + esc(t[1]) + "<em>/mo" +
+      '<div class="price">' + (o.from ? "From " : "") + money(perMo) + "<em>/mo" +
         (t[5] ? " " + esc(t[5]) : "") + " + HST</em></div>" +
+      (T.months > 1
+        ? '<p class="billed"><b>' + money(total) + "</b> paid once for " + T.months +
+          " months" + (t[5] ? " " + esc(t[5]) : "") +
+          ' &middot; <span class="save">save ' + money(saved) + "</span></p>"
+        : "") +
       '<div class="mins">' + esc(t[2]) +
         (t[3] ? ' <span class="approx">(' + esc(t[3]) + ")</span>" : "") + "</div>" +
       (o.scope === null ? "" :
@@ -2482,9 +2550,8 @@ function renderTiers(v){
         return "<div><span>&#10003;</span><span>" + esc(f) + "</span></div>";
       }).join("") + "</div>" +
       (o.note ? '<p class="tier-note">' + esc(o.note) + "</p>" : "") +
-      '<a class="btn ' + (rec ? "btn-primary" : "btn-ghost") + '" href="' +
-        (o.cta ? esc(o.cta[1]) + '" target="_blank" rel="noopener' : "/contact/") +
-        '">' + (o.cta ? esc(o.cta[0]) : "Start free trial") + "</a>" +
+      '<a class="btn ' + (rec ? "btn-primary" : "btn-ghost") + '" href="' + CAL +
+        '" target="_blank" rel="noopener">Book a 30-minute call</a>' +
       "</div>";
   }).join("");
   $("p-trades").textContent = v.trades;
@@ -2492,6 +2559,22 @@ function renderTiers(v){
   pn.textContent = v.priceNote || "";
   pn.hidden = !v.priceNote;
 }
+
+(function(){
+  var sw = document.getElementById("term-switch");
+  if (!sw) return;
+  sw.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-term]");
+    if (!b) return;
+    term = parseInt(b.getAttribute("data-term"), 10) || 1;
+    sw.querySelectorAll("button[data-term]").forEach(function(x){
+      x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    });
+    var note = document.getElementById("term-note");
+    if (note) note.hidden = term === 1;
+    renderTiers(V[key]);
+  });
+})();
 
 function calc(){
   var v = V[key];

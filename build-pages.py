@@ -15,7 +15,7 @@ Replaces the older build-legal.py. Delete that file; deploy.ps1 calls this one.
 import pathlib
 
 ROOT = pathlib.Path(__file__).parent
-UPDATED = "9 October 2026"
+UPDATED = "19 October 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 # The legal owner's name is deliberately not published. Carriers and
@@ -1962,7 +1962,7 @@ nothing.</p>
 
 <h2>Billing and taxes</h2>
 <p>Plans are billed monthly in Canadian dollars, in advance, on the same date each
-month, to the card you gave us. Prices are before HST and other applicable taxes,
+month, to the card you gave us, unless you have bought a prepaid term. Prices are before HST and other applicable taxes,
 which are added to your bill. Add-ons are billed with your plan. One-time setup
 and integration work is quoted in writing and billed separately. You can update
 your card or download invoices at any time from your billing portal.</p>
@@ -1974,6 +1974,25 @@ reach 80% of your monthly minutes. If you go over, we will offer you extra
 minutes, at $100 per 100 minutes, or a larger plan. We will not charge you for
 extra minutes without telling you first.</p>
 
+<h2>Prepaid terms</h2>
+<p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
+rises with the term. The prices are on our pricing page. A prepaid term begins after
+your free trial ends, not instead of it.</p>
+<p><strong>Your rate is fixed for the term.</strong> If our prices change while your
+term is running, yours does not. The new price applies only when you renew, and we
+tell you before that happens.</p>
+<p><strong>Minutes stay monthly.</strong> Your allowance is per month and unused
+minutes do not carry over. Prepaying does not pool them: twelve months of a 300-minute
+plan is 300 minutes each month, not 3,600 to spend at will.</p>
+<p><strong>Extra minutes are billed as they happen</strong>, at $100 per 100 minutes,
+and are not taken out of your prepayment. As with any plan, we tell you before adding
+them.</p>
+<p><strong>If you cancel part-way through a prepaid term</strong>, we refund what you
+paid less our standard monthly rate for each month you were live. The discount applies
+only to a completed term, so leaving early means you simply paid the normal monthly
+price for the months you used. Refunds go back to the original payment method within
+10 business days.</p>
+
 <h2>Missed payments</h2>
 <p>If a payment fails, we retry it and email you. If it still hasn&rsquo;t gone
 through after about two weeks, your subscription is cancelled and the line stops
@@ -1982,7 +2001,8 @@ answering.</p>
 <h2>Cancelling</h2>
 <p>Cancel anytime from your billing portal or by emailing
 <a href="mailto:{EMAIL}">{EMAIL}</a>. After the trial, your service runs to the end
-of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. When
+of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. If you
+are on a prepaid term, the refund rule under Prepaid terms applies instead. When
 you leave, turn off call forwarding on your phone so calls ring through to you
 again.</p>
 
@@ -2042,7 +2062,9 @@ indirect or consequential loss, including lost business, bookings or revenue.</p
 
 <h2>Changes</h2>
 <p>We will email you at least 30 days before we change these terms or your price.
-If you don&rsquo;t agree, you can cancel before the change takes effect.</p>
+If you don&rsquo;t agree, you can cancel before the change takes effect. A price
+change never applies to a prepaid term that is already running: your rate holds
+until that term ends.</p>
 
 <h2>Governing law</h2>
 <p>These terms are governed by the laws of Ontario and the federal laws of Canada
