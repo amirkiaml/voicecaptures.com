@@ -290,9 +290,19 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{
 .burger[aria-expanded="true"] span:nth-child(2){opacity:0}
 .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .mnav{border-top:1px solid var(--line);background:var(--bg2);
-  max-height:calc(100vh - 68px);overflow-y:auto}
+  /* The old calc(100vh - 68px) was a stale guess at the header height: the bar
+     is taller now and the announcement bar sits above it on phones, so the last
+     button in .mnav-foot fell below the fold. JS measures the panel's real top
+     and writes --mnav-max; these are the no-JS fallback, and dvh so mobile
+     browser chrome counts. */
+  max-height:var(--mnav-max,calc(100vh - 124px));overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+@supports (height:100dvh){
+  .mnav{max-height:var(--mnav-max,calc(100dvh - 124px))}
+}
 .mnav[hidden]{display:none}
-.mnav-in{max-width:1060px;margin:0 auto;padding:14px clamp(18px,4vw,24px) 20px}
+.mnav-in{max-width:1060px;margin:0 auto;
+  padding:14px clamp(18px,4vw,24px) calc(26px + env(safe-area-inset-bottom,0px))}
 .mnav-a{display:block;width:100%;text-align:left;font-family:var(--body);font-size:16px;
   font-weight:600;color:var(--text);background:none;border:0;cursor:pointer;margin:0;
   padding:11px 12px;border-radius:10px;text-decoration:none;line-height:1.4}
@@ -850,16 +860,27 @@ Toronto, Ontario, Canada<br>
 (function(){
   var btn = document.getElementById("burger"), panel = document.getElementById("mnav");
   if (!btn || !panel) return;
+  // Measured, not hard-coded: the sticky header's height varies, so the panel
+  // is sized to whatever is on screen below it or its last button is clipped.
+  function fit(){
+    if (panel.hidden) return;
+    var top = panel.getBoundingClientRect().top;
+    panel.style.setProperty("--mnav-max",
+      Math.max(180, Math.round(window.innerHeight - top - 6)) + "px");
+  }
   function close(){ panel.hidden = true; btn.setAttribute("aria-expanded","false"); }
   btn.addEventListener("click", function(e){
     e.stopPropagation();
-    if (panel.hidden) { panel.hidden = false; btn.setAttribute("aria-expanded","true"); }
+    if (panel.hidden) { panel.hidden = false; btn.setAttribute("aria-expanded","true"); fit(); }
     else close();
   });
+  window.addEventListener("orientationchange", fit);
+  window.addEventListener("scroll", fit, { passive: true });
   panel.addEventListener("click", function(e){ if (e.target.closest("a")) close(); });
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
   window.addEventListener("resize", function(){
     if (window.innerWidth > 900 && !panel.hidden) close();
+    else fit();
   });
 })();
 </script>
