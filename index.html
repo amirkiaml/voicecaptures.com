@@ -1505,8 +1505,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 <body>
 
 <a class="anno" id="anno" data-demo-link data-src="anno"
-   href="https://voicecaptures-selfserve-production.up.railway.app?src=anno"
-   target="_blank" rel="noopener">
+   href="/demo/?src=anno">
   <span class="anno-dot" aria-hidden="true"></span>
   <b>New &mdash; build your own demo assistant in seconds.</b>
   <span class="anno-sub">Answer a few questions and hear it answer as your business. Free, no call needed.</span>
@@ -1550,7 +1549,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
     <a class="btn btn-primary nav-cta demo-cta" id="nav-cta" data-demo-link data-src="nav"
-       href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+       href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
   </div>
 
   <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
@@ -1575,7 +1574,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
            target="_blank" rel="noopener">Book a call</a>
         <a class="btn btn-primary demo-cta" data-demo-link data-src="nav"
-           href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+           href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
       </div>
     </div>
   </div>
@@ -1598,7 +1597,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <div class="hero-btns">
         <a class="btn btn-primary btn-arrow demo-cta" id="hero-demo" data-demo-link data-src="website"
-           href="https://voicecaptures-selfserve-production.up.railway.app?src=website" target="_blank" rel="noopener">Build your demo</a>
+           href="/demo/?src=website">Build your demo</a>
         <a class="btn btn-ghost btn-arrow" id="hero-cta" href="/contact/">Tell us about your line</a>
       </div>
       <p class="fine" id="hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days free at one location, up to 100 minutes. Cancel before day 15 and you pay nothing.</p>
@@ -2014,8 +2013,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
     <p class="foot-demo">Curious how it would sound for you?
-      <a data-demo-link data-src="website" href="https://voicecaptures-selfserve-production.up.railway.app?src=website"
-         target="_blank" rel="noopener">Build your own demo assistant in seconds &rarr;</a></p>
+      <a data-demo-link data-src="website" href="/demo/?src=website">Build your own demo assistant in seconds &rarr;</a></p>
   </div>
 </footer>
 
@@ -2026,10 +2024,11 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 
 var CAL = "https://calendly.com/hello-voicecaptures/30min";
 
-// Self-serve demo. Change this one line to move the demo to another host; it
-// rewrites every [data-demo-link] on load. The href in the markup is the
-// no-JS fallback and should be kept in step when the host changes.
-var DEMO = "https://voicecaptures-selfserve-production.up.railway.app";
+// Every demo entry point now goes through our own /demo/ page, which holds
+// the real builder URL in one constant and forwards the query string. Keeping
+// the hop means the builder can move hosts without touching this file. The
+// href in the markup is the no-JS fallback and should match.
+var DEMO = "/demo/";
 (function(){
   var links = document.querySelectorAll("[data-demo-link]");
   for (var i = 0; i < links.length; i++) {

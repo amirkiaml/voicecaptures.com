@@ -490,6 +490,20 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
 }
 @media (min-width:1021px){ .mnav{display:none} }
 
+/* ---- /demo/ ----
+   One job per screen: headline, one button, one phone number. Narrower rail
+   than .wrap so the lede does not run long on a wide monitor. */
+.demo-in{max-width:620px}
+.demo-go{min-height:48px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:16px;padding:14px 32px;line-height:1.2}
+.demo-call{margin-top:20px}
+/* Padding, not just colour: the tel: link has to be a 44px target on a phone. */
+.demo-call a{color:var(--blue);font-weight:700;display:inline-block;
+  min-height:44px;padding:10px 0;line-height:24px}
+.demo-call a:hover{text-decoration:underline}
+/* --blue on near-black does not clear AA; the cyan ramp does. */
+html[data-theme="dark"] .demo-call a{color:var(--cyan)}
+
 /* ---- Win-back ---- */
 .wb-hero{padding-top:clamp(40px,5vw,62px)}
 .wb-art{display:block;margin-top:38px}
@@ -649,7 +663,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-<a class="btn btn-primary nav-cta demo-cta" href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+<a class="btn btn-primary nav-cta demo-cta" href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
   </div>
 
   <div class="mnav" id="mnav" hidden>
@@ -668,7 +682,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary demo-cta" href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+        <a class="btn btn-primary demo-cta" href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -743,7 +757,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
     <p class="foot-demo">Curious how it would sound for you?
-      <a href="https://voicecaptures-selfserve-production.up.railway.app?src=website" target="_blank" rel="noopener">Build your own demo assistant in seconds &rarr;</a></p>
+      <a href="/demo/?src=website">Build your own demo assistant in seconds &rarr;</a></p>
   </div>
 </footer>
 

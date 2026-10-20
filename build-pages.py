@@ -26,8 +26,13 @@ API = "https://torontoleads-production.up.railway.app"
 CAL = "https://calendly.com/hello-voicecaptures"
 # The 30-minute event, for pages that should skip the chooser.
 CAL30 = CAL + "/30min"
-# Self-serve demo. One place to change the host for every standalone page.
+# The self-serve builder's real host. This is the ONE place it is written;
+# /demo/ is the only page that links to it directly, and switches to
+# https://demo.voicecaptures.com when that DNS record goes live.
 DEMO = "https://voicecaptures-selfserve-production.up.railway.app"
+# Every other link on the site goes through our own page, which forwards the
+# query string on to DEMO. Keeps ?src= tags working and the host swappable.
+DEMO_PAGE = "/demo/"
 
 # ---------------------------------------------------------------- shell ----
 
@@ -523,6 +528,20 @@ header .btn.nav-cta.demo-cta{{animation:demoring 2.8s ease-out infinite}}
 }}
 @media (min-width:1021px){{ .mnav{{display:none}} }}
 
+/* ---- /demo/ ----
+   One job per screen: headline, one button, one phone number. Narrower rail
+   than .wrap so the lede does not run long on a wide monitor. */
+.demo-in{{max-width:620px}}
+.demo-go{{min-height:48px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:16px;padding:14px 32px;line-height:1.2}}
+.demo-call{{margin-top:20px}}
+/* Padding, not just colour: the tel: link has to be a 44px target on a phone. */
+.demo-call a{{color:var(--blue);font-weight:700;display:inline-block;
+  min-height:44px;padding:10px 0;line-height:24px}}
+.demo-call a:hover{{text-decoration:underline}}
+/* --blue on near-black does not clear AA; the cyan ramp does. */
+html[data-theme="dark"] .demo-call a{{color:var(--cyan)}}
+
 /* ---- Win-back ---- */
 .wb-hero{{padding-top:clamp(40px,5vw,62px)}}
 .wb-art{{display:block;margin-top:38px}}
@@ -701,7 +720,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary demo-cta" href="{demo}?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+        <a class="btn btn-primary demo-cta" href="{demo}?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
         <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -728,7 +747,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
     <a href="mailto:{email}">{email}</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
     <p class="foot-demo">Curious how it would sound for you?
-      <a href="{demo}?src=website" target="_blank" rel="noopener">Build your own demo assistant in seconds &rarr;</a></p>
+      <a href="{demo}?src=website">Build your own demo assistant in seconds &rarr;</a></p>
   </div>
 </footer>
 
@@ -2278,7 +2297,46 @@ CONTACT_SCRIPT = f"""
 </script>
 """
 
+# ----------------------------------------------------------------- demo ----
+
+DEMO_BODY = f"""
+<section>
+  <div class="wrap demo-in">
+    <p class="eyebrow">Live demo</p>
+    <h1>Hear your own AI receptionist</h1>
+    <p class="lede">Tell it about your business and talk to it, right in your
+    browser. About 30 seconds to set up.</p>
+    <a class="btn btn-primary demo-go" id="demo-go" href="{DEMO}">Build your demo assistant</a>
+    <p class="fine demo-call">Prefer to call? Try the live demo plumber line at
+    <a href="tel:+16476921081">(647)&nbsp;692-1081</a>.</p>
+  </div>
+</section>
+"""
+
+DEMO_SCRIPT = f"""
+<script>
+(function(){{
+  "use strict";
+  // The builder's host, written once. Switch this to
+  // https://demo.voicecaptures.com once that DNS record is live; the href in
+  // the markup is the no-JS fallback and should be changed with it.
+  var DEMO_URL = "{DEMO}";
+  var a = document.getElementById("demo-go");
+  if (!a) return;
+  // Forward whatever brought the visitor here, so /demo/?src=tradeshow hands
+  // DEMO_URL?src=tradeshow to the builder and the source survives the hop.
+  // Same tab on purpose: the builder is the destination, not a side trip.
+  a.setAttribute("href", DEMO_URL + window.location.search);
+}})();
+</script>
+"""
+
 PAGES = [
+    ("demo", "Hear your own AI receptionist | VoiceCaptures",
+     "Build a demo AI receptionist for your business and talk to it in your "
+     "browser. About 30 seconds to set up, no call and no signup.",
+     DEMO_BODY, DEMO_SCRIPT),
+
     ("contact", "Contact VoiceCaptures",
      "Tell us what you need \u2014 an AI receptionist, a win-back campaign, or a "
      "question. One form, and we come back within a day.", CONTACT_BODY, CONTACT_SCRIPT),
@@ -2316,13 +2374,12 @@ def main():
         folder.mkdir(exist_ok=True)
         html = SHELL.format(
             title=title, desc=desc, slug=slug, body=body, script=script,
-            email=EMAIL, demo=DEMO,
+            email=EMAIL, demo=DEMO_PAGE,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",
             cal=CAL30 if slug == "about" else CAL,
-            cta="" if slug == "win-back" else
-                ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO + '?src=nav"'
-                 ' target="_blank" rel="noopener">'
+            cta="" if slug in ("win-back", "demo") else
+                ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO_PAGE + '?src=nav">'
                  '<span class="spark" aria-hidden="true"></span>'
                  '<span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span>'
                  '<small>in seconds</small></span></a>'),
