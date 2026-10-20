@@ -460,8 +460,9 @@ html[data-theme="light"] .nav-menu{{box-shadow:0 22px 52px rgba(13,23,41,.14)}}
 
 /* A fixed height with the button's own padding still in play pushed the label
    off centre; the flex centring is what actually holds it. */
-header .btn.nav-cta{{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px;
-  display:inline-flex;align-items:center;justify-content:center;line-height:1}}
+header .btn.nav-cta{{height:auto;min-height:44px;padding:5px 16px;font-size:13.5px;
+  margin-left:4px;display:inline-flex;align-items:center;justify-content:center;
+  line-height:1.15}}
 
 /* ---- Self-serve demo CTA, same treatment as the home page ---- */
 .demo-cta .spark{{width:7px;height:7px;border-radius:50%;background:currentColor;
@@ -478,6 +479,19 @@ header .btn.nav-cta.demo-cta{{animation:demoring 2.8s ease-out infinite}}
 @media (prefers-reduced-motion:reduce){{
   .demo-cta .spark,header .btn.nav-cta.demo-cta{{animation:none}}
 }}
+.demo-cta-t{{display:inline-flex;flex-direction:column;align-items:flex-start;
+  line-height:1.15;text-align:left;white-space:nowrap}}
+.demo-cta-t em{{font-style:normal;opacity:.75;font-weight:700}}
+.demo-cta-t small{{font-size:10.5px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;opacity:.72;margin-top:2px}}
+.mnav-foot .demo-cta-t{{align-items:center;text-align:center}}
+.foot-legal a.f-dash{{display:inline-flex;align-items:center;gap:7px;
+  color:var(--text);font-weight:700;
+  border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
+  border-radius:999px;padding:6px 14px;margin:-6px 4px -6px 0}}
+.foot-legal a.f-dash:hover{{background:var(--blue-glow);border-color:var(--blue)}}
+.foot-legal a.f-dash .dot{{width:7px;height:7px;border-radius:50%;background:#38BDF8;
+  flex:0 0 auto;box-shadow:0 0 8px #38BDF8}}
 .foot-demo{{flex-basis:100%;font-size:13px;color:var(--muted);margin-top:4px}}
 .foot-demo a{{color:var(--cyan);font-weight:600}}
 
@@ -649,7 +663,6 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <a class="nav-a nav-wb" href="/win-back/"{cur_winback}>Win-back</a>
       <a class="nav-a" href="/contact/"{cur_contact}>Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
-      <a class="nav-a nav-dash" href="/login" title="Members dashboard &mdash; for VoiceCaptures client businesses"><span class="dot" aria-hidden="true"></span>Dashboard<em class="tag">New</em></a>
     </nav>
     <button type="button" class="burger" id="burger" aria-label="Menu"
             aria-expanded="false" aria-controls="mnav">
@@ -664,14 +677,6 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
 
   <div class="mnav" id="mnav" hidden>
     <div class="mnav-in">
-      <a class="mnav-dash" href="/login">
-        <span class="dot" aria-hidden="true"></span>
-        <span>
-          <span class="mnav-dash-t">Members dashboard</span>
-          <span class="mnav-dash-s">For VoiceCaptures client businesses</span>
-        </span>
-        <em class="tag">New</em>
-      </a>
       <a class="mnav-a" href="/">Home</a>
       <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a sub" href="/personal/">Personal line</a>
@@ -686,7 +691,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary demo-cta" href="{demo}?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo in 2 minutes</a>
+        <a class="btn btn-primary demo-cta" href="{demo}?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
         <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -702,7 +707,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <div class="tl">Answers &middot; Qualifies &middot; Books</div>
     </div>
     <div class="foot-legal">
-      <a href="/login">Client dashboard</a>
+      <a class="f-dash" href="/login"><span class="dot" aria-hidden="true"></span>Client dashboard</a>
       <a class="f-wb" href="/win-back/">Win-back campaigns</a>
       <a href="/about/">About</a>
       <a href="/careers/">Careers</a>
@@ -713,7 +718,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
     <a href="mailto:{email}">{email}</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
     <p class="foot-demo">Curious how it would sound for you?
-      <a href="{demo}?src=website" target="_blank" rel="noopener">Build your own demo assistant in 2 minutes &rarr;</a></p>
+      <a href="{demo}?src=website" target="_blank" rel="noopener">Build your own demo assistant in seconds &rarr;</a></p>
   </div>
 </footer>
 
@@ -2297,7 +2302,9 @@ def main():
             cta="" if slug == "win-back" else
                 ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO + '?src=nav"'
                  ' target="_blank" rel="noopener">'
-                 '<span class="spark" aria-hidden="true"></span>Build your demo &mdash; 2 min</a>'),
+                 '<span class="spark" aria-hidden="true"></span>'
+                 '<span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span>'
+                 '<small>in seconds</small></span></a>'),
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
         )
