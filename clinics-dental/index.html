@@ -58,7 +58,9 @@ section{padding:clamp(52px,7vw,80px) 0}
    The sectors are distinguished by the tab pills and by their content, not by
    repainting the whole page. Keeping a single blue means the hero image, the
    header and every card stay consistent wherever a visitor lands. ---- */
-[data-v="personal"] .anno{display:none}   /* already on that page */
+/* The bar used to point at the personal-line waitlist further down this page,
+   so it hid itself on that tab. It now points at the self-serve builder on
+   another host, which is relevant on every tab. */
 
 /* type */
 h1{font-family:var(--display);font-weight:700;font-size:clamp(29px,4.6vw,47px);letter-spacing:-.02em;line-height:1.1;margin-bottom:20px}
@@ -1502,10 +1504,12 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 </head>
 <body>
 
-<a class="anno" href="#personal" id="anno">
+<a class="anno" id="anno" data-demo-link data-src="anno"
+   href="https://voicecaptures-selfserve-production.up.railway.app?src=anno"
+   target="_blank" rel="noopener">
   <span class="anno-dot" aria-hidden="true"></span>
-  <b>Coming soon &mdash; a personal line for your own phone.</b>
-  <span class="anno-sub">Screens spam, takes messages. $9/mo in beta &mdash; join the waitlist.</span>
+  <b>New &mdash; build your own demo assistant in seconds.</b>
+  <span class="anno-sub">Answer a few questions and hear it answer as your business. Free, no call needed.</span>
   <span class="anno-go" aria-hidden="true">&rarr;</span>
 </a>
 
