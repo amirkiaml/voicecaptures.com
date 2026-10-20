@@ -217,6 +217,9 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
 .demo-cta-t{display:inline-flex;flex-direction:column;align-items:flex-start;
   line-height:1.15;text-align:left;white-space:nowrap}
 .demo-cta-t em{font-style:normal;opacity:.75;font-weight:700}
+/* Two labels, one shown at a time. display:none keeps the hidden one out
+   of the accessibility tree, so the button has exactly one name. */
+.dc-min{display:none}
 .demo-cta-t small{font-size:10.5px;font-weight:600;letter-spacing:.04em;
   text-transform:uppercase;opacity:.72;margin-top:2px}
 .mnav-foot .demo-cta-t{align-items:center;text-align:center}
@@ -1279,6 +1282,10 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 .mnav-dash .tag{margin-left:auto;align-self:flex-start;font-style:normal;font-size:9.5px;
   font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);
   background:var(--blue-glow);border-radius:4px;padding:2px 5px}
+.mnav-top{margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.mnav-top .btn{width:100%;font-size:14.5px;padding:12px 18px;
+  display:inline-flex;align-items:center;justify-content:center}
+.mnav-top .demo-cta-t{align-items:center;text-align:center}
 .mnav-foot{display:flex;flex-direction:column;gap:9px;margin-top:16px;
   padding-top:16px;border-top:1px solid var(--line)}
 .mnav-foot .btn{width:100%;font-size:14.5px;padding:12px 18px}
@@ -1294,13 +1301,41 @@ html[data-theme="dark"] .soon-tag.live{color:#4ADE80}
 @media (max-width:1020px){
   .nav{display:none}
   .burger{display:flex}
-  /* Specific enough to beat header .btn.nav-cta, which sets display to make
-     the label sit centred. Without that weight the CTA stayed in the bar on a
-     phone and ran off the right edge. */
-  header .bar .btn.nav-cta{display:none}
+  /* The CTA used to be hidden outright here, because the two-line version is
+     257px wide and ran off a phone. But the bar is mostly empty on mobile
+     (brand 76 + burger 40 + theme 38 out of 390), and burying the one thing
+     we want tapped behind the burger defeats the point. It shows as a single
+     compact line instead: short label, no second line, no (beta). */
+  header .bar .btn.nav-cta{min-height:38px;padding:0 12px;font-size:12.5px;
+    margin-left:0;letter-spacing:-.01em}
+  header .bar .btn.nav-cta .spark{margin-right:7px}
+  header .bar .btn.nav-cta .demo-cta-t{flex-direction:row;align-items:center}
+  header .bar .btn.nav-cta .dc-full,
+  header .bar .btn.nav-cta em,
+  header .bar .btn.nav-cta small{display:none}
+  header .bar .btn.nav-cta .dc-min{display:inline}
+  /* Under ~370px even the compact pill and the wordmark cannot both fit, so
+     the wordmark goes and the logo mark carries the brand. */
   .theme-btn{margin-left:0;margin-right:0}
 }
 @media (min-width:1021px){ .mnav{display:none} }
+
+/* Measured bar budgets at the narrow end, with the compact CTA now in the
+   bar. At 390 the wordmark alone is 204px on the standalone pages, which
+   pushed the pill 93px past the right edge; the mark carries the brand
+   instead, and .brand keeps aria-label="VoiceCaptures home" so a screen
+   reader still gets the full name. Below 380 that is still not enough, so
+   the bar tightens and the label drops to "Build demo". */
+@media (max-width:480px){
+  header .bar .brand span{display:none}
+}
+@media (max-width:379px){
+  header .bar{padding-left:12px;padding-right:12px;gap:8px}
+  header .bar .btn.nav-cta{padding:0 9px;font-size:12px}
+  header .bar .btn.nav-cta .spark{margin-right:6px}
+  header .bar .btn.nav-cta .dc-y{display:none}
+}
+
 
 /* ---- Bar rhythm --------------------------------------------------------
    The controls had measured 34, 43, 51 and 58px tall side by side, which is
@@ -1549,7 +1584,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
     <a class="btn btn-primary nav-cta demo-cta" id="nav-cta" data-demo-link data-src="nav"
-       href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
+       href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span><span class="dc-full">Build your demo assistant</span><span class="dc-min">Build <span class="dc-y">your </span>demo</span> <em>(beta)</em></span><small>in seconds</small></span></a>
   </div>
 
   <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
@@ -1558,6 +1593,13 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
        or Careers. -->
   <div class="mnav" id="mnav" hidden>
     <div class="mnav-in">
+      <!-- First, not last. In the footer it sat ~625px down the panel, so on a
+           phone you had to scroll the menu to find the one button we most want
+           tapped. -->
+      <div class="mnav-top">
+        <a class="btn btn-primary demo-cta" data-demo-link data-src="nav"
+           href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span><span class="dc-full">Build your demo assistant</span><span class="dc-min">Build <span class="dc-y">your </span>demo</span> <em>(beta)</em></span><small>in seconds</small></span></a>
+      </div>
       <button type="button" class="mnav-a sub" data-goto="personal">Personal line</button>
       <p class="mnav-h">Businesses</p>
       <button type="button" class="mnav-a sub" data-goto="home">Home services <span class="nm-demo" data-demo-go><span class="pulse" aria-hidden="true"></span>Try the demo</span></button>
@@ -1573,8 +1615,6 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <div class="mnav-foot">
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
            target="_blank" rel="noopener">Book a call</a>
-        <a class="btn btn-primary demo-cta" data-demo-link data-src="nav"
-           href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
       </div>
     </div>
   </div>

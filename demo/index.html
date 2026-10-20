@@ -320,6 +320,10 @@ html[data-theme="dark"] .nav-a.nav-dash:hover{
 .mnav-dash .tag{margin-left:auto;align-self:flex-start;font-style:normal;font-size:9.5px;
   font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);
   background:var(--blue-glow);border-radius:4px;padding:2px 5px}
+.mnav-top{margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.mnav-top .btn{width:100%;font-size:14.5px;padding:12px 18px;
+  display:inline-flex;align-items:center;justify-content:center}
+.mnav-top .demo-cta-t{align-items:center;text-align:center}
 .mnav-foot{display:flex;flex-direction:column;gap:9px;margin-top:16px;
   padding-top:16px;border-top:1px solid var(--line)}
 .mnav-foot .btn{width:100%;font-size:14.5px;padding:12px 18px}
@@ -459,6 +463,9 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
 .demo-cta-t{display:inline-flex;flex-direction:column;align-items:flex-start;
   line-height:1.15;text-align:left;white-space:nowrap}
 .demo-cta-t em{font-style:normal;opacity:.75;font-weight:700}
+/* Two labels, one shown at a time. display:none keeps the hidden one out of
+   the accessibility tree, so the button has exactly one name. */
+.dc-min{display:none}
 .demo-cta-t small{font-size:10.5px;font-weight:600;letter-spacing:.04em;
   text-transform:uppercase;opacity:.72;margin-top:2px}
 .mnav-foot .demo-cta-t{align-items:center;text-align:center}
@@ -485,10 +492,37 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
 @media (prefers-reduced-motion:reduce){ .nm-demo .pulse{animation:none} }
 @media (max-width:1020px){
   .nav{display:none}
-  header .bar .btn.nav-cta{display:none}
+  /* Was display:none. The two-line pill ran off a phone, but the bar is
+     mostly empty on mobile and hiding the main CTA behind the burger defeats
+     the point, so it shows compacted: short label, one line, no (beta). */
+  header .bar .btn.nav-cta{min-height:38px;padding:0 12px;font-size:12.5px;
+    margin-left:0;letter-spacing:-.01em}
+  header .bar .btn.nav-cta .spark{margin-right:7px}
+  header .bar .btn.nav-cta .demo-cta-t{flex-direction:row;align-items:center}
+  header .bar .btn.nav-cta .dc-full,
+  header .bar .btn.nav-cta em,
+  header .bar .btn.nav-cta small{display:none}
+  header .bar .btn.nav-cta .dc-min{display:inline}
   .burger{display:flex}
 }
 @media (min-width:1021px){ .mnav{display:none} }
+
+/* Measured bar budgets at the narrow end, with the compact CTA now in the
+   bar. At 390 the wordmark alone is 204px on the standalone pages, which
+   pushed the pill 93px past the right edge; the mark carries the brand
+   instead, and .brand keeps aria-label="VoiceCaptures home" so a screen
+   reader still gets the full name. Below 380 that is still not enough, so
+   the bar tightens and the label drops to "Build demo". */
+@media (max-width:480px){
+  header .bar .brand span{display:none}
+}
+@media (max-width:379px){
+  header .bar{padding-left:12px;padding-right:12px;gap:8px}
+  header .bar .btn.nav-cta{padding:0 9px;font-size:12px}
+  header .bar .btn.nav-cta .spark{margin-right:6px}
+  header .bar .btn.nav-cta .dc-y{display:none}
+}
+
 
 /* ---- /demo/ ----
    One job per screen: headline, one button, one phone number. Narrower rail
@@ -668,6 +702,11 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
 
   <div class="mnav" id="mnav" hidden>
     <div class="mnav-in">
+      <!-- First, not last: in the footer it sat far enough down the panel that
+           a phone had to scroll the menu to reach the main CTA. -->
+      <div class="mnav-top">
+        <a class="btn btn-primary demo-cta" href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span><span class="dc-full">Build your demo assistant</span><span class="dc-min">Build <span class="dc-y">your </span>demo</span> <em>(beta)</em></span><small>in seconds</small></span></a>
+      </div>
       <a class="mnav-a" href="/">Home</a>
       <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a sub" href="/personal/">Personal line</a>
@@ -682,7 +721,6 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary demo-cta" href="/demo/?src=nav"><span class="spark" aria-hidden="true"></span><span class="demo-cta-t"><span>Build your demo assistant <em>(beta)</em></span><small>in seconds</small></span></a>
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -696,7 +734,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     <h1>Hear your own AI receptionist</h1>
     <p class="lede">Tell it about your business and talk to it, right in your
     browser. About 30 seconds to set up.</p>
-    <a class="btn btn-primary demo-go" id="demo-go" href="https://voicecaptures-selfserve-production.up.railway.app">Build your demo assistant</a>
+    <a class="btn btn-primary demo-go" id="demo-go" href="https://demo.voicecaptures.com">Build your demo assistant</a>
     <p class="fine demo-call">Prefer to call? Try the live demo plumber line at
     <a href="tel:+16476921081">(647)&nbsp;692-1081</a>.</p>
   </div>
@@ -805,7 +843,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
   // The builder's host, written once. Switch this to
   // https://demo.voicecaptures.com once that DNS record is live; the href in
   // the markup is the no-JS fallback and should be changed with it.
-  var DEMO_URL = "https://voicecaptures-selfserve-production.up.railway.app";
+  var DEMO_URL = "https://demo.voicecaptures.com";
   var a = document.getElementById("demo-go");
   if (!a) return;
   // Forward whatever brought the visitor here, so /demo/?src=tradeshow hands
