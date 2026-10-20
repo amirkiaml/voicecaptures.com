@@ -26,6 +26,8 @@ API = "https://torontoleads-production.up.railway.app"
 CAL = "https://calendly.com/hello-voicecaptures"
 # The 30-minute event, for pages that should skip the chooser.
 CAL30 = CAL + "/30min"
+# Self-serve demo. One place to change the host for every standalone page.
+DEMO = "https://voicecaptures-selfserve-production.up.railway.app"
 
 # ---------------------------------------------------------------- shell ----
 
@@ -461,6 +463,24 @@ html[data-theme="light"] .nav-menu{{box-shadow:0 22px 52px rgba(13,23,41,.14)}}
 header .btn.nav-cta{{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px;
   display:inline-flex;align-items:center;justify-content:center;line-height:1}}
 
+/* ---- Self-serve demo CTA, same treatment as the home page ---- */
+.demo-cta .spark{{width:7px;height:7px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;display:inline-block;margin-right:9px;vertical-align:middle;
+  animation:demopulse 1.9s ease-in-out infinite}}
+@keyframes demopulse{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:.35;transform:scale(.72)}}}}
+@keyframes demoring{{
+  0%  {{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 50%,transparent)}}
+  70% {{box-shadow:0 0 0 9px color-mix(in srgb,var(--cyan) 0%,transparent)}}
+  100%{{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 0%,transparent)}}
+}}
+header .btn.nav-cta.demo-cta{{animation:demoring 2.8s ease-out infinite}}
+.mnav-foot .btn.demo-cta{{display:inline-flex;align-items:center;justify-content:center}}
+@media (prefers-reduced-motion:reduce){{
+  .demo-cta .spark,header .btn.nav-cta.demo-cta{{animation:none}}
+}}
+.foot-demo{{flex-basis:100%;font-size:13px;color:var(--muted);margin-top:4px}}
+.foot-demo a{{color:var(--cyan);font-weight:600}}
+
 /* The demo line belongs to home services, so it is signposted there rather
    than sold as a separate button in the bar. */
 .nm-demo{{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
@@ -666,6 +686,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
+        <a class="btn btn-primary demo-cta" href="{demo}?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo in 2 minutes</a>
         <a class="btn btn-amber" href="{cal}" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -691,6 +712,8 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
     </div>
     <a href="mailto:{email}">{email}</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
+    <p class="foot-demo">Curious how it would sound for you?
+      <a href="{demo}?src=website" target="_blank" rel="noopener">Build your own demo assistant in 2 minutes &rarr;</a></p>
   </div>
 </footer>
 
@@ -2267,12 +2290,14 @@ def main():
         folder.mkdir(exist_ok=True)
         html = SHELL.format(
             title=title, desc=desc, slug=slug, body=body, script=script,
-            email=EMAIL,
+            email=EMAIL, demo=DEMO,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",
             cal=CAL30 if slug == "about" else CAL,
             cta="" if slug == "win-back" else
-                '<a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>',
+                ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO + '?src=nav"'
+                 ' target="_blank" rel="noopener">'
+                 '<span class="spark" aria-hidden="true"></span>Build your demo &mdash; 2 min</a>'),
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
         )

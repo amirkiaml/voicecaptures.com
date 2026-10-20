@@ -194,6 +194,28 @@ header .btn-ghost:hover{background:rgba(255,255,255,.22);border-color:rgba(255,2
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8 12h8M13 8l4 4-4 4'/%3E%3C/svg%3E") center/contain no-repeat;
   transition:transform .25s}
 .btn-arrow:hover::before{transform:translateX(3px)}
+/* ---- Self-serve demo CTA ------------------------------------------------
+   The one action worth interrupting for, so it keeps the primary fill and
+   adds a slow ring. The dot follows the pattern already used by the Members
+   pill and the sector menu's demo badge. ---- */
+.demo-cta .spark{width:7px;height:7px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;display:inline-block;margin-right:9px;vertical-align:middle;
+  animation:demopulse 1.9s ease-in-out infinite}
+@keyframes demopulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+@keyframes demoring{
+  0%  {box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 50%,transparent)}
+  70% {box-shadow:0 0 0 9px color-mix(in srgb,var(--cyan) 0%,transparent)}
+  100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 0%,transparent)}
+}
+header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
+.mnav-foot .btn.demo-cta{display:inline-flex;align-items:center;justify-content:center}
+@media (prefers-reduced-motion:reduce){
+  .demo-cta .spark,header .btn.nav-cta.demo-cta{animation:none}
+}
+.foot-demo{flex-basis:100%;font-size:13px;color:var(--muted);margin-top:4px}
+.foot-demo a{color:var(--cyan);font-weight:600}
+.foot-demo a:hover{color:var(--cyan-lt)}
+
 .nav-cta{padding:7px 26px 7px 7px}
 .nav-cta::before{width:38px;height:38px}
 @media (max-width:1000px){ .nav{display:none} }
@@ -1498,7 +1520,8 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-    <a class="btn btn-primary nav-cta" id="nav-cta" href="#yourline">Try it on your business</a>
+    <a class="btn btn-primary nav-cta demo-cta" id="nav-cta" data-demo-link data-src="nav"
+       href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo &mdash; 2 min</a>
   </div>
 
   <!-- Compact nav. Below the breakpoint the inline bar cannot hold its items
@@ -1530,7 +1553,8 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <div class="mnav-foot">
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures/30min"
            target="_blank" rel="noopener">Book a call</a>
-        <a class="btn btn-primary" href="#yourline" data-close>Try it on your business</a>
+        <a class="btn btn-primary demo-cta" data-demo-link data-src="nav"
+           href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo in 2 minutes</a>
       </div>
     </div>
   </div>
@@ -1552,7 +1576,9 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
       <h1 id="headline">You're missing calls.<br><span class="hl">We answer them.</span></h1>
       <p class="lede" id="lede">An AI voice agent picks up every call, qualifies the job, books the slot on your real calendar, and texts you the details — on the number you already use.</p>
       <div class="hero-btns">
-        <a class="btn btn-primary btn-arrow" id="hero-cta" href="/contact/">Tell us about your line</a>
+        <a class="btn btn-primary btn-arrow demo-cta" id="hero-demo" data-demo-link data-src="website"
+           href="https://voicecaptures-selfserve-production.up.railway.app?src=website" target="_blank" rel="noopener">Hear your own AI receptionist</a>
+        <a class="btn btn-ghost btn-arrow" id="hero-cta" href="/contact/">Tell us about your line</a>
         <a class="btn btn-ghost btn-arrow hero-try" id="hero-try" href="#yourline">Hear it answer as your business</a>
       </div>
       <p class="fine" id="hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days free at one location, up to 100 minutes. Cancel before day 15 and you pay nothing.</p>
@@ -2012,6 +2038,9 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
+    <p class="foot-demo">Curious how it would sound for you?
+      <a data-demo-link data-src="website" href="https://voicecaptures-selfserve-production.up.railway.app?src=website"
+         target="_blank" rel="noopener">Build your own demo assistant in 2 minutes &rarr;</a></p>
   </div>
 </footer>
 
@@ -2021,6 +2050,18 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 "use strict";
 
 var CAL = "https://calendly.com/hello-voicecaptures/30min";
+
+// Self-serve demo. Change this one line to move the demo to another host; it
+// rewrites every [data-demo-link] on load. The href in the markup is the
+// no-JS fallback and should be kept in step when the host changes.
+var DEMO = "https://voicecaptures-selfserve-production.up.railway.app";
+(function(){
+  var links = document.querySelectorAll("[data-demo-link]");
+  for (var i = 0; i < links.length; i++) {
+    var src = links[i].getAttribute("data-src");
+    links[i].setAttribute("href", DEMO + (src ? "?src=" + encodeURIComponent(src) : ""));
+  }
+})();
 
 // Each vertical has its own URL. The path is the source of truth on load,
 // and the switcher keeps it in step afterwards so any tab can be shared.
@@ -2676,14 +2717,6 @@ function select(k, fromPop){
   var finalCta = document.getElementById("final-cta");
   // The personal line already ends on its own waitlist card.
   if (finalCta) finalCta.hidden = (k === "personal");
-
-  var navCta = document.getElementById("nav-cta");
-  if (navCta) {
-    var isPersonal = k === "personal";
-    navCta.setAttribute("href", isPersonal ? "#personal" : "#yourline");
-    navCta.childNodes[navCta.childNodes.length - 1].nodeValue =
-      isPersonal ? "Join the waitlist" : "Try it on your business";
-  }
 
   var tryBtn = document.getElementById("hero-try");
   if (tryBtn) tryBtn.hidden = !!hide["yourline"];

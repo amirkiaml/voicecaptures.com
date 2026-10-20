@@ -430,6 +430,24 @@ html[data-theme="light"] .nav-menu{box-shadow:0 22px 52px rgba(13,23,41,.14)}
 header .btn.nav-cta{height:38px;padding:0 18px;font-size:13.5px;margin-left:4px;
   display:inline-flex;align-items:center;justify-content:center;line-height:1}
 
+/* ---- Self-serve demo CTA, same treatment as the home page ---- */
+.demo-cta .spark{width:7px;height:7px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;display:inline-block;margin-right:9px;vertical-align:middle;
+  animation:demopulse 1.9s ease-in-out infinite}
+@keyframes demopulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+@keyframes demoring{
+  0%  {box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 50%,transparent)}
+  70% {box-shadow:0 0 0 9px color-mix(in srgb,var(--cyan) 0%,transparent)}
+  100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 0%,transparent)}
+}
+header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
+.mnav-foot .btn.demo-cta{display:inline-flex;align-items:center;justify-content:center}
+@media (prefers-reduced-motion:reduce){
+  .demo-cta .spark,header .btn.nav-cta.demo-cta{animation:none}
+}
+.foot-demo{flex-basis:100%;font-size:13px;color:var(--muted);margin-top:4px}
+.foot-demo a{color:var(--cyan);font-weight:600}
+
 /* The demo line belongs to home services, so it is signposted there rather
    than sold as a separate button in the bar. */
 .nm-demo{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
@@ -608,7 +626,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <svg class="t-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2v2.6M12 19.4V22M4.2 4.2l1.9 1.9M17.9 17.9l1.9 1.9M2 12h2.6M19.4 12H22M4.2 19.8l1.9-1.9M17.9 6.1l1.9-1.9"/></svg>
       <svg class="t-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></svg>
     </button>
-<a class="btn btn-primary nav-cta" href="/#yourline">Try it on your business</a>
+<a class="btn btn-primary nav-cta demo-cta" href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo &mdash; 2 min</a>
   </div>
 
   <div class="mnav" id="mnav" hidden>
@@ -635,6 +653,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
       <div class="mnav-foot">
+        <a class="btn btn-primary demo-cta" href="https://voicecaptures-selfserve-production.up.railway.app?src=nav" target="_blank" rel="noopener"><span class="spark" aria-hidden="true"></span>Build your demo in 2 minutes</a>
         <a class="btn btn-amber" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
@@ -772,6 +791,8 @@ Toronto, Ontario, Canada<br>
     </div>
     <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>
     <span class="desc">A human-sounding AI receptionist, configured for your business</span>
+    <p class="foot-demo">Curious how it would sound for you?
+      <a href="https://voicecaptures-selfserve-production.up.railway.app?src=website" target="_blank" rel="noopener">Build your own demo assistant in 2 minutes &rarr;</a></p>
   </div>
 </footer>
 
