@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-build-pages.py — emit the standalone pages: /about/, /careers/, /privacy/, /terms/.
+build-pages.py â€” emit the standalone pages: /about/, /careers/, /privacy/, /terms/.
 
 These are NOT generated from index.html. index.html is a single-page app whose
 script expects its own markup; running it on a page that has none of it would
-throw on first paint. They carry the same shell instead — fonts, palette,
-header, theme toggle, footer — so they read as part of the same site.
+throw on first paint. They carry the same shell instead â€” fonts, palette,
+header, theme toggle, footer â€” so they read as part of the same site.
 
 Replaces the older build-legal.py. Delete that file; deploy.ps1 calls this one.
 
@@ -22,7 +22,7 @@ ADDR = "Toronto, Ontario, Canada"
 # regulators get it from the registration record; the site shows the
 # trading name only.
 BRAND = "VoiceCaptures"
-API = "https://torontoleads-production.up.railway.app"
+API = "https://api.voicecaptures.com"
 CAL = "https://calendly.com/hello-voicecaptures"
 # The 30-minute event, for pages that should skip the chooser.
 CAL30 = CAL + "/30min"

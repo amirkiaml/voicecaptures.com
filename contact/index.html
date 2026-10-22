@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact VoiceCaptures</title>
-<meta name="description" content="Tell us what you need — an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
+<meta name="description" content="Tell us what you need â€” an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
 <meta name="theme-color" content="#f6f8fc">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://voicecaptures.com/contact/">
@@ -18,11 +18,11 @@
 <meta property="og:site_name" content="VoiceCaptures">
 <meta property="og:url" content="https://voicecaptures.com/contact/">
 <meta property="og:title" content="Contact VoiceCaptures">
-<meta property="og:description" content="Tell us what you need — an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
+<meta property="og:description" content="Tell us what you need â€” an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
 <meta property="og:image" content="https://voicecaptures.com/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Contact VoiceCaptures">
-<meta name="twitter:description" content="Tell us what you need — an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
+<meta name="twitter:description" content="Tell us what you need â€” an AI receptionist, a win-back campaign, or a question. One form, and we come back within a day.">
 <meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -875,12 +875,12 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
 
 <script>
 (function(){
-  var API = "https://torontoleads-production.up.railway.app";
-  var TYPES = ["Home services & trades","Restaurant, café or bar",
+  var API = "https://api.voicecaptures.com";
+  var TYPES = ["Home services & trades","Restaurant, cafÃ© or bar",
     "Clinic, dental or medical","Health, wellness or veterinary",
-    "Salon, spa or fitness","Professional services — legal, real estate, consulting",
+    "Salon, spa or fitness","Professional services â€” legal, real estate, consulting",
     "A personal line, not a business","Something else"];
-  var SYSTEMS = ["None — phone and calendar","Google Calendar",
+  var SYSTEMS = ["None â€” phone and calendar","Google Calendar",
     "Outlook or Microsoft 365","Calendly","Jobber","Housecall Pro","ServiceTitan",
     "Square","Acuity or Squarespace Scheduling","Mindbody","Jane",
     "Dentrix, Open Dental or Eaglesoft","OpenTable, Resy or Toast",
@@ -892,7 +892,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
   function esc(t){ return String(t).replace(/[&<>"]/g, function(c){
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function fill(el, opts){
-    el.innerHTML = '<option value="">Select…</option>' + opts.map(function(o){
+    el.innerHTML = '<option value="">Selectâ€¦</option>' + opts.map(function(o){
       return '<option value="' + esc(o) + '">' + esc(o) + "</option>"; }).join("");
   }
   fill($("in-type"), TYPES); fill($("in-system"), SYSTEMS); fill($("in-plan"), PLANS);
@@ -922,10 +922,10 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     // This is a phone product; a number is how the conversation starts.
     if (payload.phone.replace(/\D/g, "").length < 10) {
       m.className = "in-msg err";
-      m.textContent = "A phone number too — it's the quickest way to sort the setup.";
+      m.textContent = "A phone number too â€” it's the quickest way to sort the setup.";
       return;
     }
-    m.className = "in-msg"; m.textContent = "Sending…"; btn.disabled = true;
+    m.className = "in-msg"; m.textContent = "Sendingâ€¦"; btn.disabled = true;
 
     fetch(API + "/intake-form", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -935,7 +935,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
     .then(function(d){
       if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't send that.");
       m.className = "in-msg ok";
-      m.textContent = "Got it — we'll come back to you within a day.";
+      m.textContent = "Got it â€” we'll come back to you within a day.";
       form.reset();
       fill($("in-type"), TYPES); fill($("in-system"), SYSTEMS); fill($("in-plan"), PLANS);
     })

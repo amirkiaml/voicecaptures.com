@@ -1,11 +1,11 @@
-/* vc-auth.js — shared sign-in helper for /login/ and /dashboard/.
+﻿/* vc-auth.js â€” shared sign-in helper for /login/ and /dashboard/.
  *
  * Accounts are Supabase Auth users. The Supabase URL and publishable key come
- * from the API (/api/dashboard/config), so nothing secret lives in this repo —
+ * from the API (/api/dashboard/config), so nothing secret lives in this repo â€”
  * the publishable key is designed to be public anyway.
  */
 (function () {
-  var API = window.VC_API || "https://torontoleads-production.up.railway.app";
+  var API = window.VC_API || "https://api.voicecaptures.com";
   var clientPromise = null;
 
   function getConfig() {
