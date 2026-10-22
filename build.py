@@ -112,10 +112,33 @@ def sitemap(slugs) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}\n</urlset>\n'
 
 
+# Mojibake guard. index.html once reached production with every em dash stored
+# as "\u00e2\u20ac\u201d" — a UTF-8 em dash that some editor read as cp1252 and
+# saved back as UTF-8. It is invisible in most editors and shows up in the
+# browser tab, so the build refuses to run rather than copy it into five
+# sector pages. If this fires, reopen the file as UTF-8 and save it again.
+MOJIBAKE = re.compile(
+    "[\u00c2\u00c3\u00e2][\u0080-\u00ff\u20ac\u2122\u2013\u2014"
+    "\u2018\u2019\u201c\u201d\u0153\u017e]")
+
+
+def check_encoding(raw: bytes, src: str) -> None:
+    if raw[:3] == b"\xef\xbb\xbf":
+        sys.exit("index.html starts with a UTF-8 BOM — save it as UTF-8 "
+                 "without BOM and run again.")
+    hits = MOJIBAKE.findall(src)
+    if hits:
+        sys.exit(f"index.html contains {len(hits)} mis-encoded character(s), "
+                 f"e.g. {hits[0]!r} — it was saved as cp1252. Reopen it as "
+                 "UTF-8, fix those, and run again.")
+
+
 def main():
     if not SRC.exists():
         sys.exit("index.html not found — run this from the site repo root.")
+    raw = SRC.read_bytes()
     src = SRC.read_text(encoding="utf-8")
+    check_encoding(raw, src)
 
     for key, meta in PAGES.items():
         folder = ROOT / meta["slug"]
