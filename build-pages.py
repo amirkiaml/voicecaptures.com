@@ -1541,8 +1541,8 @@ WINBACK_BODY = f"""
       </div>
     </div>
 
-    <p class="fine" style="margin-top:16px">All prices in CAD, plus HST. Most
-    reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
+    <p class="fine" style="margin-top:16px">Prices in CAD, plus applicable taxes.
+    Most reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
 
     <p class="fine" style="margin-top:10px">The free pilot is the first 20% of
     your list, up to 100 names and never fewer than 25. Custom is a build, so it
@@ -1650,7 +1650,7 @@ WINBACK_BODY = f"""
         pilot. No charge.</p>
 
         <p class="fine" id="co-disc">Estimates only, not a quote or a guarantee.
-        CAD, plus HST. Add-ons not included.</p>
+        Prices in CAD, plus applicable taxes. Add-ons not included.</p>
 
         <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Start with a free pilot</a>
 
@@ -1686,7 +1686,7 @@ WINBACK_BODY = f"""
     are a fixed price agreed in writing before work starts. Some software only
     opens its connections to approved partners. If yours doesn&rsquo;t, we use a
     CSV export and Google Calendar instead, and we&rsquo;ll tell you before you
-    pay. CAD, plus HST.</p>
+    pay. Prices in CAD, plus applicable taxes.</p>
   </div>
 </section>
 
@@ -2081,7 +2081,7 @@ people are usually involved in the decision.</p>
 
 <h2>Billing and taxes</h2>
 <p>Plans are billed monthly in Canadian dollars, in advance, on the same date each
-month, to the card you gave us, unless you have bought a prepaid term. Prices are before HST and other applicable taxes,
+month, to the card you gave us, unless you have bought a prepaid term. Prices are before applicable sales taxes,
 which are added to your bill. Add-ons are billed with your plan. One-time setup
 and integration work is quoted in writing and billed separately. You can update
 your card or download invoices at any time from your billing portal.</p>

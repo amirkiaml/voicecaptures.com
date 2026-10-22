@@ -1938,7 +1938,7 @@ html[data-theme="light"] .beyond{box-shadow:0 6px 20px rgba(13,23,41,.06)}
     </div>
 
     <div class="terms">
-      <p>All prices CAD, plus HST. Month to month, cancel anytime.</p>
+      <p>Prices in CAD, plus applicable taxes. Month to month, cancel anytime.</p>
       <p>Every plan answers 24/7 &mdash; after-hours, overflow or all day. You set that with your forwarding, not your plan.</p>
       <p>Call history, recordings and transcripts are kept for 14 days on every plan. Longer history is an add-on. For clinics we recommend staying at 14 days &mdash; on a patient-facing line, keeping less is the safer setting, not a worse one.</p>
       <p>Live booking on the call is included at every plan &mdash; never gated behind an upgrade.</p>
@@ -2605,7 +2605,7 @@ function renderTiers(v){
       '<div class="top"><span class="nm">' + esc(t[0]) + "</span>" +
       (rec ? '<span class="pop">Recommended</span>' : "") + "</div>" +
       '<div class="price">' + (o.from ? "From " : "") + money(perMo) + "<em>/mo" +
-        (t[5] ? " " + esc(t[5]) : "") + " + HST</em></div>" +
+        (t[5] ? " " + esc(t[5]) : "") + " + tax</em></div>" +
       (T.months > 1
         ? '<p class="billed"><b>' + money(total) + "</b> paid once for " + T.months +
           " months" + (t[5] ? " " + esc(t[5]) : "") +
