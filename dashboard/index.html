@@ -23,23 +23,25 @@
 <style>
   :root {
     color-scheme: light;
-    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --ink2: #374151; --muted: #6b7280;
-    --line: #e6e8ec; --grid: #eef0f3; --hover: #fafbfc; --field: #ffffff;
-    --accent: #3b6fd8; --accent-soft: #dfe8fb; --hero-from: #eef3fd;
-    --c-calls: #3b6fd8; --c-booked: #1f9d55; --neutral-bar: #c3c8d0; --crosshair: #9ca3af;
-    --good: #1f9d55; --warn: #b45309; --bad: #dc2626; --gray: #9ca3af;
-    --good-soft: #e3f5ea; --warn-soft: #fdf1de; --bad-soft: #fde4e4; --gray-soft: #eef0f3;
-    --tip-bg: #14181f; --tip-ink: #ffffff;
+    --bg: #f3f6fb; --card: #ffffff; --ink: #0f172a; --ink2: #334155; --muted: #64748b;
+    --line: #e2e8f0; --grid: #e8edf5; --hover: #f5f8fd; --field: #ffffff; --raise: #f7f9fd;
+    --accent: #2563eb; --accent-strong: #2563eb; --accent-soft: #e3ebff; --hero-from: #e4ecff; --hero-label: #2f5bd3;
+    --c-calls: #2563eb; --c-track: #d6e0f5; --c-after: #8b5cf6; --c-booked: #16a34a; --neutral-bar: #c3cad6; --crosshair: #94a3b8;
+    --good: #15803d; --warn: #a16207; --bad: #dc2626; --gray: #64748b;
+    --good-soft: #dcfce7; --warn-soft: #fef3c7; --bad-soft: #fee2e2; --gray-soft: #edf1f7;
+    --chip-bg: #e3ebff; --chip-ink: #2f5bd3;
+    --tip-bg: #0f172a; --tip-ink: #ffffff;
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #0f1217; --card: #171b22; --ink: #e7eaf0; --ink2: #c4c9d3; --muted: #8b93a1;
-    --line: #262c36; --grid: #1f252e; --hover: #1c2129; --field: #11151b;
-    --accent: #7ea4f2; --accent-soft: #1d2a45; --hero-from: #1a2540;
-    --c-calls: #5b8ae6; --c-booked: #2bae6a; --neutral-bar: #4a5260; --crosshair: #6b7280;
-    --good: #4cc98a; --warn: #f0a33a; --bad: #f37b7b; --gray: #6b7280;
-    --good-soft: #15301f; --warn-soft: #33250f; --bad-soft: #3a1a1a; --gray-soft: #232831;
-    --tip-bg: #e7eaf0; --tip-ink: #14181f;
+    --bg: #0b1120; --card: #111a2e; --ink: #e8edf7; --ink2: #c3cbdb; --muted: #8a97ae;
+    --line: #1e2a42; --grid: #1a2540; --hover: #14203a; --field: #0d1527; --raise: #0f1830;
+    --accent: #5b8cff; --accent-strong: #2563eb; --accent-soft: #1a2a52; --hero-from: #172a57; --hero-label: #9db8ff;
+    --c-calls: #2563eb; --c-track: #1e2d52; --c-after: #8b5cf6; --c-booked: #22c55e; --neutral-bar: #3a4560; --crosshair: #64748b;
+    --good: #34d399; --warn: #f5b83d; --bad: #f87171; --gray: #94a3b8;
+    --good-soft: #0f3326; --warn-soft: #3a2a0a; --bad-soft: #3b1518; --gray-soft: #232c3f;
+    --chip-bg: #1c2c5a; --chip-ink: #93b4ff;
+    --tip-bg: #e8edf7; --tip-ink: #0f172a;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -210,6 +212,81 @@
   .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
   .gate p { color: var(--muted); }
   @media (max-width: 640px) { .acct-btn .em-short { display: none; } .pw-grid { grid-template-columns: 1fr; } }
+
+  /* ===== Look: navy cards, bold numbers, solid tags ===== */
+  .wrap { max-width: 1200px; }
+  h1 { font-size: 30px; font-weight: 800; }
+  .card { border-radius: 18px; padding: 22px 26px; }
+  .grid { gap: 16px; margin-bottom: 16px; }
+  .row2 { gap: 16px; margin-bottom: 16px; }
+  .stack { margin-bottom: 16px; }
+  .range { background: none; border: 0; padding: 0; gap: 10px; }
+  .range button { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 9px 18px; border-radius: 10px; font-size: 15px; }
+  .range button.on { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+  .gear { border-radius: 10px; padding: 9px 14px; }
+
+  .hero { background: linear-gradient(110deg, var(--hero-from), var(--card) 75%); padding: 30px 36px; margin-bottom: 16px; align-items: center; }
+  .hero .label { color: var(--hero-label); font-size: 16px; font-weight: 600; }
+  .hero .val { font-size: 52px; font-weight: 800; line-height: 1.1; margin-top: 4px; }
+  .hero .note { color: var(--muted); font-size: 15px; max-width: 560px; text-align: right; line-height: 1.6; }
+
+  .kpi { padding: 26px 30px; }
+  .kpi .label { color: var(--ink); font-size: 16px; font-weight: 600; }
+  .kpi .val { font-size: 46px; font-weight: 800; margin-top: 10px; letter-spacing: -0.02em; line-height: 1.05; align-items: center; }
+  .kpi .note { font-size: 14px; margin-top: 12px; line-height: 1.5; }
+  .delta { font-size: 16px; font-weight: 700; font-family: "DM Sans", sans-serif; letter-spacing: 0; }
+  .bar { height: 7px; margin-top: 14px; background: var(--grid); }
+  .bar > span { background: var(--accent-strong); }
+
+  .panel-title { font-size: 18px; font-weight: 700; font-family: Manrope, "DM Sans", sans-serif; }
+  .panel-sub { font-size: 14px; margin: 4px 0 14px; }
+  .legend { font-size: 14px; color: var(--ink2); gap: 18px; margin-bottom: 10px; }
+  .legend i.sq { width: 13px; height: 13px; border-radius: 3px; vertical-align: -2px; background: var(--c-calls); }
+  .legend i.sq.after { background: var(--c-after); }
+  .ymax { display: none; }
+  .xlabels { display: grid; justify-content: stretch; text-align: center; font-size: 13px; margin-top: 8px; }
+  .xlabels span { white-space: nowrap; }
+
+  .pill { padding: 4px 14px; font-size: 14px; font-weight: 600; }
+  .p-pending { background: var(--warn-soft); color: var(--warn); }
+  .p-emergency { background: var(--bad-soft); color: var(--bad); }
+  .p-booked { background: var(--good-soft); color: var(--good); }
+  .p-other { background: var(--good-soft); color: var(--good); }
+  .p-abandoned { background: var(--gray-soft); color: var(--gray); }
+  .ah-chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; background: var(--chip-bg); color: var(--chip-ink); margin-left: 6px; white-space: nowrap; vertical-align: 1px; }
+
+  table { font-size: 15px; }
+  th { font-size: 14px; padding: 10px 16px 12px; border-bottom: 0; }
+  td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr.row.open td { background: var(--hover); border-bottom: 0; }
+  .req { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .caller-num { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .detail td { background: var(--hover); padding: 0 0 16px; }
+  .dcard { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; background: var(--raise); border: 1px solid var(--line); border-radius: 16px; padding: 24px 28px; margin: 0 0 4px; }
+  .dcard .k, .detail .k { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  .dcard .col > .k:first-child, .dcard .col > .status-row:first-child + .k { margin-top: 0; }
+  .dcard .v { font-size: 16px; color: var(--ink); line-height: 1.55; }
+  .msgs { gap: 12px; max-width: none; margin-top: 0; }
+  .msg { border-radius: 14px; padding: 14px 18px; background: var(--card); }
+  .msg-head { font-size: 14px; gap: 10px; }
+  .msg-head b { color: var(--muted); font-weight: 500; }
+  .msg-head .t { font-size: 14px; }
+  .msg-body { font-size: 15px; color: var(--ink); line-height: 1.55; margin-top: 8px; }
+  .ico { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: var(--accent-strong); color: #fff; letter-spacing: .02em; }
+  .msg-foot { color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+  .player { display: flex; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 16px 10px 10px; background: var(--card); max-width: 560px; }
+  .player .pp { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--accent-strong); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
+  .player .pp svg { width: 18px; height: 18px; fill: #fff; }
+  .player .wf { flex: 1; height: 40px; cursor: pointer; display: block; min-width: 0; }
+  .player .wf rect { fill: var(--accent-strong); opacity: .45; }
+  .player .wf rect.on { opacity: 1; }
+  .player .tm { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; min-width: 40px; text-align: right; }
+  .tx-btn { border-radius: 10px; padding: 7px 14px; }
+  .status-row { margin-bottom: 8px; }
+  .status-row .k { margin: 0 !important; }
+  @media (max-width: 860px) { .dcard { grid-template-columns: 1fr; gap: 6px; padding: 18px; } .hero .note { text-align: left; } }
+  @media (max-width: 640px) { .kpi .val { font-size: 34px; } .hero .val { font-size: 40px; } .card { padding: 18px; } td { padding: 12px 10px; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
@@ -317,9 +394,8 @@
 
   <div class="card stack" data-section="daily">
     <p class="panel-title">Calls per day</p>
-    <p class="panel-sub">Hover a day for details</p>
-    <div class="legend"><span><i></i>All calls</span><span><i class="b"></i><span class="bl">Booked</span></span></div>
-    <div class="chart-box"><span class="ymax" id="dailyMax"></span><svg class="chart" id="daily" height="190"></svg></div>
+    <p class="panel-sub" id="dailySub">Bars: all calls · fill: booked</p>
+    <div class="chart-box"><span class="ymax" id="dailyMax"></span><svg class="chart" id="daily" height="230"></svg></div>
     <div class="xlabels" id="dailyX"></div>
   </div>
 
@@ -327,9 +403,9 @@
     <div class="card" data-section="hours">
       <p class="panel-title">When people call</p>
       <p class="panel-sub" id="hoursSub">By hour of day</p>
-      <div class="legend"><span><i class="sq"></i>After hours</span><span><i class="sq n"></i>Business hours</span></div>
-      <div class="chart-box"><span class="ymax" id="hoursMax"></span><svg class="chart" id="hours" height="160"></svg></div>
-      <div class="xlabels"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
+      <div class="legend"><span><i class="sq"></i>Open hours</span><span><i class="sq after"></i>After hours</span></div>
+      <div class="chart-box"><span class="ymax" id="hoursMax"></span><svg class="chart" id="hours" height="200"></svg></div>
+      <div class="xlabels" id="hoursX"></div>
     </div>
     <div class="card" data-section="outcomes">
       <p class="panel-title">Call outcomes</p>
@@ -342,7 +418,7 @@
     <div class="card" data-section="week">
       <p class="panel-title">Busiest days</p>
       <p class="panel-sub">Calls by day of week</p>
-      <div class="chart-box"><span class="ymax" id="weekMax"></span><svg class="chart" id="week" height="160"></svg></div>
+      <div class="chart-box"><span class="ymax" id="weekMax"></span><svg class="chart" id="week" height="180"></svg></div>
       <div class="xlabels" id="weekX"></div>
     </div>
     <div class="card" data-section="highlights">
@@ -353,7 +429,7 @@
 
   <div class="card" data-section="log">
     <p class="panel-title">Call log</p>
-    <p class="panel-sub">Tap a call for the summary and recording
+    <p class="panel-sub">Tap a call for the summary, recording and texts
       <label class="chk-inline" id="silentWrap" hidden style="margin-left:10px"><input type="checkbox" id="silentToggle"> <span id="silentCount"></span></label></p>
     <div class="table-wrap">
       <table>
@@ -375,12 +451,14 @@
 <script>
 let days = 7, shown = 25, allCalls = [], last = null, S = null;
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const SECTION_NAMES = { revenue: "Revenue estimate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
+const SECTION_NAMES = { revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const fmtDur = s => s == null ? "—" : s < 60 ? `${Math.round(s)} sec` : `${Math.floor(s/60)} min ${Math.round(s%60)} sec`;
 const fmtMoney = n => "$" + Math.round(n).toLocaleString();
+// +14165550187 -> +1 416-555-0187 (North American numbers); anything else as given.
+const fmtPhone = v => { const d = String(v || "").replace(/\D/g, ""); const m = /^1?(\d{3})(\d{3})(\d{4})$/.exec(d); return m && /^\+?1?\d{10}$/.test(String(v).replace(/[\s().-]/g, "")) ? `+1 ${m[1]}-${m[2]}-${m[3]}` : String(v || ""); };
 // Every time on this page is shown in the business's own timezone (Customize).
 const TZ = () => (typeof S !== "undefined" && S && S.timezone) || "America/Toronto";
 const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: TZ(), month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
@@ -408,37 +486,42 @@ function showTip(e, html) {
 const hideTip = () => { tip.style.opacity = 0; };
 
 /* ---------- KPIs ---------- */
-function delta(cur, prev, unit = "%") {
-  if (prev == null) return "";
-  if (unit === "pts") {
-    const d = cur - prev;
-    return `<span class="delta ${d > 0 ? "up" : d < 0 ? "down" : "flat"}">${d > 0 ? "▲" : d < 0 ? "▼" : "–"} ${Math.abs(d)} pts</span>`;
-  }
-  if (!prev) return cur ? `<span class="delta up">new</span>` : "";
-  const d = Math.round(((cur - prev) / prev) * 100);
-  return `<span class="delta ${d > 0 ? "up" : d < 0 ? "down" : "flat"}">${d > 0 ? "▲" : d < 0 ? "▼" : "–"} ${Math.abs(d)}%</span>`;
+function delta(cur, prev, unit = "") {
+  if (prev == null || cur == null) return "";
+  const d = Math.round(cur - prev);
+  if (!d) return "";
+  return `<span class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "▲" : "▼"} ${Math.abs(d)}${unit === "pts" ? " pts" : ""}</span>`;
 }
 
 function renderKpis(t, p) {
   const hero = $("hero");
+  const period = days === 7 ? "this week" : `in the last ${days} days`;
+  hero.hidden = false;
   if (t.estRevenue != null) {
-    hero.hidden = false;
     hero.innerHTML = `
-      <div><div class="label">Estimated revenue captured</div><div class="val">${esc(fmtMoney(t.estRevenue))}</div></div>
+      <div><div class="label">Estimated revenue captured ${esc(period)}</div><div class="val">${esc(fmtMoney(t.estRevenue))}</div></div>
       <div class="note">${esc(S.bookingLabel.toLowerCase())} booked + emergencies × your average job value of ${esc(fmtMoney(S.avgJobValue))}.</div>`;
-  } else hero.hidden = true;
+  } else {
+    const o = (last && last.outcomes) || {};
+    const leads = (o.booked || 0) + (o.pending || 0) + (o.emergency || 0);
+    hero.innerHTML = `
+      <div><div class="label">New customers who reached you ${esc(period)}</div><div class="val">${esc(leads)}</div></div>
+      <div class="note">People who booked, left a message for a callback, or had an emergency.<br>${t.afterHours} of ${t.totalCalls} calls came in when you were closed.</div>`;
+  }
   if (S.hiddenSections.includes("revenue")) hero.hidden = true;
 
   const cards = [
     { label: "Conversations", val: t.totalCalls, d: delta(t.totalCalls, p.totalCalls),
       note: [t.silent ? `${t.silent} silent hang-up${t.silent === 1 ? "" : "s"} not counted` : "", t.abandoned ? `${t.abandoned} hung up early` : ""].filter(Boolean).join(" · ") || "real calls with a person on the line" },
-    { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked) },
-    { label: "Booking rate", val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
+    { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked), booking: true },
+    { label: "Booking rate", booking: true, val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
     { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of conversations came in while you were closed` },
     { label: "Emergencies captured", val: t.emergencies },
     { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) }
   ];
-  $("kpis").innerHTML = cards.map(c => `
+  // Clients who don't book jobs can hide the two booking cards (Customize → Show).
+  const shownCards = S.hiddenSections.includes("booking") ? cards.filter(c => !c.booking) : cards;
+  $("kpis").innerHTML = shownCards.map(c => `
     <div class="card kpi">
       <div class="label">${esc(c.label)}</div>
       <div class="val">${esc(c.val)} ${c.d || ""}</div>
@@ -447,84 +530,84 @@ function renderKpis(t, p) {
     </div>`).join("");
 }
 
-/* ---------- daily line chart with crosshair ---------- */
-function renderDaily(series) {
-  const svg = $("daily");
-  const W = svg.clientWidth || 800, H = 190, padT = 10;
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  const max = Math.max(1, ...series.map(d => d.calls));
-  const n = series.length;
-  const x = i => n === 1 ? W / 2 : (i / (n - 1)) * W;
-  const y = v => padT + (1 - v / max) * (H - padT - 2);
-  const path = key => series.map((d, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(d[key]).toFixed(1)).join(" ");
-  const line = path("calls");
-  const grid = [0.5, 1].map(f => `<line x1="0" x2="${W}" y1="${y(max * f)}" y2="${y(max * f)}" style="stroke:var(--grid)"/>`).join("");
-  svg.innerHTML = `
-    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" style="stop-color:var(--c-calls);stop-opacity:.25"/><stop offset="1" style="stop-color:var(--c-calls);stop-opacity:0"/>
-    </linearGradient></defs>
-    ${grid}
-    <path d="${line} L ${x(n - 1)} ${H} L ${x(0)} ${H} Z" fill="url(#g)"/>
-    <path d="${line}" fill="none" style="stroke:var(--c-calls)" stroke-width="2" stroke-linejoin="round"/>
-    <path d="${path("booked")}" fill="none" style="stroke:var(--c-booked)" stroke-width="2" stroke-dasharray="5 4"/>
-    <line id="xh" y1="0" y2="${H}" style="stroke:var(--crosshair)" stroke-width="1" opacity="0"/>
-    <circle id="dot" r="4" style="fill:var(--c-calls);stroke:var(--card)" stroke-width="2" opacity="0"/>
-    <rect width="${W}" height="${H}" fill="transparent" id="hit"/>`;
-  $("dailyMax").textContent = max;
-
-  const hit = svg.querySelector("#hit"), xh = svg.querySelector("#xh"), dot = svg.querySelector("#dot");
-  hit.onmousemove = e => {
-    const r = svg.getBoundingClientRect();
-    const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width) * (n - 1))));
-    const d = series[i];
-    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("opacity", 1);
-    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(d.calls)); dot.setAttribute("opacity", 1);
-    showTip(e, `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked`);
-  };
-  hit.onmouseleave = () => { hideTip(); xh.setAttribute("opacity", 0); dot.setAttribute("opacity", 0); };
-
-  const maxLabels = innerWidth < 640 ? 4 : 8, step = Math.ceil(n / maxLabels);
-  $("dailyX").innerHTML = series.filter((d, i) => i % step === 0 || i === n - 1).map(d => `<span>${esc(d.label)}</span>`).join("");
-}
-
-/* ---------- vertical bars ---------- */
-function renderBars(svgId, maxId, items, { color, tipFor }) {
+/* ---------- column charts ----------
+ * cols: [{ label, total, fill, segs?: [{ v, color }], tip }]
+ *   total + fill: a dark track for all calls with the fill rising inside it
+ *   segs: stacked segments (open hours / after hours) */
+function renderColumns(svgId, xId, cols, { values = true, every = 1 } = {}) {
   const svg = $(svgId);
-  const W = svg.clientWidth || 600, H = Number(svg.getAttribute("height"));
+  const W = svg.clientWidth || 700, H = Number(svg.getAttribute("height"));
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  const max = Math.max(1, ...items.map(d => d.calls));
-  const n = items.length, gap = 2, bw = W / n - gap;
-  const r = Math.min(4, bw / 2);
-  const bars = items.map((d, i) => {
-    const h = d.calls ? Math.max(3, (d.calls / max) * (H - 4)) : 0;
-    const x = i * (W / n) + gap / 2, y = H - h;
-    // Rounded top, square base anchored to the baseline.
-    const shape = h ? `<path d="M${x},${H} V${y + r} Q${x},${y} ${x + r},${y} H${x + bw - r} Q${x + bw},${y} ${x + bw},${y + r} V${H} Z" style="fill:${color(d)}"/>` : "";
-    return `${shape}<rect x="${i * (W / n)}" y="0" width="${W / n}" height="${H}" fill="transparent" data-i="${i}"/>`;
+  const top = values ? 24 : 6, n = cols.length, slot = W / n;
+  const bw = Math.max(3, Math.min(76, slot * (n > 20 ? 0.72 : 0.56)));
+  const max = Math.max(1, ...cols.map(c => c.total));
+  const y = v => H - (v / max) * (H - top);
+  const rx = Math.min(7, bw / 3);
+  const grid = [0, 0.5, 1].map(f => `<line x1="0" x2="${W}" y1="${y(max * f)}" y2="${y(max * f)}" style="stroke:var(--grid)"/>`).join("");
+  const body = cols.map((c, i) => {
+    const x = i * slot + (slot - bw) / 2;
+    let g = "";
+    if (c.segs) {
+      let base = 0;
+      c.segs.filter(sg => sg.v > 0).forEach((sg, k) => {
+        const y1 = y(base + sg.v), y0 = y(base);
+        g += `<rect x="${x}" y="${y1 + (k ? 0 : 0)}" width="${bw}" height="${Math.max(2, y0 - y1 - (k ? 0 : 0) - (base ? 2 : 0))}" rx="${rx}" style="fill:${sg.color}"/>`;
+        base += sg.v;
+      });
+    } else if (c.total) {
+      g += `<rect x="${x}" y="${y(c.total)}" width="${bw}" height="${H - y(c.total)}" rx="${rx}" style="fill:var(--c-track)"/>`;
+      if (c.fill) g += `<rect x="${x}" y="${y(c.fill)}" width="${bw}" height="${H - y(c.fill)}" rx="${rx}" style="fill:var(--c-calls)"/>`;
+    }
+    if (values && c.total) g += `<text x="${x + bw / 2}" y="${y(c.total) - 8}" text-anchor="middle" style="fill:var(--muted);font-size:13px">${c.total}</text>`;
+    return g + `<rect x="${i * slot}" y="0" width="${slot}" height="${H}" fill="transparent" data-i="${i}"/>`;
   }).join("");
-  svg.innerHTML = `<line x1="0" x2="${W}" y1="${H - (H - 4) / 2}" y2="${H - (H - 4) / 2}" style="stroke:var(--grid)"/>
-    <line x1="0" x2="${W}" y1="4" y2="4" style="stroke:var(--grid)"/>${bars}
-    <line x1="0" x2="${W}" y1="${H}" y2="${H}" style="stroke:var(--line)"/>`;
-  $(maxId).textContent = max;
+  svg.innerHTML = grid + body;
   svg.querySelectorAll("rect[data-i]").forEach(el => {
-    el.onmousemove = e => showTip(e, tipFor(items[el.dataset.i]));
+    el.onmousemove = e => showTip(e, cols[el.dataset.i].tip);
     el.onmouseleave = hideTip;
   });
+  const xl = $(xId);
+  if (xl) {
+    xl.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    xl.innerHTML = cols.map((c, i) => `<span>${i % every === 0 ? esc(c.label) : ""}</span>`).join("");
+  }
 }
 
-function renderHours(byHour, total) {
-  renderBars("hours", "hoursMax", byHour, {
-    color: d => d.afterHours ? "var(--c-calls)" : "var(--neutral-bar)",
-    tipFor: d => `<b>${fmtHour(d.hour)}–${fmtHour((d.hour + 1) % 24)}</b><br>${d.calls} calls${d.afterHours ? " · after hours" : ""}`
-  });
+function renderDaily(series) {
+  $("dailySub").textContent = `Bars: all calls · fill: ${S.bookingLabel.toLowerCase()} booked`;
+  const n = series.length;
+  renderColumns("daily", "dailyX", series.map(d => ({ label: d.label, total: d.calls, fill: d.booked,
+    tip: `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked` })),
+    { values: n <= 14, every: n <= 14 ? 1 : Math.ceil(n / (innerWidth < 640 ? 5 : 10)) });
+}
+
+// Hour and weekday of a call in the business's timezone; after hours by its own schedule.
+function localHW(iso) {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: TZ(), weekday: "short", hour: "numeric", hourCycle: "h23" }).formatToParts(new Date(iso));
+  const g = t => parts.find(p => p.type === t).value;
+  return { hour: Number(g("hour")) % 24, weekday: DAY_NAMES.indexOf(g("weekday")) };
+}
+const isAfter = iso => { const p = localHW(iso); return !S.openDays.includes(p.weekday) || p.hour < S.openHour || p.hour >= S.closeHour; };
+
+function renderHours(calls) {
+  const open = Array(24).fill(0), after = Array(24).fill(0);
+  for (const c of calls || []) {
+    if (c.silent) continue;
+    const p = localHW(c.created_at);
+    (isAfter(c.created_at) ? after : open)[p.hour]++;
+  }
+  const used = open.map((v, h) => v + after[h]).map((v, h) => v ? h : -1).filter(h => h >= 0);
+  const from = Math.min(6, ...(used.length ? used : [6])), to = Math.max(20, ...(used.length ? used : [20]));
+  const cols = [];
+  for (let h = from; h <= to; h++) cols.push({ label: fmtHour(h).replace("am", "a").replace("pm", "p"), total: open[h] + after[h],
+    segs: [{ v: open[h], color: "var(--c-calls)" }, { v: after[h], color: "var(--c-after)" }],
+    tip: `<b>${fmtHour(h)}–${fmtHour((h + 1) % 24)}</b><br>${open[h]} open hours · ${after[h]} after hours` });
+  renderColumns("hours", "hoursX", cols, { values: false, every: 2 });
 }
 
 function renderWeek(byWeekday) {
-  renderBars("week", "weekMax", byWeekday, {
-    color: () => "var(--c-calls)",
-    tipFor: d => `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked`
-  });
-  $("weekX").innerHTML = byWeekday.map(d => `<span>${esc(d.label)}</span>`).join("");
+  renderColumns("week", "weekX", byWeekday.map(d => ({ label: d.label, total: d.calls, fill: d.booked,
+    tip: `<b>${esc(d.label)}</b><br>${d.calls} calls · ${d.booked} booked` })), { values: true });
 }
 
 /* ---------- outcomes ---------- */
@@ -564,7 +647,12 @@ function renderInsights(d) {
   $("insights").innerHTML = items.map(([k, v]) => `<div class="ins"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("");
   const od = S.openDays.length === 5 && S.openDays.join() === "0,1,2,3,4" ? "weekdays"
     : S.openDays.length === 7 ? "every day" : S.openDays.map(i => DAY_NAMES[i]).join(", ") || "no days";
-  $("hoursSub").textContent = `By hour of day · open ${fmtHour(S.openHour)}–${fmtHour(S.closeHour % 24)} ${od}`;
+  const H12 = h => h === 0 || h === 24 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`;
+  // Contiguous days read as a range ("Mon–Sat"); otherwise list them.
+  const sd = [...S.openDays].sort((a, b) => a - b);
+  const contiguous = sd.length > 2 && sd.every((d, k) => !k || d === sd[k - 1] + 1);
+  const odays = sd.length === 7 ? "every day" : contiguous ? `${DAY_NAMES[sd[0]]}–${DAY_NAMES[sd[sd.length - 1]]}` : od;
+  $("hoursSub").textContent = `Your hours: ${odays} ${H12(S.openHour)} – ${H12(S.closeHour)}`;
 }
 
 /* ---------- call log ---------- */
@@ -585,18 +673,18 @@ function statusPill(c) {
 }
 
 function renderMessages(list) {
-  if (!list || !list.length) return "";
-  const who = m => m.recipient === "caller" ? "caller" : "you";
-  const fmtT = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: TZ(), hour: "numeric", minute: "2-digit" });
-  return `<div class="k">Texts &amp; emails sent</div><div class="msgs">${list.map(m => `
+  if (!list || !list.length) return `<div class="k">Texts sent</div><div class="muted">No texts or emails were sent for this call.</div>`;
+  const who = m => m.recipient === "caller" ? "To caller" : "To your team";
+  const fmtTm = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: TZ(), hour: "numeric", minute: "2-digit" });
+  return `<div class="k">Texts sent</div><div class="msgs">${list.map(m => `
     <div class="msg ${m.status === "failed" ? "failed" : ""}">
       <div class="msg-head">
         <span class="ico">${m.channel === "email" ? "EMAIL" : "TEXT"}</span>
-        <b>To ${who(m)}</b><span>${esc(m.to_address || "")}</span>
-        <span class="t">${m.status === "failed" ? "Not delivered · " : ""}${esc(fmtT(m.created_at))}</span>
+        <b>${who(m)}</b>
+        <span class="t">${m.status === "failed" ? "Not delivered · " : ""}${esc(fmtTm(m.created_at))}</span>
       </div>
       ${m.subject ? `<div class="msg-body"><b>${esc(m.subject)}</b></div>` : ""}
-      ${m.body ? `<div class="msg-body">${esc(m.body)}</div>` : ""}
+      ${m.body ? `<div class="msg-body" style="white-space:pre-wrap">${esc(m.body)}</div>` : ""}
       ${m.status === "failed" && m.error ? `<div class="msg-err">${esc(m.error)}</div>` : ""}
     </div>`).join("")}</div>`;
 }
@@ -619,10 +707,52 @@ function renderPremium(c, i) {
     ? `<div class="admin-note">Admin preview — this client doesn't have: ${off.join(", ")}.</div>` : "";
   // No src yet: recording links expire, so a fresh one is fetched when the call is opened.
   const audio = c.has_recording && c.vapi_call_id
-    ? `<div class="k">Recording</div><audio controls preload="none" id="au${i}" data-call="${esc(c.vapi_call_id)}"></audio><div class="admin-note" id="aue${i}"></div>` : "";
+    ? `<div class="k">Recording</div>${playerHtml(c, i)}<div class="admin-note" id="aue${i}"></div>` : "";
   const tx = c.vapi_call_id
     ? `<div class="k">Transcript${last.canReview ? " &amp; review" : ""}</div><button class="tx-btn" type="button" data-call="${esc(c.vapi_call_id)}" data-i="${i}">${last.canReview ? "Show transcript &amp; scoring" : "Show transcript"}</button><div id="tx${i}"></div>` : "";
   return note + audio + tx;
+}
+
+/* Recording player: play button, waveform (decorative, seeded by the call id),
+ * time. The real <audio> is hidden; its src is fetched on first use. */
+const fmtClock = s => s == null || !isFinite(s) ? "0:00" : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const PLAY = `<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>`, PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/></svg>`;
+function playerHtml(c, i) {
+  let h = 2166136261; for (const ch of String(c.vapi_call_id)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  const rnd = () => (h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0, h / 4294967296);
+  const N = 72, bars = Array.from({ length: N }, (_, k) => {
+    const v = 0.25 + 0.75 * Math.abs(Math.sin(k * 0.45 + rnd() * 2)) * (0.55 + rnd() * 0.45);
+    const bh = Math.max(4, v * 36);
+    return `<rect x="${k * 6}" y="${20 - bh / 2}" width="3" height="${bh}" rx="1.5"/>`;
+  }).join("");
+  return `<div class="player" id="pl${i}">
+    <button class="pp" type="button" aria-label="Play recording" data-i="${i}">${PLAY}</button>
+    <svg class="wf" viewBox="0 0 ${N * 6} 40" preserveAspectRatio="none" data-i="${i}">${bars}</svg>
+    <span class="tm" id="tm${i}">${fmtClock(c.call_duration_seconds)}</span>
+    <audio preload="none" id="au${i}" data-call="${esc(c.vapi_call_id)}"></audio></div>`;
+}
+function wirePlayer(i) {
+  const a = $("au" + i), pl = $("pl" + i);
+  if (!a || !pl || pl.dataset.wired) return;
+  pl.dataset.wired = "1";
+  const btn = pl.querySelector(".pp"), wf = pl.querySelector(".wf"), rects = [...wf.querySelectorAll("rect")], tm = $("tm" + i);
+  const paint = () => {
+    const f = a.duration ? a.currentTime / a.duration : 0;
+    rects.forEach((r, k) => r.classList.toggle("on", k / rects.length < f));
+    tm.textContent = a.currentTime ? `${fmtClock(a.currentTime)} / ${fmtClock(a.duration)}` : fmtClock(a.duration);
+  };
+  a.addEventListener("timeupdate", paint);
+  a.addEventListener("loadedmetadata", paint);
+  a.addEventListener("play", () => { btn.innerHTML = PAUSE; btn.setAttribute("aria-label", "Pause recording"); });
+  a.addEventListener("pause", () => { btn.innerHTML = PLAY; btn.setAttribute("aria-label", "Play recording"); });
+  btn.onclick = async e => { e.stopPropagation(); await ensureAudio(i); if (!a.src) return; a.paused ? a.play() : a.pause(); };
+  wf.onclick = async e => {
+    e.stopPropagation();
+    const f = (e.clientX - wf.getBoundingClientRect().left) / wf.getBoundingClientRect().width;
+    await ensureAudio(i); if (!a.src) return;
+    const go = () => { a.currentTime = f * a.duration; a.play(); };
+    a.readyState >= 1 ? go() : (a.addEventListener("loadedmetadata", go, { once: true }), a.load());
+  };
 }
 
 // One fetch per player: a timestamp click during loading waits for the same request.
@@ -778,35 +908,45 @@ function renderLog(everything) {
   more.hidden = all.length <= shown;
   more.textContent = `Show more (${all.length - shown} older)`;
   if (!calls.length) { tb.innerHTML = `<tr><td colspan="5" class="empty">No calls in this period yet.</td></tr>`; return; }
-  tb.innerHTML = calls.map((c, i) => `
-    <tr class="row${c.silent ? " silent-row" : ""}" data-i="${i}">
-      <td>${esc(fmtWhen(c.created_at))}</td>
-      <td>${esc(c.caller_name || "Unknown")}<div class="muted" style="font-size:12px">${esc(c.phone || c.caller_id || "")}</div></td>
+  tb.innerHTML = calls.map((c, i) => {
+    const open = openCalls.has(String(c.id));
+    const callback = c.phone || c.caller_id || "";
+    const same = c.phone && c.caller_id && String(c.phone).replace(/\D/g, "").slice(-10) === String(c.caller_id).replace(/\D/g, "").slice(-10);
+    return `
+    <tr class="row${c.silent ? " silent-row" : ""}${open ? " open" : ""}" data-i="${i}">
+      <td>${esc(fmtWhen(c.created_at))}${!c.silent && isAfter(c.created_at) ? `<span class="ah-chip">After hours</span>` : ""}</td>
+      <td>${esc(c.caller_name || "Unknown")}<div class="caller-num">${esc(fmtPhone(c.caller_id && !/^(UNKNOWN|WEB_CALL)$/.test(c.caller_id) ? c.caller_id : c.phone || ""))}</div></td>
       <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}</td>
-      <td class="hide-sm">${esc((c.issue_description || "").slice(0, 70))}${(c.issue_description || "").length > 70 ? "…" : ""}</td>
-      <td class="hide-sm">${esc(fmtDur(c.call_duration_seconds))}</td>
+      <td class="hide-sm"><span class="req">${esc(c.issue_description || "—")}</span></td>
+      <td class="hide-sm">${esc(fmtClock(c.call_duration_seconds))}</td>
     </tr>
-    <tr class="detail" id="d${i}" data-id="${esc(c.id)}" ${openCalls.has(String(c.id)) ? "" : "hidden"}><td colspan="5">
-      ${statusEditor(c)}
-      ${c.address ? `<div class="k">Address</div><div>${esc(c.address)}</div>` : ""}
-      ${c.tour_start ? `<div class="k">Tour</div><div>${esc(c.tour_start)}</div>` : ""}
-      ${c.preferred_date ? `<div class="k">Appointment</div><div>${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : ""}
-      ${c.caller_email ? `<div class="k">Email</div><div>${esc(c.caller_email)}</div>` : ""}
-      <div class="k">Request</div><div>${esc(c.issue_description || "—")}</div>
-      ${c.summary ? `<div class="k">Call summary</div><div>${esc(c.summary)}</div>` : ""}
-      ${renderPremium(c, i)}
-      ${renderMessages(c.messages)}
-    </td></tr>`).join("");
+    <tr class="detail" id="d${i}" data-id="${esc(c.id)}" ${open ? "" : "hidden"}><td colspan="5"><div class="dcard">
+      <div class="col">
+        ${statusEditor(c)}
+        <div class="k">Request</div><div class="v">${esc(c.issue_description || "—")}</div>
+        ${callback ? `<div class="k">Callback</div><div class="v">${esc(fmtPhone(callback))}${same ? " · same as caller ID" : ""}</div>` : ""}
+        ${c.address ? `<div class="k">Address</div><div class="v">${esc(c.address)}</div>` : ""}
+        ${c.tour_start ? `<div class="k">Tour</div><div class="v">${esc(c.tour_start)}</div>` : ""}
+        ${c.preferred_date ? `<div class="k">Appointment</div><div class="v">${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : ""}
+        ${c.caller_email ? `<div class="k">Email</div><div class="v">${esc(c.caller_email)}</div>` : ""}
+        ${renderPremium(c, i)}
+        ${c.summary ? `<div class="k">Call summary</div><div class="v">${esc(c.summary)}</div>` : ""}
+      </div>
+      <div class="col">${renderMessages(c.messages)}</div>
+    </div></td></tr>`;
+  }).join("");
   tb.querySelectorAll("tr.row").forEach(r => r.onclick = () => {
     const d = $("d" + r.dataset.i); d.hidden = !d.hidden;
-    if (d.hidden) openCalls.delete(d.dataset.id); else { openCalls.add(d.dataset.id); ensureAudio(r.dataset.i); }
+    r.classList.toggle("open", !d.hidden);
+    if (d.hidden) openCalls.delete(d.dataset.id); else { openCalls.add(d.dataset.id); wirePlayer(r.dataset.i); }
   });
+  tb.querySelectorAll("tr.detail:not([hidden])").forEach(d => wirePlayer(d.id.slice(1)));
   tb.querySelectorAll(".status-sel").forEach(sel => {
     sel.onclick = e => e.stopPropagation();
     sel.onchange = () => setStatus(sel);
   });
   tb.querySelectorAll(".tx-btn").forEach(b => b.onclick = e => { e.stopPropagation(); loadTranscript(b); });
-  tb.querySelectorAll("tr.detail:not([hidden])").forEach(d => ensureAudio(d.id.slice(1))); // re-opened after a refresh
+
 }
 
 function applySections() {
@@ -853,7 +993,7 @@ function renderAll(data) {
   renderUsage(data.usage);
   renderKpis(data.totals, data.previous || {});
   renderDaily(data.daily);
-  renderHours(data.byHour, data.totals.totalCalls);
+  renderHours(data.calls);
   renderWeek(data.byWeekday);
   renderOutcomes(data.outcomes, data.totals.totalCalls + (data.totals.silent || 0));
   $("tzNote").textContent = `times in ${tzLabel(TZ())}`;
