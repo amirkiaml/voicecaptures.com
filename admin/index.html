@@ -137,6 +137,10 @@
   dialog#callView { width: min(1000px, 96vw); max-height: 90vh; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
   dialog#callView::backdrop, dialog#rtConfirm::backdrop { background: rgba(0,0,0,.45); }
   dialog#rtConfirm { width: min(520px, 94vw); border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
+  .feat-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .feat { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+  .feat input { margin-top: 3px; }
+  @media (max-width: 900px) { .feat-list { grid-template-columns: 1fr; } }
   code { font-size: 12px; background: var(--gray-soft); padding: 1px 5px; border-radius: 5px; }
   .cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
   .pie { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; }
@@ -981,6 +985,13 @@ async function loadClient() {
           <label style="grid-column:1/-1">Add-ons (JSON; keys ending _cad are monthly CAD revenue)<textarea id="pfAddons" rows="2">${esc(JSON.stringify(r.addons || {}))}</textarea></label>
         </div>
         <div style="margin-top:8px"><button class="btn" id="pfSave" type="button">Save</button> <span id="pfMsg" class="small"></span></div>
+        <h3 style="margin-top:18px">What this client sees</h3>
+        <div class="feat-list">
+          <label class="feat"><input type="checkbox" data-feat="usage" ${r.features.usage ? "checked" : ""}><span><b>Minutes this period</b><br><span class="muted small">Usage card on their dashboard${r.allowance ? ` (${r.allowance} min plan)` : " — minutes only until a plan is set"}</span></span></label>
+          <label class="feat"><input type="checkbox" data-feat="recordings" ${r.features.recordings ? "checked" : ""}><span><b>Recordings &amp; transcripts</b><br><span class="muted small">Premium: play calls and read transcripts</span></span></label>
+          <label class="feat"><input type="checkbox" data-feat="review" ${r.features.review ? "checked" : ""}><span><b>Call review</b><br><span class="muted small">Tool calls and Vapi scoring per call</span></span></label>
+        </div>
+        <div id="featMsg" class="small" style="margin-top:4px"></div>
         <h3 style="margin-top:18px">Data retention &amp; recordings</h3>
         <div class="form-grid">
           <label>Data retention (paid add-on)<select id="rtDays">
@@ -1022,6 +1033,14 @@ async function loadClient() {
       { label: "Margin", value: Math.max(0, r.margin.cad), color: "#1f9d55" }], v => fmtCur(v, "CA"), r.revenue.cad ? fmtCur(r.revenue.cad, "CA", 0) : "trial");
     $("pfSave").onclick = saveClient;
     wireRetention();
+    box.querySelectorAll("[data-feat]").forEach(cb => cb.onchange = async () => {
+      cb.disabled = true;
+      try {
+        await api(`/api/dashboard/admin/features?business=${encodeURIComponent(CL.id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [cb.dataset.feat]: cb.checked }) });
+        $("featMsg").innerHTML = `<span class="good-t">Saved — ${esc(cb.closest("label").querySelector("b").textContent)} ${cb.checked ? "on" : "off"} for this client.</span>`;
+      } catch (e) { cb.checked = !cb.checked; $("featMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+      finally { cb.disabled = false; }
+    });
     box.querySelectorAll("[data-saveblocks]").forEach(b => b.onclick = async () => {
       const v = Number(box.querySelector(`[data-blocks="${b.dataset.saveblocks}"]`).value);
       try { await api(`${B}/period/${b.dataset.saveblocks}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ extra_blocks: v }) }); loadClient(); loaded.overview = false; }
