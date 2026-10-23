@@ -451,7 +451,7 @@
 <script>
 let days = 7, shown = 25, allCalls = [], last = null, S = null;
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const SECTION_NAMES = { revenue: "Revenue estimate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
+const SECTION_NAMES = { revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -513,13 +513,15 @@ function renderKpis(t, p) {
   const cards = [
     { label: "Conversations", val: t.totalCalls, d: delta(t.totalCalls, p.totalCalls),
       note: [t.silent ? `${t.silent} silent hang-up${t.silent === 1 ? "" : "s"} not counted` : "", t.abandoned ? `${t.abandoned} hung up early` : ""].filter(Boolean).join(" · ") || "real calls with a person on the line" },
-    { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked) },
-    { label: "Booking rate", val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
+    { label: `${S.bookingLabel} booked`, val: t.booked, d: delta(t.booked, p.booked), booking: true },
+    { label: "Booking rate", booking: true, val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
     { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of conversations came in while you were closed` },
     { label: "Emergencies captured", val: t.emergencies },
     { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) }
   ];
-  $("kpis").innerHTML = cards.map(c => `
+  // Clients who don't book jobs can hide the two booking cards (Customize → Show).
+  const shownCards = S.hiddenSections.includes("booking") ? cards.filter(c => !c.booking) : cards;
+  $("kpis").innerHTML = shownCards.map(c => `
     <div class="card kpi">
       <div class="label">${esc(c.label)}</div>
       <div class="val">${esc(c.val)} ${c.d || ""}</div>
