@@ -14,6 +14,8 @@ Replaces the older build-legal.py. Delete that file; deploy.ps1 calls this one.
 
 import pathlib
 
+import pricing_data
+
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "19 October 2026"
 TERMS_UPDATED = "22 October 2026"
@@ -577,6 +579,78 @@ header .btn.nav-cta.demo-cta{{animation:demoring 2.8s ease-out infinite}}
 /* --blue on near-black does not clear AA; the cyan ramp does. */
 html[data-theme="dark"] .demo-call a{{color:var(--cyan)}}
 
+/* ---- /pricing/ ----
+   Mobile-first: one column of plan cards, and the prepaid table scrolls
+   sideways inside its own box rather than widening the page. */
+.pr-hero{{padding-bottom:18px}}
+.pr-jump{{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}}
+.pr-jump a{{font-size:13px;font-weight:700;color:var(--text);text-decoration:none;
+  border:1px solid var(--line2);border-radius:999px;padding:8px 14px;
+  min-height:38px;display:inline-flex;align-items:center}}
+.pr-jump a:hover{{background:var(--bg3);border-color:var(--blue);color:var(--blue)}}
+.pr-trial{{padding:0}}
+.pr-trial p{{max-width:1060px;margin:0 auto;background:var(--blue-glow);
+  border:1px solid color-mix(in srgb,var(--blue) 28%,transparent);
+  border-radius:12px;padding:16px 20px;font-size:14.5px;line-height:1.6}}
+.pr-sub{{color:var(--muted);font-size:15px;margin:-6px 0 22px}}
+.pr-grid{{display:grid;gap:16px;grid-template-columns:1fr}}
+.pr-card{{background:var(--bg3);border:1px solid var(--line);border-radius:14px;
+  padding:22px;display:flex;flex-direction:column}}
+.pr-card.is-rec{{border-color:var(--blue);box-shadow:0 10px 34px var(--blue-glow)}}
+.pr-top{{display:flex;align-items:center;gap:10px;margin-bottom:10px}}
+.pr-top h3{{margin:0}}
+/* .pop is styled in index.html but not in this shell, so the badge arrived as
+   bare text. Same pill, defined here for the pages this file generates. */
+.pr-top .pop{{background:var(--blue-glow);color:var(--blue);font-size:9px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;
+  border-radius:100px;white-space:nowrap}}
+.pr-price{{font-family:var(--display);font-weight:800;font-size:34px;
+  letter-spacing:-.03em;line-height:1.1;margin:0}}
+.pr-price em{{font-style:normal;font-size:14px;font-weight:600;color:var(--muted);
+  letter-spacing:0;margin-left:4px}}
+.pr-price-q{{font-size:22px}}
+.pr-min{{color:var(--muted);font-size:14px;margin:6px 0 14px}}
+.pr-feat{{list-style:none;padding:0;margin:0 0 18px;flex:1 1 auto}}
+.pr-feat li{{position:relative;padding-left:22px;font-size:14.5px;line-height:1.55;
+  margin-bottom:8px}}
+.pr-feat li::before{{content:"";position:absolute;left:0;top:7px;width:11px;height:7px;
+  border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  transform:rotate(-45deg)}}
+.pr-note{{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 16px}}
+.pr-card .btn{{width:100%}}
+.pr-vnote{{margin-top:18px;max-width:760px}}
+.pr-scroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+/* The table is 560px wide at minimum, so on a phone the 12-month column — the
+   one with the best price — starts off screen. Say so rather than hope. */
+.pr-swipe{{font-size:12.5px;color:var(--muted);margin:0 0 10px}}
+@media (min-width:760px){{ .pr-swipe{{display:none}} }}
+.pr-tbl{{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}}
+.pr-tbl th,.pr-tbl td{{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}}
+.pr-tbl thead th{{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:700;white-space:nowrap}}
+.pr-tbl thead th span{{display:block;text-transform:none;letter-spacing:0;
+  font-weight:600;font-size:12px;color:var(--cyan)}}
+.pr-tbl tbody th{{font-weight:700;white-space:nowrap}}
+.pr-tbl td b{{font-weight:800}}
+.pr-tbl td span{{display:block;font-size:12.5px;color:var(--muted)}}
+.pr-cols{{display:grid;gap:22px;grid-template-columns:1fr}}
+.pr-col h3{{margin-bottom:10px}}
+.pr-col h3 + ul,.pr-col ul{{list-style:none;padding:0;margin:0 0 14px}}
+.pr-col li{{position:relative;padding-left:16px;font-size:14.5px;line-height:1.6;
+  margin-bottom:9px}}
+.pr-col li::before{{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;
+  border-radius:50%;background:var(--muted)}}
+.pr-col .pr-price{{font-size:26px;margin-bottom:8px}}
+.pr-col p{{font-size:14.5px;line-height:1.6}}
+.pr-end{{text-align:center}}
+.pr-end .lede{{margin-left:auto;margin-right:auto}}
+.pr-cta{{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:24px 0 16px}}
+@media (min-width:760px){{
+  .pr-grid{{grid-template-columns:repeat(3,1fr)}}
+  .pr-grid-1{{grid-template-columns:minmax(0,380px)}}
+  .pr-cols{{grid-template-columns:repeat(3,1fr);gap:30px}}
+}}
+
 /* ---- Win-back ---- */
 .wb-hero{{padding-top:clamp(40px,5vw,62px)}}
 .wb-art{{display:block;margin-top:38px}}
@@ -725,6 +799,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
         </div>
       </div>
       <a class="nav-a nav-wb" href="/win-back/"{cur_winback}>Win-back</a>
+      <a class="nav-a" href="/pricing/"{cur_pricing}>Pricing</a>
       <a class="nav-a" href="/contact/"{cur_contact}>Contact</a>
       <a class="nav-a nav-cal" href="{cal}" target="_blank" rel="noopener">Book a call</a>
     </nav>
@@ -756,6 +831,7 @@ html[data-theme="light"] .cf-row input[type=number]{{background:#fbfcfe}}
       <p class="mnav-h">Outbound</p>
       <a class="mnav-a mnav-wb" href="/win-back/"><span class="wbdot" aria-hidden="true"></span>Win-back campaigns</a>
       <p class="mnav-h">Company</p>
+      <a class="mnav-a sub" href="/pricing/">Pricing</a>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
@@ -2089,10 +2165,14 @@ your card or download invoices at any time from your billing portal.</p>
 
 <h2>Minutes</h2>
 <p>A minute is time our assistant spends on a live call, including transfers.
-Unused minutes don&rsquo;t carry over. We text you when you
-reach 80% of your monthly minutes. If you go over, we will offer you extra
-minutes, at $100 per 100 minutes, or a larger plan. We will not charge you for
-extra minutes without telling you first.</p>
+Unused minutes don&rsquo;t carry over. We text you when you reach 80% of your
+monthly minutes, and again at 100%. Your line keeps answering either way &mdash;
+we never cut it off for going over.</p>
+<p><strong>Extra minutes.</strong> You can top up from your dashboard at any
+time: 50 minutes for $65, or 100 minutes for $120. A top-up applies to the
+billing period you buy it in and does not carry over. Minutes you use past your
+plan without a top-up are billed at $1.50 each on your next invoice. The texts
+above are how we tell you before that happens.</p>
 
 <h2>Prepaid terms</h2>
 <p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
@@ -2104,7 +2184,7 @@ tell you before that happens.</p>
 <p><strong>Minutes stay monthly.</strong> Your allowance is per month and unused
 minutes do not carry over. Prepaying does not pool them: twelve months of a 300-minute
 plan is 300 minutes each month, not 3,600 to spend at will.</p>
-<p><strong>Extra minutes are billed as they happen</strong>, at $100 per 100 minutes,
+<p><strong>Extra minutes are billed as described above</strong>, at $1.50 per minute,
 and are not taken out of your prepayment. As with any plan, we tell you before adding
 them.</p>
 <p><strong>When a term ends</strong>, your plan carries on month to month at our
@@ -2370,7 +2450,243 @@ DEMO_SCRIPT = f"""
 </script>
 """
 
+# ---------------------------------------------------------------- pricing ----
+
+def _tier_card(t, rec):
+    """One plan. Shape comes from index.html: [name, $price, minutes, calls,
+    [features], "per location"?, {extras}?]."""
+    extra = t[6] if len(t) > 6 else {}
+    unit = (" " + t[5]) if len(t) > 5 and isinstance(t[5], str) else ""
+    frm = "From " if extra.get("from") else ""
+    feats = "".join(f"<li>{f}</li>" for f in t[4])
+    note = f'<p class="pr-note">{extra["note"]}</p>' if extra.get("note") else ""
+    cls = " is-rec" if rec else ""
+    badge = '<span class="pop">Recommended</span>' if rec else ""
+    calls = (" &middot; " + t[3]) if t[3] else ""
+    btn = "btn-primary" if rec else "btn-ghost"
+    return (
+        f'<div class="pr-card{cls}">'
+        f'<div class="pr-top"><h3>{t[0]}</h3>{badge}</div>'
+        f'<p class="pr-price">{frm}{t[1]}<em>/mo{unit}</em></p>'
+        f'<p class="pr-min">{t[2]}{calls}</p>'
+        f'<ul class="pr-feat">{feats}</ul>{note}'
+        f'<a class="btn {btn}" href="{CAL30}" '
+        f'target="_blank" rel="noopener">Book a 30-minute call</a></div>')
+
+
+def _vertical(key, data, alt):
+    d = data[key]
+    sub = d["trades"] or ""
+    note = f'<p class="fine pr-vnote">{d["priceNote"]}</p>' if d["priceNote"] else ""
+    cards = "".join(_tier_card(t, i == d["rec"]) for i, t in enumerate(d["tiers"]))
+    acls = ' class="alt"' if alt else ""
+    subp = f'<p class="pr-sub">{sub}</p>' if sub else ""
+    return (f'<section id="p-{key}"{acls}>'
+            f'<div class="wrap"><h2>{d["label"]}</h2>{subp}'
+            f'<div class="pr-grid">{cards}</div>{note}</div></section>')
+
+
+def _prepaid_table(data):
+    """Every distinct monthly price, at each term, using the same arithmetic as
+    the homepage switch: 5%, 10%, and 12 months for the price of 10."""
+    prices = sorted({int(t[1].replace("$", "").replace(",", ""))
+                     for d in data.values() for t in d["tiers"]})
+    terms = [(3, 0.05), (6, 0.10), (12, 1 - 10 / 12)]
+    rows = ""
+    for p in prices:
+        cells = ""
+        for months, off in terms:
+            total = round(p * months * (1 - off))
+            per = round(total / months)
+            cells += (f'<td><b>${total:,}</b><span>${per:,}/mo'
+                      f' &middot; save ${round(p * months) - total:,}</span></td>')
+        rows += f"<tr><th>${p:,}/mo</th>{cells}</tr>"
+    return rows
+
+
+def _pricing_body():
+    data = pricing_data.load()
+    verts = "".join(_vertical(k, data, i % 2 == 0)
+                    for i, (k, _) in enumerate(pricing_data.VERTICALS)
+                    if data[k]["tiers"])
+    return f"""
+<section class="pr-hero">
+  <div class="wrap">
+    <p class="eyebrow">Pricing</p>
+    <h1>Every plan, on one page</h1>
+    <p class="lede">What each industry pays, what a plan includes, and what the
+    extras cost. No quote needed to see a price.</p>
+    <p class="fine">All prices in CAD. Month to month, cancel anytime. Every plan
+    covers one location and answers 24/7 &mdash; after-hours, overflow or all day.</p>
+    <div class="pr-jump">
+      <a href="#p-home">Home services</a><a href="#p-food">Restaurants</a>
+      <a href="#p-clinic">Clinics</a><a href="#p-other">Other</a>
+      <a href="#p-personal">Personal</a><a href="#p-term">Prepaid</a>
+      <a href="#p-extra">Extras</a><a href="#p-wb">Win-back</a>
+    </div>
+  </div>
+</section>
+
+<section class="pr-trial">
+  <div class="wrap">
+    <p><b>14 days free at one location, up to 100 minutes.</b> On your real
+    business number, with full setup and real calls. Cancel before day 15 and you
+    pay nothing. Billed on day 15; we email you a reminder first.</p>
+  </div>
+</section>
+{verts}
+<section id="p-personal" class="alt">
+  <div class="wrap">
+    <h2>Personal line</h2>
+    <p class="pr-sub">A screening line for your own phone, not a business</p>
+    <div class="pr-grid pr-grid-1">
+      <div class="pr-card">
+        <div class="pr-top"><h3>Personal</h3><span class="pop">Beta</span></div>
+        <p class="pr-price">$9<em>/mo</em></p>
+        <p class="pr-min">Introductory price during the beta</p>
+        <ul class="pr-feat">
+          <li>Screens unknown numbers and spam</li>
+          <li>Takes a message and texts you the summary</li>
+          <li>Your own number, no new line to give out</li>
+        </ul>
+        <p class="pr-note">Not open yet. Join the waitlist and we will tell you
+        when it is. No card now, and the price may change before launch.</p>
+        <a class="btn btn-ghost" href="/personal/">Join the waitlist</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="p-term">
+  <div class="wrap">
+    <h2>Pay for 3, 6 or 12 months up front</h2>
+    <p class="pr-sub">The discount rises with the term, and your rate is locked
+    for it &mdash; if our prices go up while your term runs, yours does not.</p>
+    <p class="pr-swipe">Swipe the table sideways for the 6- and 12-month prices. &rarr;</p>
+    <div class="pr-scroll">
+      <table class="pr-tbl">
+        <thead><tr><th>Monthly</th><th>3 months<span>save 5%</span></th>
+        <th>6 months<span>save 10%</span></th>
+        <th>12 months<span>2 months free</span></th></tr></thead>
+        <tbody>{_prepaid_table(data)}</tbody>
+      </table>
+    </div>
+    <p class="fine pr-vnote">Minutes stay monthly: twelve months of a 300-minute
+    plan is 300 minutes each month, not 3,600 to spend at will. A prepaid term
+    starts after your free trial, and we email you the renewal rate during its
+    final month. Full terms are in our <a href="/terms/">Terms of Service</a>.</p>
+  </div>
+</section>
+
+<section id="p-extra" class="alt">
+  <div class="wrap">
+    <h2>Minutes, add-ons and setup</h2>
+    <div class="pr-cols">
+      <div class="pr-col">
+        <h3>If you need more minutes</h3>
+        <ul>
+          <li>We text you at 80% of your minutes, and again at 100%.</li>
+          <li><b>Your line never stops answering.</b> We do not cut you off for
+          going over.</li>
+          <li>Top up from your dashboard: <b>50 minutes for $65</b> ($1.30 each)
+          or <b>100 for $120</b> ($1.20 each).</li>
+          <li>Minutes used past your plan without a top-up are <b>$1.50 each</b>,
+          on your next invoice.</li>
+          <li>Top-ups apply to the month you buy them in. Unused minutes do not
+          carry over.</li>
+        </ul>
+        <p class="fine">Consistently over? A larger plan is cheaper than topping
+        up every month &mdash; we will tell you when that is true for you.</p>
+      </div>
+      <div class="pr-col">
+        <h3>Add-ons</h3>
+        <ul>
+          <li>Extra line or calendar &mdash; <b>$29/mo</b></li>
+          <li>90-day call history &mdash; <b>$19/mo</b></li>
+          <li>1-year call history &mdash; <b>$49/mo</b></li>
+          <li>Practice-software, field-service, POS or CRM integration &mdash;
+          <b>from $500</b> one-time <b>+ $39/mo</b>, quoted</li>
+        </ul>
+        <p class="fine">Every plan keeps call history, recordings and transcripts
+        for 14 days. For clinics we recommend staying at 14 days &mdash; on a
+        patient-facing line, keeping less is the safer setting, not a worse one.</p>
+      </div>
+      <div class="pr-col">
+        <h3>Setup</h3>
+        <ul>
+          <li><b>Setup is included.</b> We configure the assistant for your
+          business, on your existing number. It takes about 10 minutes of your
+          time.</li>
+          <li>Multi-location or custom call flows &mdash; <b>$249</b> one-time.</li>
+        </ul>
+        <h3>What a minute means</h3>
+        <ul>
+          <li>Time our assistant spends on a live call, including transfers.</li>
+          <li>Calls the assistant marks as spam are not billed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="p-wb">
+  <div class="wrap">
+    <h2>Win-back campaigns</h2>
+    <p class="pr-sub">Outbound calls to your own past customers &mdash; priced
+    separately from the receptionist, and you can buy either on its own</p>
+    <div class="pr-cols">
+      <div class="pr-col">
+        <h3>One-time campaign</h3>
+        <p class="pr-price">$2.50<em> per customer on your list</em></p>
+        <p>A single push through a list you give us &mdash; seasonal maintenance,
+        annual recalls, lapsed customers.</p>
+      </div>
+      <div class="pr-col">
+        <h3>Always-on</h3>
+        <p class="pr-price">$2.50<em> per customer, + $99/mo</em></p>
+        <p>Each customer called automatically when they come due, rather than in
+        one batch.</p>
+      </div>
+      <div class="pr-col">
+        <h3>Build and own it</h3>
+        <p class="pr-price pr-price-q">Priced on a call</p>
+        <p>We build the system and hand it over, running on phone and AI accounts
+        you own. You pay the providers directly, at cost.</p>
+      </div>
+    </div>
+    <p class="fine pr-vnote"><b>The first 20% of your list is a free pilot</b>
+    (at least 25 names, at most 100), so you see your real booking rate before
+    you pay anything. We call your own past customers only &mdash; never cold
+    lists or purchased leads. <a href="/win-back/">How win-back works</a>.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap pr-end">
+    <h2>Start with the 14-day trial</h2>
+    <p class="lede">Or build a demo assistant for your business first and hear it
+    answer, in about 30 seconds, without talking to anyone.</p>
+    <div class="pr-cta">
+      <a class="btn btn-primary" href="/contact/">Start free trial</a>
+      <a class="btn btn-ghost" href="/demo/?src=pricing">Build your demo</a>
+      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
+    </div>
+    <p class="fine">Questions about a price? <a href="/contact/">Tell us what you
+    need</a> and we will come back within a day.</p>
+  </div>
+</section>
+"""
+
+
+PRICING_BODY = _pricing_body()
+
+
 PAGES = [
+    ("pricing", "Pricing | VoiceCaptures",
+     "What an AI receptionist costs for home services, restaurants, clinics and "
+     "any other business. Every plan, minutes, add-ons and prepaid terms, with "
+     "no quote needed.", PRICING_BODY, ""),
+
     ("demo", "Hear your own AI receptionist | VoiceCaptures",
      "Build a demo AI receptionist for your business and talk to it in your "
      "browser. About 30 seconds to set up, no call and no signup.",
@@ -2416,6 +2732,7 @@ def main():
             email=EMAIL, demo=DEMO_PAGE,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",
+            cur_pricing=' aria-current="page"' if slug == "pricing" else "",
             cal=CAL30 if slug == "about" else CAL,
             cta="" if slug in ("win-back", "demo") else
                 ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO_PAGE + '?src=nav">'

@@ -538,6 +538,78 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
 /* --blue on near-black does not clear AA; the cyan ramp does. */
 html[data-theme="dark"] .demo-call a{color:var(--cyan)}
 
+/* ---- /pricing/ ----
+   Mobile-first: one column of plan cards, and the prepaid table scrolls
+   sideways inside its own box rather than widening the page. */
+.pr-hero{padding-bottom:18px}
+.pr-jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pr-jump a{font-size:13px;font-weight:700;color:var(--text);text-decoration:none;
+  border:1px solid var(--line2);border-radius:999px;padding:8px 14px;
+  min-height:38px;display:inline-flex;align-items:center}
+.pr-jump a:hover{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.pr-trial{padding:0}
+.pr-trial p{max-width:1060px;margin:0 auto;background:var(--blue-glow);
+  border:1px solid color-mix(in srgb,var(--blue) 28%,transparent);
+  border-radius:12px;padding:16px 20px;font-size:14.5px;line-height:1.6}
+.pr-sub{color:var(--muted);font-size:15px;margin:-6px 0 22px}
+.pr-grid{display:grid;gap:16px;grid-template-columns:1fr}
+.pr-card{background:var(--bg3);border:1px solid var(--line);border-radius:14px;
+  padding:22px;display:flex;flex-direction:column}
+.pr-card.is-rec{border-color:var(--blue);box-shadow:0 10px 34px var(--blue-glow)}
+.pr-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pr-top h3{margin:0}
+/* .pop is styled in index.html but not in this shell, so the badge arrived as
+   bare text. Same pill, defined here for the pages this file generates. */
+.pr-top .pop{background:var(--blue-glow);color:var(--blue);font-size:9px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;
+  border-radius:100px;white-space:nowrap}
+.pr-price{font-family:var(--display);font-weight:800;font-size:34px;
+  letter-spacing:-.03em;line-height:1.1;margin:0}
+.pr-price em{font-style:normal;font-size:14px;font-weight:600;color:var(--muted);
+  letter-spacing:0;margin-left:4px}
+.pr-price-q{font-size:22px}
+.pr-min{color:var(--muted);font-size:14px;margin:6px 0 14px}
+.pr-feat{list-style:none;padding:0;margin:0 0 18px;flex:1 1 auto}
+.pr-feat li{position:relative;padding-left:22px;font-size:14.5px;line-height:1.55;
+  margin-bottom:8px}
+.pr-feat li::before{content:"";position:absolute;left:0;top:7px;width:11px;height:7px;
+  border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  transform:rotate(-45deg)}
+.pr-note{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 16px}
+.pr-card .btn{width:100%}
+.pr-vnote{margin-top:18px;max-width:760px}
+.pr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* The table is 560px wide at minimum, so on a phone the 12-month column — the
+   one with the best price — starts off screen. Say so rather than hope. */
+.pr-swipe{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+@media (min-width:760px){ .pr-swipe{display:none} }
+.pr-tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.pr-tbl th,.pr-tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+.pr-tbl thead th{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:700;white-space:nowrap}
+.pr-tbl thead th span{display:block;text-transform:none;letter-spacing:0;
+  font-weight:600;font-size:12px;color:var(--cyan)}
+.pr-tbl tbody th{font-weight:700;white-space:nowrap}
+.pr-tbl td b{font-weight:800}
+.pr-tbl td span{display:block;font-size:12.5px;color:var(--muted)}
+.pr-cols{display:grid;gap:22px;grid-template-columns:1fr}
+.pr-col h3{margin-bottom:10px}
+.pr-col h3 + ul,.pr-col ul{list-style:none;padding:0;margin:0 0 14px}
+.pr-col li{position:relative;padding-left:16px;font-size:14.5px;line-height:1.6;
+  margin-bottom:9px}
+.pr-col li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;
+  border-radius:50%;background:var(--muted)}
+.pr-col .pr-price{font-size:26px;margin-bottom:8px}
+.pr-col p{font-size:14.5px;line-height:1.6}
+.pr-end{text-align:center}
+.pr-end .lede{margin-left:auto;margin-right:auto}
+.pr-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:24px 0 16px}
+@media (min-width:760px){
+  .pr-grid{grid-template-columns:repeat(3,1fr)}
+  .pr-grid-1{grid-template-columns:minmax(0,380px)}
+  .pr-cols{grid-template-columns:repeat(3,1fr);gap:30px}
+}
+
 /* ---- Win-back ---- */
 .wb-hero{padding-top:clamp(40px,5vw,62px)}
 .wb-art{display:block;margin-top:38px}
@@ -686,6 +758,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
         </div>
       </div>
       <a class="nav-a nav-wb" href="/win-back/" aria-current="page">Win-back</a>
+      <a class="nav-a" href="/pricing/">Pricing</a>
       <a class="nav-a" href="/contact/">Contact</a>
       <a class="nav-a nav-cal" href="https://calendly.com/hello-voicecaptures" target="_blank" rel="noopener">Book a call</a>
     </nav>
@@ -717,6 +790,7 @@ html[data-theme="light"] .cf-row input[type=number]{background:#fbfcfe}
       <p class="mnav-h">Outbound</p>
       <a class="mnav-a mnav-wb" href="/win-back/"><span class="wbdot" aria-hidden="true"></span>Win-back campaigns</a>
       <p class="mnav-h">Company</p>
+      <a class="mnav-a sub" href="/pricing/">Pricing</a>
       <a class="mnav-a sub" href="/about/">About</a>
       <a class="mnav-a sub" href="/careers/">Careers</a>
       <a class="mnav-a sub" href="/contact/">Contact</a>
