@@ -965,9 +965,17 @@ function applySections() {
 /* Minutes this period — minutes only, never cost. Hidden until a plan is set. */
 function renderUsage(u) {
   const el = $("usageCard");
-  if (!u || !u.minutesAllowed) { el.hidden = true; return; }
-  const pct = Math.max(0, u.percent || 0);
+  if (!u) { el.hidden = true; return; }
   const fmtD = s => new Date(s + "T12:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" });
+  if (!u.minutesAllowed) { // no plan set yet: minutes used only
+    el.className = "card usage";
+    el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))}</span>
+      <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
+      <div class="muted" style="font-size:12px">${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}</div>`;
+    el.hidden = false;
+    return;
+  }
+  const pct = Math.max(0, u.percent || 0);
   el.className = "card usage" + (pct >= 100 ? " over" : pct >= 80 ? " warn" : "");
   el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))} of ${esc(u.minutesAllowed)}</span>
       <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
