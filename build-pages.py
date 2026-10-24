@@ -17,8 +17,8 @@ import pathlib
 import pricing_data
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "19 October 2026"
-TERMS_UPDATED = "22 October 2026"
+PRIVACY_UPDATED = "24 October 2026"
+TERMS_UPDATED = "24 October 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 # The legal owner's name is deliberately not published. Carriers and
@@ -2102,6 +2102,19 @@ backup systems. While information is with a provider it may be subject to US
 law. We use service providers only to run the service, and each one receives
 only what it needs to do its part.</p>
 
+<h2>If there is a security incident</h2>
+<p>If we find that information we hold about you or your callers may have been
+accessed by someone who should not have it &mdash; whether the failure is ours or
+one of the providers we rely on &mdash; <strong>we will tell affected clients
+without undue delay</strong>, and tell the people whose information is involved
+where the law requires it. We will say what we know, what we are doing about it,
+and what you can do.</p>
+<p>Canadian privacy law requires us to report a breach to the Office of the
+Privacy Commissioner of Canada, and to notify the individuals affected, when it
+creates a real risk of significant harm. We keep a record of every breach,
+whether or not it is reportable, and we can show that record to the Commissioner
+on request.</p>
+
 <h2>Your rights</h2>
 <p>You can ask to see, correct or delete the information we hold about you. Email
 <a href="mailto:{EMAIL}">{EMAIL}</a> with the number you called from and roughly
@@ -2130,6 +2143,11 @@ books appointments into your calendar, transfers calls to you, and sends text
 messages to you and to your callers. We set it up for you. AI can mishear or
 misunderstand a caller, so check your bookings and messages. It is not an
 emergency service; callers with emergencies are told to call 911.</p>
+<p><strong>How messages reach you.</strong> Summaries and alerts are delivered by
+text and by email. If a delivery fails, we follow up within one business day,
+through another channel if we need to. Carriers and inboxes sometimes delay or
+filter messages for reasons no sender controls, so your dashboard holds every
+call and message and is the record to check if something has not arrived.</p>
 
 <h2>Plans and locations</h2>
 <p>Each plan covers one business location, with the minutes, lines and calendars
@@ -2262,6 +2280,34 @@ handle this information.</p>
 <p>The service is provided as is. We don&rsquo;t promise the assistant will be
 error-free or always available; it depends on phone, AI and internet providers we
 don&rsquo;t control.</p>
+
+<h2>Availability and outages</h2>
+<p>The assistant only works while the telephony, AI and hosting providers behind
+it are working. We do not control them, we do not promise any level of uptime
+during one of their outages, and we are not liable for calls, bookings or
+messages that are lost, delayed or undelivered because of one.</p>
+<p><strong>What an outage is worth.</strong> If the assistant cannot answer your
+calls for more than <strong>4 consecutive hours</strong>, you can ask for a
+service credit: one day of your monthly plan fee for each 24 hours of the outage
+or part of one, up to that month's fee in total. Ask within 30 days of the
+outage. Credits are applied to a future invoice; they are not cash refunds, and
+they are the only compensation we offer for downtime.</p>
+<p>Credits do not apply to maintenance we told you about in advance, to anything
+caused by your own number, call forwarding, carrier, calendar or integrations,
+or to time while your account is suspended for non-payment.</p>
+
+<h2>Events outside our control</h2>
+<p>Neither of us is responsible for failing to meet an obligation under these
+terms because of something outside our reasonable control. That includes natural
+events, war, civil unrest, labour action, epidemics, failures of power or the
+public internet, acts of government, and the failure, suspension or
+<strong>security compromise of a provider we rely on</strong> &mdash; telephony,
+AI, email or hosting. Our obligations are suspended while it lasts, we tell you
+as soon as we reasonably can, and if it runs longer than 30 days either of us may
+cancel for the affected service with no further charge.</p>
+<p>This does not touch what we owe you if information is exposed. If a provider
+is breached and your data may be involved, we notify you as set out in our
+<a href="/privacy/">Privacy Policy</a>.</p>
 
 <h2>Limitation of liability</h2>
 <p>To the extent the law allows, our total liability for any claim is limited to
