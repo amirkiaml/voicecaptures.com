@@ -106,6 +106,8 @@
   .sub-table { width: 100%; font-size: 13px; margin-top: 6px; }
   .sub-table td, .sub-table th { padding: 6px 8px; }
   label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
+  .form-grid label.chk { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; align-self: end; min-height: 38px; gap: 8px; }
+  .form-grid label.chk input { width: auto; margin: 0; }
   /* USD sits under the CAD figure; inline (with a dot) only inside list rows. */
   .usd { color: var(--muted); font-size: 12px; font-weight: 500; white-space: nowrap; display: block; }
   .stat .v .usd { font-family: "DM Sans", sans-serif; font-size: 13px; margin-top: 2px; }
@@ -126,7 +128,8 @@
   .legend2 { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink2); margin-top: 6px; }
   .legend2 i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
   .list { display: grid; gap: 6px; }
-  .list .it { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .list .it { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .list .it > span { min-width: 0; overflow-wrap: anywhere; }
   .list .it:last-child { border-bottom: 0; }
   .form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
   .form-grid label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
@@ -137,7 +140,7 @@
   dialog#callView { width: min(1000px, 96vw); max-height: 90vh; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
   dialog#callView::backdrop, dialog#rtConfirm::backdrop { background: rgba(0,0,0,.45); }
   dialog#rtConfirm { width: min(520px, 94vw); border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 18px; }
-  .feat-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .feat-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .feat { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: 14px; }
   .feat input { margin-top: 3px; }
   @media (max-width: 900px) { .feat-list { grid-template-columns: 1fr; } }
@@ -222,7 +225,7 @@
     <div class="card"><div class="table-wrap"><table id="oTable">
       <thead><tr>
         <th class="sort" data-k="business">Client</th><th class="sort" data-k="status">Plan · status</th><th class="sort" data-k="periodEnd">Period</th>
-        <th class="sort" data-k="pctUsed">Minutes</th><th class="sort" data-k="calls">Calls</th><th class="sort" data-k="extraBlocks">Extras</th>
+        <th class="sort" data-k="pctUsed">Minutes</th><th class="sort" data-k="calls">Calls</th><th class="sort" data-k="extraMinutes">Extras</th>
         <th class="sort" data-k="revenue">Revenue</th><th class="sort" data-k="vapi">Vapi</th><th class="sort" data-k="twilio">Twilio (est.)</th>
         <th class="sort" data-k="total">Total cost</th><th class="sort on" data-k="margin">Margin</th><th class="sort" data-k="cpm">Cost / min</th><th>Alerts</th>
       </tr></thead>
@@ -775,7 +778,7 @@ const monLabel = k => { const [y, m] = k.split("-"); return new Date(Date.UTC(+y
 
 /* ---------- overview ---------- */
 let OV = null, oSort = { k: "margin", asc: false };
-const sortVal = (r, k) => ({ business: r.business, status: r.status, periodEnd: r.periodEnd, pctUsed: r.pctUsed ?? -1, calls: r.calls, extraBlocks: r.extraBlocks,
+const sortVal = (r, k) => ({ business: r.business, status: r.status, periodEnd: r.periodEnd, pctUsed: r.pctUsed ?? -1, calls: r.calls, extraMinutes: (r.extraMinutes || 0) + (r.overage ? r.overage.minutes : 0),
   revenue: r.revenue.cad, vapi: r.vapiCost.cad, twilio: r.twilioCost.cad, total: r.totalCost.cad, margin: r.marginPct ?? -1e9, cpm: r.costPerMinute?.cad ?? -1 }[k]);
 
 async function loadOverview() {
@@ -815,7 +818,7 @@ function renderOverview() {
     : `<div class="muted small">Nothing needs action.</div>`;
   $("oInvoice").innerHTML = d.toInvoice.length ? d.toInvoice.map(x => `<div class="it">
       <span><button class="linkbtn" data-client="${esc(x.customerId)}">${esc(x.business)}</button><div class="muted small">${fmtDay(x.periodStart)} – ${fmtDay(x.periodEnd)} · ${fmtMin(x.minutes)} of ${x.allowance} min${x.ended ? "" : " · period still open"}${x.stripeCustomerId ? ` · ${esc(x.stripeCustomerId)}` : ""}</div></span>
-      <span class="num"><b>${x.blocks} × 100 min</b> = ${bothM(x.amount)} <button class="btn" type="button" data-invoice="${x.periodId}" data-blocks="${x.blocks}" ${x.ended ? "" : 'title="Period still open; usage may grow"'}>Billed ✓</button></span></div>`).join("")
+      <span class="num"><b>${x.overMinutes} min × $${Number(x.overageRate).toFixed(2)}</b> = ${bothM(x.amount)} <button class="btn" type="button" data-invoice="${x.periodId}" ${x.ended ? "" : 'title="Period still open; usage may grow"'}>Billed ✓</button></span></div>`).join("")
     : `<div class="muted small">No client is over their allowance.</div>`;
 
   // Minutes per day, stacked by client
@@ -848,7 +851,7 @@ function renderOverview() {
   document.querySelectorAll("#tab-overview [data-client]").forEach(b => b.onclick = () => openClient(b.dataset.client));
   document.querySelectorAll("#oInvoice [data-invoice]").forEach(b => b.onclick = async () => {
     if (!confirmInline(b)) return;
-    try { await api(`${B}/period/${b.dataset.invoice}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice_blocks: Number(b.dataset.blocks) }) }); loadOverview(); }
+    try { await api(`${B}/period/${b.dataset.invoice}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice: true }) }); loadOverview(); }
     catch (e) { b.textContent = e.message; }
   });
 }
@@ -860,11 +863,11 @@ function renderOTable() {
   document.querySelectorAll("#oTable th.sort").forEach(th => { th.classList.toggle("on", th.dataset.k === oSort.k); th.classList.toggle("asc", th.dataset.k === oSort.k && oSort.asc); });
   $("oBody").innerHTML = rows.length ? rows.map(r => `<tr class="row" data-client="${esc(r.id)}">
     <td><b>${esc(r.business)}</b><div class="muted small">${esc(r.vertical || "no plan set")}</div></td>
-    <td>${esc(PLAN_LABEL[r.plan] || "—")}<div><span class="pill ${STATUS_CLS[r.status] || ""}">${esc(String(r.status).replace("_", " "))}</span></div></td>
+    <td>${esc(PLAN_LABEL[r.plan] || "—")}<div><span class="pill ${STATUS_CLS[r.status] || ""}">${esc(String(r.status).replace("_", " "))}</span>${r.serviceActive === false ? ` <span class="pill bad" title="${esc(r.servicePausedReason || "")}">paused</span>` : r.serviceMode === "on" ? ` <span class="pill" title="Always on">always on</span>` : ""}</div></td>
     <td class="small">${fmtDay(r.periodStart)} – ${fmtDay(r.periodEnd)}${r.trialDaysLeft != null ? `<div class="${r.trialDaysLeft <= 3 ? "warn-t" : "muted"}">${r.trialDaysLeft} trial day${r.trialDaysLeft === 1 ? "" : "s"} left</div>` : ""}</td>
     <td class="num">${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}${r.pctUsed != null ? `<div><span class="pill pct ${pctCls(r.pctUsed)}">${r.pctUsed}%</span></div>` : ""}</td>
     <td class="num">${r.calls}<div class="muted small">avg ${fmtDur(r.avgSeconds)}</div></td>
-    <td class="small">${r.extraBlocks ? `${r.extraBlocks} block${r.extraBlocks > 1 ? "s" : ""}` : "—"}${Object.keys(r.addons || {}).length ? `<div class="muted" title="${esc(JSON.stringify(r.addons))}">add-ons ${fmtCur(r.addonsMonthly.cad, "CA")}/mo</div>` : ""}</td>
+    <td class="small">${r.extraMinutes ? `+${r.extraMinutes} min` : ""}${r.overage && r.overage.minutes ? `<div class="${r.overage.waived ? "muted" : "warn-t"}">${r.overage.minutes} over${r.overage.waived ? " · waived" : ` · ${fmtCur(r.overage.cad, "CA")}`}</div>` : ""}${!r.extraMinutes && !(r.overage && r.overage.minutes) ? "—" : ""}${Object.keys(r.addons || {}).length ? `<div class="muted" title="${esc(JSON.stringify(r.addons))}">add-ons ${fmtCur(r.addonsMonthly.cad, "CA")}/mo</div>` : ""}</td>
     <td class="num">${bothM(r.revenue)}${r.revenueEstimated ? `<div class="muted small">est.</div>` : ""}</td>
     <td class="num">${bothM(r.vapiCost)}${r.costCoverage != null && r.costCoverage < 100 ? `<div class="warn-t small">${r.costCoverage}% of calls costed</div>` : ""}</td>
     <td class="num" title="SMS ${r.twilioParts.smsSent} × est · voice est · ${r.twilioParts.lines} number(s)">${bothM(r.twilioCost)}</td>
@@ -904,7 +907,23 @@ async function loadSettings() {
         <label>Admin alert phone<input id="stPhone" type="tel" placeholder="+1…" value="${esc(st.admin_alert_phone || "")}"></label>
         <label>&nbsp;<button class="btn" id="stSave" type="button">Save rates</button></label>
       </div>
-      <div class="muted small" style="margin-top:6px">Alerts are sent from ADMIN_SMS_FROM: <b class="${d.adminSmsFrom ? "good-t" : "bad-t"}">${d.adminSmsFrom ? "set" : "not set on Railway — alerts are skipped"}</b>.</div>
+      <div class="muted small" style="margin-top:6px">Alerts are sent from ADMIN_SMS_FROM: <b class="${d.adminSmsFrom ? "good-t" : "bad-t"}">${d.adminSmsFrom ? "set" : "not set on Render — alerts are skipped"}</b>.</div>
+      <h3 style="margin-top:16px">Plans <span class="muted small">(what each tier includes; picking a plan for a client fills these in)</span></h3>
+      <div id="plansBox" class="small muted">Loading…</div>
+      <h3 style="margin-top:16px">Extra minutes &amp; Stripe</h3>
+      <div class="muted small" style="margin-bottom:6px">Plans never stop answering on minutes: past the allowance, overage is billed on the next invoice. Rates are copied onto each billing period when it opens, so a change here applies from each client's next period (prepaid clients: after their term). Per-client exceptions: open the client → Overrides.</div>
+      <div class="form-grid">
+        <label>50-minute top-up (CAD)<input id="st50" type="number" min="0" step="0.01" value="${esc(st.topup_50_cad ?? 65)}"></label>
+        <label>100-minute top-up (CAD)<input id="st100" type="number" min="0" step="0.01" value="${esc(st.topup_100_cad ?? 120)}"></label>
+        <label>Overage, no top-up (CAD / min)<input id="stOver" type="number" min="0" step="0.01" value="${esc(st.overage_rate_cad ?? 1.5)}"></label>
+        <label>Grace before pausing — trials &amp; cut-off clients (%)<input id="stGrace" type="number" min="0" max="100" value="${esc(st.cutoff_grace_pct ?? 10)}"></label>
+        <label>Sales email (alerts come from it)<input id="stSales" type="email" value="${esc(st.sales_email || "sales@voicecaptures.com")}"></label>
+        <label>Caller sentiment add-on (CAD / month)<input id="stSent" type="number" min="0" step="1" value="${esc(st.sentiment_price_cad ?? 9)}"></label>
+        <label>&nbsp;<button class="btn" id="stPause" type="button">Save</button></label>
+      </div>
+      <div class="k2">Stripe payment links <span class="muted small" style="text-transform:none;letter-spacing:0">— each client gets their own copy with ?client_reference_id=…, so payments credit the right account automatically</span></div>
+      <table class="sub-table" id="spTable"><thead><tr><th>What</th><th>Amount</th><th>Price (CAD)</th><th>Payment link URL</th><th>Link ID (plink_…)</th><th></th></tr></thead><tbody></tbody></table>
+      <div style="margin-top:6px"><button class="btn" id="spAdd" type="button">+ Add link</button> <button class="btn" id="spSave" type="button">Save links</button></div>
       <h3 style="margin-top:16px">Fixed costs</h3>
       <div class="filters">
         <input id="fcMonth" type="month" class="btn" value="${new Date().toISOString().slice(0, 7)}" aria-label="Month">
@@ -918,10 +937,50 @@ async function loadSettings() {
         f.items.length ? f.items.map(x => `<tr><td>${esc(String(x.month).slice(0, 7))}</td><td>${esc(x.item)}</td><td class="num">${bothM(x.both)} <span class="muted small">(entered ${esc(x.currency)})</span></td><td class="small">${esc(x.note || "")}</td>
           <td><button class="linkbtn" data-delfc="${x.id}">remove</button></td></tr>`).join("") : `<tr><td colspan="5" class="muted">None entered.</td></tr>`}</tbody></table>
       <h3 style="margin-top:16px">Retention cleanup</h3>
-      <div class="small">Mode: <b>${d.cleanupMode === "delete" ? "deleting expired transcripts and recordings daily" : "dry run (counts only) — set RETENTION_CLEANUP=on on Railway to delete"}</b>.
+      <div class="small">Mode: <b>${d.cleanupMode === "delete" ? "deleting expired transcripts and recordings daily" : "dry run (counts only) — set RETENTION_CLEANUP=on on Render to delete"}</b>.
         ${lastRun ? `Last run ${esc(fmtWhen(lastRun.ran_at))}: ${lastRun.artifacts_expired} expired, ${lastRun.artifacts_deleted} deleted, ${lastRun.recordings_deleted} recordings removed.` : "Not run yet."}
         <button class="btn" id="clDry" type="button">Dry run now</button></div>
       <div id="stMsg" class="small" style="margin-top:6px"></div>`;
+    // Plans catalog
+    api(`${B}/plans`).then(pd => {
+      $("plansBox").innerHTML = `<table class="sub-table"><thead><tr><th>Plan</th><th>Price (CAD / month)</th><th>Minutes / month</th></tr></thead><tbody>${pd.plans.map(p => `<tr>
+        <td>${esc(p.label)}</td><td><input class="inline-in" style="width:90px" type="number" min="0" step="1" data-pp="${esc(p.plan_name)}" value="${p.price_cad ?? ""}"></td>
+        <td><input class="inline-in" style="width:90px" type="number" min="0" step="1" data-pm="${esc(p.plan_name)}" value="${p.minutes ?? ""}"></td></tr>`).join("")}</tbody></table>
+        <button class="btn" id="plSave" type="button" style="margin-top:6px">Save plans</button>`;
+      $("plSave").onclick = async () => {
+        const plans = pd.plans.map(p => ({ plan_name: p.plan_name, price_cad: el.querySelector(`[data-pp="${p.plan_name}"]`).value, minutes: el.querySelector(`[data-pm="${p.plan_name}"]`).value }));
+        try { await api(`${B}/plans`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plans }) }); $("stMsg").innerHTML = `<span class="good-t">Plans saved.</span>`; }
+        catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+      };
+    }).catch(e => { $("plansBox").innerHTML = needsMigration(e) ? `<span class="warn-t">Run migrations/2026-10-23-service-control.sql to edit plans.</span>` : `<span class="err">${esc(e.message)}</span>`; });
+    // Stripe products
+    const spRow = p => `<tr>
+      <td><select data-k="kind"><option value="topup" ${p.kind === "topup" ? "selected" : ""}>Extra minutes</option><option value="history" ${p.kind === "history" ? "selected" : ""}>Call history</option><option value="plan" ${p.kind === "plan" ? "selected" : ""}>Plan</option></select></td>
+      <td><input class="inline-in" data-k="amount" style="width:120px" value="${esc(p.kind === "topup" ? p.minutes ?? "" : p.kind === "history" ? p.days ?? "" : p.plan_name ?? "")}" placeholder="50 / 90 / home_starter"></td>
+      <td><input class="inline-in" data-k="price_cad" type="number" step="0.01" value="${p.price_cad ?? ""}"></td>
+      <td><input class="inline-in" data-k="url" style="width:260px" value="${esc(p.url || "")}" placeholder="https://buy.stripe.com/…"></td>
+      <td><input class="inline-in" data-k="link_id" style="width:170px" value="${esc(p.link_id || "")}" placeholder="plink_…"></td>
+      <td><button class="linkbtn" data-sprm>remove</button></td></tr>`;
+    const spBody = $("spTable").querySelector("tbody");
+    const spDraw = list => { spBody.innerHTML = list.map(spRow).join("") || `<tr class="sp-empty"><td colspan="6" class="muted">None yet. See the setup steps for the four links to create.</td></tr>`;
+      spBody.querySelectorAll("[data-sprm]").forEach(b => b.onclick = () => { b.closest("tr").remove(); }); };
+    spDraw(Array.isArray(st.stripe_products) ? st.stripe_products : []);
+    $("spAdd").onclick = () => { spBody.querySelector(".sp-empty")?.remove(); spBody.insertAdjacentHTML("beforeend", spRow({ kind: "topup" })); spBody.querySelectorAll("[data-sprm]").forEach(b => b.onclick = () => b.closest("tr").remove()); };
+    $("spSave").onclick = async () => {
+      const list = [...spBody.querySelectorAll("tr")].filter(tr => tr.querySelector("[data-k=kind]")).map(tr => {
+        const v = k => tr.querySelector(`[data-k=${k}]`).value.trim();
+        const kind = v("kind"), amt = v("amount");
+        return { kind, url: v("url"), link_id: v("link_id"), price_cad: v("price_cad") === "" ? null : Number(v("price_cad")),
+          ...(kind === "topup" ? { minutes: Number(amt) } : kind === "history" ? { days: Number(amt) } : { plan_name: amt }) };
+      });
+      try { await api(`${B}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ stripe_products: list }) }); $("stMsg").innerHTML = `<span class="good-t">Stripe links saved.</span>`; }
+      catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    };
+    $("stPause").onclick = async () => {
+      try { await api(`${B}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cutoff_grace_pct: Number($("stGrace").value), sales_email: $("stSales").value.trim(), sentiment_price_cad: Number($("stSent").value),
+        topup_50_cad: Number($("st50").value), topup_100_cad: Number($("st100").value), overage_rate_cad: Number($("stOver").value) }) });
+        $("stMsg").innerHTML = `<span class="good-t">Saved.</span>`; } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    };
     $("stSave").onclick = async () => {
       try { await api(`${B}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         usd_to_cad: Number($("stRate").value), sms_cost_estimate_usd: Number($("stSms").value), number_cost_usd_monthly: Number($("stNum").value),
@@ -960,6 +1019,7 @@ async function loadClient() {
     const pages = d.total != null ? Math.max(1, Math.ceil(d.total / d.pageSize)) : null;
     box.innerHTML = `<h1>${esc(r.business)} <span class="pill ${STATUS_CLS[r.status] || ""}" style="vertical-align:middle">${esc(String(r.status).replace("_", " "))}</span></h1>
       <div class="sub">${esc(PLAN_LABEL[r.plan] || "No plan set")} · ${fmtDay(d.range.start)} – ${fmtDay(d.range.end)} · retention ${r.retentionDays} days · recordings ${r.recordingEnabled ? "kept" : "<b>off</b>"}</div>
+      <div class="card mb" id="svcCard"><div class="muted">Loading…</div></div>
       <div class="stats six">
         ${card("Minutes", `${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}`, r.pctUsed != null ? `<span class="pill ${pctCls(r.pctUsed)}">${r.pctUsed}% used</span>` : "")}
         ${card("Calls", r.calls, `avg ${fmtDur(r.avgSeconds)}${r.spamCalls ? ` · ${r.spamCalls} spam` : ""}`)}
@@ -990,6 +1050,8 @@ async function loadClient() {
           <label class="feat"><input type="checkbox" data-feat="usage" ${r.features.usage ? "checked" : ""}><span><b>Minutes this period</b><br><span class="muted small">Usage card on their dashboard${r.allowance ? ` (${r.allowance} min plan)` : " — minutes only until a plan is set"}</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="recordings" ${r.features.recordings ? "checked" : ""}><span><b>Recordings &amp; transcripts</b><br><span class="muted small">Premium: play calls and read transcripts</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="review" ${r.features.review ? "checked" : ""}><span><b>Call review</b><br><span class="muted small">Tool calls and Vapi scoring per call</span></span></label>
+          <label class="feat"><input type="checkbox" data-feat="sentiment" ${r.features.sentiment ? "checked" : ""}><span><b>Caller sentiment</b> <span class="muted small">paid add-on</span><br><span class="muted small">Mood per call + unhappy callers. Turning it on books the add-on in their revenue.${r.sentimentKey ? "" : ` <span class="bad-t">OPENAI_API_KEY not set on Render.</span>`}</span>
+            ${r.features.sentiment ? `<br><button class="linkbtn" type="button" id="sentBackfill">Score the last 30 days</button>` : ""}</span></label>
         </div>
         <div id="featMsg" class="small" style="margin-top:4px"></div>
         <h3 style="margin-top:18px">Data retention &amp; recordings</h3>
@@ -1005,12 +1067,14 @@ async function loadClient() {
         <div id="rtHist" class="list" style="margin-top:8px"></div>
       </div>
       <div class="card mb"><h3>Billing periods</h3><div class="table-wrap"><table class="sub-table">
-        <thead><tr><th>Period</th><th>Minutes</th><th>Allowance</th><th>Extra blocks</th><th>Charged</th><th>Alerts</th><th>Invoiced</th></tr></thead><tbody>${
+        <thead><tr><th>Period</th><th>Minutes</th><th>Allowance</th><th>Extra min</th><th>Overage</th><th>Charged</th><th>Alerts</th><th>Invoiced</th></tr></thead><tbody>${
         d.periods.map(p => `<tr><td>${fmtDay(p.start)} – ${fmtDay(p.end)}${p.kind === "trial" ? ' <span class="pill warn">trial</span>' : ""}</td>
           <td class="num">${fmtMin(p.minutes)}</td><td class="num">${p.allowance}</td>
-          <td>${p.kind === "trial" ? "—" : `<input class="inline-in" type="number" min="0" value="${p.extraBlocks}" data-blocks="${p.id}"> <button class="linkbtn" data-saveblocks="${p.id}">save</button>`}</td>
+          <td><input class="inline-in" type="number" min="0" value="${p.extraMinutes}" data-xmin="${p.id}"> <button class="linkbtn" data-savexmin="${p.id}">save</button></td>
+          <td class="small">${p.kind === "trial" ? "—" : `${p.overage.minutes ? `${p.overage.minutes} min × $${Number(p.rates.overage_rate_cad).toFixed(2)}${p.overage.billed ? " · billed" : ""} = <b>${p.overage.waived ? "waived" : bothM(p.overage.amount)}</b>` : `none <span class="muted">($${Number(p.rates.overage_rate_cad).toFixed(2)}/min)</span>`}
+            ${p.invoicedAt ? "" : `<div><label class="chk small"><input type="checkbox" data-waive="${p.id}" ${p.overageWaived ? "checked" : ""}> waive</label></div>`}`}</td>
           <td class="num">${p.kind === "trial" ? "$0" : bothM(p.price)}</td>
-          <td>${alertPills({ at80: p.at80, at100: p.at100, trialCap: p.trialCap })}</td><td class="small">${p.invoicedAt ? esc(fmtWhen(p.invoicedAt)) : "—"}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">No periods yet.</td></tr>`}</tbody></table></div></div>
+          <td>${alertPills({ at80: p.at80, at100: p.at100, trialCap: p.trialCap })}</td><td class="small">${p.invoicedAt ? `${esc(fmtWhen(p.invoicedAt))} <button class="linkbtn" data-uninvoice="${p.id}">undo</button>` : "—"}</td></tr>`).join("") || `<tr><td colspan="8" class="muted">No periods yet.</td></tr>`}</tbody></table></div></div>
       <div class="card mb"><h3>Calls <span class="muted small">${d.total ?? ""} in range</span> <button class="btn" id="cCsv" type="button" style="float:right">⇩ CSV</button></h3>
         <div class="table-wrap"><table><thead><tr><th>When</th><th>Caller</th><th>Length</th><th>Cost</th><th>Outcome</th><th class="hide-sm">Ended</th><th></th></tr></thead><tbody>${
         d.calls.map(c => `<tr><td>${esc(fmtWhen(c.at))}</td><td>${esc(c.caller)}${c.spam ? ' <span class="pill bad">spam</span>' : ""}</td><td class="num">${fmtDur(c.seconds)}</td>
@@ -1033,17 +1097,29 @@ async function loadClient() {
       { label: "Margin", value: Math.max(0, r.margin.cad), color: "#1f9d55" }], v => fmtCur(v, "CA"), r.revenue.cad ? fmtCur(r.revenue.cad, "CA", 0) : "trial");
     $("pfSave").onclick = saveClient;
     wireRetention();
+    wireService(r);
+    if ($("sentBackfill")) $("sentBackfill").onclick = async e => {
+      e.preventDefault(); const b = e.target; b.disabled = true; b.textContent = "Scoring… (up to a minute)";
+      try { const x = await api(`${B}/client/${encodeURIComponent(CL.id)}/sentiment-backfill`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        b.textContent = `Done: ${x.scored} scored, ${x.skipped} skipped (silent or no transcript).`; }
+      catch (err) { b.textContent = err.message; b.disabled = false; }
+    };
     box.querySelectorAll("[data-feat]").forEach(cb => cb.onchange = async () => {
       cb.disabled = true;
       try {
         await api(`/api/dashboard/admin/features?business=${encodeURIComponent(CL.id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [cb.dataset.feat]: cb.checked }) });
         $("featMsg").innerHTML = `<span class="good-t">Saved — ${esc(cb.closest("label").querySelector("b").textContent)} ${cb.checked ? "on" : "off"} for this client.</span>`;
+        if (cb.dataset.feat === "sentiment") { loaded.overview = false; setTimeout(loadClient, 700); }
       } catch (e) { cb.checked = !cb.checked; $("featMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
       finally { cb.disabled = false; }
     });
-    box.querySelectorAll("[data-saveblocks]").forEach(b => b.onclick = async () => {
-      const v = Number(box.querySelector(`[data-blocks="${b.dataset.saveblocks}"]`).value);
-      try { await api(`${B}/period/${b.dataset.saveblocks}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ extra_blocks: v }) }); loadClient(); loaded.overview = false; }
+    const alertErr = (el, e) => el.closest("td").insertAdjacentHTML("beforeend", `<div class="err small">${esc(e.message)}</div>`);
+    const periodPost = (id, body) => api(`${B}/period/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(() => { loaded.overview = false; loadClient(); });
+    box.querySelectorAll("[data-waive]").forEach(c => c.onchange = () => periodPost(c.dataset.waive, { overage_waived: c.checked }).catch(e => alertErr(c, e)));
+    box.querySelectorAll("[data-uninvoice]").forEach(b => b.onclick = () => { if (confirmInline(b)) periodPost(b.dataset.uninvoice, { invoiced: false }).catch(e => alertErr(b, e)); });
+    box.querySelectorAll("[data-savexmin]").forEach(b => b.onclick = async () => {
+      const v = Number(box.querySelector(`[data-xmin="${b.dataset.savexmin}"]`).value);
+      try { await periodPost(b.dataset.savexmin, { extra_minutes: v }); }
       catch (e) { b.textContent = e.message; }
     });
     box.querySelectorAll("[data-view]").forEach(b => b.onclick = () => viewCall(b.dataset.view));
@@ -1104,6 +1180,97 @@ async function wireRetention() {
       $("rtMsg").innerHTML = `<span class="good-t">Recording copy ${$("pfRec").value === "true" ? "on" : "off"}. Remember the Vapi assistant's own setting.</span>`; }
     catch (e) { $("rtMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   };
+}
+
+/* ---------- service on/off, minutes, trial ---------- */
+const PAUSE_REASON = { minutes_used: "this period's minutes are used up", trial_cap: "trial minutes used up", trial_ended: "trial ended",
+  cancelled: "account cancelled", admin: "switched off by you" };
+async function wireService(r) {
+  const box = $("svcCard"), base = `${B}/client/${encodeURIComponent(CL.id)}`;
+  const post = (path, body) => api(base + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  let d;
+  try { d = await api(`${base}/service`); }
+  catch (e) { box.innerHTML = needsMigration(e) ? `<h3>Receptionist on/off</h3><div class="warn-t small">Run migrations/2026-10-23-service-control.sql to switch clients on and off and add minutes.</div>` : `<div class="err">${esc(e.message)}</div>`; return; }
+  // Plan picker fills price + minutes from the catalog.
+  const pf = $("pfPlan");
+  if (pf) pf.onchange = () => { const p = d.plans.find(x => x.plan_name === pf.value); if (p) { if (p.price_cad != null) $("pfPrice").value = p.price_cad; if (p.minutes != null) $("pfMin").value = p.minutes; } };
+  const modeLabel = { auto: "Automatic", on: "Always on", off: "Paused by you" }[d.mode];
+  const isTrial = r.status === "trialing";
+  const topLinks = d.links.filter(l => l.kind === "topup");
+  const ov = r.overrides || {}, rt = r.rates || { topup_50_cad: 65, topup_100_cad: 120, overage_rate_cad: 1.5 };
+  const money = n => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
+  const minutesRule = ov.hard_cap ? `Cut-off is on for this client: pauses at ${d.gracePct}% over the allowance.`
+    : ov.waive_overage ? `Keeps answering past the allowance; overage waived for this client.`
+    : `Keeps answering past the allowance; overage ${money(rt.overage_rate_cad)}/min goes on the next invoice.`;
+  box.innerHTML = `<h3>Receptionist <span class="pill ${d.active ? "good" : "bad"}" style="vertical-align:middle">${d.active ? "answering" : "paused"}</span>
+      <span class="muted small" style="font-weight:400">${esc(modeLabel)}${!d.active && d.reason ? ` · ${esc(PAUSE_REASON[d.reason] || d.reason)}${d.since ? ` · since ${esc(fmtWhen(d.since))}` : ""}` : ""}</span></h3>
+    <div class="small muted" style="margin-bottom:10px">${d.active ? (isTrial ? `Trial: pauses at ${d.gracePct}% over the trial cap or when the trial ends.` : minutesRule) : `Calls are ringing <b>${esc(d.ownerPhone || "the owner")}</b> directly. The client and you were texted and the client emailed.`}
+      ${!d.savedVoiceUrl && !d.active ? `<span class="bad-t">No saved Vapi URL — reconnect the number in Vapi if it doesn't come back.</span>` : ""}</div>
+    <div class="filters" style="margin-bottom:6px">
+      ${d.mode !== "off" ? `<button class="btn" data-svc="pause">Pause now</button>` : ""}
+      ${d.mode !== "auto" ? `<button class="btn" data-svc="auto">Automatic</button>` : ""}
+      ${d.mode !== "on" ? `<button class="btn" data-svc="always_on" title="Never pauses on minutes or trial (pilots, VIPs)">Always on</button>` : ""}
+    </div>
+    <div class="k2">Add minutes ${isTrial ? "(adds to the trial cap)" : "(this billing period)"}</div>
+    <div class="filters" style="margin-bottom:6px">
+      <button class="btn" data-add="50" data-price="${rt.topup_50_cad}">+50 min · ${money(rt.topup_50_cad)}</button>
+      <button class="btn" data-add="100" data-price="${rt.topup_100_cad}">+100 min · ${money(rt.topup_100_cad)}</button>
+      <input id="addMin" type="number" min="1" placeholder="Minutes" class="btn" style="width:100px" aria-label="Custom minutes">
+      <input id="addPrice" type="number" min="0" step="0.01" placeholder="$ (blank = free)" class="btn" style="width:150px" aria-label="Price">
+      <input id="addNote" type="text" maxlength="200" placeholder="Note (e.g. outage credit)" class="btn" style="width:190px" aria-label="Note">
+      <button class="btn" id="addGo">Add</button>
+    </div>
+    ${isTrial ? `<div class="k2">Trial · ends ${esc(fmtDay(r.trialEnd))} · cap ${r.trialMinutesCap} min</div>
+    <div class="filters" style="margin-bottom:6px">
+      <button class="btn" data-trial='{"extend_days":7}'>Extend 7 days</button>
+      <button class="btn" data-trial='{"extend_days":14}'>Extend 14 days</button>
+      <button class="btn" data-trial='{"cap":${(Number(r.trialMinutesCap) || 0) + 50}}'>Cap +50 min</button>
+      <button class="btn" data-trial='{"end_now":true}' style="color:var(--bad)">End trial now</button>
+    </div>` : ""}
+    <details id="ovBox" ${Object.keys(ov).length || r.prepaidUntil ? "open" : ""} style="margin:8px 0">
+      <summary class="k2" style="cursor:pointer;display:list-item">Overrides for this client ${Object.keys(ov).length || r.prepaidUntil ? `<span class="pill warn">${Object.keys(ov).length + (r.prepaidUntil ? 1 : 0)} set</span>` : `<span class="muted small" style="font-weight:400">— none, standard rates</span>`}</summary>
+      <div class="form-grid" style="margin-top:6px">
+        <label>Monthly minutes<input id="ovMin" type="number" min="0" value="${ov.minutes ?? ""}" placeholder="plan: ${r.planMinutes ?? "—"}"></label>
+        <label>Overage $/min<input id="ovRate" type="number" min="0" step="0.01" value="${ov.overage_rate_cad ?? ""}" placeholder="${rt.overage_rate_cad}"></label>
+        <label>50-min top-up $<input id="ov50" type="number" min="0" step="0.01" value="${ov.topup_50_cad ?? ""}" placeholder="${rt.topup_50_cad}"></label>
+        <label>100-min top-up $<input id="ov100" type="number" min="0" step="0.01" value="${ov.topup_100_cad ?? ""}" placeholder="${rt.topup_100_cad}"></label>
+        <label class="chk"><input id="ovWaive" type="checkbox" ${ov.waive_overage ? "checked" : ""}> Never bill overage</label>
+        <label class="chk"><input id="ovCap" type="checkbox" ${ov.hard_cap ? "checked" : ""}> Cut off when out of minutes</label>
+        <label>Prepaid until (rate lock)<input id="ovPre" type="date" value="${esc(r.prepaidUntil || "")}"></label>
+        <label>&nbsp;<button class="btn" id="ovSave" type="button">Save overrides</button></label>
+      </div>
+      <div class="small muted">Blank = standard. Changes apply to the open billing period straight away; past periods keep their own rates.
+        ${r.prepaidUntil && r.lockedRates ? ` Locked until ${esc(fmtDay(r.prepaidUntil))} at ${money(r.lockedRates.overage_rate_cad)}/min · 50 min ${money(r.lockedRates.topup_50_cad)} · 100 min ${money(r.lockedRates.topup_100_cad)}.` : ""}
+        Stripe links always charge the link's price — for a custom top-up price, add the minutes here instead.</div>
+    </details>
+    ${topLinks.length ? `<div class="small muted">Client's own buy links: ${topLinks.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(" · ")}</div>` : ""}
+    <div id="svcMsg" class="small" style="margin-top:6px"></div>
+    <div class="list" style="margin-top:8px">${d.events.slice(0, 6).map(e => `<div class="it"><span>${esc({ paused: "Paused", resumed: "Back on", mode: "Mode →", pause_failed: "Pause FAILED", resume_failed: "Turn-on FAILED" }[e.action] || e.action)} ${esc(e.action === "mode" ? ({ auto: "Automatic", on: "Always on", off: "Paused" }[e.reason] || e.reason) : PAUSE_REASON[e.reason] || e.reason || "")}
+      <span class="muted small">by ${esc(e.by_who)}</span></span><span class="small muted">${e.detail && e.detail.error ? `<span class="bad-t">${esc(e.detail.error)}</span> · ` : ""}${esc(fmtWhen(e.created_at))}</span></div>`).join("")}
+      ${d.topups.slice(0, 5).map(t => `<div class="it"><span>+${t.minutes} min <span class="muted small">${esc(t.source)}${t.note ? " · " + esc(t.note) : ""}</span></span><span class="small muted">${t.price_cad ? `$${Number(t.price_cad).toFixed(2)} · ` : ""}${esc(fmtWhen(t.created_at))}</span></div>`).join("")}</div>`;
+  const done = async msg => { $("svcMsg").innerHTML = `<span class="good-t">${esc(msg)}</span>`; loaded.overview = false; setTimeout(loadClient, 900); };
+  const failMsg = e => { $("svcMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; };
+  box.querySelectorAll("[data-svc]").forEach(b => b.onclick = async () => {
+    if (b.dataset.svc === "pause" && !confirmInline(b)) return;
+    try { const x = await post("/service", { action: b.dataset.svc }); done(x.active ? "Answering." : `Paused — ${PAUSE_REASON[x.reason] || x.reason}.`); } catch (e) { failMsg(e); }
+  });
+  const addMinutes = async (minutes, price, note) => {
+    try { const x = await post("/topup", { minutes, price_cad: price, note }); done(`Added ${x.minutes} minutes${x.active ? " — answering." : " — still paused (other rule)."}`); } catch (e) { failMsg(e); }
+  };
+  box.querySelectorAll("[data-add]").forEach(b => b.onclick = () => { if (confirmInline(b)) addMinutes(Number(b.dataset.add), Number(b.dataset.price), "manual"); });
+  $("addGo").onclick = () => addMinutes(Number($("addMin").value), $("addPrice").value === "" ? 0 : Number($("addPrice").value), $("addNote").value.trim() || "manual");
+  $("ovSave").onclick = async () => {
+    const v = id => $(id).value.trim();
+    const body = { overrides: { minutes: v("ovMin"), overage_rate_cad: v("ovRate"), topup_50_cad: v("ov50"), topup_100_cad: v("ov100"),
+      waive_overage: $("ovWaive").checked, hard_cap: $("ovCap").checked } };
+    const pre = v("ovPre");
+    if (pre !== (r.prepaidUntil || "")) { body.prepaid_until = pre || null; if (pre && !r.lockedRates) body.lock_rates = true; }
+    try { const x = await post("/overrides", body); done(`Overrides saved.${x.active === false ? " Line is paused (cut-off rule)." : ""}`); } catch (e) { failMsg(e); }
+  };
+  box.querySelectorAll("[data-trial]").forEach(b => b.onclick = async () => {
+    if (b.dataset.trial.includes("end_now") && !confirmInline(b)) return;
+    try { const x = await post("/trial", JSON.parse(b.dataset.trial)); done(`Trial updated${x.trial_end ? ` — ends ${fmtDay(x.trial_end)}` : ""}. ${x.active ? "Answering." : "Paused."}`); } catch (e) { failMsg(e); }
+  });
 }
 
 async function saveClient() {

@@ -75,6 +75,15 @@
   .bar { height: 8px; background: var(--grid); border-radius: 99px; margin-top: 10px; overflow: hidden; }
   .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
   .usage { margin-bottom: 12px; display: grid; gap: 8px; }
+  .mood { font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .mood.positive { color: var(--good); } .mood.neutral { color: var(--muted); } .mood.negative { color: var(--bad); }
+  .mood-bar { display: flex; gap: 3px; height: 7px; margin-top: 14px; border-radius: 99px; overflow: hidden; }
+  .mood-bar span { display: block; min-width: 0; }
+  .paused-card { margin-bottom: 16px; border-color: var(--bad); background: linear-gradient(110deg, var(--bad-soft), var(--card) 70%); }
+  .paused-card h3 { margin: 0 0 6px; font-family: Manrope, "DM Sans", sans-serif; font-size: 18px; }
+  .buy { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .buy a { background: var(--accent-strong); color: #fff; text-decoration: none; font-weight: 600; padding: 9px 16px; border-radius: 10px; font-size: 14px; }
+  .buy a.ghost { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
   .usage .u-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .usage .u-val { font-family: Manrope, "DM Sans", sans-serif; font-size: 20px; font-weight: 700; }
   .usage .u-track { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
@@ -387,6 +396,7 @@
     </div>
   </div>
 
+  <div class="card paused-card" id="pausedCard" hidden></div>
   <div class="card usage" id="usageCard" hidden></div>
   <div class="muted" id="retentionNote" style="font-size:12px;margin:-4px 2px 12px" hidden></div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
@@ -517,7 +527,10 @@ function renderKpis(t, p) {
     { label: "Booking rate", booking: true, val: `${t.conversionRate}%`, d: delta(t.conversionRate, p.conversionRate, "pts"), bar: t.conversionRate, note: "of calls that stayed on the line" },
     { label: "After-hours calls", val: t.afterHours, d: delta(t.afterHours, p.afterHours), note: `${pct(t.afterHours, t.totalCalls)}% of conversations came in while you were closed` },
     { label: "Emergencies captured", val: t.emergencies },
-    { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) }
+    { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) },
+    ...(last && last.sentiment && last.sentiment.scored ? [{ label: "Happy callers", val: `${last.sentiment.positivePct}%`,
+      d: delta(last.sentiment.positivePct, last.sentiment.previousPositivePct, "pts"), mood: last.sentiment,
+      note: `${last.sentiment.positive} positive · ${last.sentiment.neutral} neutral · ${last.sentiment.negative} unhappy` }] : [])
   ];
   // Clients who don't book jobs can hide the two booking cards (Customize → Show).
   const shownCards = S.hiddenSections.includes("booking") ? cards.filter(c => !c.booking) : cards;
@@ -526,6 +539,7 @@ function renderKpis(t, p) {
       <div class="label">${esc(c.label)}</div>
       <div class="val">${esc(c.val)} ${c.d || ""}</div>
       ${c.bar != null ? `<div class="bar"><span style="width:${Math.min(100, c.bar)}%"></span></div>` : ""}
+      ${c.mood ? `<div class="mood-bar" title="Caller mood"><span style="flex:${c.mood.positive};background:var(--good)"></span><span style="flex:${c.mood.neutral};background:var(--gray)"></span><span style="flex:${c.mood.negative};background:var(--bad)"></span></div>` : ""}
       ${c.note ? `<div class="note">${esc(c.note)}</div>` : ""}
     </div>`).join("");
 }
@@ -916,7 +930,7 @@ function renderLog(everything) {
     <tr class="row${c.silent ? " silent-row" : ""}${open ? " open" : ""}" data-i="${i}">
       <td>${esc(fmtWhen(c.created_at))}${!c.silent && isAfter(c.created_at) ? `<span class="ah-chip">After hours</span>` : ""}</td>
       <td>${esc(c.caller_name || "Unknown")}<div class="caller-num">${esc(fmtPhone(c.caller_id && !/^(UNKNOWN|WEB_CALL)$/.test(c.caller_id) ? c.caller_id : c.phone || ""))}</div></td>
-      <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}</td>
+      <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}${c.sentiment ? `<div class="mood ${c.sentiment}" title="${esc(c.sentiment_note || "")}">● ${{ positive: "Happy", neutral: "Neutral", negative: "Unhappy" }[c.sentiment]}</div>` : ""}</td>
       <td class="hide-sm"><span class="req">${esc(c.issue_description || "—")}</span></td>
       <td class="hide-sm">${esc(fmtClock(c.call_duration_seconds))}</td>
     </tr>
@@ -931,6 +945,7 @@ function renderLog(everything) {
         ${c.caller_email ? `<div class="k">Email</div><div class="v">${esc(c.caller_email)}</div>` : ""}
         ${renderPremium(c, i)}
         ${c.summary ? `<div class="k">Call summary</div><div class="v">${esc(c.summary)}</div>` : ""}
+        ${c.sentiment ? `<div class="k">Caller mood</div><div class="v"><span class="mood ${c.sentiment}">● ${{ positive: "Happy", neutral: "Neutral", negative: "Unhappy" }[c.sentiment]}</span>${c.sentiment_note ? ` — ${esc(c.sentiment_note)}` : ""}</div>` : ""}
       </div>
       <div class="col">${renderMessages(c.messages)}</div>
     </div></td></tr>`;
@@ -980,7 +995,39 @@ function renderUsage(u) {
   el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))} of ${esc(u.minutesAllowed)}</span>
       <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
     <div class="u-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(pct, 100)}" aria-label="Minutes used"><span style="width:${Math.min(pct, 100)}%"></span></div>
-    <div class="muted" style="font-size:12px">${pct >= 100 ? "You've used this period's minutes. Calls are still being answered — we'll be in touch about adding more." : pct >= 80 ? `${pct}% used.` : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`}</div>`;
+    ${pct >= 80 && last && last.service && last.service.active !== false ? buyButtons(last.service.links, ["topup"]) : ""}
+    <div class="muted" style="font-size:12px">${usageNote(u, pct, fmtD)}</div>`;
+  el.hidden = false;
+}
+
+function usageNote(u, pct, fmtD) {
+  const r = u.rates || {}, m = n => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
+  const topups = r.topup50 != null ? `Top up ahead and it's cheaper: 50 min ${m(r.topup50)} or 100 min ${m(r.topup100)}.` : "";
+  if (u.trial) return pct >= 100 ? "Your trial minutes are used up. We keep answering a little longer, then calls ring your phone directly until you start your plan."
+    : pct >= 80 ? `${pct}% of your trial minutes used.` : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`;
+  if (u.hardCap) return pct >= 100 ? "You've used this period's minutes. We keep answering a little longer, then calls ring your phone directly until you add minutes." : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`;
+  if (u.overMinutes > 0) return u.overageWaived ? `${esc(u.overMinutes)} minutes over your plan this period — no charge. We keep answering as usual.`
+    : `${esc(u.overMinutes)} minutes over your plan · about ${m(u.overageCharge)} on your next invoice (${m(r.overage)}/min). We keep answering. ${topups}`;
+  if (pct >= 100) return `You've used this period's minutes. We keep answering; extra minutes are ${m(r.overage)}/min on your next invoice. ${topups}`;
+  if (pct >= 80) return `${pct}% used. ${topups}`;
+  return `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}${u.extraMinutes ? ` · includes ${esc(u.extraMinutes)} extra minutes` : ""}`;
+}
+
+/* Paused receptionist: why, where calls go now, and the client's own buy links. */
+const PAUSE_WHY = { minutes_used: "this period's minutes are used up", trial_cap: "your free trial's minutes are used up",
+  trial_ended: "your free trial has ended", cancelled: "your account is cancelled", admin: "it's switched off" };
+function buyButtons(links, kinds) {
+  const l = (links || []).filter(x => kinds.includes(x.kind));
+  return l.length ? `<div class="buy">${l.map((x, i) => `<a class="${i ? "ghost" : ""}" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join("")}</div>` : "";
+}
+function renderService(s) {
+  const el = $("pausedCard");
+  if (!s || s.active !== false) { el.hidden = true; return; }
+  const trial = s.reason === "trial_ended" || s.reason === "trial_cap";
+  el.innerHTML = `<h3>Your AI receptionist is paused</h3>
+    <div>Because ${esc(PAUSE_WHY[s.reason] || "it's switched off")}. Nothing is lost: your calls ring your phone directly until it's back on.</div>
+    ${s.reason === "admin" || s.reason === "cancelled" ? "" : buyButtons(s.links, trial ? ["plan", "topup"] : ["topup", "plan"])}
+    <div class="muted" style="font-size:13px;margin-top:10px">${s.reason === "admin" || s.reason === "cancelled" ? "" : "It switches back on as soon as payment goes through. "}Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
   el.hidden = false;
 }
 
@@ -998,6 +1045,7 @@ function renderAll(data) {
   S = data.settings;
   applySections();
   renderRetention(data.retention);
+  renderService(data.service);
   renderUsage(data.usage);
   renderKpis(data.totals, data.previous || {});
   renderDaily(data.daily);
