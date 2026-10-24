@@ -1101,8 +1101,9 @@ async function loadClient() {
     if ($("sentBackfill")) $("sentBackfill").onclick = async e => {
       e.preventDefault(); const b = e.target; b.disabled = true; b.textContent = "Scoring… (up to a minute)";
       try { const x = await api(`${B}/client/${encodeURIComponent(CL.id)}/sentiment-backfill`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-        b.textContent = `Done: ${x.scored} scored, ${x.skipped} skipped (silent or no transcript).`; }
-      catch (err) { b.textContent = err.message; b.disabled = false; }
+        const why = Object.entries(x.reasons || {}).map(([k, n]) => `${n} ${k}`).join(", ");
+        b.textContent = `Done: ${x.scored} scored${x.skipped ? `, ${x.skipped} skipped (${why || "no transcript"})` : ""}${x.failed ? `, ${x.failed} failed: ${x.firstError}` : ""}.`; b.disabled = false; }
+      catch (err) { b.textContent = `Failed: ${err.message}`; b.disabled = false; }
     };
     box.querySelectorAll("[data-feat]").forEach(cb => cb.onchange = async () => {
       cb.disabled = true;
