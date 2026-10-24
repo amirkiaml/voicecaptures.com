@@ -530,7 +530,9 @@ function renderKpis(t, p) {
     { label: "Avg. call length", val: fmtDur(t.avgDurationSeconds) },
     ...(last && last.sentiment && last.sentiment.scored ? [{ label: "Happy callers", val: `${last.sentiment.positivePct}%`,
       d: delta(last.sentiment.positivePct, last.sentiment.previousPositivePct, "pts"), mood: last.sentiment,
-      note: `${last.sentiment.positive} positive · ${last.sentiment.neutral} neutral · ${last.sentiment.negative} unhappy` }] : [])
+      note: `${last.sentiment.positive} positive · ${last.sentiment.neutral} neutral · ${last.sentiment.negative} unhappy` }]
+      // On, but nothing scored in this range yet: say so instead of hiding.
+      : last && last.sentiment ? [{ label: "Happy callers", val: "—", note: "Caller mood is on. Each new call is scored after it ends." }] : [])
   ];
   // Clients who don't book jobs can hide the two booking cards (Customize → Show).
   const shownCards = S.hiddenSections.includes("booking") ? cards.filter(c => !c.booking) : cards;
