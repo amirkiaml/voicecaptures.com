@@ -158,6 +158,14 @@
   .set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
   .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
   .btn-ghost { background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  .del-box { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .del-btn { background: none; border: 0; padding: 0; color: var(--bad); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; }
+  .del-confirm { border: 1px solid var(--bad); background: var(--bad-soft); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .del-confirm p { margin: 6px 0; }
+  .del-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .del-yes { background: var(--bad); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .del-yes:disabled { opacity: .6; cursor: wait; }
+  .del-msg { color: var(--bad); margin-top: 6px; }
   .row2.single { grid-template-columns: 1fr; }
   @media (max-width: 760px) { .set-grid { grid-template-columns: 1fr 1fr; } }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
@@ -898,6 +906,24 @@ function statusEditor(c) {
     <span class="status-msg muted"></span></div>`;
 }
 
+const canDelete = () => !!(last && (last.isAdmin || (last.features && last.features.call_delete !== false)));
+async function deleteCall(box) {
+  const yes = box.querySelector(".del-yes"), msg = box.querySelector(".del-msg");
+  yes.disabled = true; yes.textContent = "Deleting…"; msg.textContent = "";
+  try {
+    const r = await api(`/api/dashboard/calls/${encodeURIComponent(box.dataset.id)}/delete`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: "DELETE" })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not delete the call");
+    openCalls.delete(String(box.dataset.id));
+    await load(); // the call disappears and every number recalculates
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    yes.disabled = false; yes.textContent = "Yes, delete permanently"; msg.textContent = e.message;
+  }
+}
+
 async function setStatus(sel) {
   const msg = sel.parentElement.querySelector(".status-msg");
   sel.disabled = true; msg.textContent = "Saving…";
@@ -948,6 +974,16 @@ function renderLog(everything) {
         ${renderPremium(c, i)}
         ${c.summary ? `<div class="k">Call summary</div><div class="v">${esc(c.summary)}</div>` : ""}
         ${c.sentiment ? `<div class="k">Caller mood</div><div class="v"><span class="mood ${c.sentiment}">● ${{ positive: "Happy", neutral: "Neutral", negative: "Unhappy" }[c.sentiment]}</span>${c.sentiment_note ? ` — ${esc(c.sentiment_note)}` : ""}</div>` : ""}
+        ${canDelete() ? `<div class="del-box" data-id="${esc(c.id)}">
+          <button class="del-btn" type="button">Delete this call…</button>
+          <div class="del-confirm" hidden>
+            <b>Delete this call permanently?</b>
+            <p>This removes the recording, transcript, summary and the caller's details for this call from VoiceCaptures and asks our voice provider to delete its copy. It can't be undone.</p>
+            <p class="muted">Kept: the minutes it used (they still count toward your plan) and a record of any texts we sent, which we're required to keep. Your deletion is logged with your email and the time.</p>
+            <div class="del-actions"><button class="del-yes" type="button">Yes, delete permanently</button><button class="btn-ghost del-no" type="button">Cancel</button></div>
+            <div class="del-msg"></div>
+          </div>
+        </div>` : ""}
       </div>
       <div class="col">${renderMessages(c.messages)}</div>
     </div></td></tr>`;
@@ -963,6 +999,13 @@ function renderLog(everything) {
     sel.onchange = () => setStatus(sel);
   });
   tb.querySelectorAll(".tx-btn").forEach(b => b.onclick = e => { e.stopPropagation(); loadTranscript(b); });
+  tb.querySelectorAll(".del-box").forEach(box => {
+    const panel = box.querySelector(".del-confirm"), open = box.querySelector(".del-btn");
+    box.onclick = e => e.stopPropagation();
+    open.onclick = () => { panel.hidden = false; open.hidden = true; box.querySelector(".del-no").focus(); };
+    box.querySelector(".del-no").onclick = () => { panel.hidden = true; open.hidden = false; };
+    box.querySelector(".del-yes").onclick = () => deleteCall(box);
+  });
 
 }
 
