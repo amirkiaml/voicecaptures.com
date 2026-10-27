@@ -158,6 +158,11 @@
   .set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
   .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
   .btn-ghost { background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  .tag-edit { cursor: pointer; display: inline-block; border-radius: 999px; }
+  .tag-edit:hover { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tag-edit::after { content: " ✎"; font-size: 11px; opacity: .55; }
+  .mood-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .mood-sel { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
   .del-box { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
   .del-btn { background: none; border: 0; padding: 0; color: var(--bad); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; }
   .del-confirm { border: 1px solid var(--bad); background: var(--bad-soft); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
@@ -906,6 +911,34 @@ function statusEditor(c) {
     <span class="status-msg muted"></span></div>`;
 }
 
+const MOOD_LABEL = { positive: "Happy", neutral: "Neutral", negative: "Unhappy" };
+/* Caller mood: shown when the add-on is on; anyone who sees it can correct it. */
+function moodEditor(c) {
+  if (!(last && last.sentiment) || c.silent) return "";
+  const manual = /^Set by /.test(c.sentiment_note || "");
+  const opts = [`<option value="auto" ${!manual ? "selected" : ""}>Automatic${c.sentiment && !manual ? ` (${MOOD_LABEL[c.sentiment]})` : manual ? "" : " (not scored yet)"}</option>`]
+    .concat(Object.entries(MOOD_LABEL).map(([k, v]) => `<option value="${k}" ${manual && c.sentiment === k ? "selected" : ""}>${v}</option>`)).join("");
+  return `<div class="k">Caller mood</div><div class="v"><div class="mood-row">
+    ${c.sentiment ? `<span class="mood ${c.sentiment}">● ${MOOD_LABEL[c.sentiment]}</span>` : ""}
+    <select class="mood-sel" data-id="${esc(c.id)}" aria-label="Change caller mood">${opts}</select>
+    <span class="mood-msg muted"></span></div>
+    ${c.sentiment_note ? `<div class="muted" style="font-size:13px;margin-top:2px">${esc(c.sentiment_note)}</div>` : ""}</div>`;
+}
+async function setMood(sel) {
+  const msg = sel.closest(".mood-row").querySelector(".mood-msg");
+  sel.disabled = true; msg.textContent = sel.value === "auto" ? "Scoring…" : "Saving…";
+  try {
+    const r = await api(`/api/dashboard/calls/${encodeURIComponent(sel.dataset.id)}/sentiment`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sentiment: sel.value })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not save");
+    await load(); // Happy callers % recalculates
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    sel.disabled = false; msg.textContent = e.message;
+  }
+}
 const canDelete = () => !!(last && (last.isAdmin || (last.features && last.features.call_delete !== false)));
 async function deleteCall(box) {
   const yes = box.querySelector(".del-yes"), msg = box.querySelector(".del-msg");
@@ -958,7 +991,7 @@ function renderLog(everything) {
     <tr class="row${c.silent ? " silent-row" : ""}${open ? " open" : ""}" data-i="${i}">
       <td>${esc(fmtWhen(c.created_at))}${!c.silent && isAfter(c.created_at) ? `<span class="ah-chip">After hours</span>` : ""}</td>
       <td>${esc(c.caller_name || "Unknown")}<div class="caller-num">${esc(fmtPhone(c.caller_id && !/^(UNKNOWN|WEB_CALL)$/.test(c.caller_id) ? c.caller_id : c.phone || ""))}</div></td>
-      <td>${statusPill(c)}${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}${c.sentiment ? `<div class="mood ${c.sentiment}" title="${esc(c.sentiment_note || "")}">● ${{ positive: "Happy", neutral: "Neutral", negative: "Unhappy" }[c.sentiment]}</div>` : ""}</td>
+      <td><span class="tag-edit" data-edit="status" title="Change status">${statusPill(c)}</span>${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}${c.sentiment ? `<div><span class="mood ${c.sentiment} tag-edit" data-edit="mood" title="${esc(c.sentiment_note ? c.sentiment_note + " · change mood" : "Change mood")}">● ${MOOD_LABEL[c.sentiment]}</span></div>` : ""}</td>
       <td class="hide-sm"><span class="req">${esc(c.issue_description || "—")}</span></td>
       <td class="hide-sm">${esc(fmtClock(c.call_duration_seconds))}</td>
     </tr>
@@ -973,13 +1006,15 @@ function renderLog(everything) {
         ${c.caller_email ? `<div class="k">Email</div><div class="v">${esc(c.caller_email)}</div>` : ""}
         ${renderPremium(c, i)}
         ${c.summary ? `<div class="k">Call summary</div><div class="v">${esc(c.summary)}</div>` : ""}
-        ${c.sentiment ? `<div class="k">Caller mood</div><div class="v"><span class="mood ${c.sentiment}">● ${{ positive: "Happy", neutral: "Neutral", negative: "Unhappy" }[c.sentiment]}</span>${c.sentiment_note ? ` — ${esc(c.sentiment_note)}` : ""}</div>` : ""}
+        ${moodEditor(c)}
         ${canDelete() ? `<div class="del-box" data-id="${esc(c.id)}">
           <button class="del-btn" type="button">Delete this call…</button>
           <div class="del-confirm" hidden>
             <b>Delete this call permanently?</b>
             <p>This removes the recording, transcript, summary and the caller's details for this call from VoiceCaptures and asks our voice provider to delete its copy. It can't be undone.</p>
-            <p class="muted">Kept: the minutes it used (they still count toward your plan) and a record of any texts we sent, which we're required to keep. Your deletion is logged with your email and the time.</p>
+            ${last && last.features && last.features.full_delete
+              ? `<p class="muted">The texts we sent about this call and our phone provider's records of it are deleted too. Only the call's time and length are kept, so minutes still count toward your plan. Your deletion is logged with your email and the time.</p>`
+              : `<p class="muted">Kept: the minutes it used (they still count toward your plan) and a record of any texts we sent, which we're required to keep. Your deletion is logged with your email and the time.</p>`}
             <div class="del-actions"><button class="del-yes" type="button">Yes, delete permanently</button><button class="btn-ghost del-no" type="button">Cancel</button></div>
             <div class="del-msg"></div>
           </div>
@@ -994,6 +1029,15 @@ function renderLog(everything) {
     if (d.hidden) openCalls.delete(d.dataset.id); else { openCalls.add(d.dataset.id); wirePlayer(r.dataset.i); }
   });
   tb.querySelectorAll("tr.detail:not([hidden])").forEach(d => wirePlayer(d.id.slice(1)));
+  // Tapping a status or mood tag opens the call and jumps to its picker.
+  tb.querySelectorAll(".tag-edit").forEach(pe => pe.onclick = e => {
+    e.stopPropagation();
+    const row = pe.closest("tr.row"), d = $("d" + row.dataset.i);
+    if (d.hidden) row.click();
+    const sel = d.querySelector(pe.dataset.edit === "mood" ? ".mood-sel" : ".status-sel");
+    if (sel) { sel.focus(); sel.scrollIntoView({ block: "nearest", behavior: "smooth" }); if (sel.showPicker) { try { sel.showPicker(); } catch { /* not allowed here */ } } }
+  });
+  tb.querySelectorAll(".mood-sel").forEach(sel => { sel.onclick = e => e.stopPropagation(); sel.onchange = () => setMood(sel); });
   tb.querySelectorAll(".status-sel").forEach(sel => {
     sel.onclick = e => e.stopPropagation();
     sel.onchange = () => setStatus(sel);
