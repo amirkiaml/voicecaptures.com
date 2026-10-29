@@ -122,29 +122,61 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
 .srch-btn:hover{background:var(--bg-soft); color:var(--blue)}
 .srch-btn svg{width:19px; height:19px}
 @media(min-width:1200px){ .srch-btn{display:inline-flex} }
-.srch{position:absolute; left:0; right:0; top:100%; background:#fff;
-  border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+
+/* A centred dialog over a dimmed page, the way the reference does it. */
+.srch{position:fixed; inset:0; z-index:70; display:grid; align-items:start;
+  justify-items:center; padding:var(--s12) var(--s4) var(--s4);
+  background:rgba(13,23,41,.38); overflow-y:auto}
 .srch[hidden]{display:none}
-.srch-in{max-width:760px; margin:0 auto; padding:var(--s6)}
-.srch-field{display:flex; align-items:center; gap:var(--s3);
+.srch-in{width:min(680px,100%); background:#fff; border-radius:var(--r-card);
+  box-shadow:0 24px 70px rgba(13,23,41,.26); padding:var(--s6) var(--s8) var(--s6)}
+.srch-field{display:flex; align-items:center; gap:var(--s4);
+  border-bottom:1px solid var(--line); padding-bottom:var(--s4)}
+.srch-field > svg{width:22px; height:22px; color:var(--faint); flex:0 0 auto}
+.srch-field input{flex:1; min-width:0; border:0; background:none; outline:none;
+  font:inherit; font-size:22px; color:var(--ink); min-height:44px}
+.srch-field input::placeholder{color:var(--faint)}
+.srch-field input::-webkit-search-cancel-button{display:none}
+.srch-x{flex:0 0 auto; width:44px; height:44px; border:0; background:none;
+  cursor:pointer; color:var(--muted); font-size:22px; line-height:1; border-radius:10px}
+.srch-x:hover{background:var(--bg-soft); color:var(--ink)}
+
+.srch-qh{margin:var(--s6) 0 var(--s3); font-size:14px; color:var(--faint)}
+.srch-quick{display:grid; grid-template-columns:1fr; gap:var(--s2) var(--s8);
+  list-style:none; margin:0; padding:0}
+@media(min-width:560px){ .srch-quick{grid-template-columns:1fr 1fr 1fr} }
+.srch-quick a{display:flex; align-items:center; gap:8px; min-height:40px;
+  text-decoration:none; color:var(--ink-2); font-size:15.5px}
+.srch-quick a::before{content:"\203A"; color:var(--faint); font-size:18px; line-height:1}
+.srch-quick a:hover{color:var(--blue)}
+.srch-quick .all a{color:var(--blue); font-weight:700}
+
+.srch-res{list-style:none; margin:var(--s4) 0 0; padding:0; max-height:52vh;
+  overflow-y:auto}
+.srch-res a{display:flex; gap:var(--s4); align-items:flex-start; padding:12px;
+  border-radius:14px; text-decoration:none; color:var(--ink)}
+.srch-res a:hover, .srch-res .on a{background:var(--f-blue)}
+.srch-res i{flex:0 0 auto; width:62px; height:46px; border-radius:8px;
+  overflow:hidden; background:var(--f-blue-2); display:grid; place-items:center}
+.srch-res i img{width:100%; height:100%; object-fit:cover}
+.srch-res i svg{width:20px; height:20px; color:var(--blue)}
+.srch-res b{display:block; font-size:16px; font-weight:700; line-height:22px}
+.srch-res span{display:block; font-size:14px; line-height:20px; color:var(--muted);
+  margin-top:2px}
+.srch-none{margin:var(--s6) 0 0; font-size:15px; color:var(--muted)}
+
+.srch-keys{display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s4);
+  margin:var(--s6) 0 0; font-size:13.5px; color:var(--muted)}
+.srch-keys span{display:inline-flex; align-items:center; gap:7px}
+.srch-keys kbd{font:inherit; font-size:12px; color:var(--ink-2);
+  border:1px solid var(--line); border-bottom-width:2px; border-radius:6px;
+  padding:3px 7px; background:var(--bg-soft)}
+.mnav-srch{display:flex; align-items:center; gap:var(--s3); margin-bottom:var(--s4);
   border:1px solid var(--line); border-radius:var(--r-pill); padding:0 var(--s4);
   background:var(--bg-soft)}
-.srch-field:focus-within{border-color:var(--blue);
-  box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 16%,transparent)}
-.srch-field svg{width:18px; height:18px; color:var(--faint); flex:0 0 auto}
-.srch-field input{flex:1; min-width:0; border:0; background:none; outline:none;
-  font:inherit; font-size:16px; color:var(--ink); min-height:48px}
-.srch-res{list-style:none; margin:var(--s4) 0 0; padding:0; max-height:46vh;
-  overflow-y:auto}
-.srch-res li+li{margin-top:2px}
-.srch-res a{display:block; padding:10px var(--s4); border-radius:12px;
-  text-decoration:none; color:var(--ink)}
-.srch-res a:hover, .srch-res a:focus-visible, .srch-res .on a{background:var(--f-blue)}
-.srch-res b{display:block; font-size:15.5px; font-weight:700}
-.srch-res span{display:block; font-size:13.5px; line-height:19px; color:var(--muted)}
-.srch-none{margin:var(--s4) 0 0; font-size:14px; color:var(--muted); padding:0 var(--s4)}
-.srch-hint{margin:var(--s3) 0 0; font-size:12.5px; color:var(--faint); padding:0 var(--s4)}
-.mnav-srch{margin-bottom:var(--s4)}
+.mnav-srch svg{width:18px; height:18px; color:var(--faint); flex:0 0 auto}
+.mnav-srch input{flex:1; min-width:0; border:0; background:none; outline:none;
+  font:inherit; font-size:16px; min-height:48px}
 /* The bar's Log in link is gone — /login is one tap away as "Client
    dashboard" in the Company menu and the mobile panel — and the rail is 1280,
    which is what lets brand, nav, sales and the CTA sit together from 1200. */
@@ -566,16 +598,35 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     </div>
   </div>
 
-  <div class="srch" id="srch" hidden>
+  <div class="srch" id="srch" role="dialog" aria-modal="true" aria-label="Search" hidden>
     <div class="srch-in">
       <div class="srch-field">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input id="srch-q" type="search" autocomplete="off" spellcheck="false"
-               placeholder="Search pricing, win-back, your trade&hellip;"
-               aria-label="Search the site" aria-controls="srch-res">
+               placeholder="Search voicecaptures.com"
+               aria-label="Search voicecaptures.com" aria-controls="srch-res">
+        <button type="button" class="srch-x" id="srch-x" aria-label="Close search">&times;</button>
       </div>
+
+      <div id="srch-quick">
+        <p class="srch-qh">Quick links</p>
+        <ul class="srch-quick">
+          <li><a href="/preview/">AI receptionist</a></li>
+          <li><a href="/pricing/">Pricing</a></li>
+          <li><a href="/win-back/">Win-back</a></li>
+          <li><a href="/demo/">Build a demo</a></li>
+          <li><a href="/preview/#contact">Contact</a></li>
+          <li class="all"><a href="/pricing/">See everything</a></li>
+        </ul>
+      </div>
+
       <ul class="srch-res" id="srch-res" role="listbox" aria-label="Results"></ul>
-      <p class="srch-hint">Up and down to move, Enter to open, Esc to close.</p>
+
+      <p class="srch-keys">
+        <span><kbd>&crarr;</kbd> to select</span>
+        <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> to navigate</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </p>
     </div>
   </div>
 
@@ -1082,67 +1133,122 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 })();
 
 /* ---- search -------------------------------------------------------------
-   A static site has nowhere to run a query, so the index lives here. Every
-   entry points at a route that exists; nothing is listed that we cannot open. */
+   A static site has nowhere to run a query, so the index lives here: title,
+   href, blurb, keywords, thumbnail. Every href points at a route that exists.
+   Entries go down to the section level, so a word like "vet" or "overage"
+   lands on something rather than on nothing. */
 (function(){
   "use strict";
+  var IMG = "/preview/img/";
   var IX = [
-    ["AI receptionist", "/preview/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone calls missed call after hours voicemail"],
-    ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price cost plans tiers minutes overage packs billing cheap how much"],
-    ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "reactivation outbound lapsed dormant past customers campaign list"],
-    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo try test free trial build assistant beta"],
-    ["Home services and trades", "/home-services/", "Plumbing, HVAC, electrical, roofing, landscaping and the rest.", "plumber hvac electrician roofer contractor trades handyman emergency"],
-    ["Restaurants and cafes", "/restaurants-cafes/", "Reservations, hours and takeout questions, answered during the rush.", "restaurant cafe bar bakery reservations takeout bookings food"],
-    ["Clinics and dental", "/clinics-dental/", "Appointments and triage for dental, medical and health practices.", "clinic dental dentist medical doctor physio vet health appointments patients"],
-    ["Any other business", "/other-businesses/", "Salons, spas, fitness, legal, real estate, consulting and more.", "salon spa fitness gym legal lawyer real estate consulting office"],
-    ["Personal line", "/personal/", "A second number that screens your calls and texts you what matters.", "personal line screening second number spam robocall"],
-    ["Contact", "/preview/#contact", "One form, and we come back within a day.", "contact form talk book call email sales phone number get in touch"],
-    ["About", "/about/", "Who we are and how we build.", "about company who team story"],
-    ["Careers", "/careers/", "Part-time sales and marketing, Toronto and remote.", "careers jobs hiring roles work sdr sales marketing"],
-    ["Client dashboard", "/login/", "Your calls, transcripts and minutes.", "login log in sign in dashboard account portal minutes usage"],
-    ["Privacy", "/privacy/", "What we collect, who processes it, and how long it is kept.", "privacy data retention gdpr pipeda subprocessors security breach"],
-    ["Terms", "/terms/", "The terms the service runs under.", "terms conditions contract agreement legal sla outage"]
+    ["AI receptionist", "/preview/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone call missed calls after hours overnight voicemail greeting answer", IMG+"hero-phones.webp"],
+    ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price pricing cost costs plan plans tier tiers monthly subscription how much cheap expensive quote budget", IMG+"dashboard.webp"],
+    ["Extra minutes and overage", "/pricing/", "$1.50 a minute over your plan, or packs of 50 and 100 bought in the dashboard.", "overage extra minutes pack packs bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
+    ["Prepaid plans", "/pricing/", "Pay three, six or twelve months up front instead of monthly.", "prepaid annual yearly upfront discount commitment term contract length save", ""],
+    ["Free trial", "/demo/", "14 days free at one location, up to 100 minutes.", "free trial try test pilot risk no card 14 days evaluate", ""],
+    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
+    ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "winback win back reactivation outbound lapsed dormant past customers campaign list database revive dead leads", IMG+"winback.webp"],
+    ["Win-back pricing", "/win-back/#pay", "One-time campaign, always-on, or a build you own.", "winback cost price per customer campaign always on one time own build", ""],
+    ["What win-back is worth", "/win-back/#calc", "Run the numbers on your own list size and job value.", "calculator roi worth return math revenue estimate list size job value payback", ""],
+    ["Home services and trades", "/home-services/", "Plumbing, HVAC, electrical, roofing, landscaping and the rest.", "plumber plumbing hvac heating cooling furnace ac electrician electrical roofer roofing landscaping lawn contractor trades handyman garage door pest emergency call out", IMG+"sec-home.webp"],
+    ["Restaurants and cafes", "/restaurants-cafes/", "Reservations, hours and takeout questions, answered during the rush.", "restaurant restaurants cafe cafes coffee bar pub bakery food reservation reservations booking table takeout delivery hours menu rush", IMG+"sec-cafe.webp"],
+    ["Clinics and dental", "/clinics-dental/", "Appointments and triage for dental, medical and health practices.", "clinic clinics dental dentist dentistry medical doctor physician physio chiropractor optometry health practice patient patients appointment appointments triage recall", IMG+"sec-clinic.webp"],
+    ["Veterinary practices", "/clinics-dental/", "Appointment and triage calls for vet clinics, handled the same way.", "vet vets veterinary veterinarian animal pet pets clinic hospital emergency", IMG+"sec-vet.webp"],
+    ["Salons, spas and fitness", "/other-businesses/", "Bookings and rescheduling for salons, spas, studios and gyms.", "salon salons hair barber nails spa massage esthetics fitness gym studio yoga pilates personal trainer booking reschedule", IMG+"sec-salon.webp"],
+    ["Professional services", "/other-businesses/", "Legal, real estate, accounting and consulting.", "legal lawyer law firm attorney paralegal real estate realtor broker accounting accountant bookkeeping consulting consultant agency office intake", IMG+"sec-pro.webp"],
+    ["Any other business", "/other-businesses/", "If it takes calls, it fits. Tell us the trade and we will say so.", "other business industry sector vertical fit anything else", ""],
+    ["Personal line", "/personal/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal.webp"],
+    ["Books into your calendar", "/preview/", "It books the job live on the call, into the calendar you already use.", "calendar booking book appointment schedule scheduling availability slot google outlook calendly", ""],
+    ["Software it books into", "/preview/", "Google Calendar, Outlook, Jobber, Housecall Pro, ServiceTitan, Square, Jane and more.", "integration integrations jobber housecall pro servicetitan square acuity mindbody jane dentrix open dental eaglesoft opentable resy toast hubspot crm outlook google calendar connect sync", IMG+"integrations.webp"],
+    ["Texts and summaries", "/preview/", "The caller's name, number and what they wanted, texted to you before you pick up.", "text texts sms message messages summary transcript notification alert notify email forward", ""],
+    ["Setup", "/demo/", "About ten minutes, and we do it for you. It keeps your existing number.", "setup set up install onboarding port number forwarding existing number how long switch", ""],
+    ["Client dashboard", "/login/", "Your calls, transcripts and minutes.", "login log in sign in signin dashboard account portal usage minutes transcripts recordings history billing invoice", IMG+"dashboard.webp"],
+    ["Contact", "/preview/#contact", "One form, and we come back within a day.", "contact form talk book a call email sales phone get in touch reach enquiry inquiry question support help", ""],
+    ["Talk to sales", "tel:+13656039234", "(365) 603-9234 — or book thirty minutes and we will tell you if it does not fit.", "sales call us phone number talk human rep representative speak", ""],
+    ["Hear the demo line", "tel:+16476921081", "(647) 692-1081, our live demo line, answering right now.", "demo line hear listen sample example live try call it", ""],
+    ["About", "/about/", "Who we are and how we build.", "about company who we are story mission team founded toronto canada canadian", ""],
+    ["Careers", "/careers/", "Part-time sales and marketing, Toronto and remote.", "careers career jobs job hiring hire role roles work open positions sdr sales marketing part time remote apply", ""],
+    ["Privacy", "/privacy/", "What we collect, who processes it, and how long it is kept.", "privacy policy data retention gdpr pipeda phipa personal information subprocessor subprocessors processors security encryption breach notification delete", ""],
+    ["Security and subprocessors", "/privacy/", "Where data is hosted and which services touch it.", "security hosting host render supabase vapi twilio elevenlabs openai resend google server location virginia us data residency", ""],
+    ["Terms", "/terms/", "The terms the service runs under.", "terms conditions contract agreement legal sla uptime outage credit cancel cancellation refund notice period liability", ""],
+    ["Recording and consent", "/privacy/", "Whether calls are recorded, and how that is handled.", "recording record recorded consent two party one party ontario canada law compliance transcript", ""],
+    ["Where we are", "/about/", "Toronto, Ontario — working with businesses wherever they are.", "toronto ontario canada canadian gta location local where based", ""]
   ];
 
   var btn = document.getElementById("srch-btn"),
       pan = document.getElementById("srch"),
       q   = document.getElementById("srch-q"),
       res = document.getElementById("srch-res"),
+      quick = document.getElementById("srch-quick"),
+      xb  = document.getElementById("srch-x"),
       qm  = document.getElementById("srch-qm"),
       resm= document.getElementById("srch-resm");
   if (!btn || !pan) return;
 
-  // Spaces and hyphens are the thing people get wrong — "winback", "win back",
-  // "home services" — so everything is matched flattened as well as as typed.
-  function flat(x){ return x.replace(/[^a-z0-9]/g, ""); }
-  function score(e, t){
-    var title = e[0].toLowerCase(), blurb = e[2].toLowerCase(), keys = e[3];
-    if (title.indexOf(t) === 0) return 100;
-    if (title.indexOf(t) > -1) return 70;
-    if ((" " + keys).indexOf(" " + t) > -1) return 50;
-    if (keys.indexOf(t) > -1) return 35;
-    if (blurb.indexOf(t) > -1) return 20;
-    var f = flat(t);
-    if (f.length > 2) {
-      if (flat(title).indexOf(f) > -1) return 60;
-      if (flat(keys).indexOf(f) > -1) return 30;
+  // Flattening a whole string invents words that are not in it — "live try"
+  // becomes "livetry", which contains "vet". So only ADJACENT words are joined,
+  // which still catches "winback" and "homeservices" and nothing spurious.
+  function glued(text){
+    var w = text.split(/[^a-z0-9]+/).filter(Boolean), out = [], i;
+    for (i = 0; i < w.length - 1; i++) {
+      out.push(w[i] + w[i+1]);
+      if (i < w.length - 2) out.push(w[i] + w[i+1] + w[i+2]);
     }
-    return 0;
+    return out;
+  }
+  function gluedHit(text, f){
+    var g = glued(text), i;
+    for (i = 0; i < g.length; i++) if (g[i].indexOf(f) === 0) return true;
+    return false;
+  }
+  // Score one typed word against one entry. Word-prefix matching is what makes
+  // "vet" reach "veterinary" and "plumb" reach "plumbing".
+  function hit(e, t){
+    var title = e[0].toLowerCase(), blurb = e[2].toLowerCase(), keys = e[3],
+        words = (title + " " + keys).split(/[^a-z0-9]+/);
+    var best = 0, i;
+    if (title.indexOf(t) === 0) best = 100;
+    else if (title.indexOf(t) > -1) best = 72;
+    for (i = 0; i < words.length && best < 60; i++) {
+      if (words[i] && words[i].indexOf(t) === 0) { best = Math.max(best, 58); break; }
+    }
+    if (best < 40 && keys.indexOf(t) > -1) best = 38;
+    if (best < 20 && blurb.indexOf(t) > -1) best = 20;
+    if (best < 64 && t.length > 3) {
+      if (gluedHit(title, t)) best = 64;
+      else if (best < 34 && gluedHit(keys, t)) best = 34;
+    }
+    return best;
+  }
+  // Every word typed has to land somewhere, so two words narrow rather than widen.
+  function score(e, terms){
+    var total = 0;
+    for (var i = 0; i < terms.length; i++) {
+      var h = hit(e, terms[i]);
+      if (!h) return 0;
+      total += h;
+    }
+    return total;
   }
   function find(term){
     var t = term.trim().toLowerCase();
-    if (!t) return IX.slice(0, 6);
-    return IX.map(function(e){ return [score(e, t), e]; })
+    if (!t) return [];
+    var terms = t.split(/\s+/);
+    return IX.map(function(e){ return [score(e, terms), e]; })
              .filter(function(r){ return r[0] > 0; })
              .sort(function(a, b){ return b[0] - a[0]; })
              .map(function(r){ return r[1]; }).slice(0, 8);
   }
+
+  var ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>';
   function draw(list, box, term){
     box.innerHTML = "";
+    if (quick && box === res) quick.hidden = !!term.trim();
+    if (!term.trim()) return;
     if (!list.length) {
       var p = document.createElement("p");
       p.className = "srch-none";
-      p.textContent = "Nothing matches “" + term.trim() + "”. Try pricing, win-back, or your trade.";
+      p.textContent = "Nothing matches “" + term.trim() + "”. Try a trade, “pricing”, or “win-back”.";
       box.appendChild(p);
       return;
     }
@@ -1152,9 +1258,14 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       if (i === 0) li.className = "on";
       var a = document.createElement("a");
       a.href = e[1];
+      var ic = document.createElement("i");
+      if (e[4]) { var im = document.createElement("img"); im.src = e[4]; im.alt = ""; im.loading = "lazy"; ic.appendChild(im); }
+      else ic.innerHTML = ICON;
+      var tx = document.createElement("div");
       var b = document.createElement("b"); b.textContent = e[0];
       var sp = document.createElement("span"); sp.textContent = e[2];
-      a.appendChild(b); a.appendChild(sp); li.appendChild(a); box.appendChild(li);
+      tx.appendChild(b); tx.appendChild(sp);
+      a.appendChild(ic); a.appendChild(tx); li.appendChild(a); box.appendChild(li);
     });
   }
   function move(box, step){
@@ -1178,29 +1289,42 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     });
   }
   keys(q, res);
-  if (qm && resm) { keys(qm, resm); draw(find(""), resm, ""); }
+  if (qm && resm) keys(qm, resm);
 
   window.closeSearch = function(){
+    if (pan.hidden) return;
     pan.hidden = true;
     btn.setAttribute("aria-expanded", "false");
+    document.documentElement.style.removeProperty("overflow");
   };
+  function open(){
+    if (window.closeNavPanels) window.closeNavPanels();
+    pan.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    document.documentElement.style.overflow = "hidden";
+    draw(find(q.value), res, q.value);
+    q.focus(); q.select();
+  }
   btn.addEventListener("click", function(e){
     e.stopPropagation();
-    var open = !pan.hidden;
-    if (window.closeNavPanels) window.closeNavPanels();
-    pan.hidden = open;
-    btn.setAttribute("aria-expanded", open ? "false" : "true");
-    if (!open) { draw(find(q.value), res, q.value); q.focus(); q.select(); }
+    if (pan.hidden) open(); else window.closeSearch();
   });
-  pan.addEventListener("click", function(e){ e.stopPropagation(); });
-  // "/" focuses search the way it does on the reference, unless the caret is
-  // already in a field.
+  xb.addEventListener("click", window.closeSearch);
+  // The backdrop closes it; the card does not.
+  pan.addEventListener("click", function(e){
+    e.stopPropagation();
+    if (e.target === pan) window.closeSearch();
+  });
+  pan.addEventListener("keydown", function(e){
+    if (e.key === "Escape") { e.stopPropagation(); window.closeSearch(); btn.focus(); }
+  });
+  // "/" focuses search, unless the caret is already in a field.
   document.addEventListener("keydown", function(e){
     if (e.key !== "/" || e.metaKey || e.ctrlKey) return;
     var t = e.target.tagName;
     if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT" || e.target.isContentEditable) return;
     if (window.innerWidth < 1200) return;
-    e.preventDefault(); btn.click();
+    e.preventDefault(); open();
   });
 })();
 </script>
