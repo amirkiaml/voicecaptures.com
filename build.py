@@ -24,38 +24,12 @@ ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / "index.html"
 SITE = "https://voicecaptures.com"
 
-PAGES = {
-    "personal": {
-        "slug": "personal",
-        "title": "Personal line that screens your calls — VoiceCaptures",
-        "desc": "A second number that picks up unknown callers, turns away the "
-                "spam and texts you who called and what they wanted. $9/mo beta.",
-    },
-    "home": {
-        "slug": "home-services",
-        "title": "AI receptionist for plumbers, HVAC and trades — VoiceCaptures",
-        "desc": "An AI voice agent answers every call, triages the job, books it "
-                "on your real calendar and texts you the details. Toronto and the GTA.",
-    },
-    "food": {
-        "slug": "restaurants-cafes",
-        "title": "AI phone answering for restaurants and cafés — VoiceCaptures",
-        "desc": "Never miss a reservation, takeout order or catering enquiry. An AI "
-                "voice agent answers in your venue's name and texts you every lead.",
-    },
-    "clinic": {
-        "slug": "clinics-dental",
-        "title": "AI receptionist for clinics and dental practices — VoiceCaptures",
-        "desc": "After-hours and reception overflow answered. New patients routed, "
-                "appointments booked, callback details texted to your front desk.",
-    },
-    "other": {
-        "slug": "other-businesses",
-        "title": "AI phone answering for any business — VoiceCaptures",
-        "desc": "Salons, studios, tutors, venues and trades. If your work arrives "
-                "by phone, an AI voice agent can answer, qualify and book it.",
-    },
-}
+# The five sector pages were removed on 2026-10-29: one page now serves every
+# trade, and the per-vertical copy lived on in five near-identical URLs that
+# split the same search traffic. Nothing is generated from index.html any more
+# — the sitemap is the only output left.
+PAGES = {}
+
 
 # Files that live at the site root. From a subfolder, a bare filename would
 # resolve to /slug/file — so these are rewritten to absolute paths.
@@ -105,7 +79,7 @@ def sitemap(slugs) -> str:
         f"\n  <url><loc>{SITE}/{s}</loc><lastmod>{today}</lastmod>"
         f"<changefreq>monthly</changefreq><priority>{p}</priority></url>"
         for s, p in [("", "1.0")] + [(f"{x}/", "0.9") for x in slugs]
-                     + [("pricing/", "0.9"), ("demo/", "0.9"),
+                     + [("pricing/", "0.9"), ("demo/", "0.9"), ("faq/", "0.8"),
                         ("win-back/", "0.8"), ("contact/", "0.8"), ("about/", "0.7"), ("careers/", "0.7"),
                         ("privacy/", "0.3"), ("terms/", "0.3"), ("login", "0.3")]
     )

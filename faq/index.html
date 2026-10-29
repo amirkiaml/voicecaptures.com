@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Common questions | VoiceCaptures</title>
+<meta name="description" content="How an AI receptionist works, what setup takes, what happens to your number, what a minute counts as, and where your call data is stored.">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://voicecaptures.com/faq/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VoiceCaptures">
+<meta property="og:url" content="https://voicecaptures.com/faq/">
+<meta property="og:title" content="Common questions | VoiceCaptures">
+<meta property="og:description" content="How an AI receptionist works, what setup takes, what happens to your number, what a minute counts as, and where your call data is stored.">
+<meta property="og:image" content="https://voicecaptures.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Common questions | VoiceCaptures">
+<meta name="twitter:description" content="How an AI receptionist works, what setup takes, what happens to your number, what a minute counts as, and where your call data is stored.">
+<meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+
+/* =====================================================================
+   PREVIEW TOKENS
+   Light only on purpose: dark gets designed once the direction is agreed.
+   Field colours are pale tints derived from the live --blue / --cyan / --wb
+   so the page stays recognisably VoiceCaptures rather than borrowed.
+   ===================================================================== */
+:root{
+  --blue:#2563EB; --blue-dk:#1D4ED8;
+  --cyan:#0E93B8; --wb:#7C3AED;
+
+  /* Fields. Each is its accent at ~8-14% over white, mixed by hand so they
+     stay neutral enough to carry near-black text at AA. */
+  --f-blue:#E8EEFB; --f-blue-2:#DCE6F9;
+  --f-cyan:#E2F1F5; --f-cyan-2:#D3EAF1;
+  --f-wb:#EFE9FB;   --f-wb-2:#E5DBF8;
+  --f-warm:#F5F2EC; --f-sand:#FBF6EC;
+
+  --bg:#FFFFFF; --bg-soft:#F4F6FA;
+  --ink:#0D1729; --ink-2:#36465C; --muted:#55637A; --faint:#7C8CA3;
+  --line:rgba(13,23,41,.09);
+
+  --r-card:24px; --r-sm:8px; --r-pill:999px;
+
+  /* 4px scale, as measured on the reference */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px;
+  --s12:48px; --s16:64px; --s24:96px;
+
+  --rail:1120px;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  /* 16/24 body, and letter-spacing stays normal everywhere — the reference
+     never tightens, which is most of why it reads institutional. */
+  font-size:16px; line-height:24px; font-weight:500;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%; height:auto; display:block}
+a{color:inherit}
+
+h1,h2,h3{font-weight:700; letter-spacing:normal; margin:0}
+h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04}
+h2{font-size:clamp(28px,3.4vw,40px); line-height:1.12}
+h3{font-size:20px; line-height:28px}
+/* The headline device: sans sets it up, serif italic pays it off. */
+.pay{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
+     font-weight:400; letter-spacing:.005em}
+h1 .pay{font-size:1.04em}
+
+.wrap{max-width:var(--rail); margin:0 auto; padding:0 var(--s6)}
+section{padding:var(--s24) 0}
+.lede{font-size:clamp(17px,1.5vw,19px); line-height:1.6; color:var(--ink-2);
+      max-width:620px; margin:var(--s6) 0 0}
+.fine{font-size:13px; line-height:1.55; color:var(--muted)}
+.eyebrow{display:inline-flex; align-items:center; gap:var(--s2);
+  font-size:13px; font-weight:700; color:var(--wb); margin:0 0 var(--s4)}
+.eyebrow .spark{width:14px;height:14px;flex:0 0 auto}
+
+/* ---- buttons: pills, one blue primary, no shadows ---- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:var(--s2);
+  font-family:inherit; font-size:16px; font-weight:700; line-height:1;
+  padding:16px 28px; min-height:52px; border-radius:var(--r-pill);
+  border:2px solid transparent; text-decoration:none; cursor:pointer;
+  transition:background .18s ease, color .18s ease, border-color .18s ease}
+.btn-primary{background:var(--blue); color:#fff}
+.btn-primary:hover{background:var(--blue-dk)}
+.btn-ghost{background:transparent; color:var(--blue); border-color:var(--blue)}
+.btn-ghost:hover{background:var(--f-blue)}
+.btn-dark{background:#11234B; color:#fff}
+.btn-dark:hover{background:#0D1729}
+.btn-sm{font-size:15px; padding:13px 22px; min-height:46px; white-space:nowrap}
+.beta{font-style:normal; font-weight:700; font-size:.78em; opacity:.72; margin-left:3px}
+
+/* ---- nav ---- */
+header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line)}
+.bar{max-width:1280px; margin:0 auto; padding:var(--s3) var(--s6);
+  display:flex; align-items:center; gap:var(--s3)}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none;
+  font-weight:800; font-size:19px; white-space:nowrap; flex:0 0 auto}
+.brand img{height:32px; width:auto; flex:0 0 auto}
+.nav{display:none; align-items:center; gap:var(--s1); margin-left:var(--s4)}
+.nav-a{display:inline-flex; align-items:center; gap:6px; font-family:inherit;
+  font-size:15px; font-weight:600; color:var(--ink); text-decoration:none;
+  background:none; border:0; cursor:pointer; padding:10px 12px; min-height:44px;
+  border-radius:8px; white-space:nowrap}
+.nav-a:hover{color:var(--blue); background:var(--f-blue)}
+.nav-a[aria-expanded="true"]{color:var(--blue); background:var(--f-blue)}
+.car{width:11px; height:11px; transition:transform .18s ease}
+.nav-a[aria-expanded="true"] .car{transform:rotate(180deg)}
+
+.bar-end{margin-left:auto; display:flex; align-items:center; gap:var(--s3)}
+.sales{display:none; align-items:center; gap:7px; font-size:14.5px; font-weight:700;
+  color:var(--ink); text-decoration:none; white-space:nowrap; padding:10px 4px; min-height:44px}
+.sales:hover{color:var(--blue)}
+.bar-end .login{display:none; font-size:15px; font-weight:600; text-decoration:none;
+  color:var(--ink); padding:10px 4px; min-height:44px; align-items:center; white-space:nowrap}
+.bar-end .login:hover{color:var(--blue)}
+.sales svg{width:15px; height:15px; color:var(--blue)}
+
+/* ---- what a missed call costs ------------------------------------------
+   Written in this system rather than carried over: three sliders, one
+   number. The arithmetic is deliberately visible underneath, because a
+   figure nobody can check is a figure nobody believes. */
+.calc{max-width:560px; margin:var(--s12) auto 0; background:#fff;
+  border:1px solid var(--line); border-radius:var(--r-card); padding:var(--s8)}
+.cfield{margin-bottom:var(--s6)}
+.cfield-h{display:flex; justify-content:space-between; align-items:baseline;
+  gap:var(--s3); margin-bottom:var(--s2)}
+.cfield-n{font-size:12px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted)}
+.cfield-v{font-size:18px; font-weight:800; color:var(--ink)}
+.calc input[type=range]{-webkit-appearance:none; appearance:none; width:100%;
+  height:6px; border-radius:999px; background:var(--f-blue-2); outline:none;
+  margin:10px 0}
+.calc input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;
+  appearance:none; width:26px; height:26px; border-radius:50%;
+  background:var(--blue); border:3px solid #fff; cursor:pointer;
+  box-shadow:0 1px 5px rgba(13,23,41,.28)}
+.calc input[type=range]::-moz-range-thumb{width:20px; height:20px;
+  border-radius:50%; background:var(--blue); border:3px solid #fff;
+  cursor:pointer; box-shadow:0 1px 5px rgba(13,23,41,.28)}
+.calc input[type=range]:focus-visible{outline:2px solid var(--blue);
+  outline-offset:3px}
+.cresult{text-align:center; margin-top:var(--s8); padding-top:var(--s6);
+  border-top:1px solid var(--line)}
+.cresult-l{font-size:12px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:var(--s2)}
+.closs{font-size:clamp(40px,7vw,56px); line-height:1.05; font-weight:800;
+  color:var(--ink); letter-spacing:-.02em}
+.closs em{font-size:22px; font-style:normal; font-weight:700; color:var(--muted)}
+.cfigs{display:flex; justify-content:center; flex-wrap:wrap; gap:var(--s8);
+  margin-top:var(--s6)}
+.cfigs b{display:block; font-size:21px; font-weight:800; color:var(--ink)}
+.cfigs span{display:block; font-size:12px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted); margin-top:2px}
+.cnote{max-width:52ch; margin:var(--s6) auto 0; text-align:center;
+  font-size:13.5px; line-height:20px; color:var(--muted)}
+@media(max-width:520px){ .calc{padding:var(--s6) var(--s4)} .cfigs{gap:var(--s6)} }
+
+/* Search. Everything here is static, so the index is built in the page and
+   the match runs in the browser — no service, nothing to go down. */
+.srch-btn{display:none; align-items:center; justify-content:center; width:44px;
+  height:44px; border:0; background:none; cursor:pointer; color:var(--ink);
+  border-radius:var(--r-pill)}
+.srch-btn:hover{background:var(--bg-soft); color:var(--blue)}
+.srch-btn svg{width:19px; height:19px}
+@media(min-width:1200px){ .srch-btn{display:inline-flex} }
+
+/* A centred dialog over a dimmed page, the way the reference does it. */
+.srch{position:fixed; inset:0; z-index:70; display:grid; align-items:start;
+  justify-items:center; padding:var(--s12) var(--s4) var(--s4);
+  background:rgba(13,23,41,.38); overflow-y:auto}
+.srch[hidden]{display:none}
+.srch-in{width:min(680px,100%); background:#fff; border-radius:var(--r-card);
+  box-shadow:0 24px 70px rgba(13,23,41,.26); padding:var(--s6) var(--s8) var(--s6)}
+.srch-field{display:flex; align-items:center; gap:var(--s4);
+  border-bottom:1px solid var(--line); padding-bottom:var(--s4)}
+.srch-field > svg{width:22px; height:22px; color:var(--faint); flex:0 0 auto}
+.srch-field input{flex:1; min-width:0; border:0; background:none; outline:none;
+  font:inherit; font-size:22px; color:var(--ink); min-height:44px}
+.srch-field input::placeholder{color:var(--faint)}
+.srch-field input::-webkit-search-cancel-button{display:none}
+.srch-x{flex:0 0 auto; width:44px; height:44px; border:0; background:none;
+  cursor:pointer; color:var(--muted); font-size:22px; line-height:1; border-radius:10px}
+.srch-x:hover{background:var(--bg-soft); color:var(--ink)}
+
+.srch-qh{margin:var(--s6) 0 var(--s3); font-size:14px; color:var(--faint)}
+.srch-quick{display:grid; grid-template-columns:1fr; gap:var(--s2) var(--s8);
+  list-style:none; margin:0; padding:0}
+@media(min-width:560px){ .srch-quick{grid-template-columns:1fr 1fr 1fr} }
+.srch-quick a{display:flex; align-items:center; gap:8px; min-height:40px;
+  text-decoration:none; color:var(--ink-2); font-size:15.5px}
+.srch-quick a::before{content:"\203A"; color:var(--faint); font-size:18px; line-height:1}
+.srch-quick a:hover{color:var(--blue)}
+.srch-quick .all a{color:var(--blue); font-weight:700}
+
+.srch-res{list-style:none; margin:var(--s4) 0 0; padding:0; max-height:52vh;
+  overflow-y:auto}
+.srch-res a{display:flex; gap:var(--s4); align-items:flex-start; padding:12px;
+  border-radius:14px; text-decoration:none; color:var(--ink)}
+.srch-res a:hover, .srch-res .on a{background:var(--f-blue)}
+.srch-res i{flex:0 0 auto; width:62px; height:46px; border-radius:8px;
+  overflow:hidden; background:var(--f-blue-2); display:grid; place-items:center}
+.srch-res i img{width:100%; height:100%; object-fit:cover}
+.srch-res i svg{width:20px; height:20px; color:var(--blue)}
+.srch-res b{display:block; font-size:16px; font-weight:700; line-height:22px}
+.srch-res span{display:block; font-size:14px; line-height:20px; color:var(--muted);
+  margin-top:2px}
+.srch-none{margin:var(--s6) 0 0; font-size:15px; color:var(--muted)}
+
+.srch-keys{display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s4);
+  margin:var(--s6) 0 0; font-size:13.5px; color:var(--muted)}
+.srch-keys span{display:inline-flex; align-items:center; gap:7px}
+.srch-keys kbd{font:inherit; font-size:12px; color:var(--ink-2);
+  border:1px solid var(--line); border-bottom-width:2px; border-radius:6px;
+  padding:3px 7px; background:var(--bg-soft)}
+.mnav-srch{display:flex; align-items:center; gap:var(--s3); margin-bottom:var(--s4);
+  border:1px solid var(--line); border-radius:var(--r-pill); padding:0 var(--s4);
+  background:var(--bg-soft)}
+.mnav-srch svg{width:18px; height:18px; color:var(--faint); flex:0 0 auto}
+.mnav-srch input{flex:1; min-width:0; border:0; background:none; outline:none;
+  font:inherit; font-size:16px; min-height:48px}
+/* The bar's Log in link is gone — /login is one tap away as "Client
+   dashboard" in the Company menu and the mobile panel — and the rail is 1280,
+   which is what lets brand, nav, sales and the CTA sit together from 1200. */
+@media(min-width:1200px){
+  .nav{display:flex}
+  .sales{display:inline-flex}
+  .bar-end .login{display:inline-flex}
+}
+/* Between 1200 and 1279 the bar is 37px short of holding all five. The word
+   "Sales:" is the one piece that carries no information the number does not. */
+@media(max-width:1279px){ .sales-w{display:none} }
+
+/* full-width panel under the bar, the way the reference does it */
+.mega{position:absolute; left:0; right:0; top:100%; background:#fff;
+  border-bottom:1px solid var(--line); border-top:1px solid var(--line)}
+.mega[hidden]{display:none}
+.mega-in{max-width:1280px; margin:0 auto; padding:var(--s8) var(--s6);
+  display:grid; gap:var(--s8); grid-template-columns:1fr}
+@media(min-width:900px){ .mega-in{grid-template-columns:1.6fr .9fr; gap:var(--s16)} }
+.mega-grid{display:grid; gap:var(--s4) var(--s8); grid-template-columns:1fr}
+@media(min-width:620px){ .mega-grid{grid-template-columns:1fr 1fr} }
+.mega-grid a{display:flex; gap:var(--s3); text-decoration:none; padding:10px;
+  border-radius:12px; align-items:flex-start}
+.mega-grid a:hover{background:var(--f-blue)}
+.mega-grid i{flex:0 0 auto; width:34px; height:34px; border-radius:9px;
+  display:grid; place-items:center; background:var(--f-cyan); color:#0A6A86}
+.mega-grid i svg{width:17px; height:17px}
+.mega-grid b{display:block; font-size:15px; font-weight:700; color:var(--ink)}
+.mega-grid em{display:block; font-style:normal; font-size:13.5px; line-height:19px;
+  color:var(--muted); margin-top:2px}
+.mega-feat{background:var(--f-blue); border-radius:var(--r-card); padding:var(--s6);
+  text-decoration:none; display:block}
+.mega-feat:hover{background:var(--f-blue-2)}
+.mega-feat b{display:block; font-size:16px; font-weight:800; color:var(--ink)}
+.mega-feat em{display:block; font-style:normal; font-size:13.5px; line-height:19px;
+  color:var(--ink-2); margin:4px 0 var(--s4)}
+.mega-feat img{width:100%; border-radius:12px; display:block}
+
+/* ---- burger + mobile panel ---- */
+.burger{display:inline-flex; flex-direction:column; justify-content:center; gap:4px;
+  width:44px; height:44px; padding:0 11px; background:none; border:1px solid var(--line);
+  border-radius:10px; cursor:pointer; flex:0 0 auto}
+.burger span{display:block; height:2px; background:var(--ink); border-radius:2px}
+@media(min-width:1200px){ .burger{display:none} }
+/* Measured at 390: the bar's end group alone wanted 223px, which with the
+   mark and the gaps ran 51px past the viewport. Below 520 the wordmark goes,
+   the label shortens and the padding tightens. The full wording is still in
+   the burger panel. */
+.cta-s{display:none}
+@media(max-width:520px){
+  .brand span{display:none}
+  .btn-sm{font-size:14px; padding:13px 14px; min-height:46px}
+  .cta-l{display:none} .cta-s{display:inline}
+  .bar{gap:var(--s2); padding-left:var(--s4); padding-right:var(--s4)}
+}
+.mnav{border-top:1px solid var(--line); background:#fff;
+  max-height:var(--mnav-max, 70vh); overflow-y:auto; overscroll-behavior:contain}
+.mnav[hidden]{display:none}
+.mnav-in{max-width:var(--rail); margin:0 auto;
+  padding:var(--s4) var(--s6) calc(var(--s8) + env(safe-area-inset-bottom,0px))}
+.mnav-h{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); margin:var(--s6) 0 var(--s2)}
+.mnav-h:first-child{margin-top:0}
+.mnav-a{display:flex; align-items:center; min-height:46px; font-size:16px;
+  font-weight:600; color:var(--ink); text-decoration:none}
+.mnav-a:hover{color:var(--blue)}
+.mnav-foot{display:flex; flex-direction:column; gap:var(--s3); margin-top:var(--s6);
+  padding-top:var(--s6); border-top:1px solid var(--line)}
+.mnav-foot .btn{width:100%}
+
+/* ---- hero ---- */
+/* Sampled from the artwork: its top and side edges are #EFF4FE, so the field
+   behind it is set to the same value and the picture stops looking like a box
+   pasted onto a panel. It runs full-bleed and its foot is masked into the
+   field, which removes the hard line its darker bottom edge would otherwise
+   draw across the page. */
+.hero{background:#EFF4FE; padding-top:var(--s16); padding-bottom:0}
+/* Short laptop viewports: the hero gives back its top padding so the orb
+   and the line under it still land above the fold. */
+@media(min-width:700px) and (max-height:860px){ .hero{padding-top:var(--s8)} }
+.hero-top{text-align:center; max-width:860px; margin:0 auto}
+.hero-top .lede{margin-left:auto; margin-right:auto; text-align:center}
+.hero-cta{display:flex; flex-wrap:wrap; gap:var(--s3); justify-content:center; margin-top:var(--s8)}
+.hero-fine{margin-top:var(--s4); text-align:center}
+.hero-split{margin-top:var(--s16)}
+.hero-caps{display:grid; gap:var(--s8); grid-template-columns:1fr;
+  max-width:820px; margin:0 auto}
+@media(min-width:700px){ .hero-caps{grid-template-columns:1fr 1fr; gap:var(--s12)} }
+.cap{text-align:center; max-width:360px; margin:0 auto}
+.cap h3{display:flex; align-items:center; justify-content:center; gap:var(--s2);
+  color:var(--wb); margin-bottom:var(--s3)}
+.cap p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2)}
+
+
+/* Device frame. Real product screenshots go inside; the frame is CSS so it
+   stays sharp and needs no bespoke render. */
+.hero-art{display:block; width:100%; max-width:none; margin:var(--s12) 0 0;
+  border-radius:0;
+  -webkit-mask-image:linear-gradient(180deg,#000 90%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 90%,transparent 100%)}
+.phone{width:min(300px,78vw); margin:0 auto; border-radius:38px;
+  background:#0D1729; padding:10px; border:1px solid rgba(255,255,255,.14)}
+.phone-in{border-radius:29px; overflow:hidden; background:#101A2E; aspect-ratio:9/19}
+.phone-in img{width:100%;height:100%;object-fit:cover;object-position:top}
+.browser{border-radius:14px; overflow:hidden; background:#0D1729;
+  border:1px solid rgba(13,23,41,.14)}
+.browser .chrome{display:flex; gap:6px; padding:10px 12px; background:#1B2740}
+.browser .chrome i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.26)}
+.browser img{width:100%; max-height:320px; object-fit:cover; object-position:top left}
+.slot{display:flex; align-items:center; justify-content:center; text-align:center;
+  padding:var(--s6); color:var(--faint); font-size:13px; line-height:1.5;
+  border:2px dashed rgba(13,23,41,.18); border-radius:var(--r-sm);
+  background:repeating-linear-gradient(45deg,rgba(13,23,41,.03) 0 10px,transparent 10px 20px)}
+
+/* ---- field cards ---- */
+.cards{display:grid; gap:var(--s4); margin-top:var(--s12)}
+@media(min-width:860px){ .cards{grid-template-columns:1fr 1fr} .cards .span2{grid-column:1/-1} }
+.card{border-radius:var(--r-card); padding:var(--s8); overflow:hidden; border:0}
+.card h3{font-size:clamp(22px,2.2vw,28px); line-height:1.15; margin-bottom:var(--s3)}
+.card p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
+.card{display:flex; flex-direction:column}
+.card .shot{margin:var(--s6) calc(-1 * var(--s8)) calc(-1 * var(--s8));
+  overflow:hidden; margin-top:auto; padding-top:var(--s6)}
+.card .shot img{width:100%; display:block;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 9%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 9%)}
+.c-blue{background:var(--f-blue)} .c-cyan{background:var(--f-cyan)}
+.c-wb{background:var(--f-wb)}     .c-sand{background:var(--f-sand)}
+.c-ink{background:#11234B; color:#fff}
+.c-ink p{color:#C3D0E4}
+.c-ink .shot img{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 7%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 7%)}
+.badge{display:inline-block; align-self:flex-start; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; padding:5px 11px; border-radius:var(--r-pill);
+  background:rgba(13,23,41,.08); color:var(--ink-2); margin-bottom:var(--s3)}
+.badge-live{background:rgba(14,147,184,.16); color:#0A6A86}
+.badge-soon{background:rgba(124,58,237,.14); color:#5B21B6}
+
+/* ---- 24-hour timeline ---- */
+.tl-head{text-align:center; max-width:720px; margin:0 auto var(--s16)}
+/* The timeline runs sideways while the page scrolls down. The outer section is
+   made tall; the inner panel sticks to the viewport and the track is moved on
+   the X axis in proportion to how far through that tall section you are. No
+   dragging, no horizontal wheel, and the page never traps you — once the track
+   reaches its end the section scrolls past normally. */
+.tl-pin{position:relative}
+.tl-stick{position:sticky; top:0; height:100vh; display:flex; flex-direction:column;
+  justify-content:center; overflow:hidden}
+.tl-scroll{overflow:hidden; padding-bottom:var(--s4)}
+.tl{position:relative; width:max-content; padding:var(--s16) 0 var(--s8);
+    border-bottom:2px solid var(--ink); display:flex; align-items:flex-end;
+    will-change:transform; padding-left:var(--s6); padding-right:40vw}
+.ev{position:relative; width:230px; flex:0 0 auto; padding-right:var(--s8)}
+.tl-prog{height:3px; background:rgba(13,23,41,.10); border-radius:2px;
+  max-width:var(--rail); margin:var(--s6) auto 0; width:calc(100% - var(--s12))}
+.tl-prog i{display:block; height:100%; width:0; border-radius:2px; background:var(--blue)}
+/* No JS, or someone who asked for less motion: fall back to an ordinary
+   side-scrolling strip rather than a pinned panel that never moves. */
+.no-pin .tl-stick{position:static; height:auto; overflow:visible}
+.no-pin .tl-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.no-pin .tl{transform:none !important}
+.no-pin .tl-prog{display:none}
+@media(prefers-reduced-motion:reduce){
+  .tl-stick{position:static; height:auto; overflow:visible}
+  .tl-scroll{overflow-x:auto}
+  .tl{transform:none !important}
+  .tl-prog{display:none}
+}
+.ev{position:relative; flex:1 1 0; padding-right:var(--s6)}
+.ev::after{content:""; position:absolute; left:0; bottom:calc(-1 * var(--s8));
+  width:1px; height:var(--s8); background:rgba(13,23,41,.22)}
+.ev .t{display:flex; align-items:center; gap:var(--s2); font-size:17px;
+  font-weight:700; margin-bottom:var(--s2)}
+.ev .t i{width:9px;height:9px;border-radius:50%;background:var(--wb);flex:0 0 auto}
+.ev p{margin:0; display:inline-block; font-size:14px; line-height:20px;
+  padding:10px 14px; border-radius:12px; max-width:206px}
+.ev.up{align-self:flex-start; margin-bottom:var(--s16)}
+.e1 .t i{background:#7C3AED} .e1 p{background:var(--f-wb-2)}
+.e2 .t i{background:#C79A4B} .e2 p{background:var(--f-sand)}
+.e3 .t i{background:#0E93B8} .e3 p{background:var(--f-cyan-2)}
+.e4 .t i{background:#2563EB} .e4 p{background:var(--f-blue-2)}
+.tl-foot{margin-top:var(--s6); text-align:center}
+
+/* ---- stats ---- */
+.stats{display:grid; gap:var(--s6); margin-top:var(--s12)}
+@media(min-width:800px){ .stats{grid-template-columns:repeat(3,1fr)} }
+.stat b{display:block; font-size:clamp(40px,5vw,58px); line-height:1;
+  font-weight:800; color:var(--wb); letter-spacing:normal}
+.stat span{display:block; margin-top:var(--s3); font-size:15px; line-height:22px; font-weight:600}
+.stat cite{display:block; margin-top:var(--s2); font-size:12.5px; font-style:normal; color:var(--muted)}
+
+/* ---- the collage ----
+   Below 1000 it is an ordinary two-column grid with the stats stacked under
+   it; the scattered arrangement only happens where there is room for it. */
+.collage-sec{overflow:hidden}
+.collage{display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); align-items:start}
+.ph{margin:0; border-radius:18px; overflow:hidden; background:var(--bg-soft); aspect-ratio:4/5}
+.ph img{width:100%; height:100%; object-fit:cover}
+.ph .slot{height:100%; border-radius:18px; font-size:12px; font-weight:700;
+  color:var(--muted); text-align:center}
+.cstat{grid-column:1/-1}
+.cstat b{display:block; font-size:clamp(38px,6vw,54px); line-height:1; font-weight:800;
+  color:var(--wb); letter-spacing:normal}
+.cstat span{display:block; margin-top:var(--s2); font-size:15px; line-height:22px; font-weight:600; max-width:30ch}
+.cstat cite{display:block; margin-top:var(--s1); font-size:12.5px; font-style:normal; color:var(--muted)}
+.cmid{grid-column:1/-1; text-align:center; margin:var(--s8) 0}
+.cmid p{margin:var(--s4) auto 0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
+.cmid .btn{margin-top:var(--s6)}
+
+@media(min-width:1000px){
+  /* Placed on an explicit 12x10 grid rather than by percentage offsets: the
+     scatter is deliberate, but no two pieces can land on each other, which is
+     exactly what the percentage version kept doing to the centre block. */
+  .collage{grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(10,1fr);
+    aspect-ratio:16/12; max-width:1060px; margin:0 auto; gap:var(--s4)}
+  .ph{aspect-ratio:auto; height:100%; width:100%}
+  .p1{grid-column:5/8;  grid-row:1/4}
+  .p2{grid-column:2/5;  grid-row:1/4}
+  .p3{grid-column:10/13; grid-row:3/6}
+  .p4{grid-column:1/4;  grid-row:6/10}
+  .p5{grid-column:4/7;  grid-row:8/11}
+  .p6{grid-column:10/13; grid-row:7/11}
+  .cstat{align-self:center}
+  .s1{grid-column:8/10; grid-row:2/4;  text-align:right}
+  .s1 span,.s1 cite{margin-left:auto}
+  .s2{grid-column:1/4;  grid-row:4/6}
+  .p1{grid-row:1/4} .p2{grid-row:1/4}
+  .s3{grid-column:7/10; grid-row:8/10; text-align:right}
+  .s3 span,.s3 cite{margin-left:auto}
+  .cmid{grid-column:4/10; grid-row:4/8; align-self:center; margin:0}
+  .cstat b{font-size:clamp(30px,3.4vw,44px)}
+  .cstat span{font-size:14px; line-height:20px}
+}
+
+/* ---- closing band ---- */
+.band{background:#11234B; color:#fff; border-radius:var(--r-card);
+  padding:var(--s16) var(--s8); text-align:center}
+.band p{color:#C3D0E4; margin:var(--s4) auto 0; max-width:520px}
+.band .btn-primary{margin-top:var(--s8)}
+
+/* ---- faq ---- */
+.faq-grid{display:grid; gap:var(--s8)}
+@media(min-width:900px){ .faq-grid{grid-template-columns:320px 1fr; gap:var(--s16)} }
+details{border-bottom:1px solid var(--line)}
+summary{display:flex; gap:var(--s4); align-items:flex-start; cursor:pointer;
+  font-size:17px; font-weight:600; line-height:26px; list-style:none;
+  padding:var(--s6) 0; min-height:44px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+"; color:var(--blue); font-weight:700; font-size:22px; line-height:24px}
+details[open] summary::before{content:"–"}
+details p{margin:0 0 var(--s6) 28px; color:var(--ink-2); font-size:15px; line-height:24px}
+
+footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
+.foot{display:flex; flex-wrap:wrap; gap:var(--s6); align-items:center; justify-content:space-between}
+
+/* ---- contact ---- */
+.contact{display:grid; gap:var(--s12); grid-template-columns:1fr}
+@media(min-width:940px){ .contact{grid-template-columns:1.25fr .85fr; gap:var(--s16)} }
+.form{display:grid; gap:var(--s4); grid-template-columns:1fr}
+@media(min-width:620px){ .form{grid-template-columns:1fr 1fr} .form .wide{grid-column:1/-1} }
+.form label{display:block}
+.form label span{display:block; font-size:13px; font-weight:700; margin-bottom:6px}
+.form label span em{font-style:normal; font-weight:500; color:var(--muted)}
+.form input,.form select,.form textarea{
+  width:100%; font-family:inherit; font-size:16px; color:var(--ink);
+  background:#fff; border:1px solid rgba(13,23,41,.18); border-radius:10px;
+  padding:13px 14px; min-height:48px}
+.form textarea{min-height:92px; resize:vertical}
+.form input:focus,.form select:focus,.form textarea:focus{
+  outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue)}
+.form .btn{width:100%}
+.in-msg{grid-column:1/-1; font-size:14px; min-height:20px; margin:0; color:var(--muted)}
+.in-msg.err{color:#B42318} .in-msg.ok{color:#0A6A86; font-weight:700}
+.contact{align-items:start}
+.aside{background:#fff; border-radius:var(--r-card); padding:var(--s8);
+  border:1px solid rgba(13,23,41,.07)}
+.aside h3{margin-bottom:var(--s3)}
+.aside > p{font-size:15px; line-height:23px; color:var(--ink-2); margin:0 0 var(--s6)}
+.aside .btn{width:100%; margin-bottom:var(--s3)}
+.alink{font:inherit; color:var(--blue); font-weight:700; background:none;
+  border:0; padding:0; cursor:pointer; text-align:left}
+.alink:hover{text-decoration:underline}
+.aside hr{border:0; border-top:1px solid var(--line); margin:var(--s8) 0 var(--s6)}
+/* Icon rows rather than a bare definition list, so the panel carries the same
+   language as the mega-menu and the cards. .aside a was setting colour on
+   every link in here, which was painting the dark button's label blue on
+   navy — the buttons are excluded now. */
+.arow{display:flex; gap:var(--s3); align-items:flex-start; margin-bottom:var(--s4)}
+.arow:last-child{margin-bottom:0}
+.arow i{flex:0 0 auto; width:34px; height:34px; border-radius:9px; display:grid;
+  place-items:center; background:var(--f-cyan); color:#0A6A86}
+.arow i svg{width:16px; height:16px}
+.arow b{display:block; font-size:13px; font-weight:800; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--muted); white-space:nowrap}
+.arow > div > span{display:block; font-size:15px; line-height:22px;
+  color:var(--ink-2); margin-top:2px}
+.arow a:not(.btn){color:var(--blue); font-weight:700; text-decoration:none}
+.arow a:not(.btn):hover{text-decoration:underline}
+.adot{width:7px; height:7px; border-radius:50%; background:var(--cyan);
+  display:inline-block; vertical-align:middle; position:relative; top:-1px;
+  animation:adot 1.9s ease-in-out infinite}
+@keyframes adot{0%,100%{opacity:1} 50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){ .adot{animation:none} }
+
+/* ---- footer ---- */
+footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
+.fcols{display:grid; gap:var(--s8); grid-template-columns:1fr}
+@media(min-width:700px){ .fcols{grid-template-columns:1fr 1fr} }
+@media(min-width:1000px){ .fcols{grid-template-columns:1.4fr 1fr 1fr 1fr; gap:var(--s12)} }
+.fcol h4{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ink); margin:0 0 var(--s4)}
+.fcol ul{list-style:none; padding:0; margin:0}
+.fcol li{margin-bottom:var(--s3)}
+.fcol a:not(.btn){font-size:15px; color:var(--ink-2); text-decoration:none;
+  display:inline-block; min-height:28px}
+.fcol a:not(.btn):hover{color:var(--blue)}
+.fbrand p{font-size:14px; line-height:22px; color:var(--ink-2); margin:var(--s4) 0 var(--s6); max-width:34ch}
+.fbrand .btn{margin-bottom:var(--s4)}
+.fbot{display:flex; flex-wrap:wrap; gap:var(--s4); justify-content:space-between;
+  align-items:center; margin-top:var(--s12); padding-top:var(--s6);
+  border-top:1px solid var(--line); font-size:13.5px; color:var(--muted)}
+.fbot a{color:var(--muted)}
+.fmeta{margin:0; font-size:14px; line-height:22px; color:var(--ink-2)}
+.fmeta dd{margin:0}
+.fmeta a{color:var(--blue); font-weight:600}
+.f-h2{margin-top:var(--s8)}
+
+.note{background:#FEF3C7; border-bottom:1px solid #FCD34D; color:#78350F;
+  font-size:13px; font-weight:600; text-align:center; padding:10px var(--s4)}
+
+
+/* ---- the page bodies' own rules, scoped ---------------------------
+   These come from the shell these pages used before the redesign. Every
+   selector is machine-prefixed with .ported, so nothing here can reach
+   the header, the footer or anything written in the new system. */
+.ported img{display:block;max-width:100%}
+.ported a{color:var(--blue);text-decoration:none}
+.ported a:hover{color:var(--blue-dk)}
+.ported :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ported .wrap{width:100%;max-width:1060px;margin:0 auto;padding:0 clamp(18px,4vw,24px)}
+.ported .alt{background:var(--bg2)}
+.ported header{position:sticky;top:0;z-index:50;background:rgba(11,13,19,.76);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+  border-bottom:1px solid var(--line)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.ported header{background:rgba(11,13,19,.94)}}
+.ported .bar{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.ported .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.ported .brand:hover{color:inherit;opacity:.85}
+.ported .brand img{height:32px;width:auto}
+.ported .brand span{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
+.ported .nav{display:flex;align-items:center;gap:4px;margin-left:auto;margin-right:12px}
+.ported .nav-a{font-family:var(--body);font-size:13.5px;font-weight:500;color:var(--muted);
+  background:none;border:0;cursor:pointer;padding:8px 12px;border-radius:8px;
+  text-decoration:none;white-space:nowrap;transition:color .18s,background .18s}
+.ported .nav-a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.ported .nav-a[aria-current="page"]{color:var(--text);font-weight:700}
+.ported .theme-btn{flex:0 0 auto;width:38px;height:38px;border-radius:10px;cursor:pointer;
+  background:none;border:1px solid var(--line2);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;margin-left:0;
+  transition:color .18s,border-color .18s}
+.ported .theme-btn:hover{color:var(--text)}
+.ported .theme-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.ported .t-moon{display:none}
+.ported h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,46px);
+  letter-spacing:-.02em;line-height:1.1;margin-bottom:16px}
+.ported h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.2vw,30px);
+  letter-spacing:-.02em;line-height:1.2;margin-bottom:10px;scroll-margin-top:86px}
+.ported h3{font-family:var(--display);font-size:16.5px;font-weight:700;line-height:1.4;margin-bottom:6px}
+.ported h1 .hl, .ported h2 .hl{color:var(--blue)}
+.ported .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:18px}
+.ported .lede{font-size:17.5px;color:var(--muted);max-width:640px;margin-bottom:22px}
+.ported section{padding:clamp(44px,6vw,72px) 0}
+.ported .prose p{font-size:16px;margin-bottom:16px;max-width:680px}
+.ported .fine{font-size:12.5px;color:var(--muted);line-height:1.6}
+.ported .btn{font-family:var(--body);font-size:15px;font-weight:700;padding:14px 30px;border-radius:8px;
+  display:inline-block;border:0;cursor:pointer;text-align:center;
+  transition:background .2s,transform .1s,border-color .2s}
+.ported .btn-primary{background:var(--cyan);color:var(--bg)}
+.ported .btn-primary:hover{background:var(--cyan-lt);color:var(--bg);transform:translateY(-1px)}
+.ported .btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--text)}
+.ported .btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.ported .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.ported .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:28px}
+.ported .card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:22px}
+.ported .card p{font-size:14.5px;color:var(--muted);margin:0}
+.ported .card .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;background:var(--blue-glow);color:var(--blue);margin-bottom:14px;
+  font-family:var(--display);font-weight:700;font-size:15px}
+.ported .badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.ported .badge{font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px;
+  border:1px solid var(--line2);color:var(--muted)}
+.ported .badge-live{border-color:color-mix(in srgb,var(--cyan) 55%,transparent);color:var(--cyan)}
+.ported .box{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--cyan);
+  border-radius:10px;padding:16px 18px;margin:18px 0;max-width:680px}
+.ported .box p:last-child{margin-bottom:0}
+.ported .doc{padding:clamp(44px,6vw,72px) 0 clamp(56px,7vw,88px);max-width:760px}
+.ported .doc .updated{font-size:13px;color:var(--muted);margin-bottom:8px}
+.ported .doc .intro{font-size:17px;color:var(--muted);margin:22px 0 8px}
+.ported .doc h2{font-size:21px;margin:40px 0 10px;padding-top:26px;border-top:1px solid var(--line)}
+.ported .doc h3{font-size:15.5px;margin:22px 0 4px;scroll-margin-top:86px}
+.ported .doc p{font-size:15.5px;margin-bottom:14px}
+.ported .doc ul{margin:0 0 16px 20px}
+.ported .doc li{font-size:15.5px;margin-bottom:7px}
+.ported .doc dt{font-weight:700;font-size:15.5px;margin-top:12px}
+.ported .doc dd{font-size:15.5px;color:var(--muted);margin-left:0}
+.ported .role{background:var(--bg2);border:1px solid var(--line);border-radius:16px;
+  margin-bottom:16px;overflow:hidden}
+.ported .role summary{list-style:none;cursor:pointer;padding:24px;display:block}
+.ported .role summary::-webkit-details-marker{display:none}
+.ported .role summary:hover{background:rgba(127,127,127,.04)}
+.ported .role-top{display:flex;align-items:flex-start;gap:16px}
+.ported .role-top h3{font-size:19px;margin-bottom:6px}
+.ported .role-sum{font-size:14.5px;color:var(--muted);margin:0}
+.ported .role-toggle{margin-left:auto;flex:0 0 auto;font-size:13px;font-weight:700;color:var(--blue);
+  display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ported .role-toggle svg{width:12px;height:12px;transition:transform .2s}
+.ported .role[open] .role-toggle svg{transform:rotate(180deg)}
+.ported .role[open] .role-toggle .lbl-more{display:none}
+.ported .role:not([open]) .role-toggle .lbl-less{display:none}
+.ported .role-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ported .role-body{padding:0 24px 26px;border-top:1px solid var(--line);margin-top:4px;padding-top:22px}
+.ported .role-body h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+.ported .role-body h4:first-child{margin-top:0}
+.ported .role-body ul{margin:0 0 4px 20px}
+.ported .role-body li{font-size:14.5px;margin-bottom:6px}
+.ported .role-body .apply{margin-top:22px}
+.ported .formwrap{background:var(--bg2);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(22px,3vw,30px);max-width:760px}
+.ported .grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media (max-width:620px){.ported .grid2{grid-template-columns:1fr}}
+.ported .f{margin-bottom:16px}
+.ported .f label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.ported .f .opt{font-weight:400;color:var(--muted)}
+.ported .f input, .ported .f select, .ported .f textarea{width:100%;font-family:var(--body);font-size:15px;
+  color:var(--text);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;
+  padding:11px 13px;transition:border-color .18s}
+.ported .f textarea{min-height:104px;resize:vertical;line-height:1.6}
+.ported .f input:focus, .ported .f select:focus, .ported .f textarea:focus{border-color:var(--blue);outline:none}
+.ported .f .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.ported .f input[type=file]{padding:9px;cursor:pointer}
+.ported .f input[type=file]::file-selector-button{font-family:var(--body);font-size:13px;font-weight:700;
+  margin-right:12px;padding:7px 14px;border-radius:7px;border:1px solid var(--line2);
+  background:var(--bg2);color:var(--text);cursor:pointer}
+.ported .check{display:flex;gap:11px;align-items:flex-start;font-size:14px;margin:4px 0 20px;
+  line-height:1.55}
+.ported .check input{width:17px;height:17px;flex:0 0 auto;margin-top:3px;accent-color:var(--blue)}
+.ported .f-msg{font-size:14px;margin-top:14px;padding:12px 14px;border-radius:9px;display:none}
+.ported .f-msg.err{display:block;background:rgba(226,75,74,.12);color:#E24B4A;
+  border:1px solid rgba(226,75,74,.3)}
+.ported .f-ok{display:none;text-align:center;padding:12px 0}
+.ported .f-ok h3{font-size:19px;margin-bottom:8px}
+.ported .f-ok p{color:var(--muted);font-size:15px;max-width:440px;margin:0 auto}
+.ported .f-ok .tick{width:46px;height:46px;border-radius:50%;background:var(--blue-glow);
+  color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.ported .f-ok .tick svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round}
+.ported footer{padding:36px 0;border-top:1px solid var(--line);background:var(--bg2)}
+.ported .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.ported .foot img{height:28px;width:auto}
+.ported .foot .tl{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-top:8px}
+.ported .foot a, .ported .foot .desc{font-size:13px;color:var(--muted)}
+.ported .foot a:hover{color:var(--blue)}
+.ported .foot-legal{display:flex;gap:16px;flex-wrap:wrap}
+.ported .nav-dash .dot{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(56,189,248,.8);animation:dashblip 1.9s ease-out infinite}
+@keyframes dashblip{
+  0%  {box-shadow:0 0 0 0 rgba(56,189,248,.85);opacity:1}
+  70% {box-shadow:0 0 0 7px rgba(56,189,248,0);opacity:.55}
+  100%{box-shadow:0 0 0 0 rgba(56,189,248,0);opacity:1}
+}
+.ported .nav-dash .tag{display:none}
+@media (prefers-reduced-motion:reduce){.ported .nav-dash .dot{animation:none}}
+@media (max-width:1180px){.ported .nav{gap:1px;margin-right:8px}
+.ported .nav-a{padding:8px 9px;font-size:13px}
+.ported .nav-dash .tag{display:none}}
+.ported .bar > *{flex:0 0 auto}
+.ported .nav > *{flex:0 0 auto}
+.ported .brand{margin-right:0}
+.ported .nav{margin-left:0;margin-right:0}
+.ported .burger{display:none;flex:0 0 auto;width:40px;height:40px;border-radius:10px;cursor:pointer;
+  background:none;border:1px solid var(--line2);
+  align-items:center;justify-content:center;flex-direction:column;gap:4px;margin-left:auto}
+.ported .burger span{display:block;width:17px;height:2px;border-radius:2px;background:var(--text);
+  transition:transform .22s,opacity .18s}
+.ported .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.ported .burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.ported .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.ported .mnav{border-top:1px solid var(--line);background:var(--bg2);
+  
+  max-height:var(--mnav-max,calc(100vh - 124px));overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+@supports (height:100dvh){.ported .mnav{max-height:var(--mnav-max,calc(100dvh - 124px))}}
+.ported .mnav[hidden]{display:none}
+.ported .mnav-in{max-width:1060px;margin:0 auto;
+  padding:14px clamp(18px,4vw,24px) calc(26px + env(safe-area-inset-bottom,0px))}
+.ported .mnav-a{display:block;width:100%;text-align:left;font-family:var(--body);font-size:16px;
+  font-weight:600;color:var(--text);background:none;border:0;cursor:pointer;margin:0;
+  padding:11px 12px;border-radius:10px;text-decoration:none;line-height:1.4}
+.ported .mnav-a:hover{background:rgba(127,127,127,.09);color:var(--text)}
+.ported .mnav-dash{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:700;
+  color:var(--text);background:var(--bg3);
+  border:1px solid color-mix(in srgb,var(--blue) 40%,transparent);
+  border-radius:12px;padding:13px 14px;margin-bottom:10px;text-decoration:none}
+.ported .mnav-dash:hover{background:var(--blue-glow);color:var(--text)}
+.ported .mnav-dash .mnav-dash-t{display:block;line-height:1.3}
+.ported .mnav-dash .mnav-dash-s{display:block;font-size:12.5px;font-weight:500;color:var(--muted);
+  line-height:1.35;margin-top:1px}
+.ported .mnav-dash .dot{width:8px;height:8px;border-radius:50%;background:#38BDF8;flex:0 0 auto;
+  animation:dashblip 1.9s ease-out infinite}
+.ported .mnav-dash .tag{margin-left:auto;align-self:flex-start;font-style:normal;font-size:9.5px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);
+  background:var(--blue-glow);border-radius:4px;padding:2px 5px}
+.ported .mnav-top{margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.ported .mnav-top .btn{width:100%;font-size:14.5px;padding:12px 18px;
+  display:inline-flex;align-items:center;justify-content:center}
+.ported .mnav-top .demo-cta-t{align-items:center;text-align:center}
+.ported .mnav-foot{display:flex;flex-direction:column;gap:9px;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--line)}
+.ported .mnav-foot .btn{width:100%;font-size:14.5px;padding:12px 18px}
+@media (max-width:900px){.ported .nav{display:none}
+.ported .burger{display:flex}
+.ported .theme-btn{margin-left:0}}
+@media (min-width:901px){.ported .mnav{display:none}}
+.ported .bar{align-items:center}
+.ported .nav .nav-a{height:38px;display:inline-flex;align-items:center;padding:0 11px;
+  font-size:14px;line-height:1}
+.ported .theme-btn{width:38px;height:38px}
+.ported .mnav .btn-amber, .ported header .mnav .btn-amber{background:#F59E0B;color:#1a1205;
+  border:1px solid #F59E0B;box-shadow:none}
+.ported .mnav .btn-amber:hover, .ported header .mnav .btn-amber:hover{background:#FBBF24;color:#1a1205;
+  border-color:#FBBF24}
+.ported .mnav-a.mnav-wb{display:flex;align-items:center;gap:9px;color:var(--wb);font-weight:600}
+.ported .mnav-a.mnav-wb:hover{background:var(--wb-glow);color:var(--wb)}
+.ported .mnav-wb .wbdot{width:7px;height:7px;border-radius:50%;background:var(--wb);flex:0 0 auto}
+.ported .foot-legal a.f-wb{color:var(--wb)}
+.ported .foot-legal a.f-wb:hover{color:var(--wb-dk)}
+.ported .mnav-h{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:14px 0 4px;padding:0 12px}
+.ported .mnav-a.sub{font-weight:500;font-size:15px;color:var(--muted);padding-left:20px}
+.ported .mnav-a.sub:hover{color:var(--text)}
+.ported .in-card{max-width:640px;margin:0 auto;background:var(--bg3);border:1px solid var(--line);
+  border-radius:16px;padding:clamp(24px,4vw,36px)}
+.ported .in-leg{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.ported .in-leg + .in-row{margin-top:0}
+.ported .in-card .in-leg:not(:first-child){margin-top:26px}
+.ported .in-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));
+  gap:14px;margin-bottom:14px}
+.ported .in-f{display:block}
+.ported .in-f > span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.ported .in-f > span em{font-style:normal;color:var(--faint)}
+.ported .in-f input, .ported .in-f select, .ported .in-f textarea{width:100%;background:var(--bg2);
+  border:1px solid var(--line2);border-radius:9px;padding:12px 14px;color:var(--text);
+  font-family:var(--body);font-size:14.5px}
+.ported .in-f textarea{resize:vertical;line-height:1.55}
+.ported .in-f input:focus, .ported .in-f select:focus, .ported .in-f textarea:focus{outline:2px solid var(--cyan);
+  outline-offset:1px}
+.ported .in-f select{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
+                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+.ported .in-note{font-size:11.5px;color:var(--faint);margin:18px 0 14px;line-height:1.6}
+.ported .in-go{width:100%;padding:15px}
+.ported .in-msg{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;min-height:18px}
+.ported .in-msg.err{color:var(--red)}
+.ported .in-msg.ok{color:var(--cyan)}
+.ported .in-alt{text-align:center;margin-top:26px;font-size:14px;color:var(--muted)}
+.ported .nav-drop{position:relative;display:flex;align-items:center}
+.ported .nav-trigger{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  background:none;border:1px solid var(--line2);border-radius:9px}
+.ported .nav-trigger:hover{border-color:color-mix(in srgb,var(--cyan) 50%,transparent)}
+.ported .nav-trigger[aria-expanded="true"]{border-color:var(--cyan);color:var(--cyan)}
+.ported .nav-car{width:12px;height:12px;opacity:.75;transition:transform .2s}
+.ported .nav-trigger[aria-expanded="true"] .nav-car{transform:rotate(180deg);opacity:1}
+.ported .nav-menu{position:absolute;left:0;top:calc(100% + 12px);min-width:292px;padding:8px;
+  border-radius:14px;background:var(--bg2);border:1px solid var(--line);
+  box-shadow:0 22px 52px rgba(0,0,0,.45);z-index:60}
+.ported .nav-menu[hidden]{display:none}
+.ported .nav-menu a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
+  align-items:center;padding:11px 13px;border-radius:11px;text-decoration:none}
+.ported .nav-menu a:hover{background:rgba(127,127,127,.09)}
+.ported .nav-menu a i{grid-row:1/span 2;width:4px;height:26px;border-radius:2px;display:block;
+  background:var(--line2);transition:background .16s}
+.ported .nav-menu a:hover i{background:var(--cyan)}
+.ported .nav-menu a b{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.ported .nav-menu a em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35}
+.ported .nav-menu .nm-h{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:10px 0 2px;padding:10px 13px 0;border-top:1px solid var(--line)}
+.ported header .btn.nav-cta{height:auto;min-height:44px;padding:5px 16px;font-size:13.5px;
+  margin-left:4px;display:inline-flex;align-items:center;justify-content:center;
+  line-height:1.15}
+.ported .demo-cta .spark{width:7px;height:7px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;display:inline-block;margin-right:9px;vertical-align:middle;
+  animation:demopulse 1.9s ease-in-out infinite}
+@keyframes demopulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+@keyframes demoring{
+  0%  {box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 50%,transparent)}
+  70% {box-shadow:0 0 0 9px color-mix(in srgb,var(--cyan) 0%,transparent)}
+  100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 0%,transparent)}
+}
+.ported header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
+.ported .mnav-foot .btn.demo-cta{display:inline-flex;align-items:center;justify-content:center}
+@media (prefers-reduced-motion:reduce){.ported .demo-cta .spark, .ported header .btn.nav-cta.demo-cta{animation:none}}
+.ported .demo-cta-t{display:inline-flex;flex-direction:column;align-items:flex-start;
+  line-height:1.15;text-align:left;white-space:nowrap}
+.ported .demo-cta-t em{font-style:normal;opacity:.75;font-weight:700}
+.ported .dc-min{display:none}
+.ported .demo-cta-t small{font-size:10.5px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;opacity:.72;margin-top:2px}
+.ported .mnav-foot .demo-cta-t{align-items:center;text-align:center}
+.ported .foot-legal a.f-dash{display:inline-flex;align-items:center;gap:7px;
+  color:var(--text);font-weight:700;
+  border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
+  border-radius:999px;padding:6px 14px;margin:-6px 4px -6px 0}
+.ported .foot-legal a.f-dash:hover{background:var(--blue-glow);border-color:var(--blue)}
+.ported .foot-legal a.f-dash .dot{width:7px;height:7px;border-radius:50%;background:#38BDF8;
+  flex:0 0 auto;box-shadow:0 0 8px #38BDF8}
+.ported .foot-demo{flex-basis:100%;font-size:13px;color:var(--muted);margin-top:4px}
+.ported .foot-demo a{color:var(--cyan);font-weight:600}
+.ported .nm-demo{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
+  font-family:var(--body);font-style:normal;font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;
+  color:var(--cyan);background:color-mix(in srgb,var(--cyan) 15%,transparent);
+  border-radius:999px;padding:3px 9px;margin-left:8px}
+.ported .nm-demo .pulse{width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);animation:nmblip 1.7s ease-in-out infinite}
+@keyframes nmblip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){.ported .nm-demo .pulse{animation:none}}
+@media (max-width:1020px){.ported .nav{display:none}
+.ported header .bar .btn.nav-cta{min-height:38px;padding:0 12px;font-size:12.5px;
+    margin-left:0;letter-spacing:-.01em}
+.ported header .bar .btn.nav-cta .spark{margin-right:7px}
+.ported header .bar .btn.nav-cta .demo-cta-t{flex-direction:row;align-items:center}
+.ported header .bar .btn.nav-cta .dc-full, .ported header .bar .btn.nav-cta em, .ported header .bar .btn.nav-cta small{display:none}
+.ported header .bar .btn.nav-cta .dc-min{display:inline}
+.ported .burger{display:flex}}
+@media (min-width:1021px){.ported .mnav{display:none}}
+@media (max-width:480px){.ported header .bar .brand span{display:none}}
+@media (max-width:379px){.ported header .bar{padding-left:12px;padding-right:12px;gap:8px}
+.ported header .bar .btn.nav-cta{padding:0 9px;font-size:12px}
+.ported header .bar .btn.nav-cta .spark{margin-right:6px}
+.ported header .bar .btn.nav-cta .dc-y{display:none}}
+.ported .demo-in{max-width:620px}
+.ported .demo-go{min-height:48px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:16px;padding:14px 32px;line-height:1.2}
+.ported .demo-call{margin-top:20px}
+.ported .demo-call a{color:var(--blue);font-weight:700;display:inline-block;
+  min-height:44px;padding:10px 0;line-height:24px}
+.ported .demo-call a:hover{text-decoration:underline}
+.ported .pr-hero{padding-bottom:18px}
+.ported .pr-jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.ported .pr-jump a{font-size:13px;font-weight:700;color:var(--text);text-decoration:none;
+  border:1px solid var(--line2);border-radius:999px;padding:8px 14px;
+  min-height:38px;display:inline-flex;align-items:center}
+.ported .pr-jump a:hover{background:var(--bg3);border-color:var(--blue);color:var(--blue)}
+.ported .pr-trial{padding:0}
+.ported .pr-trial p{max-width:1060px;margin:0 auto;background:var(--blue-glow);
+  border:1px solid color-mix(in srgb,var(--blue) 28%,transparent);
+  border-radius:12px;padding:16px 20px;font-size:14.5px;line-height:1.6}
+.ported .pr-sub{color:var(--muted);font-size:15px;margin:-6px 0 22px}
+.ported .pr-grid{display:grid;gap:16px;grid-template-columns:1fr}
+.ported .pr-card{background:var(--bg3);border:1px solid var(--line);border-radius:14px;
+  padding:22px;display:flex;flex-direction:column}
+.ported .pr-card.is-rec{border-color:var(--blue);box-shadow:0 10px 34px var(--blue-glow)}
+.ported .pr-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ported .pr-top h3{margin:0}
+.ported .pr-top .pop{background:var(--blue-glow);color:var(--blue);font-size:9px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;
+  border-radius:100px;white-space:nowrap}
+.ported .pr-price{font-family:var(--display);font-weight:800;font-size:34px;
+  letter-spacing:-.03em;line-height:1.1;margin:0}
+.ported .pr-price em{font-style:normal;font-size:14px;font-weight:600;color:var(--muted);
+  letter-spacing:0;margin-left:4px}
+.ported .pr-price-q{font-size:22px}
+.ported .pr-min{color:var(--muted);font-size:14px;margin:6px 0 14px}
+.ported .pr-feat{list-style:none;padding:0;margin:0 0 18px;flex:1 1 auto}
+.ported .pr-feat li{position:relative;padding-left:22px;font-size:14.5px;line-height:1.55;
+  margin-bottom:8px}
+.ported .pr-feat li::before{content:"";position:absolute;left:0;top:7px;width:11px;height:7px;
+  border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  transform:rotate(-45deg)}
+.ported .pr-note{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 16px}
+.ported .pr-card .btn{width:100%}
+.ported .pr-vnote{margin-top:18px;max-width:760px}
+.ported .pr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ported .pr-swipe{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+@media (min-width:760px){.ported .pr-swipe{display:none}}
+.ported .pr-tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.ported .pr-tbl th, .ported .pr-tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+.ported .pr-tbl thead th{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:700;white-space:nowrap}
+.ported .pr-tbl thead th span{display:block;text-transform:none;letter-spacing:0;
+  font-weight:600;font-size:12px;color:var(--cyan)}
+.ported .pr-tbl tbody th{font-weight:700;white-space:nowrap}
+.ported .pr-tbl td b{font-weight:800}
+.ported .pr-tbl td span{display:block;font-size:12.5px;color:var(--muted)}
+.ported .pr-cols{display:grid;gap:22px;grid-template-columns:1fr}
+.ported .pr-col h3{margin-bottom:10px}
+.ported .pr-col h3 + ul, .ported .pr-col ul{list-style:none;padding:0;margin:0 0 14px}
+.ported .pr-col li{position:relative;padding-left:16px;font-size:14.5px;line-height:1.6;
+  margin-bottom:9px}
+.ported .pr-col li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;
+  border-radius:50%;background:var(--muted)}
+.ported .pr-col .pr-price{font-size:26px;margin-bottom:8px}
+.ported .pr-col p{font-size:14.5px;line-height:1.6}
+.ported .pr-end{text-align:center}
+.ported .pr-end .lede{margin-left:auto;margin-right:auto}
+.ported .pr-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:24px 0 16px}
+@media (min-width:760px){.ported .pr-grid{grid-template-columns:repeat(3,1fr)}
+.ported .pr-grid-1{grid-template-columns:minmax(0,380px)}
+.ported .pr-cols{grid-template-columns:repeat(3,1fr);gap:30px}}
+.ported .wb-hero{padding-top:clamp(40px,5vw,62px)}
+.ported .wb-art{display:block;margin-top:38px}
+.ported .wb-art img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line)}
+.ported .th-dark{display:none}
+.ported .btns-l{display:flex;gap:12px;flex-wrap:wrap}
+.ported .wb-list{margin:0;padding-left:20px}
+.ported .wb-list li{font-size:15.5px;margin-bottom:10px;line-height:1.6}
+.ported .wb-list li:last-child{margin-bottom:0}
+.ported .wb-faq .role summary h3{font-size:17px;margin:0}
+.ported .wb-faq .role-body p{font-size:15.5px;margin:0}
+.ported .center .badges{justify-content:center}
+.ported .pays{display:grid;gap:16px;grid-template-columns:repeat(2,1fr);margin-top:30px;
+  max-width:760px}
+@media (max-width:900px){.ported .pays{grid-template-columns:1fr}}
+.ported .pay{display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:24px}
+.ported .pay h3{font-size:19px;margin-bottom:6px}
+.ported .pay h3 em{display:block;font-style:normal;font-family:var(--body);font-size:13px;
+  font-weight:500;color:var(--muted);margin-top:3px}
+.ported .pay-d{font-size:14.5px;color:var(--muted);margin-bottom:18px}
+.ported .pay-h{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:8px}
+.ported .pay-l{margin:0 0 18px 18px;padding:0}
+.ported .pay-l li{font-size:14.5px;margin-bottom:7px;line-height:1.5}
+.ported .pay-b{font-size:14.5px;margin:0 0 20px;padding-top:16px;border-top:1px solid var(--line)}
+.ported .pay-b span{display:block;font-size:11px;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.ported .pay .btn{margin-top:auto;width:100%}
+.ported .procon{display:grid;gap:26px;grid-template-columns:1fr 1fr}
+@media (max-width:720px){.ported .procon{grid-template-columns:1fr}}
+.ported .procon h4{margin-top:0}
+.ported .procon ul{margin:0 0 0 18px;padding:0}
+.ported .procon li{font-size:14.5px;margin-bottom:8px;line-height:1.55}
+.ported .pay-badge{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--blue);background:var(--blue-glow);
+  border-radius:5px;padding:4px 8px;margin-bottom:12px}
+.ported .pay-p{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.1;margin:0 0 6px}
+.ported .pay-p em{display:block;font-style:normal;font-family:var(--body);font-size:13px;
+  font-weight:500;color:var(--muted);letter-spacing:0;margin-top:4px}
+.ported .pay-p-q{font-size:20px;color:var(--text)}
+.ported .calc2{display:grid;gap:20px;grid-template-columns:1fr 1fr;margin-top:30px;align-items:start}
+@media (max-width:860px){.ported .calc2{grid-template-columns:1fr}}
+.ported .calc2-in, .ported .calc2-out{background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:24px}
+.ported .cf{margin-bottom:22px}
+.ported .cf:last-child{margin-bottom:0}
+.ported .cf label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.ported .cf-row{display:flex;align-items:center;gap:12px}
+.ported .cf-row input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--blue);height:26px}
+.ported .cf-row input[type=number]{flex:0 0 92px;width:92px;font-family:var(--body);font-size:15px;
+  color:var(--text);background:var(--bg3);border:1px solid var(--line2);border-radius:9px;
+  padding:9px 10px;text-align:right}
+.ported .cf-row input[type=number]:focus{border-color:var(--blue);outline:none}
+.ported .cf-help{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
+.ported .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.ported .chip{font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);
+  background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;
+  cursor:pointer;transition:color .15s,border-color .15s}
+.ported .chip:hover{color:var(--text);border-color:color-mix(in srgb,var(--blue) 55%,transparent)}
+.ported .co-big{font-family:var(--display);font-size:clamp(26px,4vw,34px);font-weight:700;
+  letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
+.ported .co-sub{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+.ported .co-rev{font-size:15px;margin-bottom:20px}
+.ported .co-rev b{font-family:var(--display);font-size:19px}
+.ported .co-note{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.ported .co-cards{display:grid;gap:12px;grid-template-columns:1fr}
+.ported .co-cards[hidden]{display:none}
+.ported .co-card{position:relative;background:var(--bg3);border:1px solid var(--line);
+  border-radius:12px;padding:16px}
+.ported .co-k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:4px}
+.ported .co-v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.ported .co-x{font-size:13px;color:var(--muted);margin-top:2px}
+.ported .co-free{background:var(--bg3);border:1px solid color-mix(in srgb,var(--blue) 45%,transparent);
+  border-radius:12px;padding:16px;font-size:15px;font-weight:600}
+.ported .co-free[hidden]{display:none}
+.ported .co-more{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.55}
+.ported .co-more-s{font-size:12px;color:var(--faint);margin-top:6px}
+.ported .calc2-out .fine{margin:16px 0 18px}
+.ported .calc2-out .btn{width:100%}
+.ported .addons{margin:28px 0 0;max-width:860px}
+.ported .addons > div{display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  padding:13px 0;border-bottom:1px solid var(--line)}
+.ported .addons > div:first-child{border-top:1px solid var(--line)}
+.ported .addons dt{font-size:15px;line-height:1.5}
+.ported .addons dd{margin:0;flex:0 0 auto;font-size:15px;font-weight:700;white-space:nowrap;
+  color:var(--text)}
+@media (max-width:600px){.ported .addons > div{flex-direction:column;gap:3px}
+.ported .addons dd{font-size:14.5px;color:var(--blue)}}
+/* ---- pricing cards, in the main page's system ------------------------- */
+.ported .pr-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  margin-top:var(--s8)}
+@media(min-width:860px){ .ported .pr-grid{grid-template-columns:repeat(3,1fr)} }
+.ported .pr-card{display:flex; flex-direction:column; background:#fff;
+  border:1px solid var(--line); border-radius:var(--r-card); padding:var(--s8);
+  box-shadow:none}
+.ported .pr-card.is-rec{background:var(--f-blue);
+  border-color:color-mix(in srgb, var(--blue) 26%, transparent)}
+.ported .pr-top{display:flex; align-items:center; gap:var(--s3);
+  flex-wrap:wrap; margin-bottom:var(--s3)}
+.ported .pr-top h3{font-size:12.5px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); margin:0}
+.ported .pr-top .pop{font-size:11px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--blue); background:#fff;
+  border:1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+  border-radius:var(--r-pill); padding:4px 10px}
+.ported .pr-price{font-size:46px; line-height:1.05; font-weight:800;
+  color:var(--ink); letter-spacing:-.02em; margin:0 0 var(--s2)}
+/* "/mo per location" wraps as one piece, rather than leaving "location"
+   stranded on its own line under a 46px number. */
+.ported .pr-price em{font-size:17px; font-style:normal; font-weight:700;
+  color:var(--muted); white-space:nowrap}
+.ported .pr-min{font-size:15px; color:var(--ink-2); margin:0 0 var(--s6)}
+.ported .pr-feat{list-style:none; margin:0 0 var(--s6); padding:0;
+  display:grid; gap:10px}
+.ported .pr-feat li{position:relative; margin:0; padding-left:26px;
+  font-size:15px; line-height:22px; color:var(--ink-2)}
+.ported .pr-feat li::before{content:""; position:absolute; left:2px; top:7px;
+  width:12px; height:7px; border-left:2px solid var(--blue);
+  border-bottom:2px solid var(--blue); transform:rotate(-45deg)}
+.ported .pr-note{font-size:13.5px; line-height:20px; color:var(--muted);
+  margin:0 0 var(--s6)}
+.ported .pr-card .btn{margin-top:auto; width:100%; justify-content:center}
+.ported .pr-sub{text-align:center; font-size:16px; color:var(--muted);
+  margin:var(--s2) 0 0}
+.ported .pr-vnote{margin-top:var(--s6); text-align:center}
+.ported .pr-grid + .pr-vnote{text-align:center}
+.ported [id^="p-"] > .wrap > h2{text-align:center}
+
+/* ---- the FAQ page ----------------------------------------------------- */
+/* The old sheet puts a "+" marker on every summary and a dark translucent
+   background on the bare <header> tag. Both are its own site chrome, and both
+   land on anything written in that markup, so they are turned off here. */
+.ported .faq-list summary::before{content:none}
+.ported .faq-top{background:none; position:static; backdrop-filter:none;
+  border:0; padding:0}
+/* The old sheet gives a bare .pay span a bordered, padded card box. In this
+   system .pay is just the serif accent phrase inside a heading. */
+.ported .pay{display:inline; border:0; padding:0; border-radius:0;
+  background:none; box-shadow:none;
+  font-family:'Instrument Serif',Georgia,serif; font-style:italic;
+  font-weight:400; letter-spacing:.005em}
+.ported .faq-page{padding:var(--s16) 0 var(--s24)}
+.ported .faq-top{max-width:720px; margin:0 auto var(--s16); text-align:center}
+.ported .faq-top h1{font-size:clamp(34px,4.6vw,52px); line-height:1.06;
+  margin:var(--s3) 0 var(--s4)}
+.ported .faq-top .lede{margin-left:auto; margin-right:auto}
+.ported .faq-g{max-width:760px; margin:0 auto var(--s12)}
+.ported .faq-g h2{font-size:14px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--wb); margin-bottom:var(--s4);
+  text-align:left}
+.ported .faq-list{border-top:1px solid var(--line)}
+.ported .faq-list details{border-bottom:1px solid var(--line)}
+.ported .faq-list summary{list-style:none; cursor:pointer; position:relative;
+  padding:var(--s4) 40px var(--s4) 0; font-size:17.5px; font-weight:700;
+  color:var(--ink); min-height:44px; display:flex; align-items:center}
+.ported .faq-list summary::-webkit-details-marker{display:none}
+.ported .faq-list summary::after{content:""; position:absolute; right:10px;
+  top:50%; width:10px; height:10px; margin-top:-7px;
+  border-right:2px solid var(--faint); border-bottom:2px solid var(--faint);
+  transform:rotate(45deg); transition:transform .18s ease}
+.ported .faq-list details[open] summary::after{transform:rotate(-135deg);
+  margin-top:-2px}
+.ported .faq-list summary:hover{color:var(--blue)}
+.ported .faq-list details p{margin:0 0 var(--s6); padding-right:40px;
+  font-size:16px; line-height:26px; color:var(--ink-2)}
+.ported .faq-end{max-width:760px; margin:0 auto; background:var(--f-cyan);
+  border-radius:var(--r-card); padding:var(--s12) var(--s8); text-align:center}
+.ported .faq-end h2{font-size:clamp(24px,3vw,32px); margin-bottom:var(--s3)}
+.ported .faq-end p{color:var(--ink-2); max-width:52ch; margin:0 auto}
+.ported .faq-cta{display:flex; gap:var(--s3); justify-content:center;
+  flex-wrap:wrap; margin-top:var(--s6)}
+@media(prefers-reduced-motion:reduce){
+  .ported .faq-list summary::after{transition:none}
+}
+
+.ported *{min-width:0}
+.ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}
+.ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a class="brand" href="/" aria-label="VoiceCaptures home"><img src="/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
+
+    <nav class="nav" aria-label="Main">
+      <button type="button" class="nav-a" id="t-recep" aria-expanded="false" aria-controls="m-recep">
+        AI receptionist
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="nav-a" id="t-wb" aria-expanded="false" aria-controls="m-wb">
+        Win-back
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="nav-a" href="/pricing/">Pricing</a>
+      <button type="button" class="nav-a" id="t-co" aria-expanded="false" aria-controls="m-co">
+        Company
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+
+    <div class="bar-end">
+      <button type="button" class="srch-btn" id="srch-btn" aria-label="Search"
+              aria-expanded="false" aria-controls="srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <a class="sales" href="tel:+13656039234">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
+        <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
+      </a>
+      <a class="login" href="/login">Log in</a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mega" id="m-recep" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
+        <a href="/#calc-section"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9z"/></svg></i><span><b>What a missed call costs</b><em>Run it on your own numbers</em></span></a>
+        <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
+        <a href="/pricing/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Plans &amp; pricing</b><em>Every plan on one page, no quote needed</em></span></a>
+        <a href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
+        <a href="/#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Talk to us</b><em>One form, and we come back within a day</em></span></a>
+      </div>
+      <a class="mega-feat" href="/demo/?src=nav">
+        <b>Build your demo assistant</b>
+        <em>Tell it about your business and talk to it in your browser. About 30 seconds, no call.</em>
+        <img src="/img/hero-phones.webp" width="1500" height="1165" loading="lazy" alt="">
+      </a>
+    </div>
+  </div>
+
+  <div class="mega" id="m-wb" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/win-back/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2v6h-2V5.4l-5.3 5.3-1.4-1.4L16.6 4H14V2zM6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How win-back works</b><em>We call your own past customers when they come due</em></span></a>
+        <a href="/win-back/#pay"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Ways to pay</b><em>One-time campaign, always-on, or a build you own</em></span></a>
+        <a href="/win-back/#calc"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9z"/></svg></i><span><b>What it is worth</b><em>Run it on your own list size and job value</em></span></a>
+        <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg></i><span><b>Start with a free pilot</b><em>The first 20% of your list, so you see your real rate first</em></span></a>
+      </div>
+      <a class="mega-feat" href="/win-back/">
+        <b>$2.50 per customer called</b>
+        <em>Priced up front. Most reactivation services will not quote without a sales call.</em>
+        <img src="/img/winback.webp" width="1400" height="579" loading="lazy" alt="">
+      </a>
+    </div>
+  </div>
+
+  <div class="mega" id="m-co" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/about/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg></i><span><b>About</b><em>Who we are and how we build</em></span></a>
+        <a href="/careers/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6v3h5v15H4V6h5zm2 1v2h2V4zM4 10h16"/></svg></i><span><b>Careers</b><em>Part-time sales and marketing, Toronto and remote</em></span></a>
+        <a href="/#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Contact</b><em>One form, and we come back within a day</em></span></a>
+        <a href="/login"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Client dashboard</b><em>Your calls, transcripts and minutes</em></span></a>
+      </div>
+      <a class="mega-feat" href="tel:+13656039234">
+        <b>Talk to sales</b>
+        <em>(365)&nbsp;603-9234 &mdash; or book 30 minutes and we will tell you on the call if your volume does not justify it.</em>
+      </a>
+    </div>
+  </div>
+
+  <div class="srch" id="srch" role="dialog" aria-modal="true" aria-label="Search" hidden>
+    <div class="srch-in">
+      <div class="srch-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="srch-q" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search voicecaptures.com"
+               aria-label="Search voicecaptures.com" aria-controls="srch-res">
+        <button type="button" class="srch-x" id="srch-x" aria-label="Close search">&times;</button>
+      </div>
+
+      <div id="srch-quick">
+        <p class="srch-qh">Quick links</p>
+        <ul class="srch-quick">
+          <li><a href="/">AI receptionist</a></li>
+          <li><a href="/pricing/">Pricing</a></li>
+          <li><a href="/win-back/">Win-back</a></li>
+          <li><a href="/demo/">Build a demo</a></li>
+          <li><a href="/#contact">Contact</a></li>
+          <li class="all"><a href="/pricing/">See everything</a></li>
+        </ul>
+      </div>
+
+      <ul class="srch-res" id="srch-res" role="listbox" aria-label="Results"></ul>
+
+      <p class="srch-keys">
+        <span><kbd>&crarr;</kbd> to select</span>
+        <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> to navigate</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="mnav" id="mnav" hidden>
+    <div class="mnav-in">
+      <div class="srch-field mnav-srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="srch-qm" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search&hellip;" aria-label="Search the site">
+      </div>
+      <ul class="srch-res" id="srch-resm" role="listbox" aria-label="Results"></ul>
+      <p class="mnav-h">AI receptionist</p>
+      <a class="mnav-a" href="/#how">How it answers</a>
+      <a class="mnav-a" href="/#calc-section">What a missed call costs</a>
+      <a class="mnav-a" href="/demo/?src=nav">Build your demo</a>
+      <a class="mnav-a" href="/pricing/">Plans &amp; pricing</a>
+      <a class="mnav-a" href="/faq/">Common questions</a>
+
+      <p class="mnav-h">Outbound</p>
+      <a class="mnav-a" href="/win-back/">Win-back campaigns</a>
+      <p class="mnav-h">Company</p>
+      <a class="mnav-a" href="/pricing/">Pricing</a>
+      <a class="mnav-a" href="/about/">About</a>
+      <a class="mnav-a" href="/careers/">Careers</a>
+      <a class="mnav-a" href="/#contact">Contact</a>
+      <a class="mnav-a" href="/login">Client dashboard</a>
+      <div class="mnav-foot">
+        <a class="btn btn-primary" href="/demo/?src=nav">Build your demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-ghost" href="tel:+13656039234">Sales: (365)&nbsp;603-9234</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="ported">
+<main class="wrap faq-page">
+  <div class="faq-top">
+    <p class="eyebrow">Common questions</p>
+    <h1>Everything people ask <span class="pay">before they switch.</span></h1>
+    <p class="lede">If yours is not here, call sales on
+    <a href="tel:+13656039234">(365)&nbsp;603-9234</a> or
+    <a href="/#contact">send us the question</a> &mdash; we answer within a day.</p>
+  </div>
+
+  <section class="faq-g">
+    <h2>The basics</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Will it sound robotic?</summary>
+        <p>It runs on current conversational voice models, and most callers do not register that it is not a person. Call the live demo line on (647)&nbsp;692-1081 and judge it yourself before you commit to anything.</p>
+      </details>
+      <details>
+        <summary>Will my callers know it is an AI?</summary>
+        <p>It answers in your business&rsquo;s name and does not pretend to be a named employee. If a caller asks outright whether they are talking to a person, it says plainly that it is an AI assistant.</p>
+      </details>
+      <details>
+        <summary>What if I already have a receptionist?</summary>
+        <p>It takes overflow and after-hours rather than replacing anyone. Your team keeps the calls they can reach, and nothing rings out when they cannot.</p>
+      </details>
+      <details>
+        <summary>What happens when it cannot answer something?</summary>
+        <p>It takes the caller&rsquo;s details, tells them you will call back, and texts you the summary. For anything you set it to treat as urgent, it transfers to you live instead.</p>
+      </details>
+      <details>
+        <summary>What about my sector?</summary>
+        <p>Home services, restaurants and clinics are where we work today. The mechanics are the same anywhere the phone is how work arrives &mdash; someone calls, needs qualifying, and needs a slot booked. If yours is close, start the free trial and we will tell you honestly whether it fits before you pay anything.</p>
+      </details>
+    </div>
+  </section>
+  <section class="faq-g">
+    <h2>Setup and your number</h2>
+    <div class="faq-list">
+      <details>
+        <summary>How long does setup take?</summary>
+        <p>Most businesses are live in about ten minutes. You forward your line; we configure the greeting, hours, slot length and calendar. You do not build anything.</p>
+      </details>
+      <details>
+        <summary>Do I keep my number?</summary>
+        <p>Yes. Your calls forward to us when you do not pick up, or after hours. Nothing changes for your customers, your listings or your signage.</p>
+      </details>
+      <details>
+        <summary>Can I use it for after-hours only?</summary>
+        <p>Yes &mdash; that is exactly what the entry tier is for. Forward evenings, weekends and holidays, and leave daytime calls ringing through to you.</p>
+      </details>
+      <details>
+        <summary>Can I cancel anytime?</summary>
+        <p>Yes. It is month to month with no contract. Cancel and forwarding reverts to your own phone the same day.</p>
+      </details>
+      <details>
+        <summary>What happens after the trial?</summary>
+        <p>Your plan starts on day 15. We email you a reminder before then. Cancel before day 15 and you pay nothing.</p>
+      </details>
+    </div>
+  </section>
+  <section class="faq-g">
+    <h2>Plans and minutes</h2>
+    <div class="faq-list">
+      <details>
+        <summary>What counts as a minute?</summary>
+        <p>Time the assistant spends on a live call, including transfers.</p>
+      </details>
+      <details>
+        <summary>What if I go over?</summary>
+        <p>We text you at 80% of your minutes, and again at 100% &mdash; the line never stops answering. You can top up from your dashboard: 50 minutes for $65, or 100 for $120. Minutes used past your plan without a top-up are $1.50 each, on your next invoice. There are no surprise charges.</p>
+      </details>
+      <details>
+        <summary>I have more than one location. How does pricing work?</summary>
+        <p>Each plan covers one location. For two or more, book a 30-minute call and we will quote one price for all of them, on one account and one bill.</p>
+      </details>
+      <details>
+        <summary>Is live booking included?</summary>
+        <p>Yes, at every plan. Booking on the call is never gated behind an upgrade.</p>
+      </details>
+    </div>
+  </section>
+  <section class="faq-g">
+    <h2>Data and privacy</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Where is my call data stored?</summary>
+        <p>The records we keep &mdash; recordings, transcripts and call details &mdash; are stored in Canada. The live call runs on providers in the United States: our phone provider stores no call audio, and our AI provider holds a copy of the conversation for 14 days before deleting it, which can take up to a further 30 days to clear its backups. Our <a href="/privacy/">Privacy Policy</a> sets out the detail.</p>
+      </details>
+      <details>
+        <summary>What do you keep, and for how long?</summary>
+        <p>Call history, recordings and transcripts are kept for 14 days on every plan. Longer history is an add-on. For clinics we recommend staying at 14 days &mdash; on a patient-facing line, keeping less is the safer setting, not a worse one.</p>
+      </details>
+      <details>
+        <summary>How do you handle patient information?</summary>
+        <p>Our assistant collects only contact details and the general reason for the call. Recording is off by default for clinics, and transcripts are deleted after 14 days unless you choose longer. We will work with your clinic on any privacy agreement your practice requires.</p>
+      </details>
+    </div>
+  </section>
+  <section class="faq-g">
+    <h2>Win-back calls</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Is win-back cold calling?</summary>
+        <p>No. We only contact your own past customers &mdash; people who have already bought from you &mdash; and every message identifies your business and lets them opt out.</p>
+      </details>
+      <details>
+        <summary>What does it cost?</summary>
+        <p>$2.50 per customer called, and the first slice of your list is free so you see your own response rate before you spend anything. <a href="/win-back/">How win-back works</a>.</p>
+      </details>
+    </div>
+  </section>
+
+  <aside class="faq-end">
+    <h2>Still deciding?</h2>
+    <p>The fastest answer is to hear it. Build a demo on your own business, or
+    call the live line and ask it something awkward.</p>
+    <p class="faq-cta">
+      <a class="btn btn-primary" href="/demo/?src=faq">Build your demo</a>
+      <a class="btn btn-ghost" href="tel:+16476921081">Call the demo line</a>
+    </p>
+  </aside>
+</main>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div class="fcol fbrand">
+        <a class="brand" href="/" aria-label="VoiceCaptures home"><img src="/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
+        <p>An AI receptionist that answers on your existing number, books into your
+        calendar and texts you the details.</p>
+        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo<em class="beta">(beta)</em></a>
+        <dl class="fmeta">
+          <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &middot; demo line</dd>
+          <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
+          <dd>Toronto, Ontario, Canada</dd>
+        </dl>
+      </div>
+
+      <div class="fcol">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/#how">How it answers</a></li>
+          <li><a href="/#calc-section">What a missed call costs</a></li>
+          <li><a href="/pricing/">Plans &amp; pricing</a></li>
+          <li><a href="/faq/">Common questions</a></li>
+          <li><a href="/win-back/">Win-back campaigns</a></li>
+        </ul>
+      </div>
+
+      <div class="fcol">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/pricing/">Pricing</a></li>
+          <li><a href="/careers/">Careers</a></li>
+          <li><a href="/#contact">Contact</a></li>
+          <li><a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a></li>
+        </ul>
+      </div>
+
+      <div class="fcol">
+        <h4>Get started</h4>
+        <ul>
+          <li><a href="/demo/?src=preview">Build a demo assistant</a></li>
+          <li><a href="tel:+16476921081">Call the demo line</a></li>
+          <li><a href="/login">Client dashboard</a></li>
+        </ul>
+        <h4 class="f-h2">Legal</h4>
+        <ul>
+          <li><a href="/privacy/">Privacy Policy</a></li>
+          <li><a href="/terms/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fbot">
+      <span>&copy; 2026 VoiceCaptures</span>
+      <span>Answers &middot; Qualifies &middot; Books</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var header = document.querySelector("header");
+  var triggers = [].slice.call(document.querySelectorAll(".nav-a[aria-controls]"));
+  var burger = document.getElementById("burger");
+  var panel  = document.getElementById("mnav");
+
+  function closeMegas(except){
+    triggers.forEach(function(t){
+      if (t === except) return;
+      t.setAttribute("aria-expanded","false");
+      document.getElementById(t.getAttribute("aria-controls")).hidden = true;
+    });
+  }
+  function closeMobile(){
+    if (!panel) return;
+    panel.hidden = true;
+    burger.setAttribute("aria-expanded","false");
+  }
+  // The search panel is not a mega panel — it must survive a mouseleave while
+  // someone is typing — so it closes through its own hook instead.
+  window.closeNavPanels = function(){ closeMegas(null); closeMobile(); };
+
+  triggers.forEach(function(t){
+    var m = document.getElementById(t.getAttribute("aria-controls"));
+    t.addEventListener("click", function(e){
+      e.stopPropagation();
+      var open = t.getAttribute("aria-expanded") === "true";
+      closeMegas(t); closeMobile();
+      if (window.closeSearch) window.closeSearch();
+      t.setAttribute("aria-expanded", open ? "false" : "true");
+      m.hidden = open;
+    });
+  });
+
+  // A pointer leaving the whole header closes whatever is open, so the panel
+  // does not hang around after the cursor has gone. Touch is unaffected,
+  // because there the panel is opened and closed by tapping.
+  header.addEventListener("mouseleave", function(){ closeMegas(null); });
+
+  if (burger && panel) {
+    // Size the panel to what is actually below it rather than guessing.
+    function fit(){
+      if (panel.hidden) return;
+      var top = panel.getBoundingClientRect().top;
+      panel.style.setProperty("--mnav-max",
+        Math.max(180, Math.round(window.innerHeight - top - 6)) + "px");
+    }
+    burger.addEventListener("click", function(e){
+      e.stopPropagation();
+      var open = !panel.hidden;
+      closeMegas(null);
+      panel.hidden = open;
+      burger.setAttribute("aria-expanded", open ? "false" : "true");
+      if (!open) fit();
+    });
+    panel.addEventListener("click", function(e){ if (e.target.closest("a")) closeMobile(); });
+    window.addEventListener("resize", function(){
+      if (window.innerWidth >= 1200) closeMobile(); else fit();
+    });
+    window.addEventListener("scroll", fit, { passive: true });
+  }
+
+  document.addEventListener("click", function(e){
+    if (!header.contains(e.target)) {
+      closeMegas(null); closeMobile();
+      if (window.closeSearch) window.closeSearch();
+    }
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    var open = triggers.filter(function(t){ return t.getAttribute("aria-expanded") === "true"; })[0];
+    closeMegas(null); closeMobile();
+    if (window.closeSearch) window.closeSearch();
+    if (open) open.focus();
+  });
+})();
+
+/* ---- search -------------------------------------------------------------
+   A static site has nowhere to run a query, so the index lives here: title,
+   href, blurb, keywords, thumbnail. Every href points at a route that exists.
+   Entries go down to the section level, so a word like "vet" or "overage"
+   lands on something rather than on nothing. */
+(function(){
+  "use strict";
+  var IMG = "/img/";
+  var IX = [
+    ["AI receptionist", "/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone call missed calls after hours overnight voicemail greeting answer", IMG+"hero-phones.webp"],
+    ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price pricing cost costs plan plans tier tiers monthly subscription how much cheap expensive quote budget", IMG+"dashboard.webp"],
+    ["Extra minutes and overage", "/pricing/", "$1.50 a minute over your plan, or packs of 50 and 100 bought in the dashboard.", "overage extra minutes pack packs bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
+    ["Prepaid plans", "/pricing/", "Pay three, six or twelve months up front instead of monthly.", "prepaid annual yearly upfront discount commitment term contract length save", ""],
+    ["Free trial", "/demo/", "14 days free at one location, up to 100 minutes.", "free trial try test pilot risk no card 14 days evaluate", ""],
+    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
+    ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "winback win back reactivation outbound lapsed dormant past customers campaign list database revive dead leads", IMG+"winback.webp"],
+    ["Win-back pricing", "/win-back/#pay", "One-time campaign, always-on, or a build you own.", "winback cost price per customer campaign always on one time own build", ""],
+    ["What win-back is worth", "/win-back/#calc", "Run the numbers on your own list size and job value.", "calculator roi worth return math revenue estimate list size job value payback", ""],
+    ["Home services and trades", "/pricing/", "Plumbing, HVAC, electrical, roofing, landscaping and the rest.", "plumber plumbing hvac heating cooling furnace ac electrician electrical roofer roofing landscaping lawn contractor trades handyman garage door pest emergency call out", IMG+"sec-home.webp"],
+    ["Restaurants and cafes", "/pricing/", "Reservations, hours and takeout questions, answered during the rush.", "restaurant restaurants cafe cafes coffee bar pub bakery food reservation reservations booking table takeout delivery hours menu rush", IMG+"sec-cafe.webp"],
+    ["Clinics and dental", "/pricing/", "Appointments and triage for dental, medical and health practices.", "clinic clinics dental dentist dentistry medical doctor physician physio chiropractor optometry health practice patient patients appointment appointments triage recall", IMG+"sec-clinic.webp"],
+    ["Veterinary practices", "/pricing/", "Appointment and triage calls for vet clinics, handled the same way.", "vet vets veterinary veterinarian animal pet pets clinic hospital emergency", IMG+"sec-vet.webp"],
+    ["Salons, spas and fitness", "/pricing/", "Bookings and rescheduling for salons, spas, studios and gyms.", "salon salons hair barber nails spa massage esthetics fitness gym studio yoga pilates personal trainer booking reschedule", IMG+"sec-salon.webp"],
+    ["Professional services", "/pricing/", "Legal, real estate, accounting and consulting.", "legal lawyer law firm attorney paralegal real estate realtor broker accounting accountant bookkeeping consulting consultant agency office intake", IMG+"sec-pro.webp"],
+    ["Any other business", "/pricing/", "If it takes calls, it fits. Tell us the trade and we will say so.", "other business industry sector vertical fit anything else", ""],
+    ["Personal line", "/pricing/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal.webp"],
+    ["Books into your calendar", "/", "It books the job live on the call, into the calendar you already use.", "calendar booking book appointment schedule scheduling availability slot google outlook calendly", ""],
+    ["Software it books into", "/", "Google Calendar, Outlook, Jobber, Housecall Pro, ServiceTitan, Square, Jane and more.", "integration integrations jobber housecall pro servicetitan square acuity mindbody jane dentrix open dental eaglesoft opentable resy toast hubspot crm outlook google calendar connect sync", IMG+"integrations.webp"],
+    ["Texts and summaries", "/", "The caller's name, number and what they wanted, texted to you before you pick up.", "text texts sms message messages summary transcript notification alert notify email forward", ""],
+    ["Setup", "/demo/", "About ten minutes, and we do it for you. It keeps your existing number.", "setup set up install onboarding port number forwarding existing number how long switch", ""],
+    ["Client dashboard", "/login/", "Your calls, transcripts and minutes.", "login log in sign in signin dashboard account portal usage minutes transcripts recordings history billing invoice", IMG+"dashboard.webp"],
+    ["Contact", "/#contact", "One form, and we come back within a day.", "contact form talk book a call email sales phone get in touch reach enquiry inquiry question support help", ""],
+    ["Talk to sales", "tel:+13656039234", "(365) 603-9234 — or book thirty minutes and we will tell you if it does not fit.", "sales call us phone number talk human rep representative speak", ""],
+    ["Hear the demo line", "tel:+16476921081", "(647) 692-1081, our live demo line, answering right now.", "demo line hear listen sample example live try call it", ""],
+    ["About", "/about/", "Who we are and how we build.", "about company who we are story mission team founded toronto canada canadian", ""],
+    ["Careers", "/careers/", "Part-time sales and marketing, Toronto and remote.", "careers career jobs job hiring hire role roles work open positions sdr sales marketing part time remote apply", ""],
+    ["Privacy", "/privacy/", "What we collect, who processes it, and how long it is kept.", "privacy policy data retention gdpr pipeda phipa personal information subprocessor subprocessors processors security encryption breach notification delete", ""],
+    ["Security and subprocessors", "/privacy/", "Where data is hosted and which services touch it.", "security hosting host render supabase vapi twilio elevenlabs openai resend google server location virginia us data residency", ""],
+    ["Terms", "/terms/", "The terms the service runs under.", "terms conditions contract agreement legal sla uptime outage credit cancel cancellation refund notice period liability", ""],
+    ["Recording and consent", "/privacy/", "Whether calls are recorded, and how that is handled.", "recording record recorded consent two party one party ontario canada law compliance transcript", ""],
+    ["Where we are", "/about/", "Toronto, Ontario — working with businesses wherever they are.", "toronto ontario canada canadian gta location local where based", ""]
+  ];
+
+  var btn = document.getElementById("srch-btn"),
+      pan = document.getElementById("srch"),
+      q   = document.getElementById("srch-q"),
+      res = document.getElementById("srch-res"),
+      quick = document.getElementById("srch-quick"),
+      xb  = document.getElementById("srch-x"),
+      qm  = document.getElementById("srch-qm"),
+      resm= document.getElementById("srch-resm");
+  if (!btn || !pan) return;
+
+  // Flattening a whole string invents words that are not in it — "live try"
+  // becomes "livetry", which contains "vet". So only ADJACENT words are joined,
+  // which still catches "winback" and "homeservices" and nothing spurious.
+  function glued(text){
+    var w = text.split(/[^a-z0-9]+/).filter(Boolean), out = [], i;
+    for (i = 0; i < w.length - 1; i++) {
+      out.push(w[i] + w[i+1]);
+      if (i < w.length - 2) out.push(w[i] + w[i+1] + w[i+2]);
+    }
+    return out;
+  }
+  function gluedHit(text, f){
+    var g = glued(text), i;
+    for (i = 0; i < g.length; i++) if (g[i].indexOf(f) === 0) return true;
+    return false;
+  }
+  // Score one typed word against one entry. Word-prefix matching is what makes
+  // "vet" reach "veterinary" and "plumb" reach "plumbing".
+  function hit(e, t){
+    var title = e[0].toLowerCase(), blurb = e[2].toLowerCase(), keys = e[3],
+        words = (title + " " + keys).split(/[^a-z0-9]+/);
+    var best = 0, i;
+    if (title.indexOf(t) === 0) best = 100;
+    else if (title.indexOf(t) > -1) best = 72;
+    for (i = 0; i < words.length && best < 60; i++) {
+      if (words[i] && words[i].indexOf(t) === 0) { best = Math.max(best, 58); break; }
+    }
+    if (best < 40 && keys.indexOf(t) > -1) best = 38;
+    if (best < 20 && blurb.indexOf(t) > -1) best = 20;
+    if (best < 64 && t.length > 3) {
+      if (gluedHit(title, t)) best = 64;
+      else if (best < 34 && gluedHit(keys, t)) best = 34;
+    }
+    return best;
+  }
+  // Every word typed has to land somewhere, so two words narrow rather than widen.
+  function score(e, terms){
+    var total = 0;
+    for (var i = 0; i < terms.length; i++) {
+      var h = hit(e, terms[i]);
+      if (!h) return 0;
+      total += h;
+    }
+    return total;
+  }
+  function find(term){
+    var t = term.trim().toLowerCase();
+    if (!t) return [];
+    var terms = t.split(/\s+/);
+    return IX.map(function(e){ return [score(e, terms), e]; })
+             .filter(function(r){ return r[0] > 0; })
+             .sort(function(a, b){ return b[0] - a[0]; })
+             .map(function(r){ return r[1]; }).slice(0, 8);
+  }
+
+  var ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>';
+  function draw(list, box, term){
+    box.innerHTML = "";
+    if (quick && box === res) quick.hidden = !!term.trim();
+    if (!term.trim()) return;
+    if (!list.length) {
+      var p = document.createElement("p");
+      p.className = "srch-none";
+      p.textContent = "Nothing matches “" + term.trim() + "”. Try a trade, “pricing”, or “win-back”.";
+      box.appendChild(p);
+      return;
+    }
+    list.forEach(function(e, i){
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      if (i === 0) li.className = "on";
+      var a = document.createElement("a");
+      a.href = e[1];
+      var ic = document.createElement("i");
+      if (e[4]) { var im = document.createElement("img"); im.src = e[4]; im.alt = ""; im.loading = "lazy"; ic.appendChild(im); }
+      else ic.innerHTML = ICON;
+      var tx = document.createElement("div");
+      var b = document.createElement("b"); b.textContent = e[0];
+      var sp = document.createElement("span"); sp.textContent = e[2];
+      tx.appendChild(b); tx.appendChild(sp);
+      a.appendChild(ic); a.appendChild(tx); li.appendChild(a); box.appendChild(li);
+    });
+  }
+  function move(box, step){
+    var items = box.querySelectorAll("li");
+    if (!items.length) return;
+    var cur = box.querySelector("li.on"), i = cur ? [].indexOf.call(items, cur) : -1;
+    i = (i + step + items.length) % items.length;
+    if (cur) cur.className = "";
+    items[i].className = "on";
+    items[i].scrollIntoView({ block: "nearest" });
+  }
+  function keys(input, box){
+    input.addEventListener("input", function(){ draw(find(input.value), box, input.value); });
+    input.addEventListener("keydown", function(e){
+      if (e.key === "ArrowDown") { e.preventDefault(); move(box, 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(box, -1); }
+      else if (e.key === "Enter") {
+        var on = box.querySelector("li.on a");
+        if (on) { e.preventDefault(); window.location.href = on.getAttribute("href"); }
+      }
+    });
+  }
+  keys(q, res);
+  if (qm && resm) keys(qm, resm);
+
+  window.closeSearch = function(){
+    if (pan.hidden) return;
+    pan.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+    document.documentElement.style.removeProperty("overflow");
+  };
+  function open(){
+    if (window.closeNavPanels) window.closeNavPanels();
+    pan.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    document.documentElement.style.overflow = "hidden";
+    draw(find(q.value), res, q.value);
+    q.focus(); q.select();
+  }
+  btn.addEventListener("click", function(e){
+    e.stopPropagation();
+    if (pan.hidden) open(); else window.closeSearch();
+  });
+  xb.addEventListener("click", window.closeSearch);
+  // The backdrop closes it; the card does not.
+  pan.addEventListener("click", function(e){
+    e.stopPropagation();
+    if (e.target === pan) window.closeSearch();
+  });
+  pan.addEventListener("keydown", function(e){
+    if (e.key === "Escape") { e.stopPropagation(); window.closeSearch(); btn.focus(); }
+  });
+  // "/" focuses search, unless the caret is already in a field.
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "/" || e.metaKey || e.ctrlKey) return;
+    var t = e.target.tagName;
+    if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT" || e.target.isContentEditable) return;
+    if (window.innerWidth < 1200) return;
+    e.preventDefault(); open();
+  });
+})();
+</script>
+
+<script type="module" src="/talk.js?v=f440dd43"></script>
+</body>
+</html>

@@ -2403,7 +2403,7 @@ def _pricing_body():
         </ul>
         <p class="pr-note">Not open yet. Join the waitlist and we will tell you
         when it is. No card now, and the price may change before launch.</p>
-        <a class="btn btn-ghost" href="/personal/">Join the waitlist</a>
+        <a class="btn btn-ghost" href="/#contact">Join the waitlist</a>
       </div>
     </div>
   </div>
@@ -2519,11 +2519,11 @@ def _pricing_body():
     <p class="lede">Or build a demo assistant for your business first and hear it
     answer, in about 30 seconds, without talking to anyone.</p>
     <div class="pr-cta">
-      <a class="btn btn-primary" href="/contact/">Start free trial</a>
+      <a class="btn btn-primary" href="/#contact">Start free trial</a>
       <a class="btn btn-ghost" href="/demo/?src=pricing">Build your demo</a>
       <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
     </div>
-    <p class="fine">Questions about a price? <a href="/contact/">Tell us what you
+    <p class="fine">Questions about a price? <a href="/#contact">Tell us what you
     need</a> and we will come back within a day.</p>
   </div>
 </section>
@@ -2533,7 +2533,141 @@ def _pricing_body():
 PRICING_BODY = _pricing_body()
 
 
+# ----------------------------------------------------------------- faq ----
+# Every question that used to be repeated across the five sector pages, in one
+# place. They were near-identical on all five, which split the same search
+# traffic five ways and meant a correction had to be made five times.
+FAQ_GROUPS = [
+    ("The basics", [
+        ("Will it sound robotic?",
+         "It runs on current conversational voice models, and most callers do not "
+         "register that it is not a person. Call the live demo line on (647)&nbsp;692-1081 "
+         "and judge it yourself before you commit to anything."),
+        ("Will my callers know it is an AI?",
+         "It answers in your business&rsquo;s name and does not pretend to be a named "
+         "employee. If a caller asks outright whether they are talking to a person, "
+         "it says plainly that it is an AI assistant."),
+        ("What if I already have a receptionist?",
+         "It takes overflow and after-hours rather than replacing anyone. Your team "
+         "keeps the calls they can reach, and nothing rings out when they cannot."),
+        ("What happens when it cannot answer something?",
+         "It takes the caller&rsquo;s details, tells them you will call back, and texts you "
+         "the summary. For anything you set it to treat as urgent, it transfers to "
+         "you live instead."),
+        ("What about my sector?",
+         "Home services, restaurants and clinics are where we work today. The "
+         "mechanics are the same anywhere the phone is how work arrives &mdash; someone "
+         "calls, needs qualifying, and needs a slot booked. If yours is close, start "
+         "the free trial and we will tell you honestly whether it fits before you pay "
+         "anything."),
+    ]),
+    ("Setup and your number", [
+        ("How long does setup take?",
+         "Most businesses are live in about ten minutes. You forward your line; we "
+         "configure the greeting, hours, slot length and calendar. You do not build "
+         "anything."),
+        ("Do I keep my number?",
+         "Yes. Your calls forward to us when you do not pick up, or after hours. "
+         "Nothing changes for your customers, your listings or your signage."),
+        ("Can I use it for after-hours only?",
+         "Yes &mdash; that is exactly what the entry tier is for. Forward evenings, "
+         "weekends and holidays, and leave daytime calls ringing through to you."),
+        ("Can I cancel anytime?",
+         "Yes. It is month to month with no contract. Cancel and forwarding reverts "
+         "to your own phone the same day."),
+        ("What happens after the trial?",
+         "Your plan starts on day 15. We email you a reminder before then. Cancel "
+         "before day 15 and you pay nothing."),
+    ]),
+    ("Plans and minutes", [
+        ("What counts as a minute?",
+         "Time the assistant spends on a live call, including transfers."),
+        ("What if I go over?",
+         "We text you at 80% of your minutes, and again at 100% &mdash; the line never "
+         "stops answering. You can top up from your dashboard: 50 minutes for $65, or "
+         "100 for $120. Minutes used past your plan without a top-up are $1.50 each, "
+         "on your next invoice. There are no surprise charges."),
+        ("I have more than one location. How does pricing work?",
+         "Each plan covers one location. For two or more, book a 30-minute call and "
+         "we will quote one price for all of them, on one account and one bill."),
+        ("Is live booking included?",
+         "Yes, at every plan. Booking on the call is never gated behind an upgrade."),
+    ]),
+    ("Data and privacy", [
+        ("Where is my call data stored?",
+         "The records we keep &mdash; recordings, transcripts and call details &mdash; are stored "
+         "in Canada. The live call runs on providers in the United States: our phone "
+         "provider stores no call audio, and our AI provider holds a copy of the "
+         "conversation for 14 days before deleting it, which can take up to a further "
+         "30 days to clear its backups. Our <a href=\"/privacy/\">Privacy Policy</a> sets "
+         "out the detail."),
+        ("What do you keep, and for how long?",
+         "Call history, recordings and transcripts are kept for 14 days on every plan. "
+         "Longer history is an add-on. For clinics we recommend staying at 14 days &mdash; "
+         "on a patient-facing line, keeping less is the safer setting, not a worse one."),
+        ("How do you handle patient information?",
+         "Our assistant collects only contact details and the general reason for the "
+         "call. Recording is off by default for clinics, and transcripts are deleted "
+         "after 14 days unless you choose longer. We will work with your clinic on any "
+         "privacy agreement your practice requires."),
+    ]),
+    ("Win-back calls", [
+        ("Is win-back cold calling?",
+         "No. We only contact your own past customers &mdash; people who have already "
+         "bought from you &mdash; and every message identifies your business and lets them "
+         "opt out."),
+        ("What does it cost?",
+         "$2.50 per customer called, and the first slice of your list is free so you "
+         "see your own response rate before you spend anything. "
+         "<a href=\"/win-back/\">How win-back works</a>."),
+    ]),
+]
+
+
+def faq_group(title, items):
+    rows = "".join(
+        f"""      <details>
+        <summary>{q}</summary>
+        <p>{a}</p>
+      </details>
+""" for q, a in items)
+    return f"""  <section class="faq-g">
+    <h2>{title}</h2>
+    <div class="faq-list">
+{rows}    </div>
+  </section>
+"""
+
+
+FAQ_BODY = """<main class="wrap faq-page">
+  <div class="faq-top">
+    <p class="eyebrow">Common questions</p>
+    <h1>Everything people ask <span class="pay">before they switch.</span></h1>
+    <p class="lede">If yours is not here, call sales on
+    <a href="tel:+13656039234">(365)&nbsp;603-9234</a> or
+    <a href="/#contact">send us the question</a> &mdash; we answer within a day.</p>
+  </div>
+
+""" + "".join(faq_group(t, items) for t, items in FAQ_GROUPS) + """
+  <aside class="faq-end">
+    <h2>Still deciding?</h2>
+    <p>The fastest answer is to hear it. Build a demo on your own business, or
+    call the live line and ask it something awkward.</p>
+    <p class="faq-cta">
+      <a class="btn btn-primary" href="/demo/?src=faq">Build your demo</a>
+      <a class="btn btn-ghost" href="tel:+16476921081">Call the demo line</a>
+    </p>
+  </aside>
+</main>
+"""
+
+
 PAGES = [
+    ("faq", "Common questions | VoiceCaptures",
+     "How an AI receptionist works, what setup takes, what happens to your "
+     "number, what a minute counts as, and where your call data is stored.",
+     FAQ_BODY, ""),
+
     ("pricing", "Pricing | VoiceCaptures",
      "What an AI receptionist costs for home services, restaurants, clinics and "
      "any other business. Every plan, minutes, add-ons and prepaid terms, with "
