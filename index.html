@@ -74,7 +74,11 @@ img{max-width:100%; height:auto; display:block}
 a{color:inherit}
 
 h1,h2,h3{font-weight:700; letter-spacing:normal; margin:0}
-h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04}
+/* Fluid from the first breakpoint. A fixed 38px floor made the sans wrap to four
+   cramped lines on a 390px phone while the serif accent ran the full rail, so the
+   two halves of the headline read as different sizes. The vw+px ramp keeps the
+   sans at three lines and the accent short of the edge. */
+h1{font-size:clamp(32px,4.6vw + 14px,60px); line-height:1.08}
 h2{font-size:clamp(28px,3.4vw,40px); line-height:1.12}
 h3{font-size:20px; line-height:28px}
 /* The headline device: sans sets it up, serif italic pays it off. */
@@ -83,7 +87,7 @@ h3{font-size:20px; line-height:28px}
    whose whole block this rule set in italic serif. */
 h1 .pay, h2 .pay, h3 .pay{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
      font-weight:400; letter-spacing:.005em}
-h1 .pay{font-size:1.04em}
+h1 .pay{font-size:1em}
 
 .wrap{max-width:var(--rail); margin:0 auto; padding:0 var(--s6)}
 section{padding:var(--s24) 0}

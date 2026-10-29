@@ -85,6 +85,21 @@ def _between(src: str, start: str, end: str) -> str:
     return src[a:b]
 
 
+def _decl(style: str, sel: str) -> str:
+    """The body of index.html's own `h1{...}` / `h2{...}` rule.
+
+    The ported sheet used to RESTATE the clamp, with a comment claiming it was
+    "the same clamp the home page uses". It wasn't: the home page's scale was
+    retuned for phones and this copy stayed at the old 38px floor, so every
+    subpage kept a heading a size larger than the page it was supposed to
+    match. Reading the real rule is the only way that promise holds.
+    """
+    m = re.search(r"(?:^|\n)" + re.escape(sel) + r"\{([^}]*)\}", style)
+    if not m:
+        sys.exit(f"index.html has no bare `{sel}{{...}}` rule — the shell cannot match it.")
+    return " ".join(m.group(1).split())
+
+
 def parts() -> dict:
     """The pieces of index.html a standalone page needs."""
     if not SRC.exists():
@@ -113,6 +128,8 @@ def parts() -> dict:
         "footer": footer,
         "nav_script": nav[0],
         "talk": talk.group(0),
+        "h1_decl": _decl(style, "h1"),
+        "h2_decl": _decl(style, "h2"),
     }
 
 
@@ -179,12 +196,11 @@ TYPE_CSS = """
   padding-right:var(--s6)}
 .ported .wrap.doc, .ported .doc{max-width:760px}
 
-/* The same clamp the home page's h1 uses, so a heading is the same size
-   whichever page a phone lands on. */
-.ported h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04;
-  letter-spacing:normal; margin-bottom:var(--s4)}
-.ported h2{font-size:clamp(26px,3.4vw,38px); line-height:1.12;
-  letter-spacing:normal}
+/* Not a copy of the home page's clamp — the clamp itself, lifted out of
+   index.html at build time by _decl(). A restated one drifted silently and
+   left every subpage a size larger than the page it claimed to match. */
+.ported h1{@@H1@@; letter-spacing:normal; margin-bottom:var(--s4)}
+.ported h2{@@H2@@; letter-spacing:normal}
 .ported h3{font-size:19px; line-height:26px; letter-spacing:normal}
 
 .ported p, .ported li{font-size:17px; line-height:27px; color:var(--ink-2)}
@@ -420,7 +436,7 @@ def build(old_css: str) -> str:
         # the site rather than the stylesheet they came from.
         # Typography first, cards after, so the cards' own sizes win.
         + BRIDGE_CSS
-        + TYPE_CSS
+        + TYPE_CSS.replace("@@H1@@", p["h1_decl"]).replace("@@H2@@", p["h2_decl"])
         + PRICING_CSS
         + "\n.ported *{min-width:0}"
         + "\n.ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}"
