@@ -1333,6 +1333,10 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 })();
 </script>
 
-<script type="module" src="/preview/talk.js"></script>
+<!-- The hash is the cache buster. talk.js is a static asset with a long
+     max-age, so without it a browser keeps an old script beside new HTML —
+     which is exactly how the panel came back after it was taken out.
+     build.py recomputes this; never hand-edit it. -->
+<script type="module" src="/preview/talk.js?v=502ab7ba"></script>
 </body>
 </html>
