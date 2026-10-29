@@ -132,7 +132,16 @@
       ${R.oneTimeDiscounts.map(x => `<tr class="disc"><td>${esc(x.label)}</td><td class="num">${money(x.amount)}</td></tr>`).join("")}
       <tr class="sub"><td>One-time total</td><td class="num">${money(R.oneTimeNet)}</td></tr>` : "";
     const what = R.prepaid ? (R.oneTimeLines.length ? "prepaid term + one-time" : "prepaid term") : (R.oneTimeLines.length ? "first month + one-time" : "first month");
-    const due = `${R.oneTimeLines.length ? "" : `</table><table class="keep">`}
+    const taxRow = amt => R.taxPct ? `<tr><td>HST ${R.taxPct}%${Q.tax && Q.tax.number ? ` (${esc(Q.tax.number)})` : ""}</td><td class="num">${money(amt)}</td></tr>` : "";
+    const when = R.trial ? "when the free trial ends" : "when the line goes live";
+    const due = R.atSigning ? `
+      ${taxRow(R.signingTax)}
+      <tr class="total"><td>Due at signing (one-time${R.taxPct ? ", including HST" : ""})</td><td class="num">${money(R.signingDueWithTax)} CAD</td></tr>
+      </table><table class="keep">
+      <tr class="sub"><td>${R.prepaid ? `${R.months}-month prepaid term` : "First month"}, billed ${when}</td><td class="num">${money(R.recurringDue)}</td></tr>
+      ${taxRow(R.recurringTax)}
+      <tr class="total"><td>Due ${when}${R.taxPct ? " (including HST)" : ""}</td><td class="num">${money(R.recurringDueWithTax)} CAD</td></tr>`
+    : `${R.oneTimeLines.length ? "" : `</table><table class="keep">`}
       ${R.taxPct ? `<tr class="sub"><td>Due at start (${what}), before tax</td><td class="num">${money(R.dueAtStart)}</td></tr>
       <tr><td>HST ${R.taxPct}%${Q.tax && Q.tax.number ? ` (${esc(Q.tax.number)})` : ""}</td><td class="num">${money(R.dueAtStartTax)}</td></tr>` : ""}
       <tr class="total"><td>Total due at start (${R.taxPct ? "including HST" : what})</td><td class="num">${money(R.dueAtStartWithTax)} CAD</td></tr>`;
@@ -143,9 +152,27 @@
     return `<table><tr><th>Monthly</th><th class="num">CAD</th></tr>${rows.join("")}${termRows}${ot}${due}</table>${after}${offer}`;
   }
 
+  function termOptionsHtml(Q, R) {
+    const rows = R.termOptions.map(t => `<tr${t.months === R.months ? ' style="font-weight:700"' : ""}>
+      <td>${esc(t.label)}${t.freeMonths ? `, ${t.freeMonths} months free` : t.pct ? `, save ${t.pct}%` : ""}${t.months === R.months ? " (quoted above)" : ""}${t.credits.length ? `<div class="small muted">${esc(t.credits.join("; "))}</div>` : ""}</td>
+      <td class="num">${money(t.effectiveMonthly)}</td>
+      <td class="num">${t.months > 1 ? `${money(t.recurringDue)} for ${t.months} months` : `${money(t.recurringDue)} a month`}</td>
+      <td class="num">${money(t.oneTimeNet)}</td></tr>`).join("");
+    return `<table class="keep"><tr><th>Term</th><th class="num">Per month</th><th class="num">Plan billed</th><th class="num">One-time</th></tr>${rows}</table>
+      <p class="small muted">Prepaid terms lock the rate for the term. Minutes stay monthly. Prices before tax.</p>`;
+  }
+
+  function laterHtml(R) {
+    if (!R.later || !R.later.length) return "";
+    const rows = R.later.map(x => `<tr><td><b>Phase ${x.phase}:</b> ${esc(x.name)}${x.kind === "location" ? ` <span class="muted">· ${esc(x.plan)} plan · ${esc(x.coverage)}</span>` : ""}${x.note ? `<div class="small muted">${esc(x.note)}</div>` : ""}</td>
+      <td class="num">${x.monthly ? `from ${money(x.monthly, 0)}/mo` : ""}${x.monthly && x.oneTime ? "<br>" : ""}${x.oneTime ? `from ${money(x.oneTime, 0)} one-time` : ""}</td></tr>`).join("");
+    return `<table class="keep"><tr><th>Later phases (optional)</th><th class="num">Indicative</th></tr>${rows}</table>
+      <p class="small muted">Not included in the price above. We quote each phase firmly once its workflow is written, and you decide whether to add it.</p>`;
+  }
+
   function trialHtml(R) {
     if (!R.trial) return "<p>No free trial is included in this quote.</p>";
-    return `<p>A free ${R.trial.days}-day trial${R.trial.location ? ` at ${esc(R.trial.location)}` : ""}, up to ${R.trial.cap.toLocaleString("en-CA")} minutes. Nothing is charged during the trial. If the trial ends or reaches its minutes, calls ring your phone directly until the paid term starts. ${R.prepaid ? `The ${R.months}-month prepaid term starts the day after the trial ends.` : "Monthly billing starts the day after the trial ends."}${R.locs.length > 1 ? " The other locations go live on the paid plan." : ""}</p>`;
+    return `<p>A free ${R.trial.days}-day trial${R.trial.location && R.locs.length > 1 ? ` on ${esc(R.trial.location)}` : ""}, up to ${R.trial.cap.toLocaleString("en-CA")} minutes${R.atSigning ? ", starting once the line is live" : ""}. Nothing is charged for the line during the trial. If the trial ends or reaches its minutes, calls ring your phone directly until the paid term starts. ${R.prepaid ? `The ${R.months}-month prepaid term starts the day after the trial ends.` : "Monthly billing starts the day after the trial ends."}${R.locs.length > 1 ? " The other locations go live on the paid plan." : ""}</p>`;
   }
 
   function valuePage(Q, R) {
@@ -165,26 +192,37 @@
       <p class="small muted">These are estimates, not a promise of results. They depend on your call volume, how many callers book, and what a booking is worth to you. We show them so you can check the price against your own numbers.</p>`;
   }
 
+  function conditionsHtml(Q, R) {
+    const lines = [];
+    const waived = R.oneTimeDiscounts.some(d => d.kind === "waive_setup");
+    const charged = R.oneTimeLines.filter(l => !(waived && l.kind === "setup")).length;
+    if (R.atSigning) lines.push(`The one-time fee${charged > 1 ? "s are" : " is"} due at signing and start${charged > 1 ? "" : "s"} the build. ${R.trial ? "The free trial starts once the line is live." : "The plan is billed from when the line goes live."}`);
+    for (const l of String(Q.conditions || "").split(/\n+/).map(x => x.trim()).filter(Boolean)) lines.push(l);
+    return lines.length ? `<ul>${lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : "";
+  }
+
   function quoteHtml(Q, R, opts = {}) {
     const number = Q.quoteNumber || "Draft";
     const c = Q.client || {};
     let n = 0; const h = t => `<h2><span class="n">${++n}.</span>${esc(t)}</h2>`;
     const body = `${header("Quote", number, Q)}
       <h1>VoiceCaptures for ${esc(c.name || "your business")}</h1>
-      <div class="sub">${R.locs.length} location${R.locs.length === 1 ? "" : "s"} · AI phone receptionist${R.items.length ? " with custom work" : ""}</div>
+      <div class="sub">${c.subtitle ? esc(c.subtitle) : `${R.locs.length} location${R.locs.length === 1 ? "" : "s"} · AI phone receptionist${R.items.length ? " with custom work" : ""}`}</div>
       <div class="keys">
         <div><span>Quote date</span><b>${esc(fmtDate(Q.quoteDate))}</b></div>
         <div><span>Valid until</span><b>${esc(fmtDate(Q.validUntil))}</b></div>
         <div><span>Free trial</span><b>${R.trial ? `${R.trial.days} days, ${R.trial.cap} min` : "None"}</b></div>
-        <div><span>Term</span><b>${R.prepaid ? `${R.months} months prepaid` : "Monthly"}</b></div>
+        <div><span>${R.atSigning ? "Due at signing" : "Term"}</span><b>${R.atSigning ? money(R.signingDueWithTax) : R.prepaid ? `${R.months} months prepaid` : "Monthly"}</b></div>
       </div>
       ${clientBlock(Q)}
       ${h("What we set up")}${scopeHtml(Q, R)}
       ${h("Price")}${priceTable(Q, R)}
+      ${Q.showTermOptions ? h("Payment options") + termOptionsHtml(Q, R) : ""}
+      ${R.later && R.later.length ? h("Later phases") + laterHtml(R) : ""}
       ${h("Free trial")}${trialHtml(R)}
       ${h("Minutes")}<p>Each plan's minutes are monthly and do not carry over. We text you at 80% and at 100% of a location's minutes, and your line keeps answering. Top-ups are 50 minutes for $65 or 100 minutes for $120 for that month. Minutes used past the plan without a top-up are $1.50 each on the next invoice.</p>
       ${Q.client && Q.client.notes ? h("Notes") + `<p>${esc(Q.client.notes)}</p>` : ""}
-      ${h("Terms")}<p>This quote is valid until ${esc(fmtDate(Q.validUntil))}. Prices are in Canadian dollars${R.taxPct ? ` and HST is shown separately` : " and do not include tax"}. ${R.prepaid ? `A prepaid term locks these rates for the term.` : ""} Our <a href="https://voicecaptures.com/terms">Terms of Service</a> and <a href="https://voicecaptures.com/privacy">Privacy Policy</a> apply.</p>
+      ${h("Terms")}${conditionsHtml(Q, R)}<p>This quote is valid until ${esc(fmtDate(Q.validUntil))}. Prices are in Canadian dollars${R.taxPct ? ` and HST is shown separately` : " and do not include tax"}. ${R.prepaid ? `A prepaid term locks these rates for the term.` : ""} Our <a href="https://voicecaptures.com/terms">Terms of Service</a> and <a href="https://voicecaptures.com/privacy">Privacy Policy</a> apply.</p>
       ${h("Accepted by")}
       <div class="sig"><div><div class="line"></div><div class="who">${esc(c.name || "Client")}: name, title and date</div></div>
         <div><div class="line"></div><div class="who">${SIGN.name}, ${SIGN.title}, ${SIGN.email}</div></div></div>
@@ -248,7 +286,10 @@
       for (const x of ot) out.push(`   - ${x.label}: ${money(x.amount)} CAD${x.amount < 0 ? " (negative invoice item / credit)" : ""}`);
       out.push(`   One-time total: ${money(R.oneTimeNet)}`);
     }
-    out.push("", `First invoice: ${money(R.dueAtStart)}${R.taxPct ? ` + HST ${money(R.dueAtStartTax)} = ${money(R.dueAtStartWithTax)}` : ""} CAD`);
+    if (R.atSigning) {
+      out.push("", `At signing: a separate one-time invoice for ${money(R.signingDue)}${R.taxPct ? ` + HST = ${money(R.signingDueWithTax)}` : ""} CAD (invoice items above, or the Invoice tab).`);
+      out.push(`Subscription: start it ${R.trial ? "with the trial so the first charge lands when the trial ends" : "when the line goes live"}: ${money(R.recurringDue)}${R.taxPct ? ` + HST = ${money(R.recurringDueWithTax)}` : ""} CAD.`);
+    } else out.push("", `First invoice: ${money(R.dueAtStart)}${R.taxPct ? ` + HST ${money(R.dueAtStartTax)} = ${money(R.dueAtStartWithTax)}` : ""} CAD`);
     if (R.prepaid) out.push(`Renews ${interval}. To switch to monthly after the term, change the prices to the monthly ones (${money(R.monthlyNet)}/mo).`);
     return noDash(out.join("\n"));
   }
@@ -266,14 +307,30 @@
       out.push(`${R.months}-month prepaid: ${money(R.termGross)}, ${R.termLabel.toLowerCase().replace(/^\d+-month prepaid term: /, "")} (${money(-R.termDiscount)})`);
       for (const d of R.freeAddonLines) out.push(`${d.label}: ${money(d.amount)}`);
       out.push(`Prepaid term total: ${money(R.termTotal - R.freeAddonCredit)} (${money(R.effectiveMonthly)}/month effective)`);
-    } else out.push(`Monthly price: ${money(R.monthlyNet)}`);
+    } else if (R.recurringLines.length) out.push(`Monthly price: ${money(R.monthlyNet)}`);
     if (R.oneTimeLines.length) {
       out.push("", "One-time:");
       for (const x of R.oneTimeLines.concat(R.oneTimeDiscounts)) out.push(`- ${x.label}: ${money(x.amount)}`);
       out.push(`One-time total: ${money(R.oneTimeNet)}`);
     }
-    out.push("", `Due at start: ${money(R.dueAtStart)}${R.taxPct ? ` + HST ${money(R.dueAtStartTax)} = ${money(R.dueAtStartWithTax)}` : ""}`);
-    if (R.trial) out.push(`Free trial: ${R.trial.days} days${R.trial.location ? ` at ${R.trial.location}` : ""}, up to ${R.trial.cap} minutes. Billing starts after the trial.`);
+    if (R.trial) out.push("", `Free trial: ${R.trial.days} days${R.trial.location && R.locs.length > 1 ? ` on ${R.trial.location}` : ""}, up to ${R.trial.cap} minutes${R.atSigning ? ", starting once the line is live" : ""}. Billing for the line starts after the trial.`);
+    if (R.atSigning) {
+      out.push("", `Due at signing (one-time, starts the build): ${money(R.signingDue)}${R.taxPct ? ` + HST = ${money(R.signingDueWithTax)}` : ""}`);
+      out.push(`Due ${R.trial ? "when the free trial ends" : "when the line goes live"}: ${money(R.recurringDue)}${R.taxPct ? ` + HST = ${money(R.recurringDueWithTax)}` : ""}${R.prepaid ? ` (${R.months}-month prepaid term)` : " (first month)"}`);
+    } else out.push("", `Due at start: ${money(R.dueAtStart)}${R.taxPct ? ` + HST ${money(R.dueAtStartTax)} = ${money(R.dueAtStartWithTax)}` : ""}`);
+    if (Q.showTermOptions) {
+      out.push("", "Payment options:");
+      for (const t of R.termOptions) out.push(`- ${t.label}${t.freeMonths ? `, ${t.freeMonths} months free` : t.pct ? `, save ${t.pct}%` : ""}: ${money(t.effectiveMonthly)}/mo (${t.months > 1 ? `${money(t.recurringDue)} for ${t.months} months` : "billed monthly"}), one-time ${money(t.oneTimeNet)}`);
+    }
+    if (R.later && R.later.length) {
+      out.push("", "Later phases (optional, not included above):");
+      for (const x of R.later) out.push(`- Phase ${x.phase}: ${x.name}${x.monthly ? `, from ${money(x.monthly, 0)}/mo` : ""}${x.oneTime ? `, from ${money(x.oneTime, 0)} one-time` : ""}`);
+    }
+    const cond = [];
+    if (R.atSigning) cond.push(`The one-time fee is due at signing and starts the build.${R.trial ? " The free trial starts once the line is live." : ""}`);
+    for (const l of String(Q.conditions || "").split(/\n+/).map(x => x.trim()).filter(Boolean)) cond.push(l);
+    if (cond.length) { out.push("", "Conditions:"); for (const l of cond) out.push(`- ${l}`); }
+
     for (const c2 of R.inactiveCredits) out.push(`${c2.label}: ${money(-c2.amount)} with a ${c2.needsTermMonths}-month prepaid term.`);
     out.push("", "Minutes are monthly and don't carry over. Extra minutes: 50 for $65, 100 for $120, or $1.50 each on the next invoice.");
     out.push("Terms: https://voicecaptures.com/terms  Privacy: https://voicecaptures.com/privacy", "");

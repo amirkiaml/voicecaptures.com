@@ -106,7 +106,40 @@
 
   /* The whole deal: client-side prices, discounts, totals, plus the
    * internal cost / margin view and the value side. */
+  /* Phases: locations and line items carry a phase (1 = this quote).
+   * Totals, discounts and margin use phase 1 only; later phases are listed
+   * as "from" prices and never added to the client's totals. Internally we
+   * also price all phases together for planning. */
+  const phaseOf = x => Math.max(1, Math.floor(n0(x && x.phase) || 1));
   function compute(Q) {
+    const allLocs = Q.locations || [], allItems = Q.items || [];
+    const Q1 = { ...Q, locations: allLocs.filter(l => phaseOf(l) === 1), items: allItems.filter(i => phaseOf(i) === 1) };
+    const r = computeCore(Q1);
+    const pb = Q.priceBook || PRICE_BOOK;
+    r.later = [];
+    for (const l of allLocs.filter(x => phaseOf(x) > 1)) {
+      const plan = locPlan(pb, l), addons = locAddons(pb, l);
+      r.later.push({ phase: phaseOf(l), kind: "location", name: l.name || "Location", plan: plan.name, minutes: plan.minutes,
+        monthly: r2(plan.price + addons.reduce((a, x) => a + x.monthly, 0)), oneTime: 0, coverage: COVERAGE[l.coverage] || COVERAGE.all_day, note: l.scopeNote || "" });
+    }
+    for (const i of allItems.filter(x => phaseOf(x) > 1)) r.later.push({ phase: phaseOf(i), kind: "item", name: i.name || "Custom work", monthly: n0(i.monthly), oneTime: n0(i.oneTime), note: i.note || "" });
+    r.later.sort((a, b) => a.phase - b.phase);
+    if (r.later.length) {
+      const all = computeCore({ ...Q, locations: allLocs, items: allItems });
+      r.allPhases = { listMonthly: all.listMonthly, effectiveMonthly: all.effectiveMonthly, oneTimeNet: all.oneTimeNet, dueAtStart: all.dueAtStart,
+        margin: all.internal.margin, marginPct: all.internal.marginPct, costCad: all.internal.costCad, termProfit: all.internal.termProfit };
+    } else r.allPhases = null;
+    // Every prepaid option side by side (for "show term options" on the quote).
+    r.termOptions = pb.terms.map(t => {
+      const x = t.months === r.months ? r : computeCore({ ...Q1, term: t.months });
+      return { months: t.months, label: t.label, pct: t.pct || 0, freeMonths: t.freeMonths || 0, effectiveMonthly: x.effectiveMonthly,
+        recurringDue: r2(x.prepaid ? x.termTotal - x.freeAddonCredit : x.monthlyNet), oneTimeNet: x.oneTimeNet, dueAtStart: x.dueAtStart,
+        credits: x.oneTimeDiscounts.filter(d => d.kind === "credit").map(d => d.label) };
+    });
+    return r;
+  }
+
+  function computeCore(Q) {
     const pb = Q.priceBook || PRICE_BOOK, cost = Q.internal || COST_DEFAULTS;
     const fx = n0(cost.fx) || 1.37;
     const term = pb.terms.find(t => t.months === Number(Q.term)) || pb.terms[0];
@@ -272,7 +305,13 @@
       netMonthly: r2(valueMonthly - effectiveMonthly)
     } : null;
 
+    // At-signing mode: one-time fees are invoiced at signing (they start the
+    // build); the plan is billed from when the line goes live / the trial ends.
+    const atSigning = !!Q.oneTimeAtSigning && oneTimeNet > 0;
+    const recurringDue = r2(Math.max(0, firstRecurring));
     return {
+      atSigning, signingDue: atSigning ? oneTimeNet : 0, signingDueWithTax: atSigning ? withTax(oneTimeNet) : 0, signingTax: atSigning ? r2(oneTimeNet * tax / 100) : 0,
+      recurringDue, recurringDueWithTax: withTax(recurringDue), recurringTax: r2(recurringDue * tax / 100),
       currency: pb.currency, fx, months, term, prepaid, locs, items,
       plansMonthly, addonsMonthly, itemsMonthly, listMonthly, recurringLines, monthlyNet,
       termGross, termDiscount, termLabel, termTotal, freeAddonLines, freeAddonCredit,
@@ -292,6 +331,6 @@
   /* Never an em or en dash in anything we generate for a client. */
   const noDash = s => String(s == null ? "" : s).replace(/—|–/g, "--");
 
-  const api = { PRICE_BOOK, COST_DEFAULTS, COVERAGE, compute, findPlan, locPlan, blendedUsd, noDash, r2 };
+  const api = { PRICE_BOOK, COST_DEFAULTS, COVERAGE, compute, computeCore, phaseOf, findPlan, locPlan, blendedUsd, noDash, r2 };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.VCQ = api;
 })(typeof window !== "undefined" ? window : globalThis);
