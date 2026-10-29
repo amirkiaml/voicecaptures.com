@@ -220,6 +220,7 @@ function newQuote(industry = "clinic") {
     items: [], setup: { on: false }, trial: { on: true, days: 14, cap: 100, locationId: null }, term: 1,
     discounts: { multiPct: 0, waiveSetup: false, credits: [], freeAddons: [], manual: [] },
     tax: { hst: false, number: "" },
+    showTermOptions: false, oneTimeAtSigning: false, conditions: "",
     value: { includeInPdf: false, models: { missed: { on: true, missedCalls: 40, bookingRate: 30, avgValue: 250 }, replaced: { on: false, what: "answering service", monthlyCost: 600, hours: 0 }, time: { on: false, hours: 20, hourlyCost: 25 } } },
     invoice: { number: null, issueDate: today(), dueDate: addDays(today(), 15), instructions: "" }
   };
@@ -282,6 +283,7 @@ function renderDeal() {
         ${fld("Name", `${k}.name`, { rerender: false })}
         ${fld("Plan", `${k}.plan`, { select: planOptions(Q.client.industry), rerender: true })}
         ${fld("Coverage", `${k}.coverage`, { select: Object.entries(VCQ.COVERAGE) })}
+        ${fld("Phase", `${k}.phase`, { t: "int", select: [[1, "Phase 1 (this quote)"], [2, "Phase 2 (later, from price)"], [3, "Phase 3 (later, from price)"], [4, "Phase 4 (later, from price)"]], rerender: true })}
         ${l.plan === "custom" ? fld("Custom plan name", `${k}.customName`, { ph: "Custom plan" }) + fld("Price / month (CAD)", `${k}.customPrice`, { t: "num", min: 0 }) + fld("Included minutes", `${k}.customMinutes`, { t: "int", min: 0 }) : ""}
         ${fld("Volume entered as", `${k}.volumeMode`, { select: [["calls", "Calls x average length"], ["minutes", "Minutes directly"]], rerender: true })}
         ${l.volumeMode === "minutes" ? fld("Minutes / month (est.)", `${k}.minutes`, { t: "num", min: 0 }) + fld("Calls / month (for SMS cost)", `${k}.calls`, { t: "num", min: 0 })
@@ -305,9 +307,16 @@ function renderDeal() {
       ${fld("Your hours", `items.${i}.hours`, { t: "num", min: 0 })}
       ${fld("Running cost US$/mo", `items.${i}.monthlyCostUsd`, { t: "num", min: 0, help: "internal" })}
       <button class="btn small danger" data-act="rmItem" data-i="${i}" type="button" style="margin-bottom:6px">✕</button>
-    </div><div class="fg" style="margin:-2px 0 12px">${fld("Description on the quote (optional)", `items.${i}.note`, { cls: "wide" })}</div>`).join("") || '<div class="muted small">None yet.</div>'}
+    </div><div class="fg" style="margin:-2px 0 12px">${fld("Phase", `items.${i}.phase`, { t: "int", select: [[1, "Phase 1 (this quote)"], [2, "Phase 2 (later, from price)"], [3, "Phase 3 (later, from price)"], [4, "Phase 4 (later, from price)"]], rerender: true })}${fld("Description on the quote (optional)", `items.${i}.note`).replace("<label", '<label style="grid-column:span 2"')}</div>`).join("") || '<div class="muted small">None yet.</div>'}
     <button class="btn" data-act="addItem" type="button">+ Add line item</button> <button class="btn" data-act="addIntegration" type="button">+ Integration ($${pb.integration.oneTimeFrom} + $${pb.integration.monthlyFrom}/mo)</button>
   </div>
+
+  <div class="card"><h2>Quote options</h2><div class="fg">
+    ${fld("Subtitle under the client name (optional)", "client.subtitle", { cls: "wide", ph: "e.g. After-hours line for all three locations" })}
+    ${chk("Show monthly / 6 / 12-month options on the quote", "showTermOptions")}
+    ${chk("One-time fees due at signing (starts the build; trial starts once live)", "oneTimeAtSigning", { rerender: true })}
+    ${fld("Conditions on the quote (one per line)", "conditions", { area: true, cls: "wide", ph: "e.g. Assumes your on-call API returns the doctor and number by date and time." })}
+  </div></div>
 
   <div class="card"><h2>Trial and term</h2><div class="fg four">
     ${chk("Free trial", "trial.on", { rerender: true })}
@@ -396,7 +405,13 @@ function breakdownHtml() {
     for (const x of R.oneTimeDiscounts) rows.push(`<tr class="disc"><td>${esc(x.label)}</td><td class="num">${cad(x.amount)}</td></tr>`);
     rows.push(`<tr class="sub"><td>One-time total</td><td class="num">${cad(R.oneTimeNet)}</td></tr>`);
   }
-  rows.push(`<tr class="tot"><td>Due at start${R.taxPct ? " incl. HST" : ""}</td><td class="num">${cad(R.dueAtStartWithTax)}</td></tr>`);
+  if (R.atSigning) rows.push(`<tr class="tot"><td>Due at signing${R.taxPct ? " incl. HST" : ""}</td><td class="num">${cad(R.signingDueWithTax)}</td></tr>`,
+    `<tr class="sub"><td>Due ${R.trial ? "when the trial ends" : "at go-live"}${R.taxPct ? " incl. HST" : ""}</td><td class="num">${cad(R.recurringDueWithTax)}</td></tr>`);
+  else rows.push(`<tr class="tot"><td>Due at start${R.taxPct ? " incl. HST" : ""}</td><td class="num">${cad(R.dueAtStartWithTax)}</td></tr>`);
+  if (R.later.length) {
+    rows.push(`<tr><th colspan="2">Later phases (not in totals)</th></tr>`);
+    for (const x of R.later) rows.push(`<tr><td class="muted">Phase ${x.phase}: ${esc(x.name)}</td><td class="num muted">${x.monthly ? `from ${cad(x.monthly)}/mo` : ""}${x.monthly && x.oneTime ? "<br>" : ""}${x.oneTime ? `from ${cad(x.oneTime)}` : ""}</td></tr>`);
+  }
   const inactive = R.inactiveCredits.map(c => `<div class="small warn-t">${esc(c.label)} (${cad(-c.amount)}) only applies with a ${c.needsTermMonths}-month term.</div>`).join("");
   return `<div class="tw"><table>${rows.join("")}</table></div>${inactive}${R.trial ? `<div class="small muted" style="margin-top:6px">Trial: ${R.trial.days} days, ${R.trial.cap} min${R.trial.location ? ` at ${esc(R.trial.location)}` : ""}.</div>` : ""}`;
 }
@@ -407,7 +422,8 @@ function renderSummary() {
   $("sum").innerHTML = `
     <div class="card"><div class="k">Monthly list</div><div class="v">${cad(R.listMonthly)}</div><div class="u">US${money(R.listMonthly / Q.internal.fx)}</div></div>
     <div class="card"><div class="k">Effective / month</div><div class="v">${cad(R.effectiveMonthly)}</div><div class="u">${R.prepaid ? `${R.months}-month prepaid` : "monthly"}</div></div>
-    <div class="card"><div class="k">Due at start</div><div class="v">${cad(R.dueAtStartWithTax)}</div><div class="u">${R.taxPct ? "incl. HST" : "before tax"} · US${money(R.dueAtStartWithTax / Q.internal.fx)}</div></div>
+    ${R.atSigning ? `<div class="card"><div class="k">Due at signing</div><div class="v">${cad(R.signingDueWithTax)}</div><div class="u">then ${cad(R.recurringDueWithTax)} ${R.trial ? "after trial" : "at go-live"}${R.taxPct ? " · incl. HST" : ""}</div></div>`
+      : `<div class="card"><div class="k">Due at start</div><div class="v">${cad(R.dueAtStartWithTax)}</div><div class="u">${R.taxPct ? "incl. HST" : "before tax"} · US${money(R.dueAtStartWithTax / Q.internal.fx)}</div></div>`}
     <div class="card"><div class="k">Gross margin <span class="ibadge">internal</span></div><div class="v ${pctCls}">${I.marginPct == null ? "n/a" : I.marginPct + "%"}</div><div class="u">${cad(I.margin)}/mo · min ${I.minPct}%</div></div>
     <div class="card"><div class="k">First-term profit <span class="ibadge">internal</span></div><div class="v">${cad(I.termProfit)}</div><div class="u">after time + trial cost</div></div>`;
   $("warns").innerHTML = R.warnings.length ? `<div class="warns"><b>Check before sending</b><ul>${R.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
@@ -454,6 +470,13 @@ function renderMargin() {
     ${work ? `<div class="tw"><table><thead><tr><th>Work</th><th class="num">Hours</th><th class="num">Your time (${cad(Q.internal.hourlyRate)}/h)</th><th class="num">Fee after credits</th><th class="num">Difference</th></tr></thead><tbody>${work}
     <tr class="tot"><td>Total</td><td></td><td class="num">${both(I.oneTimeCost)}</td><td class="num">${both(R.oneTimeNet)}</td><td class="num">${both(R.oneTimeNet - I.oneTimeCost)}</td></tr></tbody></table></div>` : '<div class="muted small">No one-time work.</div>'}
   </div>
+  ${R.allPhases ? `<div class="card internal"><h2>All phases together <span class="ibadge">internal, planning only</span></h2><div class="tw"><table>
+    <tr><td>Monthly list, all phases</td><td class="num">${both(R.allPhases.listMonthly)}</td></tr>
+    <tr><td>Effective monthly on this term</td><td class="num">${both(R.allPhases.effectiveMonthly)}</td></tr>
+    <tr><td>One-time, all phases</td><td class="num">${both(R.allPhases.oneTimeNet)}</td></tr>
+    <tr><td>Margin</td><td class="num">${both(R.allPhases.margin)}<div><span class="pill">${R.allPhases.marginPct ?? "n/a"}%</span></div></td></tr>
+    <tr class="tot"><td>First-term profit, all phases</td><td class="num">${both(R.allPhases.termProfit)}</td></tr></table></div>
+    <div class="small muted">Never shown on the quote. Later phases appear there only as "from" prices.</div></div>` : ""}
   <div class="card internal"><h2>Deal summary <span class="ibadge">internal</span></h2><div class="tw"><table>
     <tr><td>Trial cost (cap x blended rate)</td><td class="num">${both(I.trialCostCad)}</td></tr>
     <tr><td>Monthly margin x ${R.months} month${R.months > 1 ? "s" : ""}</td><td class="num">${both(I.margin * R.months)}</td></tr>
