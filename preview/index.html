@@ -110,21 +110,11 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
   color:var(--ink); text-decoration:none; white-space:nowrap; padding:10px 4px; min-height:44px}
 .sales:hover{color:var(--blue)}
 .sales svg{width:15px; height:15px; color:var(--blue)}
-.nav-talk{display:none; align-items:center; gap:7px; font-family:inherit;
-  font-size:14.5px; font-weight:700; color:var(--blue); cursor:pointer;
-  background:var(--f-blue); border:1px solid color-mix(in srgb,var(--blue) 26%,transparent);
-  border-radius:var(--r-pill); padding:0 14px; min-height:44px; white-space:nowrap}
-.nav-talk:hover{background:var(--f-blue-2)}
-.nav-talk svg{width:15px; height:15px}
-.nav-talk-dot{width:7px; height:7px; border-radius:50%; background:var(--cyan);
-  flex:0 0 auto; animation:adot 1.9s ease-in-out infinite}
-/* Talk to it costs about 130px, and with it the bar wanted 1331px against a
-   1200 rail. The bar's Log in link is gone — /login is still one tap away as
-   "Client dashboard" in the Company menu and the mobile panel — the rail goes
-   to 1280, and the full set appears at 1280 rather than 1200. */
-@media(min-width:1280px){
+/* The bar's Log in link is gone — /login is one tap away as "Client
+   dashboard" in the Company menu and the mobile panel — and the rail is 1280,
+   which is what lets brand, nav, sales and the CTA sit together from 1200. */
+@media(min-width:1200px){
   .nav{display:flex}
-  .nav-talk{display:inline-flex}
   .sales{display:inline-flex}
 }
 
@@ -159,7 +149,7 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
   width:44px; height:44px; padding:0 11px; background:none; border:1px solid var(--line);
   border-radius:10px; cursor:pointer; flex:0 0 auto}
 .burger span{display:block; height:2px; background:var(--ink); border-radius:2px}
-@media(min-width:1280px){ .burger{display:none} }
+@media(min-width:1200px){ .burger{display:none} }
 /* Measured at 390: the bar's end group alone wanted 223px, which with the
    mark and the gaps ran 51px past the viewport. Below 520 the wordmark goes,
    the label shortens and the padding tightens. The full wording is still in
@@ -476,11 +466,6 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
         <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
       </a>
-      <button type="button" class="nav-talk" id="nav-talk" data-vc-talk aria-controls="vc-panel">
-        <span class="nav-talk-dot" aria-hidden="true"></span>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg>
-        Talk to it
-      </button>
       <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
@@ -1009,7 +994,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     });
     panel.addEventListener("click", function(e){ if (e.target.closest("a")) closeMobile(); });
     window.addEventListener("resize", function(){
-      if (window.innerWidth >= 1280) closeMobile(); else fit();
+      if (window.innerWidth >= 1200) closeMobile(); else fit();
     });
     window.addEventListener("scroll", fit, { passive: true });
   }

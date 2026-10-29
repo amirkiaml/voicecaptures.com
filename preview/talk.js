@@ -63,14 +63,8 @@ const CSS = `/* ---- talk-to-it widget ----
 
 .vc-state{font-size:14px; font-weight:700; color:var(--ink); min-height:20px}
 .vc-sub{font-size:13px; line-height:19px; color:var(--muted); margin:6px 0 var(--s4)}
-.vc-log{text-align:left; max-height:132px; overflow-y:auto; margin:0 0 var(--s4);
   font-size:13.5px; line-height:19px}
-.vc-log p{margin:0 0 8px}
-.vc-log b{color:var(--blue)}
-.vc-log .you b{color:var(--muted)}
 .vc-body .btn{width:100%}
-.vc-alt{font-size:13px; color:var(--muted); margin:var(--s4) 0 0}
-.vc-alt a{color:var(--blue); font-weight:700}
 
 /* The same orb, sitting in the hero so it is the first thing on the page.
    Clicking it opens the panel and starts the call in that one gesture. */
@@ -118,9 +112,7 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
     </div>
     <p class="vc-state" id="vc-state">Ready when you are</p>
     <p class="vc-sub" id="vc-sub">It answers in your browser. Ask it anything, book a meeting with sales, or leave a message and it emails the team.</p>
-    <div class="vc-log" id="vc-log" aria-live="polite"></div>
     <button class="btn btn-primary" id="vc-go" type="button">Start talking</button>
-    <p class="vc-alt">Rather use the phone? <a href="tel:+13656039234">(365)&nbsp;603-9234</a></p>
   </div>
 </div>
 `;
@@ -164,7 +156,7 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
   "use strict";
   const $ = (id) => document.getElementById(id);
   const bubble = $("vc-bubble"), panel = $("vc-panel"), orb = $("vc-orb"),
-        state = $("vc-state"), sub = $("vc-sub"), log = $("vc-log"),
+        state = $("vc-state"), sub = $("vc-sub"),
         go = $("vc-go"), close = $("vc-x");
   if (!bubble) return;
 
@@ -208,15 +200,6 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
     orb.classList.toggle("is-live", on);
     if (stage) stage.classList.toggle("is-live", on);
     if (!on) { orb.style.removeProperty("--beat"); if (stage) stage.style.removeProperty("--field"); }
-  }
-
-  function line(role, text){
-    const p = document.createElement("p");
-    if (role === "user") p.className = "you";
-    p.innerHTML = "<b>" + (role === "user" ? "You" : "Assistant") + "</b> ";
-    p.appendChild(document.createTextNode(text));
-    log.appendChild(p);
-    log.scrollTop = log.scrollHeight;
   }
 
   function tick(){
@@ -263,10 +246,6 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
         vapi.on("speech-start", () => { speaking(true); say("Speaking", ""); });
         vapi.on("speech-end", () => { speaking(false); say("Listening", "Go ahead."); });
         vapi.on("volume-level", beat);
-        vapi.on("message", (m) => {
-          if (m && m.type === "transcript" && m.transcriptType === "final" && m.transcript)
-            line(m.role, m.transcript);
-        });
         vapi.on("error", (e) => {
           live = false; go.disabled = false; go.textContent = "Start talking";
           clearInterval(timer); speaking(false);
