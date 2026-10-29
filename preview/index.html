@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview — VoiceCaptures</title>
+<!-- PREVIEW ONLY. Not linked from anywhere, not in the sitemap, and noindex so
+     it never reaches search. Nothing on the live site references this file. -->
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   PREVIEW TOKENS
+   Light only on purpose: dark gets designed once the direction is agreed.
+   Field colours are pale tints derived from the live --blue / --cyan / --wb
+   so the page stays recognisably VoiceCaptures rather than borrowed.
+   ===================================================================== */
+:root{
+  --blue:#2563EB; --blue-dk:#1D4ED8;
+  --cyan:#0E93B8; --wb:#7C3AED;
+
+  /* Fields. Each is its accent at ~8-14% over white, mixed by hand so they
+     stay neutral enough to carry near-black text at AA. */
+  --f-blue:#E8EEFB; --f-blue-2:#DCE6F9;
+  --f-cyan:#E2F1F5; --f-cyan-2:#D3EAF1;
+  --f-wb:#EFE9FB;   --f-wb-2:#E5DBF8;
+  --f-warm:#F5F2EC; --f-sand:#FBF6EC;
+
+  --bg:#FFFFFF; --bg-soft:#F4F6FA;
+  --ink:#0D1729; --ink-2:#36465C; --muted:#55637A; --faint:#7C8CA3;
+  --line:rgba(13,23,41,.09);
+
+  --r-card:24px; --r-sm:8px; --r-pill:999px;
+
+  /* 4px scale, as measured on the reference */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px;
+  --s12:48px; --s16:64px; --s24:96px;
+
+  --rail:1120px;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  /* 16/24 body, and letter-spacing stays normal everywhere — the reference
+     never tightens, which is most of why it reads institutional. */
+  font-size:16px; line-height:24px; font-weight:500;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+h1,h2,h3{font-weight:700; letter-spacing:normal; margin:0}
+h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04}
+h2{font-size:clamp(28px,3.4vw,40px); line-height:1.12}
+h3{font-size:20px; line-height:28px}
+/* The headline device: sans sets it up, serif italic pays it off. */
+.pay{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
+     font-weight:400; letter-spacing:.005em}
+h1 .pay{font-size:1.04em}
+
+.wrap{max-width:var(--rail); margin:0 auto; padding:0 var(--s6)}
+section{padding:var(--s24) 0}
+.lede{font-size:clamp(17px,1.5vw,19px); line-height:1.6; color:var(--ink-2);
+      max-width:620px; margin:var(--s6) 0 0}
+.fine{font-size:13px; line-height:1.55; color:var(--muted)}
+.eyebrow{display:inline-flex; align-items:center; gap:var(--s2);
+  font-size:13px; font-weight:700; color:var(--wb); margin:0 0 var(--s4)}
+.eyebrow .spark{width:14px;height:14px;flex:0 0 auto}
+
+/* ---- buttons: pills, one blue primary, no shadows ---- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:var(--s2);
+  font-family:inherit; font-size:16px; font-weight:700; line-height:1;
+  padding:16px 28px; min-height:52px; border-radius:var(--r-pill);
+  border:2px solid transparent; text-decoration:none; cursor:pointer;
+  transition:background .18s ease, color .18s ease, border-color .18s ease}
+.btn-primary{background:var(--blue); color:#fff}
+.btn-primary:hover{background:var(--blue-dk)}
+.btn-ghost{background:transparent; color:var(--blue); border-color:var(--blue)}
+.btn-ghost:hover{background:var(--f-blue)}
+.btn-dark{background:#15213A; color:#fff}
+.btn-dark:hover{background:#0D1729}
+.btn-sm{font-size:15px; padding:12px 22px; min-height:44px}
+
+/* ---- nav ---- */
+header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(1.6) blur(10px); border-bottom:1px solid var(--line)}
+.bar{max-width:var(--rail); margin:0 auto; padding:var(--s3) var(--s6);
+  display:flex; align-items:center; gap:var(--s6)}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; font-size:19px}
+.brand img{height:30px; width:auto}
+.nav{display:none; gap:var(--s6); margin-left:var(--s4)}
+.nav a{font-size:15px; font-weight:600; text-decoration:none; color:var(--ink)}
+.nav a:hover{color:var(--blue)}
+.bar-end{margin-left:auto; display:flex; align-items:center; gap:var(--s3)}
+.bar-end .login{display:none; font-size:15px; font-weight:600; text-decoration:none}
+@media(min-width:1000px){ .nav{display:flex} .bar-end .login{display:inline} }
+
+/* ---- hero ---- */
+.hero{background:var(--f-blue); padding-top:var(--s16); padding-bottom:0}
+.hero-top{text-align:center; max-width:860px; margin:0 auto}
+.hero-top .lede{margin-left:auto; margin-right:auto; text-align:center}
+.hero-cta{display:flex; flex-wrap:wrap; gap:var(--s3); justify-content:center; margin-top:var(--s8)}
+.hero-fine{margin-top:var(--s4); text-align:center}
+.hero-split{display:grid; gap:var(--s8); margin-top:var(--s16); align-items:center;
+  padding-bottom:var(--s24)}
+.cap{text-align:center; max-width:360px; margin:0 auto}
+.cap h3{display:flex; align-items:center; justify-content:center; gap:var(--s2);
+  color:var(--wb); margin-bottom:var(--s3)}
+.cap p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2)}
+@media(min-width:900px){
+  .hero-split{grid-template-columns:1fr 1.25fr 1fr}
+}
+
+/* Device frame. Real product screenshots go inside; the frame is CSS so it
+   stays sharp and needs no bespoke render. */
+.phone{width:min(300px,78vw); margin:0 auto; border-radius:38px;
+  background:#0D1729; padding:10px; border:1px solid rgba(255,255,255,.14)}
+.phone-in{border-radius:29px; overflow:hidden; background:#101A2E; aspect-ratio:9/19}
+.phone-in img{width:100%;height:100%;object-fit:cover;object-position:top}
+.browser{border-radius:14px; overflow:hidden; background:#0D1729;
+  border:1px solid rgba(13,23,41,.14)}
+.browser .chrome{display:flex; gap:6px; padding:10px 12px; background:#1B2740}
+.browser .chrome i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.26)}
+.browser img{width:100%; max-height:320px; object-fit:cover; object-position:top left}
+.slot{display:flex; align-items:center; justify-content:center; text-align:center;
+  padding:var(--s6); color:var(--faint); font-size:13px; line-height:1.5;
+  border:2px dashed rgba(13,23,41,.18); border-radius:var(--r-sm);
+  background:repeating-linear-gradient(45deg,rgba(13,23,41,.03) 0 10px,transparent 10px 20px)}
+
+/* ---- field cards ---- */
+.cards{display:grid; gap:var(--s4); margin-top:var(--s12)}
+@media(min-width:860px){ .cards{grid-template-columns:1fr 1fr} .cards .span2{grid-column:1/-1} }
+.card{border-radius:var(--r-card); padding:var(--s8); overflow:hidden; border:0}
+.card h3{font-size:clamp(22px,2.2vw,28px); line-height:1.15; margin-bottom:var(--s3)}
+.card p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
+.card .shot{margin-top:var(--s6); border-radius:14px; overflow:hidden}
+.c-blue{background:var(--f-blue)} .c-cyan{background:var(--f-cyan)}
+.c-wb{background:var(--f-wb)}     .c-sand{background:var(--f-sand)}
+.c-ink{background:#15213A; color:#fff}
+.c-ink p{color:#C3D0E4}
+.badge{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; padding:5px 11px; border-radius:var(--r-pill);
+  background:rgba(13,23,41,.08); color:var(--ink-2); margin-bottom:var(--s3)}
+.badge-live{background:rgba(14,147,184,.16); color:#0A6A86}
+.badge-soon{background:rgba(124,58,237,.14); color:#5B21B6}
+
+/* ---- 24-hour timeline ---- */
+.tl-head{text-align:center; max-width:720px; margin:0 auto var(--s16)}
+.tl-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:var(--s4)}
+.tl{position:relative; min-width:980px; padding:var(--s16) 0 var(--s8);
+    border-bottom:2px solid var(--ink); display:flex; align-items:flex-end}
+.ev{position:relative; flex:1 1 0; padding-right:var(--s6)}
+.ev::after{content:""; position:absolute; left:0; bottom:calc(-1 * var(--s8));
+  width:1px; height:var(--s8); background:rgba(13,23,41,.22)}
+.ev .t{display:flex; align-items:center; gap:var(--s2); font-size:17px;
+  font-weight:700; margin-bottom:var(--s2)}
+.ev .t i{width:9px;height:9px;border-radius:50%;background:var(--wb);flex:0 0 auto}
+.ev p{margin:0; display:inline-block; font-size:14px; line-height:20px;
+  padding:10px 14px; border-radius:12px; max-width:230px}
+.ev.up{align-self:flex-start; margin-bottom:var(--s16)}
+.e1 .t i{background:#7C3AED} .e1 p{background:var(--f-wb-2)}
+.e2 .t i{background:#C79A4B} .e2 p{background:var(--f-sand)}
+.e3 .t i{background:#0E93B8} .e3 p{background:var(--f-cyan-2)}
+.e4 .t i{background:#2563EB} .e4 p{background:var(--f-blue-2)}
+.tl-foot{margin-top:var(--s6); text-align:center}
+
+/* ---- stats ---- */
+.stats{display:grid; gap:var(--s6); margin-top:var(--s12)}
+@media(min-width:800px){ .stats{grid-template-columns:repeat(3,1fr)} }
+.stat b{display:block; font-size:clamp(40px,5vw,58px); line-height:1;
+  font-weight:800; color:var(--wb); letter-spacing:normal}
+.stat span{display:block; margin-top:var(--s3); font-size:15px; line-height:22px; font-weight:600}
+.stat cite{display:block; margin-top:var(--s2); font-size:12.5px; font-style:normal; color:var(--muted)}
+
+/* ---- closing band ---- */
+.band{background:#15213A; color:#fff; border-radius:var(--r-card);
+  padding:var(--s16) var(--s8); text-align:center}
+.band p{color:#C3D0E4; margin:var(--s4) auto 0; max-width:520px}
+.band .btn-primary{margin-top:var(--s8)}
+
+/* ---- faq ---- */
+.faq-grid{display:grid; gap:var(--s8)}
+@media(min-width:900px){ .faq-grid{grid-template-columns:320px 1fr; gap:var(--s16)} }
+details{border-bottom:1px solid var(--line)}
+summary{display:flex; gap:var(--s4); align-items:flex-start; cursor:pointer;
+  font-size:17px; font-weight:600; line-height:26px; list-style:none;
+  padding:var(--s6) 0; min-height:44px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+"; color:var(--blue); font-weight:700; font-size:22px; line-height:24px}
+details[open] summary::before{content:"–"}
+details p{margin:0 0 var(--s6) 28px; color:var(--ink-2); font-size:15px; line-height:24px}
+
+footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
+.foot{display:flex; flex-wrap:wrap; gap:var(--s6); align-items:center; justify-content:space-between}
+
+.note{background:#FEF3C7; border-bottom:1px solid #FCD34D; color:#78350F;
+  font-size:13px; font-weight:600; text-align:center; padding:10px var(--s4)}
+</style>
+</head>
+<body>
+
+<div class="note">Preview — not linked from the live site, not indexed. Light mode only for now.</div>
+
+<header>
+  <div class="bar">
+    <a class="brand" href="/preview/"><img src="/logo-mark.png" alt="">VoiceCaptures</a>
+    <nav class="nav">
+      <a href="#">AI receptionist</a><a href="#">Win-back</a>
+      <a href="#">Pricing</a><a href="#">About</a><a href="#">Contact</a>
+    </nav>
+    <div class="bar-end">
+      <a class="login" href="#">Log in</a>
+      <a class="btn btn-primary btn-sm" href="#">Build your demo</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>AI receptionist</p>
+      <h1>Every call answered.<br>Every job booked.<br><span class="pay">Details texted to you.</span></h1>
+      <p class="lede">An AI receptionist that answers on your existing number, books
+      into your calendar live on the call, and texts you and your caller the details.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#">Build your demo</a>
+        <a class="btn btn-ghost" href="#">Hear the demo line</a>
+      </div>
+      <p class="fine hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days
+      free at one location, up to 100 minutes.</p>
+    </div>
+
+    <div class="hero-split">
+      <div class="cap">
+        <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>Calls</h3>
+        <p>Answers day or night in your business's name, triages the emergency,
+        and books into your real calendar while the caller is still on the line.</p>
+      </div>
+
+      <div class="phone">
+        <div class="phone-in">
+          <div class="slot" style="height:100%;border:0;color:#7C8CA3">
+            Phone slot — the hero asset.<br><br>
+            Composite your <b>real SMS summary</b> into a phone frame:<br>
+            caller name, number, address, what they wanted.<br><br>
+            Portrait, ~1080&times;2280. Never generate a photo<br>
+            with a screen in it — AI mangles on-screen text.
+          </div>
+        </div>
+      </div>
+
+      <div class="cap">
+        <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg>Texts</h3>
+        <p>Sends you the caller's name, number and what they wanted before you
+        pick up the phone, and texts the caller their confirmation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tl-head">
+      <h2>It books work <span class="pay">while you're asleep.</span></h2>
+      <p class="lede" style="margin-left:auto;margin-right:auto;text-align:center">
+      A real evening on the demo line. Every one of these would have been a
+      voicemail nobody left.</p>
+    </div>
+
+    <div class="tl-scroll">
+      <div class="tl">
+        <div class="ev e1"><div class="t"><i></i>5:00 pm</div><p><b>Office closes.</b> Calls start forwarding.</p></div>
+        <div class="ev up e2"><div class="t"><i></i>6:42 pm</div><p>Call answered · drain backup · <b>booked 8am tomorrow</b></p></div>
+        <div class="ev e3"><div class="t"><i></i>8:15 pm</div><p>Quote question answered · details texted to the caller</p></div>
+        <div class="ev up e4"><div class="t"><i></i>11:20 pm</div><p>Burst pipe · <b>flagged urgent and transferred to you</b></p></div>
+        <div class="ev e1"><div class="t"><i></i>2:05 am</div><p>Call answered · callback details captured</p></div>
+        <div class="ev up e2"><div class="t"><i></i>7:30 am</div><p><b>Your morning text:</b> 4 calls, 2 jobs booked, 1 to call back</p></div>
+      </div>
+    </div>
+    <p class="fine tl-foot">Illustrative of a typical evening. Names and numbers are invented; the call flow is not.</p>
+  </div>
+</section>
+
+<section style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="tl-head" style="margin-bottom:0">
+      <h2>Built for a phone that <span class="pay">rings while you're working.</span></h2>
+    </div>
+
+    <div class="cards">
+      <div class="card c-cyan">
+        <span class="badge badge-live">Available now</span>
+        <h3>Every call, in one place.</h3>
+        <p>Who called, what they wanted, what the assistant did and the full
+        transcript — on one screen, not scattered across voicemail and sticky notes.</p>
+        <div class="shot browser"><div class="chrome"><i></i><i></i><i></i></div>
+          <img src="/dash-light.png" alt="The client dashboard"></div>
+      </div>
+
+      <div class="card c-wb">
+        <span class="badge badge-live">Available now</span>
+        <h3>It calls your past customers <span class="pay">back.</span></h3>
+        <p>Win-back campaigns ring the customers you already have when they come
+        due — never cold lists or purchased leads.</p>
+        <div class="shot browser"><div class="chrome"><i></i><i></i><i></i></div>
+          <img src="/winback-light.png" alt="Win-back campaign results"></div>
+      </div>
+
+      <div class="card c-sand span2">
+        <span class="badge badge-live">Available now</span>
+        <h3>It knows your trade, <span class="pay">not just your name.</span></h3>
+        <p>A plumber needs to know whether water is on the floor right now. A clinic
+        needs to separate a new patient from an emergency, and must never record a
+        symptom. Those are different assistants, not different greetings.</p>
+        <div class="shot slot" style="min-height:180px">
+          Photo slot — a tradesperson mid-job, phone in pocket.<br>
+          Suggested: 1600×900, warm, real hands and tools. No screens in frame.
+        </div>
+      </div>
+
+      <div class="card c-blue">
+        <span class="badge badge-soon">Coming soon</span>
+        <h3>A personal line <span class="pay">for your own phone.</span></h3>
+        <p>Screens unknown numbers, takes a message, texts you the summary. In beta
+        at $9/mo — join the waitlist and we'll tell you when it opens.</p>
+      </div>
+
+      <div class="card c-ink">
+        <span class="badge badge-soon">Coming soon</span>
+        <h3>Books straight into <span class="pay">your software.</span></h3>
+        <p>Practice management, field service, POS and CRM integrations, so nobody
+        has to work somewhere new. Quoted per system.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tl-head" style="margin-bottom:0">
+      <h2>A missed call is <span class="pay">a job that went next door.</span></h2>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>14%</b><span>Missed-call rate in home services</span><cite>CallRail benchmark report, 2025</cite></div>
+      <div class="stat"><b>85%</b><span>Of callers whose call goes unanswered never call back</span><cite>CallRail benchmark report, 2025</cite></div>
+      <div class="stat"><b>$500–$1,200</b><span>Typical value of one missed service call</span><cite>answeringagent.com, 2026</cite></div>
+    </div>
+    <div style="text-align:center;margin-top:var(--s12)">
+      <a class="btn btn-dark" href="#">See what it's worth on your numbers</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="band">
+      <h2 style="color:#fff">Hear it answer <span class="pay">as your business.</span></h2>
+      <p>Tell it about your business and talk to it, right in your browser. About
+      30 seconds to set up, no call and no signup.</p>
+      <a class="btn btn-primary" href="#">Build your demo</a>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--f-wb); padding-top:var(--s16)">
+  <div class="wrap faq-grid">
+    <h2>Frequently<br>asked questions</h2>
+    <div>
+      <details open><summary>Does it sound like a robot?</summary>
+        <p>Call the demo line and judge for yourself — that is the whole reason the
+        number is on the site. It is not a phone tree and it does not read a script.</p></details>
+      <details><summary>Does it use my existing number?</summary>
+        <p>Yes. You forward your line to it; the caller sees and dials the number they
+        already have. Nothing about your listings or signage changes.</p></details>
+      <details><summary>What happens when it cannot answer something?</summary>
+        <p>It takes the caller's details, tells them you will call back, and texts you
+        the summary. For anything it is set to treat as urgent it transfers to you live.</p></details>
+      <details><summary>How long does setup take?</summary>
+        <p>About ten minutes of your time. We configure the assistant around your
+        services, booking rules and calendar — you do not build anything.</p></details>
+      <details><summary>What do you keep, and for how long?</summary>
+        <p>Call history, recordings and transcripts are kept 14 days on every plan.
+        Longer history is an add-on. For clinics we recommend staying at 14 days.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="/preview/"><img src="/logo-mark.png" alt="">VoiceCaptures</a>
+    <p class="fine" style="margin:0">Answers · Qualifies · Books</p>
+  </div>
+</footer>
+
+</body>
+</html>
