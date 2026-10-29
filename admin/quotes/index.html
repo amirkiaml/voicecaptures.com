@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Quotes · VoiceCaptures admin</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("vc_theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --ink2: #374151; --muted: #6b7280;
+    --line: #e6e8ec; --hover: #fafbfc; --field: #ffffff;
+    --accent: #3b6fd8; --accent-soft: #dfe8fb;
+    --good: #1f9d55; --warn: #b45309; --bad: #dc2626;
+    --good-soft: #e3f5ea; --warn-soft: #fdf1de; --bad-soft: #fde4e4; --gray-soft: #eef0f3;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1217; --card: #171b22; --ink: #e7eaf0; --ink2: #c4c9d3; --muted: #8b93a1;
+    --line: #262c36; --hover: #1c2129; --field: #11151b;
+    --accent: #7ea4f2; --accent-soft: #1d2a45;
+    --good: #4cc98a; --warn: #f0a33a; --bad: #f37b7b;
+    --good-soft: #15301f; --warn-soft: #33250f; --bad-soft: #3a1a1a; --gray-soft: #232831;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 "DM Sans", -apple-system, "Segoe UI", Roboto, sans-serif; }
+  h1, h2, .big, .brandbar span { font-family: Manrope, "DM Sans", sans-serif; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 60px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .brandbar { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; }
+  .brandbar img { width: 30px; }
+  .brandbar span { font-weight: 800; font-size: 18px; }
+  .tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); }
+  .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn, select, input, textarea { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 9px; padding: 7px 10px; }
+  input, select, textarea { width: 100%; min-width: 0; }
+  input[type=checkbox], input[type=radio] { width: auto; }
+  textarea { resize: vertical; min-height: 60px; }
+  .btn { cursor: pointer; color: var(--ink2); background: var(--card); width: auto; white-space: nowrap; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .btn.small { padding: 4px 9px; font-size: 13px; }
+  .btn.danger { color: var(--bad); }
+  a.btn { text-decoration: none; display: inline-block; }
+  h1 { margin: 0; font-size: 24px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  h3 { font-size: 13px; margin: 14px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .muted { color: var(--muted); } .small { font-size: 13px; }
+  .good-t { color: var(--good); } .warn-t { color: var(--warn); } .bad-t { color: var(--bad); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; min-width: 0; margin-bottom: 14px; }
+  .bar2 { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .bar2 select#qPick { flex: 1 1 260px; width: auto; }
+  .bar2 select#qStatus { width: auto; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0 14px; border-bottom: 1px solid var(--line); }
+  .tabs button { border: 0; background: none; font: inherit; font-size: 14px; color: var(--muted); padding: 9px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+  .sum { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0; }
+  .sum .card { margin: 0; padding: 10px 12px; }
+  .sum .k { font-size: 12px; color: var(--muted); }
+  .sum .v { font: 700 19px/1.2 Manrope, sans-serif; margin-top: 2px; }
+  .sum .u { font-size: 12px; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  .sticky { position: sticky; top: 92px; }
+  .fg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; }
+  .fg.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fg label, label.f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink2); min-width: 0; }
+  .fg .wide { grid-column: 1 / -1; }
+  label.chk { flex-direction: row !important; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); }
+  .loc { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; background: var(--hover); }
+  .loc-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .loc-h b { font-size: 15px; }
+  .row { display: grid; grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr auto; gap: 8px; align-items: end; margin-bottom: 8px; }
+  .row.c3 { grid-template-columns: 2fr 1.2fr 1fr 0.9fr auto; }
+  .row.c4 { grid-template-columns: 2fr 1fr 1fr 1fr auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 6px 8px; }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  tr.disc td { color: var(--good); }
+  tr.sub td { font-weight: 700; }
+  tr.tot td { font-weight: 800; border-top: 2px solid var(--ink); border-bottom: 0; }
+  .tw { overflow-x: auto; }
+  .usd { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--gray-soft); color: var(--ink2); }
+  .pill.good { background: var(--good-soft); color: var(--good); } .pill.warn { background: var(--warn-soft); color: var(--warn); } .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .warns { border: 1px solid var(--bad); background: var(--bad-soft); color: var(--ink); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 14px; }
+  .warns b { color: var(--bad); }
+  .warns ul { margin: 4px 0 0 18px; padding: 0; }
+  .internal { border-left: 3px solid var(--warn); }
+  .ibadge { font-size: 11px; font-weight: 700; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+  pre.out { white-space: pre-wrap; word-break: break-word; background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; max-height: 520px; overflow: auto; margin: 8px 0 0; }
+  iframe.prev { width: 100%; height: 760px; border: 1px solid var(--line); border-radius: 10px; background: #e9edf4; }
+  .msg { font-size: 13px; min-height: 18px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 99px; background: var(--warn); margin-right: 6px; vertical-align: middle; }
+  .gate { text-align: center; padding: 40px 16px; }
+  .vres { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .vres .card { margin: 0; }
+  .vres .v { font: 700 22px/1.2 Manrope, sans-serif; }
+  @media (max-width: 1000px) {
+    .grid2 { grid-template-columns: minmax(0, 1fr); }
+    .sticky { position: static; }
+    .sum { grid-template-columns: repeat(3, minmax(0, 1fr)); position: static; }
+  }
+  @media (max-width: 680px) {
+    .fg, .fg.four { grid-template-columns: 1fr 1fr; }
+    .sum, .vres { grid-template-columns: 1fr 1fr; }
+    .row, .row.c3, .row.c4 { grid-template-columns: 1fr 1fr; }
+    .row > :first-child { grid-column: 1 / -1; }
+    iframe.prev { height: 560px; }
+    h1 { font-size: 21px; }
+  }
+  @media (max-width: 380px) { .fg, .fg.four, .fg.two { grid-template-columns: 1fr; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="/vc-auth.js"></script>
+<script src="calc.js"></script>
+<script src="docs.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brandbar" href="/admin/"><img src="/logo-mark.png" alt=""><span>VoiceCaptures</span></a>
+    <div class="right">
+      <span class="tag">Admin · internal</span>
+      <a class="btn" href="/admin/">← Admin</a>
+      <button class="btn" id="theme" type="button">☾ Dark</button>
+      <button class="btn" id="signOut" type="button">Log out</button>
+    </div>
+  </div>
+
+  <div id="gate" class="card gate" hidden></div>
+
+  <div id="app" hidden>
+    <h1>Pricing &amp; quotes</h1>
+    <div class="muted small" style="margin-bottom:10px">For deals that don't fit the standard plans. Internal only: cost and margin never appear on client documents.</div>
+
+    <div class="bar2">
+      <select id="qPick" aria-label="Saved quotes"><option value="">Loading saved quotes…</option></select>
+      <button class="btn" id="bNew" type="button">New</button>
+      <button class="btn" id="bDup" type="button">Duplicate</button>
+      <select id="qStatus" aria-label="Status"><option value="draft">Draft</option><option value="sent">Sent</option><option value="accepted">Accepted</option><option value="declined">Declined</option><option value="archived">Archived</option></select>
+      <button class="btn primary" id="bSave" type="button">Save</button>
+      <button class="btn" id="bExport" type="button">Export JSON</button>
+      <label class="btn" for="fImport" style="margin:0">Import JSON</label><input id="fImport" type="file" accept="application/json,.json" hidden>
+      <button class="btn danger" id="bDel" type="button">Delete</button>
+      <span class="msg" id="saveMsg"></span>
+    </div>
+
+    <div class="sum" id="sum"></div>
+    <div id="warns"></div>
+
+    <nav class="tabs" id="tabs">
+      <button type="button" data-tab="deal" class="on">Deal</button>
+      <button type="button" data-tab="margin">Cost &amp; margin <span class="ibadge">internal</span></button>
+      <button type="button" data-tab="value">Value</button>
+      <button type="button" data-tab="out">Outputs</button>
+      <button type="button" data-tab="book">Price book</button>
+    </nav>
+
+    <section id="tab-deal">
+      <div class="grid2">
+        <div id="dealForm"></div>
+        <div class="sticky"><div class="card"><h2>Client price</h2><div id="breakdown"></div></div></div>
+      </div>
+    </section>
+    <section id="tab-margin" hidden>
+      <div class="grid2">
+        <div id="marginOut"></div>
+        <div class="sticky"><div class="card internal"><h2>Cost rates <span class="ibadge">internal</span></h2><div id="ratesForm"></div></div></div>
+      </div>
+    </section>
+    <section id="tab-value" hidden>
+      <div class="grid2">
+        <div id="valueForm"></div>
+        <div class="sticky" id="valueOut"></div>
+      </div>
+    </section>
+    <section id="tab-out" hidden><div id="outForm"></div></section>
+    <section id="tab-book" hidden><div id="bookOut"></div></section>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const { money } = VCQDocs;
+let R = null; // last computed result
+const cad = n => money(n);
+const usd$ = (n, dp = 2) => (n < 0 ? "-US" : "US") + money(Math.abs(n), dp);
+const both = (cadAmount, dp = 2) => `${money(cadAmount, dp)}<span class="usd">${usd$(cadAmount / (Q.internal.fx || 1.37), dp)}</span>`;
+const bothUsd = (usd, dp = 2) => `${money(usd * (Q.internal.fx || 1.37), dp)}<span class="usd">${usd$(usd, dp)}</span>`;
+
+/* ---------------- quote state ---------------- */
+function newQuote(industry = "clinic") {
+  const pb = clone(VCQ.PRICE_BOOK);
+  const first = pb.verticals[industry].plans[0];
+  return {
+    v: 1, priceBook: pb, internal: clone(VCQ.COST_DEFAULTS),
+    client: { name: "", industry, contact: "", email: "", phone: "", address: "", notes: "" },
+    quoteDate: today(), validUntil: addDays(today(), 30), quoteNumber: null,
+    locations: [{ id: uid(), name: "Main location", plan: first.id, coverage: "all_day", volumeMode: "calls", calls: 100, avgMin: 2.5, minutes: 250, addons: { extra_line: 0, history: "" } }],
+    items: [], setup: { on: false }, trial: { on: true, days: 14, cap: 100, locationId: null }, term: 1,
+    discounts: { multiPct: 0, waiveSetup: false, credits: [], freeAddons: [], manual: [] },
+    tax: { hst: false, number: "" },
+    value: { includeInPdf: false, models: { missed: { on: true, missedCalls: 40, bookingRate: 30, avgValue: 250 }, replaced: { on: false, what: "answering service", monthlyCost: 600, hours: 0 }, time: { on: false, hours: 20, hourlyCost: 25 } } },
+    invoice: { number: null, issueDate: today(), dueDate: addDays(today(), 15), instructions: "" }
+  };
+}
+let Q = newQuote(), QID = null, dirty = false, LIST = [];
+
+/* ---------------- binding: data-k="a.b.0.c" ---------------- */
+function getPath(o, p) { return p.split(".").reduce((a, k) => a == null ? a : a[k], o); }
+function setPath(o, p, v) { const ks = p.split("."); const last = ks.pop(); const t = ks.reduce((a, k) => a[k], o); t[last] = v; }
+function readInput(el) {
+  if (el.type === "checkbox") return el.checked;
+  if (el.dataset.t === "num") return el.value === "" ? 0 : Number(el.value);
+  if (el.dataset.t === "int") return parseInt(el.value, 10) || 0;
+  return el.value;
+}
+document.addEventListener("input", e => { const el = e.target; if (el.dataset && el.dataset.k) { setPath(Q, el.dataset.k, readInput(el)); changed(el.dataset.rerender === "1"); } });
+document.addEventListener("change", e => { const el = e.target; if (el.dataset && el.dataset.k) { setPath(Q, el.dataset.k, readInput(el)); changed(el.dataset.rerender === "1"); } });
+
+const fld = (label, k, opt = {}) => {
+  const v = getPath(Q, k);
+  const t = opt.t || (typeof v === "number" ? "num" : "str");
+  const attrs = `data-k="${k}" data-t="${t}"${opt.rerender ? ' data-rerender="1"' : ""}${opt.min != null ? ` min="${opt.min}"` : ""}${opt.step ? ` step="${opt.step}"` : ""}${opt.ph ? ` placeholder="${esc(opt.ph)}"` : ""}`;
+  let input;
+  if (opt.select) input = `<select ${attrs}>${opt.select.map(([val, lab]) => `<option value="${esc(val)}" ${String(v) === String(val) ? "selected" : ""}>${esc(lab)}</option>`).join("")}</select>`;
+  else if (opt.area) input = `<textarea ${attrs}>${esc(v)}</textarea>`;
+  else input = `<input type="${opt.type || (t === "num" || t === "int" ? "number" : "text")}" ${attrs} value="${esc(v ?? "")}">`;
+  return `<label class="${opt.cls || ""}">${esc(label)}${input}${opt.help ? `<span class="muted small">${opt.help}</span>` : ""}</label>`;
+};
+const chk = (label, k, opt = {}) => `<label class="chk ${opt.cls || ""}"><input type="checkbox" data-k="${k}"${opt.rerender ? ' data-rerender="1"' : ""} ${getPath(Q, k) ? "checked" : ""}> ${label}</label>`;
+
+/* ---------------- Deal form ---------------- */
+function planOptions(industry) {
+  const pb = Q.priceBook, out = [];
+  for (const [vk, v] of Object.entries(pb.verticals)) for (const p of v.plans) if (vk === industry) out.push([p.id, `${p.name}: $${p.price}/mo, ${p.minutes} min`]);
+  out.push([pb.multiLocation.id, `Multi-location: from $${pb.multiLocation.price}/mo, ${pb.multiLocation.minutes} min`]);
+  for (const [vk, v] of Object.entries(pb.verticals)) if (vk !== industry) for (const p of v.plans) out.push([p.id, `${v.label}: ${p.name} $${p.price}/mo, ${p.minutes} min`]);
+  out.push(["custom", "Custom plan (own price and minutes)"]);
+  return out;
+}
+function renderDeal() {
+  const pb = Q.priceBook, D = Q.discounts;
+  const locSel = [["", "Choose a location"]].concat(Q.locations.map(l => [l.id, l.name || "Location"]));
+  const itemSel = [["", "Choose a line item"]].concat(Q.items.map(i => [i.id, i.name || "Custom item"]));
+  if (Q.trial.locationId == null && Q.locations[0]) Q.trial.locationId = Q.locations[0].id;
+  $("dealForm").innerHTML = `
+  <div class="card"><h2>Client</h2><div class="fg">
+    ${fld("Client name", "client.name", { cls: "wide", ph: "e.g. CReATe Fertility Centre" })}
+    ${fld("Industry", "client.industry", { select: Object.entries(pb.verticals).map(([k, v]) => [k, v.label]), rerender: true })}
+    ${fld("Contact", "client.contact")}${fld("Email", "client.email", { type: "email" })}
+    ${fld("Phone", "client.phone")}${fld("Quote date", "quoteDate", { type: "date" })}${fld("Valid until", "validUntil", { type: "date" })}
+    ${fld("Address (optional)", "client.address", { cls: "wide" })}
+    ${fld("Notes on the quote (client sees these)", "client.notes", { area: true, cls: "wide" })}
+  </div></div>
+
+  <div class="card"><h2>Locations</h2>
+    ${Q.locations.map((l, i) => {
+      const k = `locations.${i}`, p = VCQ.locPlan(pb, l);
+      return `<div class="loc"><div class="loc-h"><b>${esc(l.name || `Location ${i + 1}`)}</b>${Q.locations.length > 1 ? `<button class="btn small danger" data-act="rmLoc" data-i="${i}" type="button">Remove</button>` : ""}</div>
+      <div class="fg">
+        ${fld("Name", `${k}.name`, { rerender: false })}
+        ${fld("Plan", `${k}.plan`, { select: planOptions(Q.client.industry), rerender: true })}
+        ${fld("Coverage", `${k}.coverage`, { select: Object.entries(VCQ.COVERAGE) })}
+        ${l.plan === "custom" ? fld("Custom plan name", `${k}.customName`, { ph: "Custom plan" }) + fld("Price / month (CAD)", `${k}.customPrice`, { t: "num", min: 0 }) + fld("Included minutes", `${k}.customMinutes`, { t: "int", min: 0 }) : ""}
+        ${fld("Volume entered as", `${k}.volumeMode`, { select: [["calls", "Calls x average length"], ["minutes", "Minutes directly"]], rerender: true })}
+        ${l.volumeMode === "minutes" ? fld("Minutes / month (est.)", `${k}.minutes`, { t: "num", min: 0 }) + fld("Calls / month (for SMS cost)", `${k}.calls`, { t: "num", min: 0 })
+          : fld("Calls / month (est.)", `${k}.calls`, { t: "num", min: 0 }) + fld("Avg call length (min)", `${k}.avgMin`, { t: "num", min: 0, step: "0.1" })}
+        ${fld("Extra lines / calendars", `${k}.addons.extra_line`, { t: "int", min: 0, help: `$${pb.addons.extra_line.monthly}/mo each` })}
+        ${fld("Call history", `${k}.addons.history`, { select: [["", "14 days (included)"], ["90", `90 days, $${pb.addons.history90.monthly}/mo`], ["365", `1 year, $${pb.addons.history365.monthly}/mo`]] })}
+        ${fld("Scope note on the quote (optional)", `${k}.scopeNote`, { cls: "wide", ph: "e.g. Answers after 5 pm and weekends; urgent calls to the on-call nurse" })}
+      </div><div class="small muted" style="margin-top:6px">${esc(p.name)}: $${p.price}/mo, ${p.minutes} min included.</div></div>`;
+    }).join("")}
+    <button class="btn" data-act="addLoc" type="button">+ Add location</button>
+    <h3>Setup</h3>
+    ${chk(`Multi-location or custom call flow setup ($${pb.setup.multiOrCustom} one-time)`, "setup.on", { rerender: true })}
+    <div class="small muted">Standard setup is included. ${Q.locations.length > 1 && !Q.setup.on ? '<span class="warn-t">More than one location: the pricing page charges this setup.</span>' : ""}</div>
+  </div>
+
+  <div class="card"><h2>Custom line items <span class="muted small" style="font-weight:400">integrations, custom builds (from $${pb.integration.oneTimeFrom} + $${pb.integration.monthlyFrom}/mo)</span></h2>
+    ${Q.items.map((it, i) => `<div class="row">
+      ${fld("Name", `items.${i}.name`, { ph: "e.g. On-call doctor lookup + live transfer" })}
+      ${fld("One-time (CAD)", `items.${i}.oneTime`, { t: "num", min: 0 })}
+      ${fld("Monthly (CAD)", `items.${i}.monthly`, { t: "num", min: 0 })}
+      ${fld("Your hours", `items.${i}.hours`, { t: "num", min: 0 })}
+      ${fld("Running cost US$/mo", `items.${i}.monthlyCostUsd`, { t: "num", min: 0, help: "internal" })}
+      <button class="btn small danger" data-act="rmItem" data-i="${i}" type="button" style="margin-bottom:6px">✕</button>
+    </div><div class="fg" style="margin:-2px 0 12px">${fld("Description on the quote (optional)", `items.${i}.note`, { cls: "wide" })}</div>`).join("") || '<div class="muted small">None yet.</div>'}
+    <button class="btn" data-act="addItem" type="button">+ Add line item</button> <button class="btn" data-act="addIntegration" type="button">+ Integration ($${pb.integration.oneTimeFrom} + $${pb.integration.monthlyFrom}/mo)</button>
+  </div>
+
+  <div class="card"><h2>Trial and term</h2><div class="fg four">
+    ${chk("Free trial", "trial.on", { rerender: true })}
+    ${Q.trial.on ? fld("Days", "trial.days", { t: "int", min: 1 }) + fld("Minute cap", "trial.cap", { t: "int", min: 0 }) + fld("Location", "trial.locationId", { select: locSel.slice(1) }) : ""}
+    ${fld("Prepaid term", "term", { t: "int", select: pb.terms.map(t => [t.months, t.label + (t.freeMonths ? `: ${t.freeMonths} months free` : t.pct ? `: save ${t.pct}%` : "")]), rerender: true })}
+  </div></div>
+
+  <div class="card"><h2>Discounts <span class="muted small" style="font-weight:400">each shows as its own line</span></h2>
+    <div class="fg">
+      ${fld("Multi-location discount (% off plans)", "discounts.multiPct", { t: "num", min: 0 })}
+      ${Q.setup.on ? chk("Waive the setup fee", "discounts.waiveSetup") : ""}
+    </div>
+    <h3>One-time credits</h3>
+    ${D.credits.map((c, i) => `<div class="row c3">
+      ${fld("Label on the quote", `discounts.credits.${i}.label`, { ph: "e.g. 50% of the integration fee credited" })}
+      ${fld("Type", `discounts.credits.${i}.type`, { select: [["pct_item", "% of a line item"], ["fixed", "Fixed amount"]], rerender: true })}
+      ${c.type === "pct_item" ? fld("Line item", `discounts.credits.${i}.itemId`, { select: itemSel }) + fld("%", `discounts.credits.${i}.pct`, { t: "num", min: 0 }) : fld("Amount (CAD)", `discounts.credits.${i}.amount`, { t: "num", min: 0 }) + fld("Only with term", `discounts.credits.${i}.needsTermMonths`, { t: "int", select: [[0, "Any term"], [3, "3+ months"], [6, "6+ months"], [12, "12 months"]] })}
+      <button class="btn small danger" data-act="rmCredit" data-i="${i}" type="button" style="margin-bottom:6px">✕</button>
+      ${c.type === "pct_item" ? fld("Only with term", `discounts.credits.${i}.needsTermMonths`, { t: "int", select: [[0, "Any term"], [3, "3+ months"], [6, "6+ months"], [12, "12 months"]] }) : ""}
+    </div>`).join("")}
+    <button class="btn small" data-act="addCredit" type="button">+ Credit</button>
+    <h3>Free add-ons for N months</h3>
+    ${D.freeAddons.map((f, i) => `<div class="row c4">
+      ${fld("Location", `discounts.freeAddons.${i}.locationId`, { select: locSel })}
+      ${fld("Add-on", `discounts.freeAddons.${i}.addon`, { select: [["history", "Call history add-on"], ["extra_line", "Extra lines / calendars"]] })}
+      ${fld("Months", `discounts.freeAddons.${i}.months`, { t: "int", min: 1 })}
+      <span></span><button class="btn small danger" data-act="rmFree" data-i="${i}" type="button" style="margin-bottom:6px">✕</button>
+    </div>`).join("")}
+    <button class="btn small" data-act="addFree" type="button">+ Free add-on</button>
+    <h3>Manual discount</h3>
+    ${D.manual.map((m, i) => `<div class="row c4">
+      ${fld("Reason (shown on the quote)", `discounts.manual.${i}.reason`, { ph: "e.g. Founding clinic partner" })}
+      ${fld("Applies to", `discounts.manual.${i}.applies`, { select: [["monthly", "Monthly price"], ["one_time", "One-time fees"]] })}
+      ${fld("Type", `discounts.manual.${i}.type`, { select: [["pct", "%"], ["amount", "$ amount"]] })}
+      ${fld("Value", `discounts.manual.${i}.value`, { t: "num", min: 0 })}
+      <button class="btn small danger" data-act="rmManual" data-i="${i}" type="button" style="margin-bottom:6px">✕</button>
+    </div>`).join("")}
+    <button class="btn small" data-act="addManual" type="button">+ Manual discount</button>
+  </div>
+
+  <div class="card"><h2>Tax</h2><div class="fg">
+    ${chk(`Charge Ontario HST ${pb.hstPct}%`, "tax.hst")}
+    ${fld("HST number", "tax.number", { ph: "123456789 RT0001" })}
+  </div><div class="small muted">Off until you're registered for HST.</div></div>`;
+}
+
+const ACTS = {
+  addLoc() { const p = Q.locations[0] ? Q.locations[0].plan : Q.priceBook.verticals[Q.client.industry].plans[0].id; Q.locations.push({ id: uid(), name: `Location ${Q.locations.length + 1}`, plan: p, coverage: "all_day", volumeMode: "calls", calls: 100, avgMin: 2.5, minutes: 250, addons: { extra_line: 0, history: "" } }); if (Q.locations.length > 1) Q.setup.on = true; },
+  rmLoc(i) { const [gone] = Q.locations.splice(i, 1); if (Q.trial.locationId === gone.id) Q.trial.locationId = Q.locations[0] ? Q.locations[0].id : null; },
+  addItem() { Q.items.push({ id: uid(), name: "", oneTime: 0, monthly: 0, hours: 0, monthlyCostUsd: 0, note: "" }); },
+  addIntegration() { const pb = Q.priceBook.integration; Q.items.push({ id: uid(), name: "Integration", oneTime: pb.oneTimeFrom, monthly: pb.monthlyFrom, hours: 6, monthlyCostUsd: 0, note: "" }); },
+  rmItem(i) { const [gone] = Q.items.splice(i, 1); Q.discounts.credits = Q.discounts.credits.filter(c => c.itemId !== gone.id); },
+  addCredit() { Q.discounts.credits.push({ label: "", type: Q.items.length ? "pct_item" : "fixed", itemId: Q.items[0] ? Q.items[0].id : "", pct: 50, amount: 0, needsTermMonths: 0 }); },
+  rmCredit(i) { Q.discounts.credits.splice(i, 1); },
+  addFree() { Q.discounts.freeAddons.push({ locationId: Q.locations[0] ? Q.locations[0].id : "", addon: "history", months: 3 }); },
+  rmFree(i) { Q.discounts.freeAddons.splice(i, 1); },
+  addManual() { Q.discounts.manual.push({ reason: "", applies: "monthly", type: "pct", value: 0 }); },
+  rmManual(i) { Q.discounts.manual.splice(i, 1); }
+};
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b || !ACTS[b.dataset.act]) return;
+  ACTS[b.dataset.act](Number(b.dataset.i));
+  changed(true);
+});
+
+/* ---------------- client price breakdown ---------------- */
+function breakdownHtml() {
+  const rows = [];
+  for (const l of R.locs) {
+    rows.push(`<tr><td>${esc(l.name)}: ${esc(l.plan.name)}</td><td class="num">${cad(l.plan.price)}</td></tr>`);
+    for (const a of l.addons) rows.push(`<tr><td class="muted">&nbsp; ${esc(a.name)}${a.qty > 1 ? ` x${a.qty}` : ""}</td><td class="num">${cad(a.monthly)}</td></tr>`);
+  }
+  for (const i of R.items) if (i.monthly) rows.push(`<tr><td>${esc(i.name || "Custom item")} (monthly)</td><td class="num">${cad(i.monthly)}</td></tr>`);
+  rows.push(`<tr class="sub"><td>Monthly list</td><td class="num">${cad(R.listMonthly)}</td></tr>`);
+  for (const d of R.recurringLines) rows.push(`<tr class="disc"><td>${esc(d.label)}</td><td class="num">${cad(d.amount)}</td></tr>`);
+  if (R.recurringLines.length) rows.push(`<tr class="sub"><td>Monthly price</td><td class="num">${cad(R.monthlyNet)}</td></tr>`);
+  if (R.prepaid) {
+    rows.push(`<tr><td>${R.months} x ${cad(R.monthlyNet)}</td><td class="num">${cad(R.termGross)}</td></tr>`, `<tr class="disc"><td>${esc(R.termLabel)}</td><td class="num">${cad(-R.termDiscount)}</td></tr>`);
+    for (const d of R.freeAddonLines) rows.push(`<tr class="disc"><td>${esc(d.label)}</td><td class="num">${cad(d.amount)}</td></tr>`);
+    rows.push(`<tr class="sub"><td>Prepaid term (${cad(R.effectiveMonthly)}/mo effective)</td><td class="num">${cad(R.termTotal - R.freeAddonCredit)}</td></tr>`);
+  } else for (const d of R.freeAddonLines) rows.push(`<tr class="disc"><td>${esc(d.label)}</td><td class="num">${cad(-d.perMonth)}/mo</td></tr>`);
+  if (R.oneTimeLines.length) {
+    rows.push(`<tr><th colspan="2">One-time</th></tr>`);
+    for (const x of R.oneTimeLines) rows.push(`<tr><td>${esc(x.label)}</td><td class="num">${cad(x.amount)}</td></tr>`);
+    for (const x of R.oneTimeDiscounts) rows.push(`<tr class="disc"><td>${esc(x.label)}</td><td class="num">${cad(x.amount)}</td></tr>`);
+    rows.push(`<tr class="sub"><td>One-time total</td><td class="num">${cad(R.oneTimeNet)}</td></tr>`);
+  }
+  rows.push(`<tr class="tot"><td>Due at start${R.taxPct ? " incl. HST" : ""}</td><td class="num">${cad(R.dueAtStartWithTax)}</td></tr>`);
+  const inactive = R.inactiveCredits.map(c => `<div class="small warn-t">${esc(c.label)} (${cad(-c.amount)}) only applies with a ${c.needsTermMonths}-month term.</div>`).join("");
+  return `<div class="tw"><table>${rows.join("")}</table></div>${inactive}${R.trial ? `<div class="small muted" style="margin-top:6px">Trial: ${R.trial.days} days, ${R.trial.cap} min${R.trial.location ? ` at ${esc(R.trial.location)}` : ""}.</div>` : ""}`;
+}
+
+/* ---------------- summary strip + guardrail ---------------- */
+function renderSummary() {
+  const I = R.internal, pctCls = I.marginPct == null ? "" : I.belowMin ? "bad-t" : I.marginPct < I.minPct + 10 ? "warn-t" : "good-t";
+  $("sum").innerHTML = `
+    <div class="card"><div class="k">Monthly list</div><div class="v">${cad(R.listMonthly)}</div><div class="u">US${money(R.listMonthly / Q.internal.fx)}</div></div>
+    <div class="card"><div class="k">Effective / month</div><div class="v">${cad(R.effectiveMonthly)}</div><div class="u">${R.prepaid ? `${R.months}-month prepaid` : "monthly"}</div></div>
+    <div class="card"><div class="k">Due at start</div><div class="v">${cad(R.dueAtStartWithTax)}</div><div class="u">${R.taxPct ? "incl. HST" : "before tax"} · US${money(R.dueAtStartWithTax / Q.internal.fx)}</div></div>
+    <div class="card"><div class="k">Gross margin <span class="ibadge">internal</span></div><div class="v ${pctCls}">${I.marginPct == null ? "n/a" : I.marginPct + "%"}</div><div class="u">${cad(I.margin)}/mo · min ${I.minPct}%</div></div>
+    <div class="card"><div class="k">First-term profit <span class="ibadge">internal</span></div><div class="v">${cad(I.termProfit)}</div><div class="u">after time + trial cost</div></div>`;
+  $("warns").innerHTML = R.warnings.length ? `<div class="warns"><b>Check before sending</b><ul>${R.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
+}
+
+/* ---------------- cost & margin (internal) ---------------- */
+function renderRates() {
+  const c = "internal";
+  $("ratesForm").innerHTML = `<div class="fg two">
+    ${fld("USD to CAD", `${c}.fx`, { t: "num", step: "0.01" })}${fld("Minimum margin %", `${c}.minMarginPct`, { t: "num" })}
+    ${fld("Your hourly rate (CAD)", `${c}.hourlyRate`, { t: "num" })}${fld("Setup hours", `${c}.setupHours`, { t: "num" })}
+  </div><h3>Per minute (US$)</h3><div class="fg two">
+    ${fld("Vapi platform", `${c}.usd.vapi`, { t: "num", step: "0.001" })}${fld("Speech-to-text", `${c}.usd.stt`, { t: "num", step: "0.001" })}
+    ${fld("LLM", `${c}.usd.llm`, { t: "num", step: "0.001" })}${fld("Voice", `${c}.usd.voice`, { t: "num", step: "0.001" })}
+    ${fld("Twilio inbound", `${c}.usd.twilioMin`, { t: "num", step: "0.0001" })}
+  </div><h3>Other (US$)</h3><div class="fg two">
+    ${fld("Twilio number / month", `${c}.usd.numberMonthly`, { t: "num", step: "0.01" })}${fld("SMS / message", `${c}.usd.sms`, { t: "num", step: "0.0001" })}
+    ${fld("Email / message", `${c}.usd.email`, { t: "num", step: "0.0001" })}${fld("SMS per call", `${c}.smsPerCall`, { t: "num" })}
+    ${fld("Emails per call", `${c}.emailsPerCall`, { t: "num" })}
+  </div><div class="small muted" style="margin-top:8px" id="blended"></div>`;
+}
+function renderMargin() {
+  const I = R.internal;
+  $("blended") && ($("blended").innerHTML = `Blended: US$${I.perMinUsd.toFixed(4)}/min = CA$${I.perMinCad.toFixed(4)}/min at ${Q.internal.fx}.`);
+  const locRows = I.locs.map(l => `<tr>
+    <td><b>${esc(l.name)}</b><div class="small muted">${esc(l.plan)} · ~${l.calls} calls</div></td>
+    <td class="num">${Math.round(l.minutes)} / ${l.included}${l.overMin ? `<div class="small warn-t">+${l.overMin} over</div>` : l.unusedMin ? `<div class="small muted">${l.unusedMin} unused</div>` : ""}</td>
+    <td class="num">${both(l.priceCad)}</td>
+    <td class="num">${l.overageCad ? both(l.overageCad) : "—"}</td>
+    <td class="num">${bothUsd(l.costUsd)}</td>
+    <td class="num">${both(l.margin)}<div><span class="pill ${l.marginPct < I.minPct ? "bad" : "good"}">${l.marginPct ?? "n/a"}%</span></div></td>
+    <td class="num">${both(l.breakEven)}<div class="small muted">${I.minPct}%: ${cad(l.minPrice)}</div></td></tr>
+    ${l.upgrade ? `<tr><td colspan="7" class="small warn-t">Estimate is over the plan: ${esc(l.upgrade.name)} at ${cad(l.upgrade.price)}/mo would save the client ${cad(l.upgrade.saves)}/mo vs plan + overage.</td></tr>` : ""}`).join("");
+  const itemRows = I.items.map(x => `<tr><td>${esc(x.name || "Custom item")}<div class="small muted">monthly line item</div></td><td></td><td class="num">${both(x.priceCad)}</td><td></td><td class="num">${bothUsd(x.costUsd)}</td><td class="num">${both(x.margin)}${x.marginPct != null ? `<div><span class="pill">${x.marginPct}%</span></div>` : ""}</td><td></td></tr>`).join("");
+  const work = I.oneTimeWork.map(w => `<tr><td>${esc(w.label)}</td><td class="num">${w.hours}</td><td class="num">${both(w.costCad)}</td><td class="num">${both(w.fee)}</td><td class="num ${w.diff < 0 ? "bad-t" : "good-t"}">${both(w.diff)}</td></tr>`).join("");
+  $("marginOut").innerHTML = `
+  <div class="card internal"><h2>Monthly cost and margin <span class="ibadge">internal</span></h2>
+    <div class="small muted" style="margin-bottom:8px">Price per location = list price x ${I.ratio} (all monthly discounts and the prepaid term spread evenly). Overage is projected at ${money(Q.priceBook.overagePerMin)}/min.</div>
+    <div class="tw"><table><thead><tr><th>Location</th><th class="num">Est. / incl. min</th><th class="num">Price / mo</th><th class="num">Overage</th><th class="num">Our cost</th><th class="num">Margin</th><th class="num">Break-even</th></tr></thead>
+    <tbody>${locRows}${itemRows}
+    <tr class="tot"><td>Total</td><td></td><td class="num">${both(I.revenue)}</td><td></td><td class="num">${bothUsd(I.costUsd)}</td><td class="num">${both(I.margin)}<div><span class="pill ${I.belowMin ? "bad" : "good"}">${I.marginPct ?? "n/a"}%</span></div></td><td class="num">${both(I.breakEven)}<div class="small muted">${I.minPct}%: ${cad(I.minPrice)}</div></td></tr></tbody></table></div>
+  </div>
+  <div class="card internal"><h2>One-time work <span class="ibadge">internal</span></h2>
+    ${work ? `<div class="tw"><table><thead><tr><th>Work</th><th class="num">Hours</th><th class="num">Your time (${cad(Q.internal.hourlyRate)}/h)</th><th class="num">Fee after credits</th><th class="num">Difference</th></tr></thead><tbody>${work}
+    <tr class="tot"><td>Total</td><td></td><td class="num">${both(I.oneTimeCost)}</td><td class="num">${both(R.oneTimeNet)}</td><td class="num">${both(R.oneTimeNet - I.oneTimeCost)}</td></tr></tbody></table></div>` : '<div class="muted small">No one-time work.</div>'}
+  </div>
+  <div class="card internal"><h2>Deal summary <span class="ibadge">internal</span></h2><div class="tw"><table>
+    <tr><td>Trial cost (cap x blended rate)</td><td class="num">${both(I.trialCostCad)}</td></tr>
+    <tr><td>Monthly margin x ${R.months} month${R.months > 1 ? "s" : ""}</td><td class="num">${both(I.margin * R.months)}</td></tr>
+    <tr><td>One-time fees less your time</td><td class="num">${both(R.oneTimeNet - I.oneTimeCost)}</td></tr>
+    <tr class="tot"><td>First-term profit</td><td class="num">${both(I.termProfit)}</td></tr></table></div></div>`;
+}
+
+/* ---------------- value ---------------- */
+function renderValueForm() {
+  const m = "value.models";
+  $("valueForm").innerHTML = `
+  <div class="card"><h2>${chk("<b>Missed revenue</b>", `${m}.missed.on`, { rerender: true })}</h2>
+    ${Q.value.models.missed.on ? `<div class="fg">${fld("Missed calls / month", `${m}.missed.missedCalls`, { t: "num" })}${fld("Booking rate %", `${m}.missed.bookingRate`, { t: "num" })}${fld("Average value of a booking (CAD)", `${m}.missed.avgValue`, { t: "num" })}</div>` : ""}</div>
+  <div class="card"><h2>${chk("<b>Cost replaced</b>", `${m}.replaced.on`, { rerender: true })}</h2>
+    ${Q.value.models.replaced.on ? `<div class="fg">${fld("What it replaces", `${m}.replaced.what`, { select: [["answering service", "Answering service"], ["part-time receptionist", "Part-time receptionist"], ["call centre", "Call centre"], ["overtime front-desk cover", "Front-desk overtime"]] })}${fld("Monthly cost (CAD)", `${m}.replaced.monthlyCost`, { t: "num" })}${fld("Hours / month (optional)", `${m}.replaced.hours`, { t: "num" })}</div>` : ""}</div>
+  <div class="card"><h2>${chk("<b>Time saved</b>", `${m}.time.on`, { rerender: true })}</h2>
+    ${Q.value.models.time.on ? `<div class="fg">${fld("Staff hours saved / month", `${m}.time.hours`, { t: "num" })}${fld("Hourly cost (CAD)", `${m}.time.hourlyCost`, { t: "num" })}</div>` : ""}</div>
+  <div class="card">${chk("Add the value summary page to the quote PDF", "value.includeInPdf")}</div>`;
+}
+function renderValueOut() {
+  const V = R.value;
+  $("valueOut").innerHTML = !V ? '<div class="card muted">Turn on at least one value model.</div>' : `
+  <div class="card"><h2>Value vs price</h2><div class="vres">
+    <div class="card"><div class="muted small">Value / month</div><div class="v">${cad(V.monthly)}</div></div>
+    <div class="card"><div class="muted small">Client price / month</div><div class="v">${cad(V.clientMonthly)}</div></div>
+    <div class="card"><div class="muted small">ROI (year 1)</div><div class="v">${V.roi ?? "n/a"}x</div></div>
+    <div class="card"><div class="muted small">Payback of due-at-start</div><div class="v">${V.paybackMonths ?? "n/a"} mo</div></div></div>
+    <div class="tw" style="margin-top:10px"><table>${V.lines.map(l => `<tr><td>${esc(l.label)}<div class="small muted">${esc(l.detail)}</div></td><td class="num">${cad(l.monthly)}</td></tr>`).join("")}
+    <tr class="sub"><td>Annual value</td><td class="num">${cad(V.annual)}</td></tr><tr><td>Annual cost (12 x effective monthly + one-time)</td><td class="num">${cad(V.annualCost)}</td></tr>
+    <tr class="tot"><td>Net gain / month</td><td class="num ${V.netMonthly < 0 ? "bad-t" : ""}">${cad(V.netMonthly)}</td></tr></table></div></div>`;
+}
+
+/* ---------------- outputs ---------------- */
+function renderOutForm() {
+  const inv = Q.invoice;
+  $("outForm").innerHTML = `
+  <div class="card"><h2>Quote / order form <span class="muted small" style="font-weight:400">client-facing, no internal numbers</span></h2>
+    <div class="bar2">${chk("Include value summary page", "value.includeInPdf")}
+      <button class="btn primary" id="bPdf" type="button">Open PDF (print → Save as PDF)</button>
+      <button class="btn" id="bCopyText" type="button">Copy as plain text</button><span class="msg" id="copyMsg"></span></div>
+    ${!QID ? '<div class="small warn-t">Save the quote first so it gets a quote number.</div>' : ""}
+    <iframe class="prev" id="prev" title="Quote preview"></iframe>
+  </div>
+  <div class="card"><h2>Stripe line items <span class="muted small" style="font-weight:400">set these up by hand</span></h2>
+    <button class="btn" id="bCopyStripe" type="button">Copy</button><pre class="out" id="stripeOut"></pre></div>
+  <div class="card"><h2>Plain-text quote</h2><pre class="out" id="textOut"></pre></div>
+  <div class="card"><h2>Invoice <span class="muted small" style="font-weight:400">only for one-off charges paid outside Stripe</span></h2>
+    <div class="fg four">
+      <label>Invoice number<div class="bar2" style="margin:0"><input value="${esc(inv.number || "")}" placeholder="Not assigned" readonly style="flex:1"><button class="btn small" id="bInvNo" type="button" ${inv.number ? "disabled" : ""}>${inv.number ? "Assigned" : "Assign"}</button></div></label>
+      ${fld("Issue date", "invoice.issueDate", { type: "date" })}${fld("Due date", "invoice.dueDate", { type: "date" })}
+      <label>&nbsp;<button class="btn" id="bInv" type="button">Open invoice PDF</button></label>
+      ${fld("Payment instructions", "invoice.instructions", { area: true, cls: "wide", ph: "Interac e-Transfer to amir@voicecaptures.com, with the invoice number in the message." })}
+    </div><div class="small muted" id="invNote"></div></div>`;
+  $("bPdf").onclick = () => openDoc(VCQDocs.quoteHtml(Q, R, { value: !!Q.value.includeInPdf }));
+  $("bInv").onclick = () => openDoc(VCQDocs.invoiceHtml(Q, R, Q.invoice));
+  $("bCopyText").onclick = () => copy(VCQDocs.plainText(Q, R), "copyMsg");
+  $("bCopyStripe").onclick = e => copy(VCQDocs.stripeText(Q, R), null, e.target);
+  $("bInvNo").onclick = assignInvoiceNumber;
+}
+function renderOutLive() {
+  if (!$("prev")) return;
+  $("prev").srcdoc = VCQDocs.quoteHtml(Q, R, { value: !!Q.value.includeInPdf });
+  $("stripeOut").textContent = VCQDocs.stripeText(Q, R);
+  $("textOut").textContent = VCQDocs.plainText(Q, R);
+  const lines = VCQDocs.invoiceLines(R);
+  $("invNote").textContent = lines.length ? `Invoice lines: ${lines.map(x => `${x.label} ${money(x.amount)}`).join("; ")}.` : "No one-time charges on this quote, so there is nothing to invoice outside Stripe.";
+}
+function openDoc(html) {
+  const w = window.open("", "_blank");
+  if (!w) { alertMsg("Allow pop-ups for this page to open the PDF."); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  const go = () => setTimeout(() => { try { w.focus(); w.print(); } catch (e) { /* user can print from the tab */ } }, 400);
+  if (w.document.fonts && w.document.fonts.ready) w.document.fonts.ready.then(go); else w.onload = go;
+}
+async function copy(text, msgId, btn) {
+  try { await navigator.clipboard.writeText(text); } catch (e) {
+    const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove();
+  }
+  if (msgId) { $(msgId).textContent = "Copied."; setTimeout(() => $(msgId).textContent = "", 2000); }
+  if (btn) { const o = btn.textContent; btn.textContent = "Copied"; setTimeout(() => btn.textContent = o, 1500); }
+}
+
+/* ---------------- price book (read-only view of this quote's copy) ---------------- */
+function renderBook() {
+  const pb = Q.priceBook;
+  $("bookOut").innerHTML = `<div class="card"><h2>Price book used by this quote</h2>
+    <div class="small muted" style="margin-bottom:8px">Defaults live at the top of <code>admin/quotes/calc.js</code> (checked against voicecaptures.com/pricing on 2026-10-28). Each saved quote keeps its own copy, so later price changes don't rewrite it.</div>
+    <div class="tw"><table><tr><th>Vertical</th><th>Plan</th><th class="num">Price / mo</th><th class="num">Minutes</th></tr>
+    ${Object.values(pb.verticals).flatMap(v => v.plans.map(p => `<tr><td>${esc(v.label)}</td><td>${esc(p.name)}</td><td class="num">${cad(p.price)}</td><td class="num">${p.minutes}</td></tr>`)).join("")}
+    <tr><td>Any</td><td>${esc(pb.multiLocation.name)} (per location, from)</td><td class="num">${cad(pb.multiLocation.price)}</td><td class="num">${pb.multiLocation.minutes}</td></tr></table></div>
+    <h3>Terms</h3><div class="small">${pb.terms.map(t => `${t.label}${t.freeMonths ? `: ${t.freeMonths} months free` : t.pct ? `: save ${t.pct}%` : ""}`).join(" · ")}</div>
+    <h3>Minutes</h3><div class="small">Overage $${pb.overagePerMin}/min · Top-ups ${pb.topups.map(t => `${t.minutes} min $${t.price}`).join(", ")}</div>
+    <h3>Add-ons</h3><div class="small">${Object.values(pb.addons).map(a => `${esc(a.name)} $${a.monthly}/mo`).join(" · ")}</div>
+    <h3>Setup and integrations</h3><div class="small">Setup included · Multi-location or custom call flows $${pb.setup.multiOrCustom} one-time · Integrations from $${pb.integration.oneTimeFrom} + $${pb.integration.monthlyFrom}/mo · HST ${pb.hstPct}% (toggle)</div>
+    <div style="margin-top:12px"><button class="btn small" id="bBookReset" type="button">Reset this quote to the current price book</button></div></div>`;
+  $("bBookReset").onclick = () => { Q.priceBook = clone(VCQ.PRICE_BOOK); changed(true); };
+}
+
+/* ---------------- render loop ---------------- */
+let TAB = "deal";
+function renderForms() { renderDeal(); renderRates(); renderValueForm(); renderOutForm(); renderBook(); }
+function renderLive() {
+  R = VCQ.compute(Q);
+  renderSummary();
+  $("breakdown").innerHTML = breakdownHtml();
+  renderMargin(); renderValueOut();
+  if (TAB === "out") renderOutLive();
+}
+let liveTimer = null;
+function changed(structural) {
+  dirty = true; setSaveMsg();
+  if (structural) { const y = scrollY; renderForms(); scrollTo(0, y); }
+  clearTimeout(liveTimer);
+  liveTimer = setTimeout(renderLive, structural ? 0 : 60);
+  try { localStorage.setItem("vc_quote_draft", JSON.stringify({ id: QID, Q })); } catch (e) {}
+}
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
+  TAB = b.dataset.tab;
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+  for (const t of ["deal", "margin", "value", "out", "book"]) $("tab-" + t).hidden = t !== TAB;
+  if (TAB === "out") renderOutLive();
+});
+
+/* ---------------- saving ---------------- */
+let SB = null;
+const toLogin = () => location.replace("/login/?next=/admin/quotes/");
+async function api(path, opts = {}) {
+  const { data: { session } } = await SB.auth.getSession();
+  if (!session) { toLogin(); throw new Error("Signed out"); }
+  const r = await fetch(vcAuth.API + path, { ...opts, headers: { ...(opts.headers || {}), ...(opts.body ? { "Content-Type": "application/json" } : {}), Authorization: `Bearer ${session.access_token}` } });
+  if (r.status === 401) { await SB.auth.signOut(); toLogin(); throw new Error("Signed out"); }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.error || `Error ${r.status}`); e.status = r.status; e.needsMigration = d.needsMigration; throw e; }
+  return d;
+}
+const B = "/api/dashboard/admin/quotes";
+function setSaveMsg(t, cls) { $("saveMsg").innerHTML = t ? `<span class="${cls || ""}">${esc(t)}</span>` : dirty ? '<span class="dot"></span><span class="muted">Unsaved changes</span>' : (QID ? '<span class="muted">Saved</span>' : ""); }
+function alertMsg(t) { setSaveMsg(t, "bad-t"); }
+async function loadList(selectId) {
+  try {
+    const d = await api(B);
+    LIST = d.quotes;
+    $("qPick").innerHTML = `<option value="">${LIST.length ? "Open a saved quote…" : "No saved quotes yet"}</option>` + LIST.map(q =>
+      `<option value="${q.id}" ${q.id === selectId ? "selected" : ""}>${esc(q.quote_number || "")} · ${esc(q.client_name)} · ${esc(q.status)}${q.monthly_cad != null ? ` · $${Number(q.monthly_cad).toFixed(0)}/mo` : ""}</option>`).join("");
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    $("qPick").innerHTML = `<option value="">${e.needsMigration ? "Saving needs migrations/2026-10-29-quotes.sql (Export/Import JSON works meanwhile)" : esc(e.message)}</option>`;
+    if (e.status === 403) $("gate").hidden = false, $("gate").innerHTML = "<h2>Admins only</h2>", $("app").hidden = true;
+  }
+}
+async function save() {
+  if (!Q.client.name.trim()) { alertMsg("Add the client name first."); return; }
+  $("bSave").disabled = true; setSaveMsg("Saving…");
+  const body = JSON.stringify({ client_name: Q.client.name.trim(), status: $("qStatus").value, data: Q,
+    summary: { monthly_cad: R.effectiveMonthly, term_months: R.months, first_invoice_cad: R.dueAtStartWithTax } });
+  try {
+    const d = await api(QID ? `${B}/${QID}` : B, { method: "POST", body });
+    if (!QID) { QID = d.quote.id; Q.quoteNumber = d.quote.quote_number; await api(`${B}/${QID}`, { method: "POST", body: JSON.stringify({ ...JSON.parse(body), data: Q }) }); }
+    dirty = false; setSaveMsg(`Saved ${Q.quoteNumber || ""}`.trim(), "good-t");
+    history.replaceState(null, "", `#${QID}`);
+    await loadList(QID); renderForms(); renderLive();
+  } catch (e) { if (e.message !== "Signed out") alertMsg(e.needsMigration ? "Run migrations/2026-10-29-quotes.sql to save; use Export JSON meanwhile." : e.message); }
+  finally { $("bSave").disabled = false; }
+}
+async function openQuote(id) {
+  if (dirty && !confirmLose()) { $("qPick").value = QID || ""; return; }
+  try {
+    const d = await api(`${B}/${id}`);
+    Q = upgrade(d.quote.data); Q.quoteNumber = d.quote.quote_number; Q.invoice.number = d.quote.invoice_number || Q.invoice.number;
+    QID = id; $("qStatus").value = d.quote.status; dirty = false;
+    history.replaceState(null, "", `#${id}`);
+    renderForms(); renderLive(); setSaveMsg();
+  } catch (e) { if (e.message !== "Signed out") alertMsg(e.message); }
+}
+function confirmLose() { return window.confirm("Discard unsaved changes?"); }
+function upgrade(data) {
+  // Fill anything an older saved quote is missing from today's defaults.
+  const base = newQuote((data.client && data.client.industry) || "clinic");
+  const merged = { ...base, ...data, client: { ...base.client, ...(data.client || {}) }, internal: { ...base.internal, ...(data.internal || {}), usd: { ...base.internal.usd, ...((data.internal || {}).usd || {}) } },
+    discounts: { ...base.discounts, ...(data.discounts || {}) }, tax: { ...base.tax, ...(data.tax || {}) }, trial: { ...base.trial, ...(data.trial || {}) },
+    setup: { ...base.setup, ...(data.setup || {}) }, invoice: { ...base.invoice, ...(data.invoice || {}) },
+    value: { ...base.value, ...(data.value || {}), models: { ...base.value.models, ...((data.value || {}).models || {}) } } };
+  merged.locations = (merged.locations || []).map(l => ({ addons: { extra_line: 0, history: "" }, volumeMode: "calls", ...l }));
+  return merged;
+}
+async function assignInvoiceNumber() {
+  if (!QID) { alertMsg("Save the quote first."); return; }
+  try { const d = await api(`${B}/${QID}/invoice-number`, { method: "POST", body: "{}" }); Q.invoice.number = d.invoice_number; changed(true); }
+  catch (e) { if (e.message !== "Signed out") alertMsg(e.message); }
+}
+
+$("bSave").onclick = save;
+$("qStatus").onchange = () => { dirty = true; setSaveMsg(); };
+$("qPick").onchange = () => { if ($("qPick").value) openQuote($("qPick").value); };
+$("bNew").onclick = () => { if (dirty && !confirmLose()) return; Q = newQuote(Q.client.industry); QID = null; dirty = false; $("qStatus").value = "draft"; $("qPick").value = ""; history.replaceState(null, "", "#"); renderForms(); renderLive(); setSaveMsg(); };
+$("bDup").onclick = () => { Q = clone(Q); Q.quoteNumber = null; Q.invoice.number = null; Q.client.name = Q.client.name ? Q.client.name + " (copy)" : ""; Q.quoteDate = today(); Q.validUntil = addDays(today(), 30); QID = null; $("qStatus").value = "draft"; $("qPick").value = ""; changed(true); setSaveMsg("Copy: not saved yet", "warn-t"); };
+$("bDel").onclick = async () => {
+  if (!QID) { Q = newQuote(Q.client.industry); dirty = false; renderForms(); renderLive(); setSaveMsg(); return; }
+  if (!window.confirm(`Delete ${Q.quoteNumber || "this quote"} for ${Q.client.name}? This can't be undone.`)) return;
+  try { await api(`${B}/${QID}`, { method: "DELETE" }); QID = null; Q = newQuote(Q.client.industry); dirty = false; history.replaceState(null, "", "#"); await loadList(); renderForms(); renderLive(); setSaveMsg("Deleted", "muted"); }
+  catch (e) { if (e.message !== "Signed out") alertMsg(e.message); }
+};
+$("bExport").onclick = () => {
+  const blob = new Blob([JSON.stringify({ kind: "voicecaptures-quote", exportedAt: new Date().toISOString(), id: QID, status: $("qStatus").value, data: Q }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `${(Q.quoteNumber || "quote-draft")}-${(Q.client.name || "client").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+$("fImport").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    const data = j.data || j;
+    if (!data.locations || !data.client) throw new Error("That file isn't a VoiceCaptures quote.");
+    Q = upgrade(data); Q.quoteNumber = null; Q.invoice.number = null; QID = null;
+    $("qStatus").value = j.status || "draft"; $("qPick").value = "";
+    changed(true); setSaveMsg("Imported: save to store it as a new quote", "warn-t");
+  } catch (err) { alertMsg(err.message); }
+};
+
+/* ---------------- theme / auth ---------------- */
+function syncTheme() { $("theme").textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "☀ Light" : "☾ Dark"; }
+$("theme").onclick = () => { const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", t); try { localStorage.setItem("vc_theme", t); } catch (e) {} syncTheme(); };
+syncTheme();
+let leaving = false;
+$("signOut").onclick = async () => { leaving = true; await SB.auth.signOut(); location.replace("/login/"); };
+window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+vcAuth.client().then(async ({ sb }) => {
+  SB = sb;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return toLogin();
+  sb.auth.onAuthStateChange(ev => { if (ev === "SIGNED_OUT" && !leaving) toLogin(); });
+  $("app").hidden = false;
+  const want = (location.hash || "").replace("#", "");
+  // Unsaved draft from a previous visit (this browser only).
+  let draft = null; try { draft = JSON.parse(localStorage.getItem("vc_quote_draft") || "null"); } catch (e) {}
+  if (draft && draft.Q && !want) { Q = upgrade(draft.Q); QID = draft.id || null; dirty = true; }
+  renderForms(); renderLive(); setSaveMsg();
+  await loadList(QID);
+  if (/^[0-9a-f-]{36}$/i.test(want)) openQuote(want);
+}).catch(err => { $("gate").hidden = false; $("gate").innerHTML = `<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`; });
+</script>
+</body>
+</html>
