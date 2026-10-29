@@ -233,7 +233,7 @@ const WINDOW_MINUTES = 15;
   const say = (t, s) => {
     state.textContent = t;
     if (s !== undefined) sub.textContent = s;
-    if (inline) heroSay(t);
+    if (inline) heroSay(t, s);
   };
   /* Seconds left in the call now running. Plain state, deliberately: nothing
      about the CLOCK is stored, so a reload cannot leave someone cut short. */
@@ -307,7 +307,23 @@ const WINDOW_MINUTES = 15;
   // Where the words and the status go: the hero while it is the one talking,
   // the panel otherwise. One function, so neither surface can be left stale.
   let fade = null;
-  function heroSay(t){ if (heroState) heroState.textContent = t; }
+  function heroSay(t, s){
+    if (heroState) heroState.textContent = t;
+    /* The second line carries what to DO about it — how many minutes to wait,
+       which number to call. The hero used to drop it and show the headline
+       alone, so "That is five goes in 15 minutes" appeared with no hint of
+       when you could go again. Only when no call is running: mid-call that
+       line is the transcript's. */
+    if (s && !live) heroHold(s);
+  }
+  /** A line that stays put, unlike the transcript's, which fades. */
+  function heroHold(text){
+    if (!heroLine) return;
+    clearTimeout(fade);
+    heroLine.innerHTML = "";
+    heroLine.appendChild(document.createTextNode(text));
+    heroLine.classList.add("in");
+  }
   function heroLineSet(role, text){
     if (!heroLine) return;
     heroLine.innerHTML = "";
@@ -387,10 +403,15 @@ const WINDOW_MINUTES = 15;
     const wait = waitMinutes();
     if (wait > 0) {
       /* Gentle on purpose: someone who has called five times is interested,
-         not hostile, and the sales line is open to them right now. */
-      say("That is five goes in " + WINDOW_MINUTES + " minutes",
-          "Give it about " + wait + (wait === 1 ? " minute" : " minutes") +
-          " and it will be ready again \u2014 or call (365) 603-9234 and talk to a person now.");
+         not hostile, and the sales line is open to them right now. The wait is
+         named in minutes rather than left vague — "come back later" is the
+         answer that sends someone away for good. */
+      say("Back in " + wait + (wait === 1 ? " minute" : " minutes"),
+          "That is five calls in " + WINDOW_MINUTES + " minutes, so the demo needs a "
+          + "breather \u2014 or call (365) 603-9234 now and talk to a person.");
+      /* The hero opened its live display on the click; put it back, with long
+         enough to read a phone number first. */
+      if (inline) setTimeout(() => heroCalling(false), 7000);
       return;
     }
     /* Otherwise every attempt starts a fresh three minutes. */
@@ -412,6 +433,11 @@ const WINDOW_MINUTES = 15;
         vapi = new Vapi(VAPI_PUBLIC_KEY);
         vapi.on("call-start", () => {
           live = true; go.disabled = false; go.textContent = "End";
+          /* The held line still carries "allow the microphone", which is
+             answered the moment the call connects. Clear it so the first
+             transcript line lands on an empty row rather than replacing
+             stale instructions. */
+          if (inline && heroLine) { clearTimeout(fade); heroLine.classList.remove("in"); heroLine.textContent = ""; }
           say("Listening", "Ask it anything, or ask it to book you a meeting.");
           noteStart();   // counted when it CONNECTS, so a failure costs nobody a go
           left = CALL_SECONDS;
