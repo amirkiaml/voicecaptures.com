@@ -151,6 +151,17 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
   border-radius:10px; cursor:pointer; flex:0 0 auto}
 .burger span{display:block; height:2px; background:var(--ink); border-radius:2px}
 @media(min-width:1200px){ .burger{display:none} }
+/* Measured at 390: the bar's end group alone wanted 223px, which with the
+   mark and the gaps ran 51px past the viewport. Below 520 the wordmark goes,
+   the label shortens and the padding tightens. The full wording is still in
+   the burger panel. */
+.cta-s{display:none}
+@media(max-width:520px){
+  .brand span{display:none}
+  .btn-sm{font-size:14px; padding:13px 14px; min-height:46px}
+  .cta-l{display:none} .cta-s{display:inline}
+  .bar{gap:var(--s2); padding-left:var(--s4); padding-right:var(--s4)}
+}
 .mnav{border-top:1px solid var(--line); background:#fff;
   max-height:var(--mnav-max, 70vh); overflow-y:auto; overscroll-behavior:contain}
 .mnav[hidden]{display:none}
@@ -434,7 +445,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       </a>
       <span class="bar-sep" aria-hidden="true"></span>
       <a class="login" href="/login">Log in</a>
-      <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo</a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo</span><span class="cta-s">Build demo</span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
       </button>
