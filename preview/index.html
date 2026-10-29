@@ -86,6 +86,7 @@ section{padding:var(--s24) 0}
 .btn-dark{background:#11234B; color:#fff}
 .btn-dark:hover{background:#0D1729}
 .btn-sm{font-size:15px; padding:13px 22px; min-height:46px; white-space:nowrap}
+.beta{font-style:normal; font-weight:700; font-size:.78em; opacity:.72; margin-left:5px}
 
 /* ---- nav ---- */
 header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line)}
@@ -398,8 +399,8 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 .arow span{display:block; font-size:15px; line-height:22px; color:var(--ink-2); margin-top:2px}
 .arow a:not(.btn){color:var(--blue); font-weight:700; text-decoration:none}
 .arow a:not(.btn):hover{text-decoration:underline}
-.adot{width:8px; height:8px; border-radius:50%; background:var(--cyan);
-  display:inline-block; margin-right:7px; vertical-align:middle;
+.adot{width:7px; height:7px; border-radius:50%; background:var(--cyan);
+  display:inline-block; margin-left:5px; vertical-align:middle;
   animation:adot 1.9s ease-in-out infinite}
 @keyframes adot{0%,100%{opacity:1} 50%{opacity:.3}}
 @media(prefers-reduced-motion:reduce){ .adot{animation:none} }
@@ -413,9 +414,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   color:var(--ink); margin:0 0 var(--s4)}
 .fcol ul{list-style:none; padding:0; margin:0}
 .fcol li{margin-bottom:var(--s3)}
-.fcol a{font-size:15px; color:var(--ink-2); text-decoration:none;
+.fcol a:not(.btn){font-size:15px; color:var(--ink-2); text-decoration:none;
   display:inline-block; min-height:28px}
-.fcol a:hover{color:var(--blue)}
+.fcol a:not(.btn):hover{color:var(--blue)}
 .fbrand p{font-size:14px; line-height:22px; color:var(--ink-2); margin:var(--s4) 0 var(--s6); max-width:34ch}
 .fbrand .btn{margin-bottom:var(--s4)}
 .fbot{display:flex; flex-wrap:wrap; gap:var(--s4); justify-content:space-between;
@@ -511,7 +512,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       </a>
       <span class="bar-sep" aria-hidden="true"></span>
       <a class="login" href="/login">Log in</a>
-      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo</span><span class="cta-s">Build demo</span></a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo <em class="beta">(beta)</em></span><span class="cta-s">Build demo <em class="beta">(beta)</em></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
       </button>
@@ -584,7 +585,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <a class="mnav-a" href="#contact">Contact</a>
       <a class="mnav-a" href="/login">Client dashboard</a>
       <div class="mnav-foot">
-        <a class="btn btn-primary" href="/demo/?src=nav">Build your demo</a>
+        <a class="btn btn-primary" href="/demo/?src=nav">Build your demo <em class="beta">(beta)</em></a>
         <a class="btn btn-ghost" href="tel:+13656039234">Sales: (365)&nbsp;603-9234</a>
       </div>
     </div>
@@ -599,7 +600,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <p class="lede">An AI receptionist that answers on your existing number, books
       into your calendar live on the call, and texts you and your caller the details.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="/demo/?src=preview">Build your demo</a>
+        <a class="btn btn-primary" href="/demo/?src=preview">Build your demo <em class="beta">(beta)</em></a>
         <a class="btn btn-ghost" href="tel:+16476921081">Hear the demo line</a>
       </div>
       <p class="fine hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days
@@ -737,7 +738,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <h2 style="color:#fff">Hear it answer <span class="pay">as your business.</span></h2>
       <p>Tell it about your business and talk to it, right in your browser. About
       30 seconds to set up, no call and no signup.</p>
-      <a class="btn btn-primary" href="/demo/?src=preview">Build your demo</a>
+      <a class="btn btn-primary" href="/demo/?src=preview">Build your demo <em class="beta">(beta)</em></a>
     </div>
   </div>
 </section>
@@ -791,9 +792,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <p>Thirty minutes, no slide deck. We will tell you on the call if your call
       volume does not justify it.</p>
       <a class="btn btn-dark" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a 30-minute call</a>
-      <a class="btn btn-ghost" href="/demo/?src=preview">Build your demo instead</a>
+      <a class="btn btn-ghost" href="/demo/?src=preview">Build your demo instead <em class="beta">(beta)</em></a>
       <hr>
-      <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Hear it answer</b><span><span class="adot" aria-hidden="true"></span><a href="tel:+16476921081">(647)&nbsp;692-1081</a><br>Our live demo line, answering right now</span></div></div>
+      <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Hear it answer <span class="adot" aria-hidden="true"></span></b><span><a href="tel:+16476921081">(647)&nbsp;692-1081</a><br>Our live demo line, answering right now</span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Talk to sales</b><span><a href="tel:+13656039234">(365)&nbsp;603-9234</a></span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><div><b>Email</b><span><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z"/></svg></i><div><b>Where we are</b><span>Toronto, Ontario, Canada &mdash; working with businesses wherever they are</span></div></div>
@@ -810,7 +811,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/preview/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
         <p>An AI receptionist that answers on your existing number, books into your
         calendar and texts you the details.</p>
-        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo</a>
+        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo <em class="beta">(beta)</em></a>
         <dl class="fmeta">
           <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &middot; demo line</dd>
           <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
