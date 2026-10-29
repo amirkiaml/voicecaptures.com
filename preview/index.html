@@ -110,26 +110,32 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 @media(min-width:1000px){ .nav{display:flex} .bar-end .login{display:inline} }
 
 /* ---- hero ---- */
-.hero{background:var(--f-blue); padding-top:var(--s16); padding-bottom:0}
+/* Sampled from the artwork: its top and side edges are #EFF4FE, so the field
+   behind it is set to the same value and the picture stops looking like a box
+   pasted onto a panel. It runs full-bleed and its foot is masked into the
+   field, which removes the hard line its darker bottom edge would otherwise
+   draw across the page. */
+.hero{background:#EFF4FE; padding-top:var(--s16); padding-bottom:0}
 .hero-top{text-align:center; max-width:860px; margin:0 auto}
 .hero-top .lede{margin-left:auto; margin-right:auto; text-align:center}
 .hero-cta{display:flex; flex-wrap:wrap; gap:var(--s3); justify-content:center; margin-top:var(--s8)}
 .hero-fine{margin-top:var(--s4); text-align:center}
-.hero-split{display:grid; gap:var(--s8); margin-top:var(--s16); align-items:center;
-  padding-bottom:var(--s24)}
+.hero-split{margin-top:var(--s16)}
+.hero-caps{display:grid; gap:var(--s8); grid-template-columns:1fr;
+  max-width:820px; margin:0 auto}
+@media(min-width:700px){ .hero-caps{grid-template-columns:1fr 1fr; gap:var(--s12)} }
 .cap{text-align:center; max-width:360px; margin:0 auto}
 .cap h3{display:flex; align-items:center; justify-content:center; gap:var(--s2);
   color:var(--wb); margin-bottom:var(--s3)}
 .cap p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2)}
-@media(min-width:900px){
-  /* The phones are the hero asset, so they get the room: the side copy is
-     support, not an equal column. */
-  .hero-split{grid-template-columns:.85fr 2.2fr .85fr; gap:var(--s6)}
-}
+
 
 /* Device frame. Real product screenshots go inside; the frame is CSS so it
    stays sharp and needs no bespoke render. */
-.hero-art{width:100%; max-width:720px; margin:0 auto; border-radius:18px}
+.hero-art{display:block; width:100%; max-width:none; margin:var(--s12) 0 0;
+  border-radius:0;
+  -webkit-mask-image:linear-gradient(180deg,#000 90%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 90%,transparent 100%)}
 .phone{width:min(300px,78vw); margin:0 auto; border-radius:38px;
   background:#0D1729; padding:10px; border:1px solid rgba(255,255,255,.14)}
 .phone-in{border-radius:29px; overflow:hidden; background:#101A2E; aspect-ratio:9/19}
@@ -158,19 +164,6 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 .c-wb{background:var(--f-wb)}     .c-sand{background:var(--f-sand)}
 .c-ink{background:#15213A; color:#fff}
 .c-ink p{color:#C3D0E4}
-/* On the full-width card the heading sat in the left half and left a void to
-   its right, so above 860 the heading and the paragraph share the row. */
-@media(min-width:860px){
-  .span2 .card-head{display:grid; grid-template-columns:1fr 1fr; gap:var(--s8); align-items:start}
-  .span2 .card-head h3{margin-bottom:0}
-  .span2 .card-head p{max-width:none}
-}
-.trades{display:grid; gap:var(--s3); margin-top:var(--s6); grid-template-columns:1fr}
-.trades figure{margin:0}
-.trades img{width:100%; border-radius:12px; aspect-ratio:16/9; object-fit:cover}
-.trades figcaption{margin-top:var(--s2); font-size:13px; font-weight:700; color:var(--ink-2)}
-@media(min-width:620px){ .trades{grid-template-columns:1fr 1fr} }
-@media(min-width:1000px){ .trades{grid-template-columns:repeat(4,1fr)} }
 .badge{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em;
   text-transform:uppercase; padding:5px 11px; border-radius:var(--r-pill);
   background:rgba(13,23,41,.08); color:var(--ink-2); margin-bottom:var(--s3)}
@@ -245,6 +238,7 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 .cstat span{display:block; margin-top:var(--s2); font-size:15px; line-height:22px; font-weight:600; max-width:30ch}
 .cstat cite{display:block; margin-top:var(--s1); font-size:12.5px; font-style:normal; color:var(--muted)}
 .cmid{grid-column:1/-1; text-align:center; margin:var(--s8) 0}
+.cmid p{margin:var(--s4) auto 0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
 .cmid .btn{margin-top:var(--s6)}
 
 @media(min-width:1000px){
@@ -264,9 +258,10 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
   .s1{grid-column:8/10; grid-row:2/4;  text-align:right}
   .s1 span,.s1 cite{margin-left:auto}
   .s2{grid-column:1/4;  grid-row:4/6}
+  .p1{grid-row:1/4} .p2{grid-row:1/4}
   .s3{grid-column:7/10; grid-row:8/10; text-align:right}
   .s3 span,.s3 cite{margin-left:auto}
-  .cmid{grid-column:4/10; grid-row:5/8; align-self:center; margin:0}
+  .cmid{grid-column:4/10; grid-row:4/8; align-self:center; margin:0}
   .cstat b{font-size:clamp(30px,3.4vw,44px)}
   .cstat span{font-size:14px; line-height:20px}
 }
@@ -330,22 +325,23 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
     </div>
 
     <div class="hero-split">
-      <div class="cap">
-        <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>Calls</h3>
-        <p>Answers day or night in your business's name, triages the emergency,
-        and books into your real calendar while the caller is still on the line.</p>
-      </div>
-
-      <img class="hero-art" src="/preview/img/hero-phones.webp" width="1600" height="900"
-           alt="Two phones: the assistant answering a call, and the text conversation where it books the job">
-
-      <div class="cap">
-        <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg>Texts</h3>
-        <p>Sends you the caller's name, number and what they wanted before you
-        pick up the phone, and texts the caller their confirmation.</p>
+      <div class="hero-caps">
+        <div class="cap">
+          <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>Calls</h3>
+          <p>Answers day or night in your business’s name, triages the emergency,
+          and books into your real calendar while the caller is still on the line.</p>
+        </div>
+        <div class="cap">
+          <h3><svg class="spark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg>Texts</h3>
+          <p>Sends you the caller’s name, number and what they wanted before you
+          pick up the phone, and texts the caller their confirmation.</p>
+        </div>
       </div>
     </div>
   </div>
+
+  <img class="hero-art" src="/preview/img/hero-phones.webp" width="1500" height="1165"
+       alt="Two phones: the assistant answering a call, and the text conversation where it books the job">
 </section>
 
 <section class="tl-pin" id="tl-pin" style="padding:0">
@@ -407,26 +403,6 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
           loading="lazy" alt="Past customers flowing into a week of booked callbacks"></div>
       </div>
 
-      <div class="card c-sand span2">
-        <span class="badge badge-live">Available now</span>
-        <div class="card-head">
-          <h3>It knows your trade, <span class="pay">not just your name.</span></h3>
-          <p>A plumber needs to know whether water is on the floor right now. A clinic
-          needs to separate a new patient from an emergency, and must never record a
-          symptom. Those are different assistants, not different greetings.</p>
-        </div>
-        <div class="trades">
-          <figure><img src="/preview/img/trade-home.webp" width="1600" height="900" loading="lazy"
-            alt="A plumber under a sink; the assistant has booked the service visit"><figcaption>Home services &amp; trades</figcaption></figure>
-          <figure><img src="/preview/img/trade-food.webp" width="1600" height="900" loading="lazy"
-            alt="A chef plating; the assistant has taken the reservation"><figcaption>Restaurants &amp; caf&eacute;s</figcaption></figure>
-          <figure><img src="/preview/img/trade-clinic.webp" width="1600" height="900" loading="lazy"
-            alt="A clinician at work; the assistant has rebooked the appointment"><figcaption>Clinics &amp; dental</figcaption></figure>
-          <figure><img src="/preview/img/trade-law.webp" width="1600" height="900" loading="lazy"
-            alt="A lawyer in a meeting; the assistant has scheduled the consultation"><figcaption>Professional services</figcaption></figure>
-        </div>
-      </div>
-
       <div class="card c-blue">
         <span class="badge badge-soon">Coming soon</span>
         <h3>A personal line <span class="pay">for your own phone.</span></h3>
@@ -461,8 +437,11 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
       <div class="cstat s3"><b>$500&ndash;$1,200</b><span>is what one missed service call is worth</span><cite>answeringagent.com, 2026</cite></div>
 
       <div class="cmid">
-        <h2>See what a missed call <span class="pay">is costing you.</span></h2>
-        <a class="btn btn-dark" href="#">Run it on your numbers</a>
+        <h2>It knows your trade, <span class="pay">not just your name.</span></h2>
+        <p>A plumber needs to know whether water is on the floor right now. A clinic
+        needs to separate a new patient from an emergency, and must never record a
+        symptom. Those are different assistants, not different greetings.</p>
+        <a class="btn btn-dark" href="#">See what a missed call is costing you</a>
       </div>
     </div>
   </div>
