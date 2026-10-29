@@ -133,6 +133,18 @@ def check_encoding(raw: bytes, src: str) -> None:
                  "UTF-8, fix those, and run again.")
 
 
+def stamp_assets() -> None:
+    """Write talk.js's content hash into every page that loads it.
+
+    It is served with a long max-age, so without a version in the URL a browser
+    will keep an old copy beside new HTML. That shipped once: the voice panel
+    the hero was meant to replace came back on a live screen.
+    """
+    import stamp
+
+    stamp.stamp(ROOT / "talk.js", sorted(ROOT.glob("**/*.html")))
+
+
 def main():
     if not SRC.exists():
         sys.exit("index.html not found — run this from the site repo root.")
@@ -149,6 +161,8 @@ def main():
     (ROOT / "sitemap.xml").write_text(
         sitemap([m["slug"] for m in PAGES.values()]), encoding="utf-8")
     print("  sitemap.xml")
+    # Last, so every page just written gets the current hash.
+    stamp_assets()
     print(f"\n{len(PAGES)} pages built from index.html.")
 
 

@@ -132,7 +132,7 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
 
 <div class="vc-panel" id="vc-panel" role="dialog" aria-label="Talk to VoiceCaptures" hidden>
   <div class="vc-head">
-    <img src="/preview/img/logo-mark.png" width="512" height="512" alt="">
+    <img src="/img/logo-mark.png" width="512" height="512" alt="">
     <b>Talk to VoiceCaptures</b>
     <button type="button" class="vc-x" id="vc-x" aria-label="Close">&times;</button>
   </div>

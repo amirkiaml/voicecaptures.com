@@ -36,5 +36,5 @@ def stamp(asset: pathlib.Path, pages) -> int:
 if __name__ == "__main__":
     pages = sorted(ROOT.glob("**/*.html"))
     pages = [p for p in pages if "node_modules" not in p.parts]
-    n = stamp(ROOT / "preview" / ASSET, pages)
+    n = stamp(ROOT / ASSET, pages)
     print(f"stamp: talk.js hash written into {n} page(s)")
