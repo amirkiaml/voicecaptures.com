@@ -102,6 +102,26 @@ const CSS = `/* ---- talk-to-it widget ----
 .vc-hero:hover .vc-orb{filter:brightness(1.05)}
 .vc-hero:hover .vc-hero-lbl{color:var(--blue-dk)}
 .vc-hero:focus-visible{outline:2px solid var(--blue); outline-offset:6px; border-radius:20px}
+/* While the call runs the hero says what is happening where the prompt was —
+   the page does not grow a dialog around it. */
+.vc-hero-live{display:none}
+.vc-hero.is-calling .vc-hero-lbl, .vc-hero.is-calling .vc-hero-can{display:none}
+.vc-hero.is-calling .vc-hero-live{display:block}
+.vc-hero-state{display:inline-flex; align-items:center; gap:8px; font-size:15px;
+  font-weight:700; color:var(--blue); min-height:22px}
+.vc-hero-state::before{content:""; width:7px; height:7px; border-radius:50%;
+  background:var(--cyan); animation:adot 1.9s ease-in-out infinite}
+/* One line at a time, and it goes on its own. A transcript that piles up turns
+   the hero into a log; this is just proof it heard you. */
+.vc-hero-line{display:block; max-width:40ch; margin:6px auto 0; min-height:38px;
+  font-size:14.5px; line-height:19px; color:var(--muted);
+  opacity:0; transition:opacity .5s ease}
+.vc-hero-line.in{opacity:1}
+.vc-hero-line b{color:var(--ink-2); font-weight:700}
+@media(prefers-reduced-motion:reduce){
+  .vc-hero-state::before{animation:none}
+  .vc-hero-line{transition:none}
+}
 @media(prefers-reduced-motion:reduce){ .vc-hero-lbl::before{animation:none} }
 `;
 
@@ -175,7 +195,11 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
 
   let vapi = null, live = false, timer = null, left = 0;
 
-  const say = (t, s) => { state.textContent = t; if (s !== undefined) sub.textContent = s; };
+  const say = (t, s) => {
+    state.textContent = t;
+    if (s !== undefined) sub.textContent = s;
+    if (inline) heroSay(t);
+  };
   const used = () => +(sessionStorage.getItem("vc-calls") || 0);
 
   function openPanel(open){
@@ -187,16 +211,58 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
 
   // Any element with data-vc-talk opens the panel; data-vc-talk="start" also
   // starts the call, because the click is the gesture the mic prompt needs.
-  window.vcTalk = function(autostart){
+  // The hero orb IS the control: it runs the call where it stands, so clicking
+  // it does not grow a dialog over the page. Everything else opens the panel.
+  const hero     = document.querySelector(".vc-hero");
+  const heroState= document.getElementById("vc-hero-state");
+  const heroLine = document.getElementById("vc-hero-line");
+  let inline = false;
+
+  window.vcTalk = function(autostart, inPlace){
+    if (inPlace) {
+      inline = true;
+      if (live) { stop(); return; }
+      // On the CLICK, not on call-start: if the call never connects, the hero
+      // still has somewhere to say so. Anything that ends the attempt — the
+      // error path, stop(), call-end — takes it back out.
+      heroCalling(true);
+      heroSay("Connecting\u2026");
+      start();
+      return;
+    }
+    inline = false;
     openPanel(true);
     if (autostart && !live) start();
   };
   document.querySelectorAll("[data-vc-talk]").forEach((el) => {
     el.addEventListener("click", (e) => {
       e.stopPropagation();
-      window.vcTalk(el.getAttribute("data-vc-talk") === "start");
+      const mode = el.getAttribute("data-vc-talk");
+      window.vcTalk(mode === "start", el === hero);
     });
   });
+
+  // Where the words and the status go: the hero while it is the one talking,
+  // the panel otherwise. One function, so neither surface can be left stale.
+  let fade = null;
+  function heroSay(t){ if (heroState) heroState.textContent = t; }
+  function heroLineSet(role, text){
+    if (!heroLine) return;
+    heroLine.innerHTML = "";
+    const b = document.createElement("b");
+    b.textContent = role === "user" ? "You: " : "";
+    heroLine.appendChild(b);
+    heroLine.appendChild(document.createTextNode(text));
+    heroLine.classList.add("in");
+    clearTimeout(fade);
+    // Long enough to read, short enough that it is gone before the next one.
+    fade = setTimeout(() => heroLine.classList.remove("in"), 4200);
+  }
+  function heroCalling(on){
+    if (!hero) return;
+    hero.classList.toggle("is-calling", on);
+    if (!on && heroLine) { clearTimeout(fade); heroLine.classList.remove("in"); heroLine.textContent = ""; }
+  }
   close.addEventListener("click", () => { openPanel(false); if (live) stop(); });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !panel.hidden) { openPanel(false); if (live) stop(); }
@@ -266,12 +332,19 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
         });
         vapi.on("call-end", () => {
           live = false; go.disabled = false; go.textContent = "Start talking";
-          clearInterval(timer); speaking(false);
+          clearInterval(timer); speaking(false); heroCalling(false);
           if (!/limit/.test(state.textContent)) say("Call ended", "Start another, or call the line.");
         });
         vapi.on("speech-start", () => { speaking(true); say("Speaking", ""); });
         vapi.on("speech-end", () => { speaking(false); say("Listening", "Go ahead."); });
         vapi.on("volume-level", beat);
+        // The transcript is back, but it never accumulates: one finished line at
+        // a time under the hero, which fades on its own.
+        vapi.on("message", (m) => {
+          if (!inline) return;
+          if (m && m.type === "transcript" && m.transcriptType === "final" && m.transcript)
+            heroLineSet(m.role, m.transcript);
+        });
         vapi.on("error", (e) => {
           live = false; go.disabled = false; go.textContent = "Start talking";
           clearInterval(timer); speaking(false);
@@ -287,12 +360,20 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
       say(denied ? "Microphone blocked" : "That did not connect",
           denied ? "Allow the mic in your browser, or call the line."
                  : ((err && err.message) || "Call (365) 603-9234 instead."));
+      if (inline) {
+        // The hero has no second line to explain itself in, so the reason goes
+        // where the transcript would, and the orb comes back out of its call.
+        heroLineSet("assistant", denied
+          ? "Allow the microphone in your browser, or call (365) 603-9234."
+          : "It could not connect just now. Call (365) 603-9234 instead.");
+        setTimeout(() => heroCalling(false), 4600);
+      }
       console.error("vapi start failed:", err);
     }
   }
 
   function stop(){
-    clearInterval(timer); speaking(false);
+    clearInterval(timer); speaking(false); heroCalling(false);
     try { if (vapi) vapi.stop(); } catch (e) {}
     live = false; go.disabled = false; go.textContent = "Start talking";
   }
