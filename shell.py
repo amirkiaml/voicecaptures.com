@@ -117,6 +117,57 @@ def parts() -> dict:
 
 
 
+
+TYPE_CSS = """
+/* ---- one typographic system ---------------------------------------------
+   The ported bodies were written against a sheet with its own scale: 15.5px
+   copy on a 24px line, h1 at 30px, and a .wrap with NO side padding, which
+   put body text hard against the edge of a phone. These bring the whole
+   ported layer onto the home page's scale, so a reader cannot tell which
+   pages were carried over.
+
+   Anything a later block sets — the pricing cards, the FAQ list — still wins,
+   because this comes first. */
+.ported .wrap{max-width:var(--rail); padding-left:var(--s6);
+  padding-right:var(--s6)}
+.ported .wrap.doc, .ported .doc{max-width:760px}
+
+/* The same clamp the home page's h1 uses, so a heading is the same size
+   whichever page a phone lands on. */
+.ported h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04;
+  letter-spacing:normal; margin-bottom:var(--s4)}
+.ported h2{font-size:clamp(26px,3.4vw,38px); line-height:1.12;
+  letter-spacing:normal}
+.ported h3{font-size:19px; line-height:26px; letter-spacing:normal}
+
+.ported p, .ported li{font-size:17px; line-height:27px; color:var(--ink-2)}
+.ported .lede{font-size:18px; line-height:28px; color:var(--muted)}
+.ported .sub{font-size:17px; line-height:27px; color:var(--muted)}
+.ported .fine, .ported .note, .ported small{font-size:13.5px; line-height:20px;
+  color:var(--muted)}
+.ported .eyebrow{font-size:12.5px; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--wb)}
+
+.ported .doc h2{margin-top:var(--s12); margin-bottom:var(--s4)}
+.ported .doc h3{margin-top:var(--s8); margin-bottom:var(--s3)}
+.ported .doc p, .ported .doc li{margin-bottom:var(--s4)}
+.ported .doc ul, .ported .doc ol{padding-left:22px}
+.ported .doc a{color:var(--blue); font-weight:600}
+
+/* Buttons were 15px on a 40px box; the home page's are 16px on a 48px pill. */
+.ported .btn{font-size:16px; font-weight:700; min-height:48px;
+  border-radius:var(--r-pill); padding:0 22px; display:inline-flex;
+  align-items:center; justify-content:center; gap:8px}
+.ported .btn-ghost{background:#fff; color:var(--blue);
+  border:1px solid color-mix(in srgb, var(--blue) 34%, transparent)}
+.ported .btn-ghost:hover{background:var(--f-blue)}
+.ported .btn-dark{background:var(--ink); color:#fff; border:1px solid var(--ink)}
+@media(max-width:560px){
+  .ported .btn{width:100%}
+  .ported .btns .btn + .btn{margin-top:var(--s3)}
+}
+"""
+
 PRICING_CSS = """
 /* ---- pricing cards, in the main page's system ------------------------- */
 .ported .pr-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
@@ -154,6 +205,8 @@ PRICING_CSS = """
 .ported .pr-card .btn{margin-top:auto; width:100%; justify-content:center}
 .ported .pr-sub{text-align:center; font-size:16px; color:var(--muted);
   margin:var(--s2) 0 0}
+@media(min-width:860px){ .ported .pr-grid-2{grid-template-columns:repeat(2,1fr);
+  max-width:880px; margin-left:auto; margin-right:auto} }
 .ported .pr-vnote{margin-top:var(--s6); text-align:center}
 .ported .pr-grid + .pr-vnote{text-align:center}
 .ported [id^="p-"] > .wrap > h2{text-align:center}
@@ -171,10 +224,9 @@ PRICING_CSS = """
   background:none; box-shadow:none;
   font-family:'Instrument Serif',Georgia,serif; font-style:italic;
   font-weight:400; letter-spacing:.005em}
-.ported .faq-page{padding:var(--s16) 0 var(--s24)}
+.ported .faq-page{padding:var(--s16) var(--s6) var(--s24)}
 .ported .faq-top{max-width:720px; margin:0 auto var(--s16); text-align:center}
-.ported .faq-top h1{font-size:clamp(34px,4.6vw,52px); line-height:1.06;
-  margin:var(--s3) 0 var(--s4)}
+.ported .faq-top h1{margin:var(--s3) 0 var(--s4)}
 .ported .faq-top .lede{margin-left:auto; margin-right:auto}
 .ported .faq-g{max-width:760px; margin:0 auto var(--s12)}
 .ported .faq-g h2{font-size:14px; font-weight:800; letter-spacing:.1em;
@@ -266,6 +318,8 @@ def build(old_css: str) -> str:
         # The pricing cards are written against the NEW tokens, not carried:
         # they are the page people compare prices on, so they match the rest of
         # the site rather than the stylesheet they came from.
+        # Typography first, cards after, so the cards' own sizes win.
+        + TYPE_CSS
         + PRICING_CSS
         + "\n.ported *{min-width:0}"
         + "\n.ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}"

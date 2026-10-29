@@ -2374,7 +2374,7 @@ def _pricing_body():
       <a href="#p-home">Home services</a><a href="#p-food">Restaurants</a>
       <a href="#p-clinic">Clinics</a><a href="#p-other">Other</a>
       <a href="#p-personal">Personal</a><a href="#p-term">Prepaid</a>
-      <a href="#p-extra">Extras</a><a href="#p-wb">Win-back</a>
+      <a href="#p-multi">Multi-location</a><a href="#p-extra">Extras</a><a href="#p-wb">Win-back</a>
     </div>
   </div>
 </section>
@@ -2387,6 +2387,43 @@ def _pricing_body():
   </div>
 </section>
 {verts}
+<section id="p-multi" class="alt">
+  <div class="wrap">
+    <h2>More than one location, or something we have to build</h2>
+    <p class="sub">Two paths out of the plans above. Both are quoted on a call,
+    and both come back as one number &mdash; not a range.</p>
+    <div class="pr-grid pr-grid-2">
+      <div class="pr-card">
+        <div class="pr-top"><h3>Multi-location</h3></div>
+        <p class="pr-price">From $549<em>/mo per location</em></p>
+        <p class="pr-min">Up to 500 minutes per location</p>
+        <ul class="pr-feat">
+          <li>Everything in Pro, at every location</li>
+          <li>One account and one bill, however many lines</li>
+          <li>Per-location greetings, hours and calendars</li>
+          <li>Setup for all of them &mdash; $249 one-time</li>
+        </ul>
+        <p class="pr-note">The free trial covers one location; the rest go live
+        on the paid plan.</p>
+        <a class="btn btn-primary" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
+      </div>
+      <div class="pr-card">
+        <div class="pr-top"><h3>Custom build</h3></div>
+        <p class="pr-price">From $500<em> + $39/mo</em></p>
+        <p class="pr-min">Quoted on your software and your call flow</p>
+        <ul class="pr-feat">
+          <li>Practice management, field service, a POS or a CRM, written into the call</li>
+          <li>Call flows that do not fit a plan &mdash; triage rules, multi-step transfers</li>
+          <li>A build you own outright, if you would rather not rent it</li>
+        </ul>
+        <p class="pr-note">We scope it on the call and send one price for
+        everything, before any work starts.</p>
+        <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="p-personal" class="alt">
   <div class="wrap">
     <h2>Personal line</h2>
