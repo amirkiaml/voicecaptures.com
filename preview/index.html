@@ -110,6 +110,38 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
   color:var(--ink); text-decoration:none; white-space:nowrap; padding:10px 4px; min-height:44px}
 .sales:hover{color:var(--blue)}
 .sales svg{width:15px; height:15px; color:var(--blue)}
+
+/* Search. Everything here is static, so the index is built in the page and
+   the match runs in the browser — no service, nothing to go down. */
+.srch-btn{display:none; align-items:center; justify-content:center; width:44px;
+  height:44px; border:0; background:none; cursor:pointer; color:var(--ink);
+  border-radius:var(--r-pill)}
+.srch-btn:hover{background:var(--bg-soft); color:var(--blue)}
+.srch-btn svg{width:19px; height:19px}
+@media(min-width:1200px){ .srch-btn{display:inline-flex} }
+.srch{position:absolute; left:0; right:0; top:100%; background:#fff;
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.srch[hidden]{display:none}
+.srch-in{max-width:760px; margin:0 auto; padding:var(--s6)}
+.srch-field{display:flex; align-items:center; gap:var(--s3);
+  border:1px solid var(--line); border-radius:var(--r-pill); padding:0 var(--s4);
+  background:var(--bg-soft)}
+.srch-field:focus-within{border-color:var(--blue);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 16%,transparent)}
+.srch-field svg{width:18px; height:18px; color:var(--faint); flex:0 0 auto}
+.srch-field input{flex:1; min-width:0; border:0; background:none; outline:none;
+  font:inherit; font-size:16px; color:var(--ink); min-height:48px}
+.srch-res{list-style:none; margin:var(--s4) 0 0; padding:0; max-height:46vh;
+  overflow-y:auto}
+.srch-res li+li{margin-top:2px}
+.srch-res a{display:block; padding:10px var(--s4); border-radius:12px;
+  text-decoration:none; color:var(--ink)}
+.srch-res a:hover, .srch-res a:focus-visible, .srch-res .on a{background:var(--f-blue)}
+.srch-res b{display:block; font-size:15.5px; font-weight:700}
+.srch-res span{display:block; font-size:13.5px; line-height:19px; color:var(--muted)}
+.srch-none{margin:var(--s4) 0 0; font-size:14px; color:var(--muted); padding:0 var(--s4)}
+.srch-hint{margin:var(--s3) 0 0; font-size:12.5px; color:var(--faint); padding:0 var(--s4)}
+.mnav-srch{margin-bottom:var(--s4)}
 /* The bar's Log in link is gone — /login is one tap away as "Client
    dashboard" in the Company menu and the mobile panel — and the rail is 1280,
    which is what lets brand, nav, sales and the CTA sit together from 1200. */
@@ -466,6 +498,10 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
         <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
       </a>
+      <button type="button" class="srch-btn" id="srch-btn" aria-label="Search"
+              aria-expanded="false" aria-controls="srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
       <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
@@ -522,8 +558,27 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     </div>
   </div>
 
+  <div class="srch" id="srch" hidden>
+    <div class="srch-in">
+      <div class="srch-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="srch-q" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search pricing, win-back, your trade&hellip;"
+               aria-label="Search the site" aria-controls="srch-res">
+      </div>
+      <ul class="srch-res" id="srch-res" role="listbox" aria-label="Results"></ul>
+      <p class="srch-hint">Up and down to move, Enter to open, Esc to close.</p>
+    </div>
+  </div>
+
   <div class="mnav" id="mnav" hidden>
     <div class="mnav-in">
+      <div class="srch-field mnav-srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="srch-qm" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search&hellip;" aria-label="Search the site">
+      </div>
+      <ul class="srch-res" id="srch-resm" role="listbox" aria-label="Results"></ul>
       <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a" href="/home-services/">Home services &amp; trades</a>
       <a class="mnav-a" href="/restaurants-cafes/">Restaurants &amp; caf&eacute;s</a>
@@ -959,6 +1014,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     panel.hidden = true;
     burger.setAttribute("aria-expanded","false");
   }
+  // The search panel is not a mega panel — it must survive a mouseleave while
+  // someone is typing — so it closes through its own hook instead.
+  window.closeNavPanels = function(){ closeMegas(null); closeMobile(); };
 
   triggers.forEach(function(t){
     var m = document.getElementById(t.getAttribute("aria-controls"));
@@ -966,6 +1024,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       e.stopPropagation();
       var open = t.getAttribute("aria-expanded") === "true";
       closeMegas(t); closeMobile();
+      if (window.closeSearch) window.closeSearch();
       t.setAttribute("aria-expanded", open ? "false" : "true");
       m.hidden = open;
     });
@@ -1000,13 +1059,140 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   }
 
   document.addEventListener("click", function(e){
-    if (!header.contains(e.target)) { closeMegas(null); closeMobile(); }
+    if (!header.contains(e.target)) {
+      closeMegas(null); closeMobile();
+      if (window.closeSearch) window.closeSearch();
+    }
   });
   document.addEventListener("keydown", function(e){
     if (e.key !== "Escape") return;
     var open = triggers.filter(function(t){ return t.getAttribute("aria-expanded") === "true"; })[0];
     closeMegas(null); closeMobile();
+    if (window.closeSearch) window.closeSearch();
     if (open) open.focus();
+  });
+})();
+
+/* ---- search -------------------------------------------------------------
+   A static site has nowhere to run a query, so the index lives here. Every
+   entry points at a route that exists; nothing is listed that we cannot open. */
+(function(){
+  "use strict";
+  var IX = [
+    ["AI receptionist", "/preview/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone calls missed call after hours voicemail"],
+    ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price cost plans tiers minutes overage packs billing cheap how much"],
+    ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "reactivation outbound lapsed dormant past customers campaign list"],
+    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo try test free trial build assistant beta"],
+    ["Home services and trades", "/home-services/", "Plumbing, HVAC, electrical, roofing, landscaping and the rest.", "plumber hvac electrician roofer contractor trades handyman emergency"],
+    ["Restaurants and cafes", "/restaurants-cafes/", "Reservations, hours and takeout questions, answered during the rush.", "restaurant cafe bar bakery reservations takeout bookings food"],
+    ["Clinics and dental", "/clinics-dental/", "Appointments and triage for dental, medical and health practices.", "clinic dental dentist medical doctor physio vet health appointments patients"],
+    ["Any other business", "/other-businesses/", "Salons, spas, fitness, legal, real estate, consulting and more.", "salon spa fitness gym legal lawyer real estate consulting office"],
+    ["Personal line", "/personal/", "A second number that screens your calls and texts you what matters.", "personal line screening second number spam robocall"],
+    ["Contact", "/preview/#contact", "One form, and we come back within a day.", "contact form talk book call email sales phone number get in touch"],
+    ["About", "/about/", "Who we are and how we build.", "about company who team story"],
+    ["Careers", "/careers/", "Part-time sales and marketing, Toronto and remote.", "careers jobs hiring roles work sdr sales marketing"],
+    ["Client dashboard", "/login/", "Your calls, transcripts and minutes.", "login log in sign in dashboard account portal minutes usage"],
+    ["Privacy", "/privacy/", "What we collect, who processes it, and how long it is kept.", "privacy data retention gdpr pipeda subprocessors security breach"],
+    ["Terms", "/terms/", "The terms the service runs under.", "terms conditions contract agreement legal sla outage"]
+  ];
+
+  var btn = document.getElementById("srch-btn"),
+      pan = document.getElementById("srch"),
+      q   = document.getElementById("srch-q"),
+      res = document.getElementById("srch-res"),
+      qm  = document.getElementById("srch-qm"),
+      resm= document.getElementById("srch-resm");
+  if (!btn || !pan) return;
+
+  // Spaces and hyphens are the thing people get wrong — "winback", "win back",
+  // "home services" — so everything is matched flattened as well as as typed.
+  function flat(x){ return x.replace(/[^a-z0-9]/g, ""); }
+  function score(e, t){
+    var title = e[0].toLowerCase(), blurb = e[2].toLowerCase(), keys = e[3];
+    if (title.indexOf(t) === 0) return 100;
+    if (title.indexOf(t) > -1) return 70;
+    if ((" " + keys).indexOf(" " + t) > -1) return 50;
+    if (keys.indexOf(t) > -1) return 35;
+    if (blurb.indexOf(t) > -1) return 20;
+    var f = flat(t);
+    if (f.length > 2) {
+      if (flat(title).indexOf(f) > -1) return 60;
+      if (flat(keys).indexOf(f) > -1) return 30;
+    }
+    return 0;
+  }
+  function find(term){
+    var t = term.trim().toLowerCase();
+    if (!t) return IX.slice(0, 6);
+    return IX.map(function(e){ return [score(e, t), e]; })
+             .filter(function(r){ return r[0] > 0; })
+             .sort(function(a, b){ return b[0] - a[0]; })
+             .map(function(r){ return r[1]; }).slice(0, 8);
+  }
+  function draw(list, box, term){
+    box.innerHTML = "";
+    if (!list.length) {
+      var p = document.createElement("p");
+      p.className = "srch-none";
+      p.textContent = "Nothing matches “" + term.trim() + "”. Try pricing, win-back, or your trade.";
+      box.appendChild(p);
+      return;
+    }
+    list.forEach(function(e, i){
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      if (i === 0) li.className = "on";
+      var a = document.createElement("a");
+      a.href = e[1];
+      var b = document.createElement("b"); b.textContent = e[0];
+      var sp = document.createElement("span"); sp.textContent = e[2];
+      a.appendChild(b); a.appendChild(sp); li.appendChild(a); box.appendChild(li);
+    });
+  }
+  function move(box, step){
+    var items = box.querySelectorAll("li");
+    if (!items.length) return;
+    var cur = box.querySelector("li.on"), i = cur ? [].indexOf.call(items, cur) : -1;
+    i = (i + step + items.length) % items.length;
+    if (cur) cur.className = "";
+    items[i].className = "on";
+    items[i].scrollIntoView({ block: "nearest" });
+  }
+  function keys(input, box){
+    input.addEventListener("input", function(){ draw(find(input.value), box, input.value); });
+    input.addEventListener("keydown", function(e){
+      if (e.key === "ArrowDown") { e.preventDefault(); move(box, 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(box, -1); }
+      else if (e.key === "Enter") {
+        var on = box.querySelector("li.on a");
+        if (on) { e.preventDefault(); window.location.href = on.getAttribute("href"); }
+      }
+    });
+  }
+  keys(q, res);
+  if (qm && resm) { keys(qm, resm); draw(find(""), resm, ""); }
+
+  window.closeSearch = function(){
+    pan.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  };
+  btn.addEventListener("click", function(e){
+    e.stopPropagation();
+    var open = !pan.hidden;
+    if (window.closeNavPanels) window.closeNavPanels();
+    pan.hidden = open;
+    btn.setAttribute("aria-expanded", open ? "false" : "true");
+    if (!open) { draw(find(q.value), res, q.value); q.focus(); q.select(); }
+  });
+  pan.addEventListener("click", function(e){ e.stopPropagation(); });
+  // "/" focuses search the way it does on the reference, unless the caret is
+  // already in a field.
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "/" || e.metaKey || e.ctrlKey) return;
+    var t = e.target.tagName;
+    if (t === "INPUT" || t === "TEXTAREA" || t === "SELECT" || e.target.isContentEditable) return;
+    if (window.innerWidth < 1200) return;
+    e.preventDefault(); btn.click();
   });
 })();
 </script>
