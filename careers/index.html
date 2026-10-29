@@ -79,7 +79,10 @@ h1{font-size:clamp(38px,5.4vw,60px); line-height:1.04}
 h2{font-size:clamp(28px,3.4vw,40px); line-height:1.12}
 h3{font-size:20px; line-height:28px}
 /* The headline device: sans sets it up, serif italic pays it off. */
-.pay{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
+/* The accent phrase. Only ever used inside a heading, and scoped to one on
+   purpose: a bare .pay also matches the payment-option cards on /win-back/,
+   whose whole block this rule set in italic serif. */
+h1 .pay, h2 .pay, h3 .pay{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
      font-weight:400; letter-spacing:.005em}
 h1 .pay{font-size:1.04em}
 
@@ -431,41 +434,40 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
    Below 1000 it is an ordinary two-column grid with the stats stacked under
    it; the scattered arrangement only happens where there is room for it. */
 .collage-sec{overflow:hidden}
+/* The three figures sit under the photographs rather than inside the grid
+   with them: a free cell is only free until a photo's span changes, and
+   placing them by hand had them land on top of one. */
+.cstats{display:grid; grid-template-columns:1fr; gap:var(--s8);
+  max-width:1060px; margin:var(--s12) auto 0; text-align:center}
+@media(min-width:760px){ .cstats{grid-template-columns:repeat(3,1fr); gap:var(--s6)} }
+.cstats .cstat{grid-column:auto; text-align:center}
+.cstats .cstat span,.cstats .cstat cite{margin-left:auto; margin-right:auto}
 .collage{display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); align-items:start}
 .ph{margin:0; border-radius:18px; overflow:hidden; background:var(--bg-soft); aspect-ratio:4/5}
 .ph img{width:100%; height:100%; object-fit:cover}
 .ph .slot{height:100%; border-radius:18px; font-size:12px; font-weight:700;
   color:var(--muted); text-align:center}
-.cstat{grid-column:1/-1}
 .cstat b{display:block; font-size:clamp(38px,6vw,54px); line-height:1; font-weight:800;
   color:var(--wb); letter-spacing:normal}
 .cstat span{display:block; margin-top:var(--s2); font-size:15px; line-height:22px; font-weight:600; max-width:30ch}
 .cstat cite{display:block; margin-top:var(--s1); font-size:12.5px; font-style:normal; color:var(--muted)}
-.cmid{grid-column:1/-1; text-align:center; margin:var(--s8) 0}
-.cmid p{margin:var(--s4) auto 0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
-.cmid .btn{margin-top:var(--s6)}
 
 @media(min-width:1000px){
   /* Placed on an explicit 12x10 grid rather than by percentage offsets: the
      scatter is deliberate, but no two pieces can land on each other, which is
      exactly what the percentage version kept doing to the centre block. */
-  .collage{grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(10,1fr);
-    aspect-ratio:16/12; max-width:1060px; margin:0 auto; gap:var(--s4)}
+  .collage{grid-template-columns:repeat(12,1fr); grid-template-rows:repeat(7,1fr);
+    aspect-ratio:16/9; max-width:1060px; margin:0 auto; gap:var(--s4)}
   .ph{aspect-ratio:auto; height:100%; width:100%}
-  .p1{grid-column:5/8;  grid-row:1/4}
-  .p2{grid-column:2/5;  grid-row:1/4}
-  .p3{grid-column:10/13; grid-row:3/6}
-  .p4{grid-column:1/4;  grid-row:6/10}
-  .p5{grid-column:4/7;  grid-row:8/11}
-  .p6{grid-column:10/13; grid-row:7/11}
-  .cstat{align-self:center}
-  .s1{grid-column:8/10; grid-row:2/4;  text-align:right}
-  .s1 span,.s1 cite{margin-left:auto}
-  .s2{grid-column:1/4;  grid-row:4/6}
-  .p1{grid-row:1/4} .p2{grid-row:1/4}
-  .s3{grid-column:7/10; grid-row:8/10; text-align:right}
-  .s3 span,.s3 cite{margin-left:auto}
-  .cmid{grid-column:4/10; grid-row:4/8; align-self:center; margin:0}
+  /* Six photographs, scattered but interlocking. The figures used to hold the
+     middle open; with them moved below, the grid closes up to 7 rows so the
+     band is a collage rather than a ring around an empty centre. */
+  .p1{grid-column:5/9;  grid-row:1/4}
+  .p2{grid-column:1/5;  grid-row:2/5}
+  .p3{grid-column:9/13; grid-row:2/5}
+  .p4{grid-column:2/6;  grid-row:5/8}
+  .p5{grid-column:6/9;  grid-row:4/7}
+  .p6{grid-column:9/13; grid-row:5/8}
   .cstat b{font-size:clamp(30px,3.4vw,44px)}
   .cstat span{font-size:14px; line-height:20px}
 }
@@ -1067,8 +1069,14 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .sub{font-size:17px; line-height:27px; color:var(--muted)}
 .ported .fine, .ported .note, .ported small{font-size:13.5px; line-height:20px;
   color:var(--muted)}
-.ported .eyebrow{font-size:12.5px; font-weight:800; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--wb)}
+/* The home page's eyebrow exactly: 13px, sentence case, no tracking. The
+   carried-over pages had it uppercase with wide tracking, and inside .doc it
+   inherited the body size and came out at 15.5px. */
+.ported .eyebrow{display:inline-flex; align-items:center; gap:var(--s2);
+  font-size:13px; font-weight:700; letter-spacing:normal; text-transform:none;
+  color:var(--wb); margin:0 0 var(--s4)}
+.ported .doc .eyebrow{font-size:13px}
+.ported .eyebrow .spark{width:14px; height:14px; flex:0 0 auto}
 
 .ported .doc h2{margin-top:var(--s12); margin-bottom:var(--s4)}
 .ported .doc h3{margin-top:var(--s8); margin-bottom:var(--s3)}
@@ -1131,6 +1139,34 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pr-grid + .pr-vnote{text-align:center}
 .ported [id^="p-"] > .wrap > h2{text-align:center}
 
+/* ---- the demo page ---------------------------------------------------- */
+.ported .demo-hero{padding-top:var(--s16)}
+.ported .demo-in{max-width:720px}
+.ported .demo-cta-row{display:flex; flex-wrap:wrap; gap:var(--s3);
+  margin-top:var(--s8)}
+.ported .demo-call{margin-top:var(--s4)}
+.ported .demo-steps{counter-reset:step; list-style:none; padding:0;
+  max-width:760px; margin:var(--s12) auto 0; display:grid; gap:var(--s8)}
+.ported .demo-steps li{position:relative; padding-left:60px; margin:0}
+.ported .demo-steps li::before{counter-increment:step; content:counter(step,decimal-leading-zero);
+  position:absolute; left:0; top:2px; font-size:13px; font-weight:800;
+  letter-spacing:.06em; color:var(--blue); background:var(--f-blue);
+  border-radius:var(--r-pill); padding:7px 12px}
+.ported .demo-steps b{display:block; font-size:19px; line-height:26px;
+  color:var(--ink)}
+.ported .demo-steps span{display:block; margin-top:6px; font-size:16px;
+  line-height:25px; color:var(--ink-2)}
+.ported .demo-try{display:grid; grid-template-columns:1fr; gap:var(--s4);
+  max-width:900px; margin:var(--s8) auto 0}
+@media(min-width:760px){ .ported .demo-try{grid-template-columns:1fr 1fr} }
+.ported .demo-try > div{background:#fff; border:1px solid var(--line);
+  border-radius:var(--r-card); padding:var(--s6)}
+.ported .demo-try b{display:block; font-size:17px; color:var(--ink)}
+.ported .demo-try span{display:block; margin-top:6px; font-size:15.5px;
+  line-height:24px; color:var(--ink-2)}
+.ported .demo-after{max-width:720px}
+.ported .demo-after p{margin-bottom:var(--s4)}
+
 /* ---- the FAQ page ----------------------------------------------------- */
 /* The old sheet puts a "+" marker on every summary and a dark translucent
    background on the bare <header> tag. Both are its own site chrome, and both
@@ -1138,9 +1174,18 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .faq-list summary::before{content:none}
 .ported .faq-top{background:none; position:static; backdrop-filter:none;
   border:0; padding:0}
-/* The old sheet gives a bare .pay span a bordered, padded card box. In this
-   system .pay is just the serif accent phrase inside a heading. */
-.ported .pay{display:inline; border:0; padding:0; border-radius:0;
+/* In this system .pay is the serif accent phrase inside a heading. In the OLD
+   sheet .pay is a payment-option CARD — which is why an unqualified rule here
+   set the whole of /win-back/'s "Choose how you pay" block in italic serif.
+   Only a .pay inside a heading is the accent phrase. */
+/* .hl is what the carried-over pages call the accent phrase; .pay is what this
+   system calls it. Same thing, so they render the same — one heading pattern
+   across the site rather than a serif italic on some pages and plain blue on
+   others. */
+.ported h1 .pay, .ported h2 .pay, .ported h3 .pay,
+.ported h1 .hl,  .ported h2 .hl,  .ported h3 .hl{
+  color:var(--ink);
+  display:inline; border:0; padding:0; border-radius:0;
   background:none; box-shadow:none;
   font-family:'Instrument Serif',Georgia,serif; font-style:italic;
   font-weight:400; letter-spacing:.005em}
@@ -1333,7 +1378,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 
 <section>
   <div class="wrap">
-    <p class="eyebrow">Careers</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Careers</p>
     <h1>Build with <span class="hl">VoiceCaptures</span></h1>
     <p class="lede">We're building AI voice systems that help businesses answer
     every call, qualify customers, and capture more opportunities.</p>

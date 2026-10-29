@@ -756,7 +756,7 @@ SHELL = shell.build(OLD_BODY_CSS)
 ABOUT_BODY = f"""
 <section>
   <div class="wrap">
-    <p class="eyebrow">About us</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>About us</p>
     <h1>Every call answered. <span class="hl">Every lead captured.</span></h1>
     <p class="lede">VoiceCaptures builds AI voice assistants that answer the phone
     for small and mid-sized businesses, wherever they are &mdash; so the calls
@@ -978,7 +978,7 @@ MKT = role_block(
 CAREERS_BODY = f"""
 <section>
   <div class="wrap">
-    <p class="eyebrow">Careers</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Careers</p>
     <h1>Build with <span class="hl">VoiceCaptures</span></h1>
     <p class="lede">We're building AI voice systems that help businesses answer
     every call, qualify customers, and capture more opportunities.</p>
@@ -1289,7 +1289,7 @@ WINBACK_BODY = f"""
 
 <section class="wb-hero">
   <div class="wrap">
-    <p class="eyebrow">Outbound campaigns</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Outbound campaigns</p>
     <h1>Send us the customers you haven&rsquo;t seen in a year.<br>
     <span class="hl">We call them and book them back in.</span></h1>
     <p class="lede">One flat price per campaign, or own the system outright.</p>
@@ -1807,7 +1807,8 @@ WINBACK_SCRIPT = """
 # ------------------------------------------------------------ legal text ----
 
 PRIVACY_BODY = f"""<main class="wrap doc">
-<h1>Privacy Policy</h1>
+<p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Legal</p>
+<h1>Privacy <span class="pay">policy.</span></h1>
 <p class="updated">Last updated: {PRIVACY_UPDATED}</p>
 
 <p class="intro"><strong>{BRAND}</strong> is a registered business based in
@@ -1934,7 +1935,8 @@ when you called. We will reply within 30 days.</p>
 """
 
 TERMS_BODY = f"""<main class="wrap doc">
-<h1>Terms of Service</h1>
+<p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Legal</p>
+<h1>Terms <span class="pay">of service.</span></h1>
 <p class="updated">Last updated: {TERMS_UPDATED}</p>
 
 <p class="intro">These terms cover your <strong>{BRAND}</strong> subscription and
@@ -2144,7 +2146,7 @@ that apply there.</p>
 CONTACT_BODY = f"""
 <section class="hero">
   <div class="wrap">
-    <p class="eyebrow">Contact</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Contact</p>
     <h1>Tell us what you <span class="hl">need.</span></h1>
     <p class="lede">One form for everything &mdash; a receptionist, a win-back
     campaign, or a question. A few details and we will come back within a day.
@@ -2271,15 +2273,77 @@ CONTACT_SCRIPT = f"""
 # ----------------------------------------------------------------- demo ----
 
 DEMO_BODY = f"""
-<section>
+<section class="demo-hero">
   <div class="wrap demo-in">
-    <p class="eyebrow">Live demo</p>
-    <h1>Hear your own AI receptionist</h1>
-    <p class="lede">Tell it about your business and talk to it, right in your
-    browser. About 30 seconds to set up.</p>
-    <a class="btn btn-primary demo-go" id="demo-go" href="{DEMO}">Build your demo assistant</a>
-    <p class="fine demo-call">Prefer to call? Try the live demo plumber line at
-    <a href="tel:+16476921081">(647)&nbsp;692-1081</a>.</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Live demo</p>
+    <h1>Hear it answer <span class="pay">as your own business.</span></h1>
+    <p class="lede">Give it your website or a few details, and talk to the
+    assistant it builds &mdash; in your browser, on this page, about thirty
+    seconds from now. No call, no signup, no card.</p>
+    <p class="demo-cta-row">
+      <a class="btn btn-primary demo-go" id="demo-go" href="{DEMO}">Build your demo assistant</a>
+      <a class="btn btn-ghost" href="tel:+16476921081">Call the live line instead</a>
+    </p>
+    <p class="fine demo-call">The line on <a href="tel:+16476921081">(647)&nbsp;692-1081</a>
+    is a real plumbing assistant, answering right now.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 class="center">What happens in those thirty seconds</h2>
+    <ol class="demo-steps">
+      <li>
+        <b>You tell it where to look</b>
+        <span>Your website address, or six short answers if you do not have one.
+        It reads the pages, not just the home page.</span>
+      </li>
+      <li>
+        <b>It writes itself around your business</b>
+        <span>Your services, your hours, how you word things, what you do not
+        do. You see every fact it picked up and can correct any of them.</span>
+      </li>
+      <li>
+        <b>You talk to it</b>
+        <span>Straight away, in the browser. Ask it something awkward &mdash;
+        a price it should not quote, a job you do not take.</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="center">What to try</h2>
+    <p class="sub">The demo is the sales pitch, so push it rather than being
+    polite to it.</p>
+    <div class="demo-try">
+      <div><b>Interrupt it</b><span>Talk over the greeting. It should stop and
+      listen rather than finish its sentence.</span></div>
+      <div><b>Ask for something you do not offer</b><span>It should say so
+      plainly instead of inventing a service.</span></div>
+      <div><b>Give it an emergency</b><span>Water on the floor, a burst pipe. It
+      should treat that differently from a routine booking.</span></div>
+      <div><b>Change your mind mid-sentence</b><span>"Tuesday &mdash; no, make it
+      Thursday." It should follow the correction, not the first answer.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap demo-after">
+    <h2>What the demo is not</h2>
+    <p>It is built from your public website in half a minute, so it knows what
+    that page says and nothing else. A real line is configured with you: your
+    calendar, your booking rules, your transfer numbers, the things customers
+    ask that the website never mentions. Setup for that takes about ten minutes
+    and we do it with you.</p>
+    <p>The demo does not book anything, does not text anyone, and is deleted
+    after 72 hours unless you carry on.</p>
+    <p class="demo-cta-row">
+      <a class="btn btn-primary" href="/#contact">Tell us about your line</a>
+      <a class="btn btn-ghost" href="/pricing/">See the plans</a>
+    </p>
   </div>
 </section>
 """
@@ -2364,8 +2428,8 @@ def _pricing_body():
     return f"""
 <section class="pr-hero">
   <div class="wrap">
-    <p class="eyebrow">Pricing</p>
-    <h1>Every plan, on one page</h1>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Pricing</p>
+    <h1>Every plan, <span class="pay">on one page.</span></h1>
     <p class="lede">What each industry pays, what a plan includes, and what the
     extras cost. No quote needed to see a price.</p>
     <p class="fine">All prices in CAD. Month to month, cancel anytime. Every plan
@@ -2678,7 +2742,7 @@ def faq_group(title, items):
 
 FAQ_BODY = """<main class="wrap faq-page">
   <div class="faq-top">
-    <p class="eyebrow">Common questions</p>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Common questions</p>
     <h1>Everything people ask <span class="pay">before they switch.</span></h1>
     <p class="lede">If yours is not here, call sales on
     <a href="tel:+13656039234">(365)&nbsp;603-9234</a> or

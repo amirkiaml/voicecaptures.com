@@ -145,8 +145,14 @@ TYPE_CSS = """
 .ported .sub{font-size:17px; line-height:27px; color:var(--muted)}
 .ported .fine, .ported .note, .ported small{font-size:13.5px; line-height:20px;
   color:var(--muted)}
-.ported .eyebrow{font-size:12.5px; font-weight:800; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--wb)}
+/* The home page's eyebrow exactly: 13px, sentence case, no tracking. The
+   carried-over pages had it uppercase with wide tracking, and inside .doc it
+   inherited the body size and came out at 15.5px. */
+.ported .eyebrow{display:inline-flex; align-items:center; gap:var(--s2);
+  font-size:13px; font-weight:700; letter-spacing:normal; text-transform:none;
+  color:var(--wb); margin:0 0 var(--s4)}
+.ported .doc .eyebrow{font-size:13px}
+.ported .eyebrow .spark{width:14px; height:14px; flex:0 0 auto}
 
 .ported .doc h2{margin-top:var(--s12); margin-bottom:var(--s4)}
 .ported .doc h3{margin-top:var(--s8); margin-bottom:var(--s3)}
@@ -211,6 +217,34 @@ PRICING_CSS = """
 .ported .pr-grid + .pr-vnote{text-align:center}
 .ported [id^="p-"] > .wrap > h2{text-align:center}
 
+/* ---- the demo page ---------------------------------------------------- */
+.ported .demo-hero{padding-top:var(--s16)}
+.ported .demo-in{max-width:720px}
+.ported .demo-cta-row{display:flex; flex-wrap:wrap; gap:var(--s3);
+  margin-top:var(--s8)}
+.ported .demo-call{margin-top:var(--s4)}
+.ported .demo-steps{counter-reset:step; list-style:none; padding:0;
+  max-width:760px; margin:var(--s12) auto 0; display:grid; gap:var(--s8)}
+.ported .demo-steps li{position:relative; padding-left:60px; margin:0}
+.ported .demo-steps li::before{counter-increment:step; content:counter(step,decimal-leading-zero);
+  position:absolute; left:0; top:2px; font-size:13px; font-weight:800;
+  letter-spacing:.06em; color:var(--blue); background:var(--f-blue);
+  border-radius:var(--r-pill); padding:7px 12px}
+.ported .demo-steps b{display:block; font-size:19px; line-height:26px;
+  color:var(--ink)}
+.ported .demo-steps span{display:block; margin-top:6px; font-size:16px;
+  line-height:25px; color:var(--ink-2)}
+.ported .demo-try{display:grid; grid-template-columns:1fr; gap:var(--s4);
+  max-width:900px; margin:var(--s8) auto 0}
+@media(min-width:760px){ .ported .demo-try{grid-template-columns:1fr 1fr} }
+.ported .demo-try > div{background:#fff; border:1px solid var(--line);
+  border-radius:var(--r-card); padding:var(--s6)}
+.ported .demo-try b{display:block; font-size:17px; color:var(--ink)}
+.ported .demo-try span{display:block; margin-top:6px; font-size:15.5px;
+  line-height:24px; color:var(--ink-2)}
+.ported .demo-after{max-width:720px}
+.ported .demo-after p{margin-bottom:var(--s4)}
+
 /* ---- the FAQ page ----------------------------------------------------- */
 /* The old sheet puts a "+" marker on every summary and a dark translucent
    background on the bare <header> tag. Both are its own site chrome, and both
@@ -218,9 +252,18 @@ PRICING_CSS = """
 .ported .faq-list summary::before{content:none}
 .ported .faq-top{background:none; position:static; backdrop-filter:none;
   border:0; padding:0}
-/* The old sheet gives a bare .pay span a bordered, padded card box. In this
-   system .pay is just the serif accent phrase inside a heading. */
-.ported .pay{display:inline; border:0; padding:0; border-radius:0;
+/* In this system .pay is the serif accent phrase inside a heading. In the OLD
+   sheet .pay is a payment-option CARD — which is why an unqualified rule here
+   set the whole of /win-back/'s "Choose how you pay" block in italic serif.
+   Only a .pay inside a heading is the accent phrase. */
+/* .hl is what the carried-over pages call the accent phrase; .pay is what this
+   system calls it. Same thing, so they render the same — one heading pattern
+   across the site rather than a serif italic on some pages and plain blue on
+   others. */
+.ported h1 .pay, .ported h2 .pay, .ported h3 .pay,
+.ported h1 .hl,  .ported h2 .hl,  .ported h3 .hl{
+  color:var(--ink);
+  display:inline; border:0; padding:0; border-radius:0;
   background:none; box-shadow:none;
   font-family:'Instrument Serif',Georgia,serif; font-style:italic;
   font-weight:400; letter-spacing:.005em}
