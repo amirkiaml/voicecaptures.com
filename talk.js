@@ -201,11 +201,24 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
 const VAPI_PUBLIC_KEY   = "e321c752-3efd-401d-97f8-6f41eded6660";
 const VAPI_ASSISTANT_ID = "2980a8c6-e543-4440-9f29-5ee97bd15fd0";
 
-/* 90 seconds PER VISIT, not per call. A per-call cap just means starting
-   another call, which is the "over and over" this is meant to stop. The spend
-   is kept in sessionStorage, so closing the panel and reopening it carries on
-   from where it stopped rather than handing out a fresh budget. */
-const BUDGET_SECONDS = 90;
+/* Two minutes PER CALL, and nothing is carried between them. The point is a
+   call that always ends, not a visitor who runs out: a refresh, a reopen or
+   simply pressing the button again starts a fresh two minutes with no state
+   to clear. Cost is bounded by call length rather than by rationing. */
+const CALL_SECONDS = 120;
+
+/* A soft brake on repetition: five calls in fifteen minutes, then a wait.
+   Inside that allowance a refresh, a reopen or another press just works, which
+   is the point — the limit should be invisible to anyone using it normally.
+
+   This is FRICTION, NOT SECURITY, and it is worth being plain about which.
+   The site is static, so there is no server here and no IP to key off; the
+   count lives in the visitor's own localStorage and a private window or a
+   cleared store resets it. It stops the same person idly going again and
+   again. The controls that actually bound cost are on the Vapi key itself —
+   allowed origins, concurrency and a spend cap. */
+const MAX_CALLS = 5;
+const WINDOW_MINUTES = 15;
 
 (function(){
   "use strict";
@@ -215,31 +228,44 @@ const BUDGET_SECONDS = 90;
         go = $("vc-go"), close = $("vc-x");
   if (!bubble) return;
 
-  let vapi = null, live = false, timer = null, left = 0;
+  let vapi = null, live = false, timer = null;
 
   const say = (t, s) => {
     state.textContent = t;
     if (s !== undefined) sub.textContent = s;
     if (inline) heroSay(t);
   };
-  /* Seconds already spent this visit. sessionStorage is per tab and clears
-     when it closes, which is exactly what "per visit" means here. */
-  function spent(){
-    try { return Math.min(BUDGET_SECONDS, +(sessionStorage.getItem("vc-spent") || 0)); }
-    catch (e) { return 0; }           // private mode: the cap still works in memory
+  /* Seconds left in the call now running. Plain state, deliberately: nothing
+     about the CLOCK is stored, so a reload cannot leave someone cut short. */
+  let left = CALL_SECONDS;
+
+  /* When calls were started, newest last, trimmed to the window. localStorage
+     rather than sessionStorage: a new tab should not be a way around it. */
+  const WINDOW_MS = WINDOW_MINUTES * 60000;
+  function recent(){
+    let raw = [];
+    try { raw = JSON.parse(localStorage.getItem("vc-starts") || "[]"); }
+    catch (e) { raw = []; }
+    if (!Array.isArray(raw)) raw = [];
+    const cut = Date.now() - WINDOW_MS;
+    return raw.filter((t) => typeof t === "number" && t > cut);
   }
-  function setSpent(v){
-    try { sessionStorage.setItem("vc-spent", String(Math.min(BUDGET_SECONDS, v))); }
-    catch (e) {}
+  function noteStart(){
+    const list = recent().concat(Date.now());
+    try { localStorage.setItem("vc-starts", JSON.stringify(list)); } catch (e) {}
   }
-  const remaining = () => Math.max(0, BUDGET_SECONDS - spent());
+  /** Minutes until the oldest call in the window falls out of it. */
+  function waitMinutes(){
+    const list = recent();
+    if (list.length < MAX_CALLS) return 0;
+    const freesAt = list[list.length - MAX_CALLS] + WINDOW_MS;
+    return Math.max(1, Math.ceil((freesAt - Date.now()) / 60000));
+  }
   const mmss = (t) => Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
 
   function openPanel(open){
     panel.hidden = !open;
     bubble.setAttribute("aria-expanded", open ? "true" : "false");
-    // Someone coming back mid-visit should see what is left before they press
-    // anything, not discover it a second into the call.
     if (open) { paintMeter(); go.focus(); }
   }
   bubble.addEventListener("click", () => openPanel(panel.hidden));
@@ -331,30 +357,26 @@ const BUDGET_SECONDS = 90;
   }
 
   /* The meter. Both surfaces carry one, and both are driven from here so they
-     cannot disagree about how much time is left. */
+     cannot disagree about how much time is left. It is only on while a call
+     is running — there is nothing to report between calls. */
   function paintMeter(){
-    const r = remaining();
-    const pct = (r / BUDGET_SECONDS) * 100;
+    const pct = (left / CALL_SECONDS) * 100;
     document.querySelectorAll(".vc-meter").forEach((m) => {
-      m.hidden = !(live || spent() > 0);
+      m.hidden = !live;
       const fill = m.querySelector(".vc-meter-fill");
       const lbl  = m.querySelector(".vc-meter-t");
-      if (fill) fill.style.width = pct.toFixed(1) + "%";
-      if (fill) fill.classList.toggle("is-low", r <= 20);
-      if (lbl) lbl.textContent = r > 0 ? mmss(r) + " left in this demo"
-                                       : "That is the demo for this visit";
+      if (fill) { fill.style.width = Math.max(0, pct).toFixed(1) + "%";
+                  fill.classList.toggle("is-low", left <= 20); }
+      if (lbl) lbl.textContent = mmss(Math.max(0, left)) + " left in this call";
     });
   }
 
   function tick(){
-    setSpent(spent() + 1);
+    left--;
     paintMeter();
-    if (remaining() > 0) return;
-    say("That is the demo limit", "Call (365) 603-9234, or build your own demo assistant.");
+    if (left > 0) return;
+    say("Two minutes is the demo", "Start another whenever you like, or call (365) 603-9234.");
     stop();
-    /* Closed rather than left sitting on a spent meter. Reopening is fine — it
-       just will not start another call. */
-    setTimeout(() => { window.closeSearch && 0; openPanel(false); heroCalling(false); }, 2600);
   }
 
   async function start(){
@@ -362,12 +384,17 @@ const BUDGET_SECONDS = 90;
       say("Not connected yet", "Add the Vapi public key and assistant ID to switch this on.");
       return;
     }
-    if (remaining() <= 0) {
-      say("That is the demo for this visit",
-          "Call (365) 603-9234, or build your own demo assistant.");
-      paintMeter();
+    const wait = waitMinutes();
+    if (wait > 0) {
+      /* Gentle on purpose: someone who has called five times is interested,
+         not hostile, and the sales line is open to them right now. */
+      say("That is five goes in " + WINDOW_MINUTES + " minutes",
+          "Give it about " + wait + (wait === 1 ? " minute" : " minutes") +
+          " and it will be ready again \u2014 or call (365) 603-9234 and talk to a person now.");
       return;
     }
+    /* Otherwise every attempt starts a fresh two minutes. */
+    left = CALL_SECONDS;
     go.disabled = true;
     say("Connecting…", "Allow the microphone when your browser asks.");
     try {
@@ -386,6 +413,8 @@ const BUDGET_SECONDS = 90;
         vapi.on("call-start", () => {
           live = true; go.disabled = false; go.textContent = "End";
           say("Listening", "Ask it anything, or ask it to book you a meeting.");
+          noteStart();   // counted when it CONNECTS, so a failure costs nobody a go
+          left = CALL_SECONDS;
           timer = setInterval(tick, 1000);
           paintMeter();
         });
@@ -432,9 +461,10 @@ const BUDGET_SECONDS = 90;
   }
 
   function stop(){
-    clearInterval(timer); speaking(false); heroCalling(false); paintMeter();
+    clearInterval(timer); speaking(false); heroCalling(false);
     try { if (vapi) vapi.stop(); } catch (e) {}
     live = false; go.disabled = false; go.textContent = "Start talking";
+    paintMeter();   // after live is false, or the bar stays up between calls
   }
 
   go.addEventListener("click", () => (live ? stop() : start()));
