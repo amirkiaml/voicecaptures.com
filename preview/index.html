@@ -93,7 +93,7 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 .bar{max-width:var(--rail); margin:0 auto; padding:var(--s3) var(--s6);
   display:flex; align-items:center; gap:var(--s6)}
 .brand{display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; font-size:19px}
-.brand img{height:30px; width:auto; flex:0 0 auto}
+.brand img{height:32px; width:auto; flex:0 0 auto}
 /* Below 520 the wordmark and the CTA cannot both fit, and the wordmark was
    running underneath the button. The mark carries the brand; the link keeps
    its aria-label so a screen reader still gets the full name. */
@@ -152,6 +152,7 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 .card p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
 .card .shot{margin-top:var(--s6); border-radius:14px; overflow:hidden}
 .shot-crop{aspect-ratio:16/10}
+.c-blue .shot-crop{aspect-ratio:16/9}
 .shot-crop img{width:100%; height:100%; object-fit:cover; object-position:88% 50%}
 .c-blue{background:var(--f-blue)} .c-cyan{background:var(--f-cyan)}
 .c-wb{background:var(--f-wb)}     .c-sand{background:var(--f-sand)}
@@ -301,7 +302,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 
 <header>
   <div class="bar">
-    <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/logo-mark.png" alt=""><span>VoiceCaptures</span></a>
+    <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/preview/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
     <nav class="nav">
       <a href="#">AI receptionist</a><a href="#">Win-back</a>
       <a href="#">Pricing</a><a href="#">About</a><a href="#">Contact</a>
@@ -429,8 +430,10 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
       <div class="card c-blue">
         <span class="badge badge-soon">Coming soon</span>
         <h3>A personal line <span class="pay">for your own phone.</span></h3>
-        <p>Screens unknown numbers, takes a message, texts you the summary. In beta
-        at $9/mo — join the waitlist and we'll tell you when it opens.</p>
+        <p>Screens the scammers and the spam so you only get the calls that
+        matter. In beta at $9/mo — join the waitlist and we’ll tell you when it opens.</p>
+        <div class="shot shot-crop"><img src="/preview/img/personal.webp" width="1600" height="761"
+          loading="lazy" alt="A recent-calls list with scam and spam calls already handled"></div>
       </div>
 
       <div class="card c-ink">
@@ -446,12 +449,12 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 <section class="collage-sec">
   <div class="wrap">
     <div class="collage">
-      <figure class="ph p1"><div class="slot">1 &middot; clinic</div></figure>
-      <figure class="ph p2"><div class="slot">2 &middot; home services</div></figure>
-      <figure class="ph p3"><div class="slot">3 &middot; vet</div></figure>
-      <figure class="ph p4"><div class="slot">4 &middot; caf&eacute;</div></figure>
-      <figure class="ph p5"><div class="slot">5 &middot; salon or studio</div></figure>
-      <figure class="ph p6"><div class="slot">6 &middot; professional services</div></figure>
+      <figure class="ph p1"><img src="/preview/img/sec-clinic.webp" width="1000" height="1250" loading="lazy" alt="A hygienist with a patient in the chair"></figure>
+      <figure class="ph p2"><img src="/preview/img/sec-home.webp" width="1000" height="1250" loading="lazy" alt="An electrician working at a panel"></figure>
+      <figure class="ph p3"><img src="/preview/img/sec-vet.webp" width="1000" height="1250" loading="lazy" alt="A vet with a dog in the exam room"></figure>
+      <figure class="ph p4"><img src="/preview/img/sec-cafe.webp" width="1000" height="1250" loading="lazy" alt="A cafe owner pouring a coffee at the counter"></figure>
+      <figure class="ph p5"><img src="/preview/img/sec-salon.webp" width="1000" height="1250" loading="lazy" alt="A stylist cutting a client's hair"></figure>
+      <figure class="ph p6"><img src="/preview/img/sec-pro.webp" width="1000" height="1250" loading="lazy" alt="An adviser across a desk from a client"></figure>
 
       <div class="cstat s1"><b>14%</b><span>of calls in home services go unanswered</span><cite>CallRail benchmark report, 2025</cite></div>
       <div class="cstat s2"><b>85%</b><span>of those callers never call back</span><cite>CallRail benchmark report, 2025</cite></div>
@@ -501,7 +504,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 
 <footer>
   <div class="wrap foot">
-    <a class="brand" href="/preview/"><img src="/logo-mark.png" alt="">VoiceCaptures</a>
+    <a class="brand" href="/preview/"><img src="/preview/img/logo-mark.png" width="512" height="512" alt="">VoiceCaptures</a>
     <p class="fine" style="margin:0">Answers · Qualifies · Books</p>
   </div>
 </footer>
