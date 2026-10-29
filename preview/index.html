@@ -85,7 +85,7 @@ section{padding:var(--s24) 0}
 .btn-ghost:hover{background:var(--f-blue)}
 .btn-dark{background:#15213A; color:#fff}
 .btn-dark:hover{background:#0D1729}
-.btn-sm{font-size:15px; padding:12px 22px; min-height:44px}
+.btn-sm{font-size:15px; padding:13px 22px; min-height:46px}
 
 /* ---- nav ---- */
 header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
@@ -99,7 +99,7 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
    its aria-label so a screen reader still gets the full name. */
 @media(max-width:520px){
   .brand span{display:none}
-  .btn-sm{font-size:14px; padding:11px 16px}
+  .btn-sm{font-size:14px; padding:13px 16px; min-height:46px}
   .bar{gap:var(--s3); padding-left:var(--s4); padding-right:var(--s4)}
 }
 .nav{display:none; gap:var(--s6); margin-left:var(--s4)}
@@ -156,15 +156,19 @@ header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
 .card{border-radius:var(--r-card); padding:var(--s8); overflow:hidden; border:0}
 .card h3{font-size:clamp(22px,2.2vw,28px); line-height:1.15; margin-bottom:var(--s3)}
 .card p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
-.card .shot{margin-top:var(--s6); border-radius:14px; overflow:hidden}
-.shot-crop{aspect-ratio:16/10}
-.c-blue .shot-crop{aspect-ratio:16/9}
-.shot-crop img{width:100%; height:100%; object-fit:cover; object-position:88% 50%}
+.card{display:flex; flex-direction:column}
+.card .shot{margin:var(--s6) calc(-1 * var(--s8)) calc(-1 * var(--s8));
+  overflow:hidden; margin-top:auto; padding-top:var(--s6)}
+.card .shot img{width:100%; display:block;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 9%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 9%)}
 .c-blue{background:var(--f-blue)} .c-cyan{background:var(--f-cyan)}
 .c-wb{background:var(--f-wb)}     .c-sand{background:var(--f-sand)}
 .c-ink{background:#15213A; color:#fff}
 .c-ink p{color:#C3D0E4}
-.badge{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.08em;
+.c-ink .shot img{-webkit-mask-image:none; mask-image:none; border-radius:14px}
+.c-ink .shot{margin:var(--s6) 0 0; padding-top:0}
+.badge{display:inline-block; align-self:flex-start; font-size:11px; font-weight:800; letter-spacing:.08em;
   text-transform:uppercase; padding:5px 11px; border-radius:var(--r-pill);
   background:rgba(13,23,41,.08); color:var(--ink-2); margin-bottom:var(--s3)}
 .badge-live{background:rgba(14,147,184,.16); color:#0A6A86}
@@ -287,6 +291,57 @@ details p{margin:0 0 var(--s6) 28px; color:var(--ink-2); font-size:15px; line-he
 footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 .foot{display:flex; flex-wrap:wrap; gap:var(--s6); align-items:center; justify-content:space-between}
 
+/* ---- contact ---- */
+.contact{display:grid; gap:var(--s12); grid-template-columns:1fr}
+@media(min-width:940px){ .contact{grid-template-columns:1.25fr .85fr; gap:var(--s16)} }
+.form{display:grid; gap:var(--s4); grid-template-columns:1fr}
+@media(min-width:620px){ .form{grid-template-columns:1fr 1fr} .form .wide{grid-column:1/-1} }
+.form label{display:block}
+.form label span{display:block; font-size:13px; font-weight:700; margin-bottom:6px}
+.form label span em{font-style:normal; font-weight:500; color:var(--muted)}
+.form input,.form select,.form textarea{
+  width:100%; font-family:inherit; font-size:16px; color:var(--ink);
+  background:#fff; border:1px solid rgba(13,23,41,.18); border-radius:10px;
+  padding:13px 14px; min-height:48px}
+.form textarea{min-height:92px; resize:vertical}
+.form input:focus,.form select:focus,.form textarea:focus{
+  outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue)}
+.form .btn{width:100%}
+.in-msg{grid-column:1/-1; font-size:14px; min-height:20px; margin:0; color:var(--muted)}
+.in-msg.err{color:#B42318} .in-msg.ok{color:#0A6A86; font-weight:700}
+.aside{background:#fff; border-radius:var(--r-card); padding:var(--s8)}
+.aside h3{margin-bottom:var(--s3)}
+.aside p{font-size:15px; line-height:23px; color:var(--ink-2); margin:0 0 var(--s6)}
+.aside .btn{width:100%; margin-bottom:var(--s3)}
+.aside hr{border:0; border-top:1px solid var(--line); margin:var(--s8) 0}
+.aside dl{margin:0; font-size:15px; line-height:24px}
+.aside dt{font-weight:700; margin-top:var(--s4)}
+.aside dd{margin:0; color:var(--ink-2)}
+.aside a{color:var(--blue); font-weight:600}
+
+/* ---- footer ---- */
+footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
+.fcols{display:grid; gap:var(--s8); grid-template-columns:1fr}
+@media(min-width:700px){ .fcols{grid-template-columns:1fr 1fr} }
+@media(min-width:1000px){ .fcols{grid-template-columns:1.4fr 1fr 1fr 1fr; gap:var(--s12)} }
+.fcol h4{font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ink); margin:0 0 var(--s4)}
+.fcol ul{list-style:none; padding:0; margin:0}
+.fcol li{margin-bottom:var(--s3)}
+.fcol a{font-size:15px; color:var(--ink-2); text-decoration:none;
+  display:inline-block; min-height:28px}
+.fcol a:hover{color:var(--blue)}
+.fbrand p{font-size:14px; line-height:22px; color:var(--ink-2); margin:var(--s4) 0 var(--s6); max-width:34ch}
+.fbrand .btn{margin-bottom:var(--s4)}
+.fbot{display:flex; flex-wrap:wrap; gap:var(--s4); justify-content:space-between;
+  align-items:center; margin-top:var(--s12); padding-top:var(--s6);
+  border-top:1px solid var(--line); font-size:13.5px; color:var(--muted)}
+.fbot a{color:var(--muted)}
+.fmeta{margin:0; font-size:14px; line-height:22px; color:var(--ink-2)}
+.fmeta dd{margin:0}
+.fmeta a{color:var(--blue); font-weight:600}
+.f-h2{margin-top:var(--s8)}
+
 .note{background:#FEF3C7; border-bottom:1px solid #FCD34D; color:#78350F;
   font-size:13px; font-weight:600; text-align:center; padding:10px var(--s4)}
 </style>
@@ -299,12 +354,12 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
   <div class="bar">
     <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/preview/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
     <nav class="nav">
-      <a href="#">AI receptionist</a><a href="#">Win-back</a>
-      <a href="#">Pricing</a><a href="#">About</a><a href="#">Contact</a>
+      <a href="/home-services/">AI receptionist</a><a href="/win-back/">Win-back</a>
+      <a href="/pricing/">Pricing</a><a href="/about/">About</a><a href="#contact">Contact</a>
     </nav>
     <div class="bar-end">
-      <a class="login" href="#">Log in</a>
-      <a class="btn btn-primary btn-sm" href="#">Build your demo</a>
+      <a class="login" href="/login">Log in</a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo</a>
     </div>
   </div>
 </header>
@@ -317,8 +372,8 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
       <p class="lede">An AI receptionist that answers on your existing number, books
       into your calendar live on the call, and texts you and your caller the details.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#">Build your demo</a>
-        <a class="btn btn-ghost" href="#">Hear the demo line</a>
+        <a class="btn btn-primary" href="/demo/?src=preview">Build your demo</a>
+        <a class="btn btn-ghost" href="tel:+16476921081">Hear the demo line</a>
       </div>
       <p class="fine hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days
       free at one location, up to 100 minutes.</p>
@@ -399,7 +454,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
         <h3>It calls your past customers <span class="pay">back.</span></h3>
         <p>Win-back campaigns ring the customers you already have when they come
         due — never cold lists or purchased leads.</p>
-        <div class="shot shot-crop"><img src="/preview/img/winback.webp" width="1536" height="1024"
+        <div class="shot"><img src="/preview/img/winback.webp" width="1400" height="579"
           loading="lazy" alt="Past customers flowing into a week of booked callbacks"></div>
       </div>
 
@@ -408,7 +463,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
         <h3>A personal line <span class="pay">for your own phone.</span></h3>
         <p>Screens the scammers and the spam so you only get the calls that
         matter. In beta at $9/mo — join the waitlist and we’ll tell you when it opens.</p>
-        <div class="shot shot-crop"><img src="/preview/img/personal.webp" width="1600" height="761"
+        <div class="shot"><img src="/preview/img/personal.webp" width="1328" height="865"
           loading="lazy" alt="A recent-calls list with scam and spam calls already handled"></div>
       </div>
 
@@ -417,6 +472,8 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
         <h3>Books straight into <span class="pay">your software.</span></h3>
         <p>Practice management, field service, POS and CRM integrations, so nobody
         has to work somewhere new. Quoted per system.</p>
+        <div class="shot"><img src="/preview/img/integrations.webp" width="1400" height="1050"
+          loading="lazy" alt="A call captured, booked into the calendar and written through to field service and CRM"></div>
       </div>
     </div>
   </div>
@@ -441,7 +498,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
         <p>A plumber needs to know whether water is on the floor right now. A clinic
         needs to separate a new patient from an emergency, and must never record a
         symptom. Those are different assistants, not different greetings.</p>
-        <a class="btn btn-dark" href="#">See what a missed call is costing you</a>
+        <a class="btn btn-dark" href="/win-back/#calc">See what a missed call is costing you</a>
       </div>
     </div>
   </div>
@@ -453,7 +510,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
       <h2 style="color:#fff">Hear it answer <span class="pay">as your business.</span></h2>
       <p>Tell it about your business and talk to it, right in your browser. About
       30 seconds to set up, no call and no signup.</p>
-      <a class="btn btn-primary" href="#">Build your demo</a>
+      <a class="btn btn-primary" href="/demo/?src=preview">Build your demo</a>
     </div>
   </div>
 </section>
@@ -481,10 +538,105 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
   </div>
 </section>
 
+<section id="contact" style="background:var(--f-cyan)">
+  <div class="wrap contact">
+    <div>
+      <h2>Tell us about <span class="pay">your line.</span></h2>
+      <p class="lede">One form. We come back within a day, with a straight answer
+      about whether this fits your business.</p>
+      <form class="form" id="intake" novalidate>
+        <label><span>First name</span><input id="in-first" required autocomplete="given-name"></label>
+        <label><span>Last name</span><input id="in-last" autocomplete="family-name"></label>
+        <label><span>Email</span><input id="in-email" type="email" required autocomplete="email"></label>
+        <label><span>Phone</span><input id="in-phone" type="tel" required autocomplete="tel"></label>
+        <label class="wide"><span>Business name</span><input id="in-business" required autocomplete="organization" placeholder="Or your own name"></label>
+        <label><span>What you do</span><select id="in-type"><option>Home services & trades</option><option>Restaurant, café or bar</option><option>Clinic, dental or medical</option><option>Health, wellness or veterinary</option><option>Salon, spa or fitness</option><option>Professional services — legal, real estate, consulting</option><option>A personal line, not a business</option><option>Something else</option></select></label>
+        <label><span>Software you use</span><select id="in-system"><option>None — phone and calendar</option><option>Google Calendar</option><option>Outlook or Microsoft 365</option><option>Calendly</option><option>Jobber</option><option>Housecall Pro</option><option>ServiceTitan</option><option>Square</option><option>Acuity or Squarespace Scheduling</option><option>Mindbody</option><option>Jane</option><option>Dentrix, Open Dental or Eaglesoft</option><option>OpenTable, Resy or Toast</option><option>HubSpot or another CRM</option><option>Something else</option><option>Not sure</option></select></label>
+        <label class="wide"><span>What you’re after</span><select id="in-plan"><option>AI receptionist for my business</option><option>Personal line (beta)</option><option>Win-back campaign</option><option>A custom build we own</option><option>Not sure yet</option></select></label>
+        <label class="wide"><span>Anything else <em>optional</em></span><textarea id="in-comments" rows="3" placeholder="How calls reach you today, what you’d want it to handle, anything unusual."></textarea></label>
+        <p class="in-msg" id="in-msg" role="status" aria-live="polite"></p>
+        <div class="wide"><button class="btn btn-primary" type="submit" id="in-go">Send it over</button></div>
+      </form>
+    </div>
+
+    <aside class="aside">
+      <h3>Rather just talk?</h3>
+      <p>Thirty minutes, no slide deck. We will tell you on the call if your call
+      volume does not justify it.</p>
+      <a class="btn btn-dark" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a 30-minute call</a>
+      <a class="btn btn-ghost" href="/demo/?src=preview">Build your demo instead</a>
+      <hr>
+      <dl>
+        <dt>Hear it answer</dt>
+        <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &mdash; our live demo plumber line</dd>
+        <dt>Email</dt>
+        <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
+        <dt>Where we are</dt>
+        <dd>Toronto, Ontario, Canada &mdash; working with businesses wherever they are</dd>
+        <dt>Hiring</dt>
+        <dd><a href="/careers/">Open roles</a> &mdash; part-time sales and marketing</dd>
+      </dl>
+    </aside>
+  </div>
+</section>
+
 <footer>
-  <div class="wrap foot">
-    <a class="brand" href="/preview/"><img src="/preview/img/logo-mark.png" width="512" height="512" alt="">VoiceCaptures</a>
-    <p class="fine" style="margin:0">Answers · Qualifies · Books</p>
+  <div class="wrap">
+    <div class="fcols">
+      <div class="fcol fbrand">
+        <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/preview/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
+        <p>An AI receptionist that answers on your existing number, books into your
+        calendar and texts you the details.</p>
+        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo</a>
+        <dl class="fmeta">
+          <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &middot; demo line</dd>
+          <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
+          <dd>Toronto, Ontario, Canada</dd>
+        </dl>
+      </div>
+
+      <div class="fcol">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/home-services/">Home services &amp; trades</a></li>
+          <li><a href="/restaurants-cafes/">Restaurants &amp; caf&eacute;s</a></li>
+          <li><a href="/clinics-dental/">Clinics &amp; dental</a></li>
+          <li><a href="/other-businesses/">Any other business</a></li>
+          <li><a href="/personal/">Personal line</a></li>
+          <li><a href="/win-back/">Win-back campaigns</a></li>
+        </ul>
+      </div>
+
+      <div class="fcol">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/pricing/">Pricing</a></li>
+          <li><a href="/careers/">Careers</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a call</a></li>
+        </ul>
+      </div>
+
+      <div class="fcol">
+        <h4>Get started</h4>
+        <ul>
+          <li><a href="/demo/?src=preview">Build a demo assistant</a></li>
+          <li><a href="tel:+16476921081">Call the demo line</a></li>
+          <li><a href="/login">Client dashboard</a></li>
+        </ul>
+        <h4 class="f-h2">Legal</h4>
+        <ul>
+          <li><a href="/privacy/">Privacy Policy</a></li>
+          <li><a href="/terms/">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fbot">
+      <span>&copy; 2026 VoiceCaptures</span>
+      <span>Answers &middot; Qualifies &middot; Books</span>
+    </div>
   </div>
 </footer>
 
@@ -535,6 +687,64 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
   window.addEventListener("orientationchange", measure);
   if (reduce.addEventListener) reduce.addEventListener("change", measure);
   window.addEventListener("load", measure);
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  // Same endpoint and payload shape the live /contact/ page uses, so a
+  // submission from here is a real enquiry — source is tagged "preview" to
+  // keep test sends separable from the live form.
+  var API = "https://api.voicecaptures.com";
+  var form = document.getElementById("intake");
+  if (!form) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var msg = $("in-msg"), btn = $("in-go");
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var payload = {
+      first_name: $("in-first").value.trim(),
+      last_name:  $("in-last").value.trim(),
+      email:      $("in-email").value.trim(),
+      phone:      $("in-phone").value.trim(),
+      business_name: $("in-business").value.trim(),
+      business_type: $("in-type").value,
+      system:     $("in-system").value,
+      plan:       $("in-plan").value,
+      comments:   $("in-comments").value.trim(),
+      vertical:   "contact",
+      source:     "preview"
+    };
+    if (!payload.first_name || !payload.email || !payload.business_name) {
+      msg.className = "in-msg err";
+      msg.textContent = "Name, email and business name, and we can take it from there.";
+      return;
+    }
+    // This is a phone product; a number is how the conversation starts.
+    if (payload.phone.replace(/\D/g, "").length < 10) {
+      msg.className = "in-msg err";
+      msg.textContent = "A phone number too — it's the quickest way to sort the setup.";
+      return;
+    }
+    msg.className = "in-msg"; msg.textContent = "Sending…"; btn.disabled = true;
+    fetch(API + "/intake-form", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d || !d.ok) throw new Error((d && d.error) || "Couldn't send that.");
+      msg.className = "in-msg ok";
+      msg.textContent = "Got it — we'll come back to you within a day.";
+      form.reset();
+    })
+    .catch(function(err){
+      msg.className = "in-msg err";
+      msg.textContent = (err.message || "Couldn't send that.") + " Or email hello@voicecaptures.com.";
+    })
+    .then(function(){ btn.disabled = false; });
+  });
 })();
 </script>
 </body>
