@@ -85,29 +85,86 @@ section{padding:var(--s24) 0}
 .btn-ghost:hover{background:var(--f-blue)}
 .btn-dark{background:#11234B; color:#fff}
 .btn-dark:hover{background:#0D1729}
-.btn-sm{font-size:15px; padding:13px 22px; min-height:46px}
+.btn-sm{font-size:15px; padding:13px 22px; min-height:46px; white-space:nowrap}
 
 /* ---- nav ---- */
-header{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.92);
-  backdrop-filter:saturate(1.6) blur(10px); border-bottom:1px solid var(--line)}
-.bar{max-width:var(--rail); margin:0 auto; padding:var(--s3) var(--s6);
-  display:flex; align-items:center; gap:var(--s6)}
-.brand{display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; font-size:19px}
+header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line)}
+.bar{max-width:1200px; margin:0 auto; padding:var(--s3) var(--s6);
+  display:flex; align-items:center; gap:var(--s3)}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none;
+  font-weight:800; font-size:19px; white-space:nowrap; flex:0 0 auto}
 .brand img{height:32px; width:auto; flex:0 0 auto}
-/* Below 520 the wordmark and the CTA cannot both fit, and the wordmark was
-   running underneath the button. The mark carries the brand; the link keeps
-   its aria-label so a screen reader still gets the full name. */
-@media(max-width:520px){
-  .brand span{display:none}
-  .btn-sm{font-size:14px; padding:13px 16px; min-height:46px}
-  .bar{gap:var(--s3); padding-left:var(--s4); padding-right:var(--s4)}
-}
-.nav{display:none; gap:var(--s6); margin-left:var(--s4)}
-.nav a{font-size:15px; font-weight:600; text-decoration:none; color:var(--ink)}
-.nav a:hover{color:var(--blue)}
+.nav{display:none; align-items:center; gap:var(--s1); margin-left:var(--s4)}
+.nav-a{display:inline-flex; align-items:center; gap:6px; font-family:inherit;
+  font-size:15px; font-weight:600; color:var(--ink); text-decoration:none;
+  background:none; border:0; cursor:pointer; padding:10px 12px; min-height:44px;
+  border-radius:8px; white-space:nowrap}
+.nav-a:hover{color:var(--blue); background:var(--f-blue)}
+.nav-a[aria-expanded="true"]{color:var(--blue); background:var(--f-blue)}
+.car{width:11px; height:11px; transition:transform .18s ease}
+.nav-a[aria-expanded="true"] .car{transform:rotate(180deg)}
+
 .bar-end{margin-left:auto; display:flex; align-items:center; gap:var(--s3)}
-.bar-end .login{display:none; font-size:15px; font-weight:600; text-decoration:none}
-@media(min-width:1000px){ .nav{display:flex} .bar-end .login{display:inline} }
+.sales{display:none; align-items:center; gap:7px; font-size:14.5px; font-weight:700;
+  color:var(--ink); text-decoration:none; white-space:nowrap; padding:10px 4px; min-height:44px}
+.sales:hover{color:var(--blue)}
+.sales svg{width:15px; height:15px; color:var(--blue)}
+.bar-end .login{display:none; font-size:15px; font-weight:600; text-decoration:none;
+  padding:10px 4px; min-height:44px; align-items:center; white-space:nowrap}
+.bar-sep{display:none; width:1px; height:22px; background:var(--line)}
+@media(min-width:1200px){
+  .nav{display:flex}
+  .bar-end .login{display:inline-flex}
+  .sales{display:inline-flex}
+  .bar-sep{display:block}
+}
+
+/* full-width panel under the bar, the way the reference does it */
+.mega{position:absolute; left:0; right:0; top:100%; background:#fff;
+  border-bottom:1px solid var(--line); border-top:1px solid var(--line)}
+.mega[hidden]{display:none}
+.mega-in{max-width:1200px; margin:0 auto; padding:var(--s8) var(--s6);
+  display:grid; gap:var(--s8); grid-template-columns:1fr}
+@media(min-width:900px){ .mega-in{grid-template-columns:1.6fr .9fr; gap:var(--s16)} }
+.mega-grid{display:grid; gap:var(--s4) var(--s8); grid-template-columns:1fr}
+@media(min-width:620px){ .mega-grid{grid-template-columns:1fr 1fr} }
+.mega-grid a{display:flex; gap:var(--s3); text-decoration:none; padding:10px;
+  border-radius:12px; align-items:flex-start}
+.mega-grid a:hover{background:var(--f-blue)}
+.mega-grid i{flex:0 0 auto; width:34px; height:34px; border-radius:9px;
+  display:grid; place-items:center; background:var(--f-cyan); color:#0A6A86}
+.mega-grid i svg{width:17px; height:17px}
+.mega-grid b{display:block; font-size:15px; font-weight:700; color:var(--ink)}
+.mega-grid em{display:block; font-style:normal; font-size:13.5px; line-height:19px;
+  color:var(--muted); margin-top:2px}
+.mega-feat{background:var(--f-blue); border-radius:var(--r-card); padding:var(--s6);
+  text-decoration:none; display:block}
+.mega-feat:hover{background:var(--f-blue-2)}
+.mega-feat b{display:block; font-size:16px; font-weight:800; color:var(--ink)}
+.mega-feat em{display:block; font-style:normal; font-size:13.5px; line-height:19px;
+  color:var(--ink-2); margin:4px 0 var(--s4)}
+.mega-feat img{width:100%; border-radius:12px; display:block}
+
+/* ---- burger + mobile panel ---- */
+.burger{display:inline-flex; flex-direction:column; justify-content:center; gap:4px;
+  width:44px; height:44px; padding:0 11px; background:none; border:1px solid var(--line);
+  border-radius:10px; cursor:pointer; flex:0 0 auto}
+.burger span{display:block; height:2px; background:var(--ink); border-radius:2px}
+@media(min-width:1200px){ .burger{display:none} }
+.mnav{border-top:1px solid var(--line); background:#fff;
+  max-height:var(--mnav-max, 70vh); overflow-y:auto; overscroll-behavior:contain}
+.mnav[hidden]{display:none}
+.mnav-in{max-width:var(--rail); margin:0 auto;
+  padding:var(--s4) var(--s6) calc(var(--s8) + env(safe-area-inset-bottom,0px))}
+.mnav-h{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); margin:var(--s6) 0 var(--s2)}
+.mnav-h:first-child{margin-top:0}
+.mnav-a{display:flex; align-items:center; min-height:46px; font-size:16px;
+  font-weight:600; color:var(--ink); text-decoration:none}
+.mnav-a:hover{color:var(--blue)}
+.mnav-foot{display:flex; flex-direction:column; gap:var(--s3); margin-top:var(--s6);
+  padding-top:var(--s6); border-top:1px solid var(--line)}
+.mnav-foot .btn{width:100%}
 
 /* ---- hero ---- */
 /* Sampled from the artwork: its top and side edges are #EFF4FE, so the field
@@ -353,13 +410,106 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 <header>
   <div class="bar">
     <a class="brand" href="/preview/" aria-label="VoiceCaptures home"><img src="/preview/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
-    <nav class="nav">
-      <a href="/home-services/">AI receptionist</a><a href="/win-back/">Win-back</a>
-      <a href="/pricing/">Pricing</a><a href="/about/">About</a><a href="#contact">Contact</a>
+
+    <nav class="nav" aria-label="Main">
+      <button type="button" class="nav-a" id="t-recep" aria-expanded="false" aria-controls="m-recep">
+        AI receptionist
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="nav-a" id="t-wb" aria-expanded="false" aria-controls="m-wb">
+        Win-back
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="nav-a" href="/pricing/">Pricing</a>
+      <button type="button" class="nav-a" id="t-co" aria-expanded="false" aria-controls="m-co">
+        Company
+        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </nav>
+
     <div class="bar-end">
+      <a class="sales" href="tel:+13656039234">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
+        Sales: (365)&nbsp;603-9234
+      </a>
+      <span class="bar-sep" aria-hidden="true"></span>
       <a class="login" href="/login">Log in</a>
       <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo</a>
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mega" id="m-recep" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/home-services/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>Home services &amp; trades</b><em>Plumbing, HVAC, electrical, locksmith, garage door</em></span></a>
+        <a href="/restaurants-cafes/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h13v5a5 5 0 01-5 5H9a5 5 0 01-5-5V3zm14 1h2a3 3 0 010 6h-2V4zM3 19h16v2H3z"/></svg></i><span><b>Restaurants &amp; caf&eacute;s</b><em>Reservations, catering and order questions</em></span></a>
+        <a href="/clinics-dental/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 2h4v6h6v4h-6v6h-4v-6H4V8h6z"/></svg></i><span><b>Clinics &amp; dental</b><em>Patients, bookings and overflow, no symptoms recorded</em></span></a>
+        <a href="/other-businesses/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16l-1 5H5zM5 11h14v9H5zm4 3h6v2H9z"/></svg></i><span><b>Any other business</b><em>Salons, studios, venues, professional services</em></span></a>
+        <a href="/personal/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-9 9a9 9 0 0118 0z"/></svg></i><span><b>Personal line</b><em>Screens the calls to your own phone &middot; beta</em></span></a>
+        <a href="/pricing/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Plans &amp; pricing</b><em>Every plan on one page, no quote needed</em></span></a>
+      </div>
+      <a class="mega-feat" href="/demo/?src=nav">
+        <b>Build your demo assistant</b>
+        <em>Tell it about your business and talk to it in your browser. About 30 seconds, no call.</em>
+        <img src="/preview/img/hero-phones.webp" width="1500" height="1165" loading="lazy" alt="">
+      </a>
+    </div>
+  </div>
+
+  <div class="mega" id="m-wb" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/win-back/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2v6h-2V5.4l-5.3 5.3-1.4-1.4L16.6 4H14V2zM6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How win-back works</b><em>We call your own past customers when they come due</em></span></a>
+        <a href="/win-back/#pay"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Ways to pay</b><em>One-time campaign, always-on, or a build you own</em></span></a>
+        <a href="/win-back/#calc"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9z"/></svg></i><span><b>What it is worth</b><em>Run it on your own list size and job value</em></span></a>
+        <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg></i><span><b>Start with a free pilot</b><em>The first 20% of your list, so you see your real rate first</em></span></a>
+      </div>
+      <a class="mega-feat" href="/win-back/">
+        <b>$2.50 per customer called</b>
+        <em>Priced up front. Most reactivation services will not quote without a sales call.</em>
+        <img src="/preview/img/winback.webp" width="1400" height="579" loading="lazy" alt="">
+      </a>
+    </div>
+  </div>
+
+  <div class="mega" id="m-co" hidden>
+    <div class="mega-in">
+      <div class="mega-grid">
+        <a href="/about/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg></i><span><b>About</b><em>Who we are and how we build</em></span></a>
+        <a href="/careers/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6v3h5v15H4V6h5zm2 1v2h2V4zM4 10h16"/></svg></i><span><b>Careers</b><em>Part-time sales and marketing, Toronto and remote</em></span></a>
+        <a href="#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Contact</b><em>One form, and we come back within a day</em></span></a>
+        <a href="/login"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Client dashboard</b><em>Your calls, transcripts and minutes</em></span></a>
+      </div>
+      <a class="mega-feat" href="tel:+13656039234">
+        <b>Talk to sales</b>
+        <em>(365)&nbsp;603-9234 &mdash; or book 30 minutes and we will tell you on the call if your volume does not justify it.</em>
+      </a>
+    </div>
+  </div>
+
+  <div class="mnav" id="mnav" hidden>
+    <div class="mnav-in">
+      <p class="mnav-h">AI receptionist</p>
+      <a class="mnav-a" href="/home-services/">Home services &amp; trades</a>
+      <a class="mnav-a" href="/restaurants-cafes/">Restaurants &amp; caf&eacute;s</a>
+      <a class="mnav-a" href="/clinics-dental/">Clinics &amp; dental</a>
+      <a class="mnav-a" href="/other-businesses/">Any other business</a>
+      <a class="mnav-a" href="/personal/">Personal line</a>
+      <p class="mnav-h">Outbound</p>
+      <a class="mnav-a" href="/win-back/">Win-back campaigns</a>
+      <p class="mnav-h">Company</p>
+      <a class="mnav-a" href="/pricing/">Pricing</a>
+      <a class="mnav-a" href="/about/">About</a>
+      <a class="mnav-a" href="/careers/">Careers</a>
+      <a class="mnav-a" href="#contact">Contact</a>
+      <a class="mnav-a" href="/login">Client dashboard</a>
+      <div class="mnav-foot">
+        <a class="btn btn-primary" href="/demo/?src=nav">Build your demo</a>
+        <a class="btn btn-ghost" href="tel:+13656039234">Sales: (365)&nbsp;603-9234</a>
+      </div>
     </div>
   </div>
 </header>
@@ -744,6 +894,77 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       msg.textContent = (err.message || "Couldn't send that.") + " Or email hello@voicecaptures.com.";
     })
     .then(function(){ btn.disabled = false; });
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var header = document.querySelector("header");
+  var triggers = [].slice.call(document.querySelectorAll(".nav-a[aria-controls]"));
+  var burger = document.getElementById("burger");
+  var panel  = document.getElementById("mnav");
+
+  function closeMegas(except){
+    triggers.forEach(function(t){
+      if (t === except) return;
+      t.setAttribute("aria-expanded","false");
+      document.getElementById(t.getAttribute("aria-controls")).hidden = true;
+    });
+  }
+  function closeMobile(){
+    if (!panel) return;
+    panel.hidden = true;
+    burger.setAttribute("aria-expanded","false");
+  }
+
+  triggers.forEach(function(t){
+    var m = document.getElementById(t.getAttribute("aria-controls"));
+    t.addEventListener("click", function(e){
+      e.stopPropagation();
+      var open = t.getAttribute("aria-expanded") === "true";
+      closeMegas(t); closeMobile();
+      t.setAttribute("aria-expanded", open ? "false" : "true");
+      m.hidden = open;
+    });
+  });
+
+  // A pointer leaving the whole header closes whatever is open, so the panel
+  // does not hang around after the cursor has gone. Touch is unaffected,
+  // because there the panel is opened and closed by tapping.
+  header.addEventListener("mouseleave", function(){ closeMegas(null); });
+
+  if (burger && panel) {
+    // Size the panel to what is actually below it rather than guessing.
+    function fit(){
+      if (panel.hidden) return;
+      var top = panel.getBoundingClientRect().top;
+      panel.style.setProperty("--mnav-max",
+        Math.max(180, Math.round(window.innerHeight - top - 6)) + "px");
+    }
+    burger.addEventListener("click", function(e){
+      e.stopPropagation();
+      var open = !panel.hidden;
+      closeMegas(null);
+      panel.hidden = open;
+      burger.setAttribute("aria-expanded", open ? "false" : "true");
+      if (!open) fit();
+    });
+    panel.addEventListener("click", function(e){ if (e.target.closest("a")) closeMobile(); });
+    window.addEventListener("resize", function(){
+      if (window.innerWidth >= 1200) closeMobile(); else fit();
+    });
+    window.addEventListener("scroll", fit, { passive: true });
+  }
+
+  document.addEventListener("click", function(e){
+    if (!header.contains(e.target)) { closeMegas(null); closeMobile(); }
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    var open = triggers.filter(function(t){ return t.getAttribute("aria-expanded") === "true"; })[0];
+    closeMegas(null); closeMobile();
+    if (open) open.focus();
   });
 })();
 </script>
