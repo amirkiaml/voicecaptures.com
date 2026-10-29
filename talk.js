@@ -201,11 +201,11 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
 const VAPI_PUBLIC_KEY   = "e321c752-3efd-401d-97f8-6f41eded6660";
 const VAPI_ASSISTANT_ID = "2980a8c6-e543-4440-9f29-5ee97bd15fd0";
 
-/* Two minutes PER CALL, and nothing is carried between them. The point is a
+/* Three minutes PER CALL, and nothing is carried between them. The point is a
    call that always ends, not a visitor who runs out: a refresh, a reopen or
-   simply pressing the button again starts a fresh two minutes with no state
+   simply pressing the button again starts a fresh three minutes with no state
    to clear. Cost is bounded by call length rather than by rationing. */
-const CALL_SECONDS = 120;
+const CALL_SECONDS = 180;
 
 /* A soft brake on repetition: five calls in fifteen minutes, then a wait.
    Inside that allowance a refresh, a reopen or another press just works, which
@@ -375,7 +375,7 @@ const WINDOW_MINUTES = 15;
     left--;
     paintMeter();
     if (left > 0) return;
-    say("Two minutes is the demo", "Start another whenever you like, or call (365) 603-9234.");
+    say("Three minutes is the demo", "Start another whenever you like, or call (365) 603-9234.");
     stop();
   }
 
@@ -393,7 +393,7 @@ const WINDOW_MINUTES = 15;
           " and it will be ready again \u2014 or call (365) 603-9234 and talk to a person now.");
       return;
     }
-    /* Otherwise every attempt starts a fresh two minutes. */
+    /* Otherwise every attempt starts a fresh three minutes. */
     left = CALL_SECONDS;
     go.disabled = true;
     say("Connecting…", "Allow the microphone when your browser asks.");
