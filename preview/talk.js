@@ -62,6 +62,7 @@ const CSS = `/* ---- talk-to-it widget ----
 @keyframes vcswell{0%,100%{opacity:.75} 30%{opacity:1} 60%{opacity:.85}}
 @media(prefers-reduced-motion:reduce){ .vc-field{animation:none} }
 .vc-orb{position:relative; width:112px; height:112px; margin:0;
+  transform:scale(var(--orb,1)); transition:transform .09s ease-out;
   border-radius:50%; display:grid; place-items:center;
   background:radial-gradient(circle at 34% 30%, #BFE3F5 0%, #9EC4F7 42%, #A89BF2 100%)}
 .vc-orb::before{content:""; position:absolute; inset:-14px; border-radius:50%;
@@ -201,17 +202,30 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
     if (e.key === "Escape" && !panel.hidden) { openPanel(false); if (live) stop(); }
   });
 
+  // There are two of each on the page — the hero's and the panel's — and both
+  // answer to the voice, so these walk the lot rather than the first match.
+  const orbs   = () => document.querySelectorAll(".vc-orb");
+  const stages = () => document.querySelectorAll(".vc-stage");
   function beat(v){
     // volume-level is 0..1; map it to a gentle swell rather than a twitch
     const amp = Math.min(1, v);
-    orb.style.setProperty("--beat", (1 + amp * 0.45).toFixed(3));
-    if (stage) stage.style.setProperty("--field", (1 + amp * 0.12).toFixed(3));
+    const glow = (1 + amp * 0.45).toFixed(3);
+    const ball = (1 + amp * 0.13).toFixed(3);
+    orbs().forEach((o) => {
+      o.style.setProperty("--beat", glow);
+      o.style.setProperty("--orb", ball);
+    });
+    stages().forEach((st) => st.style.setProperty("--field", (1 + amp * 0.12).toFixed(3)));
   }
-  const stage = document.querySelector(".vc-stage");
   function speaking(on){
-    orb.classList.toggle("is-live", on);
-    if (stage) stage.classList.toggle("is-live", on);
-    if (!on) { orb.style.removeProperty("--beat"); if (stage) stage.style.removeProperty("--field"); }
+    orbs().forEach((o) => {
+      o.classList.toggle("is-live", on);
+      if (!on) { o.style.removeProperty("--beat"); o.style.removeProperty("--orb"); }
+    });
+    stages().forEach((st) => {
+      st.classList.toggle("is-live", on);
+      if (!on) st.style.removeProperty("--field");
+    });
   }
 
   function tick(){
