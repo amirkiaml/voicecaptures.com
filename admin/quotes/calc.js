@@ -153,6 +153,7 @@
       const l = locs.find(x => x.id === f.locationId);
       const a = l && l.addons.find(x => x.key === f.addon || (f.addon === "history" && /^history/.test(x.key)));
       const n = Math.max(0, Math.floor(n0(f.months)));
+      if (l && !a) { warnings.push(`Free add-on on ${l.name}: that location doesn't have ${f.addon === "extra_line" ? "an extra line" : "a call history add-on"}, so nothing is credited. Add it to the location first.`); continue; }
       if (!a || !n) continue;
       const covered = months > 1 ? Math.min(n, months) : n;
       freeAddonLines.push({ kind: "free_addon", label: `${a.name} free for ${n} month${n > 1 ? "s" : ""} (${l.name})`, amount: -r2(a.monthly * covered), months: n, perMonth: a.monthly });

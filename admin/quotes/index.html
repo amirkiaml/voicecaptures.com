@@ -497,6 +497,8 @@ function renderOutForm() {
     ${!QID ? '<div class="small warn-t">Save the quote first so it gets a quote number.</div>' : ""}
     <iframe class="prev" id="prev" title="Quote preview"></iframe>
   </div>
+  <div class="card"><h2>Saved outputs <span class="muted small" style="font-weight:400">every quote or invoice you open is saved here, exactly as generated</span></h2>
+    <div id="outList" class="small muted">${QID ? "Loading…" : "Save the quote to keep its outputs."}</div></div>
   <div class="card"><h2>Stripe line items <span class="muted small" style="font-weight:400">set these up by hand</span></h2>
     <button class="btn" id="bCopyStripe" type="button">Copy</button><pre class="out" id="stripeOut"></pre></div>
   <div class="card"><h2>Plain-text quote</h2><pre class="out" id="textOut"></pre></div>
@@ -507,8 +509,9 @@ function renderOutForm() {
       <label>&nbsp;<button class="btn" id="bInv" type="button">Open invoice PDF</button></label>
       ${fld("Payment instructions", "invoice.instructions", { area: true, cls: "wide", ph: "Interac e-Transfer to amir@voicecaptures.com, with the invoice number in the message." })}
     </div><div class="small muted" id="invNote"></div></div>`;
-  $("bPdf").onclick = () => openDoc(VCQDocs.quoteHtml(Q, R, { value: !!Q.value.includeInPdf }));
-  $("bInv").onclick = () => openDoc(VCQDocs.invoiceHtml(Q, R, Q.invoice));
+  $("bPdf").onclick = () => generate("quote");
+  $("bInv").onclick = () => generate("invoice");
+  loadOutputs();
   $("bCopyText").onclick = () => copy(VCQDocs.plainText(Q, R), "copyMsg");
   $("bCopyStripe").onclick = e => copy(VCQDocs.stripeText(Q, R), null, e.target);
   $("bInvNo").onclick = assignInvoiceNumber;
@@ -520,6 +523,39 @@ function renderOutLive() {
   $("textOut").textContent = VCQDocs.plainText(Q, R);
   const lines = VCQDocs.invoiceLines(R);
   $("invNote").textContent = lines.length ? `Invoice lines: ${lines.map(x => `${x.label} ${money(x.amount)}`).join("; ")}.` : "No one-time charges on this quote, so there is nothing to invoice outside Stripe.";
+}
+/* Open the document to print / save as PDF, and keep a copy on the quote:
+ * the exact html, the plain text, the Stripe list and the totals. */
+async function generate(kind) {
+  const html = kind === "invoice" ? VCQDocs.invoiceHtml(Q, R, Q.invoice) : VCQDocs.quoteHtml(Q, R, { value: !!Q.value.includeInPdf });
+  const w = openDoc(html);
+  if (!QID) { setSaveMsg("Not stored: save the quote to keep its outputs.", "warn-t"); return; }
+  try {
+    if (dirty) await save();
+    const docHtml = kind === "invoice" ? VCQDocs.invoiceHtml(Q, R, Q.invoice) : VCQDocs.quoteHtml(Q, R, { value: !!Q.value.includeInPdf });
+    await api(`${B}/${QID}/outputs`, { method: "POST", body: JSON.stringify({ kind, html: docHtml, with_value: kind === "quote" && !!Q.value.includeInPdf,
+      plain_text: kind === "quote" ? VCQDocs.plainText(Q, R) : null, stripe_text: kind === "quote" ? VCQDocs.stripeText(Q, R) : null,
+      totals: { listMonthly: R.listMonthly, effectiveMonthly: R.effectiveMonthly, termMonths: R.months, oneTime: R.oneTimeNet, dueAtStart: R.dueAtStart, tax: R.dueAtStartTax, dueWithTax: R.dueAtStartWithTax,
+        invoiceTotal: kind === "invoice" ? VCQDocs.invoiceLines(R).reduce((a, x) => a + x.amount, 0) : null } }) });
+    setSaveMsg(`${kind === "invoice" ? "Invoice" : "Quote"} saved to this quote's outputs`, "good-t");
+    loadOutputs();
+  } catch (e) { if (e.message !== "Signed out") alertMsg(e.needsMigration ? "Run migrations/2026-10-30-quote-outputs.sql to keep outputs." : `Output not stored: ${e.message}`); }
+}
+async function loadOutputs() {
+  const box = $("outList"); if (!box || !QID) return;
+  try {
+    const d = await api(`${B}/${QID}/outputs`);
+    box.className = "";
+    box.innerHTML = d.outputs.length ? `<div class="tw"><table><thead><tr><th>When</th><th>Document</th><th class="num">Total</th><th>By</th><th></th></tr></thead><tbody>${d.outputs.map(o => `<tr>
+      <td>${esc(new Date(o.created_at).toLocaleString("en-CA", { timeZone: "America/Toronto", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }))}</td>
+      <td>${o.kind === "invoice" ? "Invoice" : "Quote"} ${esc(o.doc_number || "")}${o.with_value ? ' <span class="pill">+ value page</span>' : ""}</td>
+      <td class="num">${o.totals ? money(o.kind === "invoice" ? (o.totals.invoiceTotal ?? 0) : o.totals.dueWithTax) : ""}</td>
+      <td class="small muted">${esc(o.created_by || "")}</td>
+      <td><button class="btn small" data-reopen="${o.id}" type="button">Open</button>${o.file_path ? ` <button class="btn small" data-file="${o.id}" type="button">PDF file</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
+      : '<span class="muted">Nothing generated yet. Open the quote or invoice PDF and it is stored here.</span>';
+    box.querySelectorAll("[data-reopen]").forEach(b => b.onclick = async () => { try { const x = await api(`${B}/${QID}/outputs/${b.dataset.reopen}`); openDoc(x.output.html); } catch (e) { alertMsg(e.message); } });
+    box.querySelectorAll("[data-file]").forEach(b => b.onclick = async () => { try { const x = await api(`${B}/${QID}/outputs/${b.dataset.file}/file`); window.open(x.url, "_blank"); } catch (e) { alertMsg(e.message); } });
+  } catch (e) { if (e.message !== "Signed out") box.innerHTML = `<span class="${e.needsMigration ? "warn-t" : "bad-t"}">${esc(e.needsMigration ? "Run migrations/2026-10-30-quote-outputs.sql to keep outputs." : e.message)}</span>`; }
 }
 function openDoc(html) {
   const w = window.open("", "_blank");
