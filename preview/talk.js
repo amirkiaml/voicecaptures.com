@@ -10,17 +10,29 @@ const CSS = `/* ---- talk-to-it widget ----
    The orb beats while the assistant is speaking, driven by the SDK's
    volume-level event where it is available and by a plain CSS pulse where it
    is not, so it still reads as alive on browsers that give us nothing. */
+/* The floating control is the same sphere as the hero's, small, with one
+   word under it. */
 .vc-bubble{position:fixed; right:18px; bottom:18px; z-index:60;
-  display:inline-flex; align-items:center; gap:9px; border:0; cursor:pointer;
-  font-family:inherit; font-size:15px; font-weight:700; color:#fff;
-  background:var(--blue); border-radius:var(--r-pill); padding:14px 20px;
-  min-height:52px; box-shadow:0 10px 30px rgba(37,99,235,.32)}
-.vc-bubble:hover{background:var(--blue-dk)}
-.vc-bubble svg{width:19px; height:19px}
-.vc-bubble .lbl{display:none}
-@media(min-width:560px){ .vc-bubble .lbl{display:inline} }
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  border:0; background:none; padding:0; cursor:pointer; font-family:inherit}
+.vc-bubble .ball{position:relative; width:64px; height:64px; border-radius:50%;
+  display:grid; place-items:center; color:#10224A;
+  background:radial-gradient(circle at 34% 30%, #BFE3F5 0%, #9EC4F7 42%, #A89BF2 100%);
+  box-shadow:0 10px 30px rgba(37,99,235,.32);
+  transition:transform .16s ease-out}
+.vc-bubble .ball::before{content:""; position:absolute; inset:-9px; border-radius:50%;
+  background:radial-gradient(circle, color-mix(in srgb,var(--blue) 24%,transparent) 0%, transparent 68%);
+  animation:vcidle 3.4s ease-in-out infinite}
+@keyframes vcidle{0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.14);opacity:.85}}
+.vc-bubble:hover .ball{transform:scale(1.06)}
+.vc-bubble svg{position:relative; width:24px; height:24px}
+.vc-bubble .lbl{font-size:13.5px; font-weight:800; color:var(--ink);
+  letter-spacing:.01em}
+.vc-bubble:hover .lbl{color:var(--blue)}
+.vc-bubble:focus-visible{outline:2px solid var(--blue); outline-offset:6px; border-radius:16px}
+@media(prefers-reduced-motion:reduce){ .vc-bubble .ball::before{animation:none} }
 
-.vc-panel{position:fixed; right:18px; bottom:84px; z-index:61; width:min(360px,calc(100vw - 36px));
+.vc-panel{position:fixed; right:18px; bottom:110px; z-index:61; width:min(360px,calc(100vw - 36px));
   background:#fff; border:1px solid var(--line); border-radius:20px; overflow:hidden}
 .vc-panel[hidden]{display:none}
 .vc-head{display:flex; align-items:center; gap:var(--s3); padding:var(--s4) var(--s6);
@@ -92,9 +104,9 @@ const CSS = `/* ---- talk-to-it widget ----
 @media(prefers-reduced-motion:reduce){ .vc-hero-lbl::before{animation:none} }
 `;
 
-const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expanded="false" aria-controls="vc-panel">
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg>
-  <span class="lbl">Talk to VoiceCaptures</span>
+const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expanded="false" aria-label="Speak to the assistant" aria-controls="vc-panel">
+  <span class="ball"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></span>
+  <span class="lbl">Speak</span>
 </button>
 
 <div class="vc-panel" id="vc-panel" role="dialog" aria-label="Talk to VoiceCaptures" hidden>

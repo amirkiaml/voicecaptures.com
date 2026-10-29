@@ -109,6 +109,9 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
 .sales{display:none; align-items:center; gap:7px; font-size:14.5px; font-weight:700;
   color:var(--ink); text-decoration:none; white-space:nowrap; padding:10px 4px; min-height:44px}
 .sales:hover{color:var(--blue)}
+.bar-end .login{display:none; font-size:15px; font-weight:600; text-decoration:none;
+  color:var(--ink); padding:10px 4px; min-height:44px; align-items:center; white-space:nowrap}
+.bar-end .login:hover{color:var(--blue)}
 .sales svg{width:15px; height:15px; color:var(--blue)}
 
 /* Search. Everything here is static, so the index is built in the page and
@@ -148,7 +151,11 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
 @media(min-width:1200px){
   .nav{display:flex}
   .sales{display:inline-flex}
+  .bar-end .login{display:inline-flex}
 }
+/* Between 1200 and 1279 the bar is 37px short of holding all five. The word
+   "Sales:" is the one piece that carries no information the number does not. */
+@media(max-width:1279px){ .sales-w{display:none} }
 
 /* full-width panel under the bar, the way the reference does it */
 .mega{position:absolute; left:0; right:0; top:100%; background:#fff;
@@ -494,14 +501,15 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     </nav>
 
     <div class="bar-end">
-      <a class="sales" href="tel:+13656039234">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
-        <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
-      </a>
       <button type="button" class="srch-btn" id="srch-btn" aria-label="Search"
               aria-expanded="false" aria-controls="srch">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       </button>
+      <a class="sales" href="tel:+13656039234">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
+        <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
+      </a>
+      <a class="login" href="/login">Log in</a>
       <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
