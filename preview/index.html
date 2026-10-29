@@ -193,6 +193,9 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
    field, which removes the hard line its darker bottom edge would otherwise
    draw across the page. */
 .hero{background:#EFF4FE; padding-top:var(--s16); padding-bottom:0}
+/* Short laptop viewports: the hero gives back its top padding so the orb
+   and the line under it still land above the fold. */
+@media(min-width:700px) and (max-height:860px){ .hero{padding-top:var(--s8)} }
 .hero-top{text-align:center; max-width:860px; margin:0 auto}
 .hero-top .lede{margin-left:auto; margin-right:auto; text-align:center}
 .hero-cta{display:flex; flex-wrap:wrap; gap:var(--s3); justify-content:center; margin-top:var(--s8)}
@@ -392,6 +395,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0; margin-top:0}
 .aside h3{margin-bottom:var(--s3)}
 .aside > p{font-size:15px; line-height:23px; color:var(--ink-2); margin:0 0 var(--s6)}
 .aside .btn{width:100%; margin-bottom:var(--s3)}
+.alink{font:inherit; color:var(--blue); font-weight:700; background:none;
+  border:0; padding:0; cursor:pointer; text-align:left}
+.alink:hover{text-decoration:underline}
 .aside hr{border:0; border-top:1px solid var(--line); margin:var(--s8) 0 var(--s6)}
 /* Icon rows rather than a bare definition list, so the panel carries the same
    language as the mega-menu and the cards. .aside a was setting colour on
@@ -571,6 +577,8 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
           </div>
         </div>
         <span class="vc-hero-lbl">Tap to talk to it now</span>
+        <span class="vc-hero-can">It books meetings with our sales team, and emails
+        them your message while you are still on the line.</span>
       </button>
 
       <div class="hero-cta">
@@ -770,6 +778,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <hr>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Hear it answer&nbsp;<span class="adot" aria-hidden="true"></span></b><span><a href="tel:+16476921081">(647)&nbsp;692-1081</a><br>Our live demo line, answering right now</span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Talk to sales</b><span><a href="tel:+13656039234">(365)&nbsp;603-9234</a></span></div></div>
+      <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><div><b>Let the assistant do it</b><span><button type="button" class="alink" data-vc-talk="start">Talk to it here</button> &mdash; it books the meeting with sales, or emails them your message, while you are still on the line</span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><div><b>Email</b><span><a href="mailto:sales@voicecaptures.com">sales@voicecaptures.com</a></span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z"/></svg></i><div><b>Where we are</b><span>Toronto, Ontario, Canada &mdash; working with businesses wherever they are</span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6v3h5v15H4V6h5zm2 1v2h2V4z"/></svg></i><div><b>Hiring</b><span><a href="/careers/">Open roles</a> &mdash; part-time sales and marketing</span></div></div>

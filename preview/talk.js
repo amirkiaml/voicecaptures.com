@@ -77,9 +77,17 @@ const CSS = `/* ---- talk-to-it widget ----
 .vc-hero{display:block; margin:var(--s4) auto 0; padding:0; border:0;
   background:none; cursor:pointer; font-family:inherit; text-align:center}
 .vc-hero .vc-stage{width:min(300px,62vw); height:min(300px,62vw); margin:0 auto}
-@media(min-width:700px){ .vc-hero{margin-top:var(--s8)} .vc-hero .vc-stage{width:300px; height:300px} }
+@media(min-width:700px){ .vc-hero{margin-top:var(--s6)} .vc-hero .vc-stage{width:284px; height:284px} }
+/* A short laptop viewport would cut the line under the orb, so the orb gives
+   back what the viewport is missing. */
+@media(min-width:700px) and (max-height:860px){
+  .vc-hero{margin-top:var(--s3)}
+  .vc-hero .vc-stage{width:208px; height:208px}
+}
 .vc-hero .vc-orb{width:38%; height:38%}
 .vc-hero .vc-orb svg{width:32%; height:32%; min-width:26px; min-height:26px}
+.vc-hero-can{display:block; max-width:34ch; margin:6px auto 0; font-size:13.5px;
+  line-height:19px; color:var(--muted)}
 .vc-hero-lbl{display:inline-flex; align-items:center; gap:8px; margin-top:var(--s2);
   font-size:15px; font-weight:700; color:var(--blue)}
 .vc-hero-lbl::before{content:""; width:7px; height:7px; border-radius:50%;
@@ -109,7 +117,7 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
       </div>
     </div>
     <p class="vc-state" id="vc-state">Ready when you are</p>
-    <p class="vc-sub" id="vc-sub">It answers in your browser. We will ask for your microphone.</p>
+    <p class="vc-sub" id="vc-sub">It answers in your browser. Ask it anything, book a meeting with sales, or leave a message and it emails the team.</p>
     <div class="vc-log" id="vc-log" aria-live="polite"></div>
     <button class="btn btn-primary" id="vc-go" type="button">Start talking</button>
     <p class="vc-alt">Rather use the phone? <a href="tel:+13656039234">(365)&nbsp;603-9234</a></p>
@@ -244,7 +252,7 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
         vapi.on("call-start", () => {
           live = true; go.disabled = false; go.textContent = "End";
           sessionStorage.setItem("vc-calls", used() + 1);
-          say("Listening", "Go ahead — ask it anything.");
+          say("Listening", "Ask it anything, or ask it to book you a meeting.");
           left = MAX_SECONDS; timer = setInterval(tick, 1000);
         });
         vapi.on("call-end", () => {
