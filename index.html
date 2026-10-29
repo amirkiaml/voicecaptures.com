@@ -154,6 +154,10 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
   --display:'Manrope',sans-serif; --body:'Manrope',sans-serif;
   color:var(--ink);
 }
+/* The old sheet's *{min-width:0}, which the scoping pass drops as a
+   document-level rule. Without it a grid or flex child will not shrink
+   below its content and wide tables walk off the screen. */
+.ported *{min-width:0}
 .ported .alt{background:var(--bg-soft)}
 .ported .hl{font-family:'Instrument Serif',Georgia,serif; font-style:italic;
   font-weight:400; color:var(--ink)}
