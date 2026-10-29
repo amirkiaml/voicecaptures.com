@@ -359,6 +359,7 @@ header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px so
 .card h3{font-size:clamp(22px,2.2vw,28px); line-height:1.15; margin-bottom:var(--s3)}
 .card p{margin:0; font-size:15px; line-height:23px; color:var(--ink-2); max-width:46ch}
 .card{display:flex; flex-direction:column}
+.card-cta{align-self:flex-start; margin-top:var(--s6)}
 .card .shot{margin:var(--s6) calc(-1 * var(--s8)) calc(-1 * var(--s8));
   overflow:hidden; margin-top:auto; padding-top:var(--s6)}
 .card .shot img{width:100%; display:block;
@@ -833,6 +834,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h3>A personal line <span class="pay">for your own phone.</span></h3>
         <p>Screens the scammers and the spam so you only get the calls that
         matter. In beta at $9/mo — join the waitlist and we’ll tell you when it opens.</p>
+        <a class="btn btn-primary btn-sm card-cta" href="#contact" data-plan="Personal line (beta)">Join the waitlist</a>
         <div class="shot"><img src="/img/personal.webp" width="1328" height="865"
           loading="lazy" alt="A recent-calls list with scam and spam calls already handled"></div>
       </div>
@@ -1428,6 +1430,24 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   }
   [calls, value, rate].forEach(function(s){ s.addEventListener("input", paint); });
   paint();
+})();
+</script>
+
+<script>
+/* A card CTA that names a plan picks it in the form it scrolls to, so nobody
+   lands on the contact form and has to re-state what they just clicked. */
+(function(){
+  "use strict";
+  var plan = document.getElementById("in-plan");
+  if (!plan) return;
+  document.querySelectorAll("a[data-plan]").forEach(function(a){
+    a.addEventListener("click", function(){
+      var want = a.getAttribute("data-plan");
+      for (var i = 0; i < plan.options.length; i++) {
+        if (plan.options[i].text === want) { plan.selectedIndex = i; break; }
+      }
+    });
+  });
 })();
 </script>
 
