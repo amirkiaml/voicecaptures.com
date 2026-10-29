@@ -126,8 +126,10 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
-<script src="calc.js"></script>
-<script src="docs.js"></script>
+<!-- Bump ?v= whenever calc.js or docs.js change, so a browser never pairs
+     this page with an older cached copy of them. -->
+<script src="calc.js?v=2026-10-28b"></script>
+<script src="docs.js?v=2026-10-28b"></script>
 </head>
 <body>
 <div class="wrap">
@@ -196,6 +198,14 @@
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
+// Guard: page and scripts must be the same version.
+if (!window.VCQ || !VCQ.phaseOf || !window.VCQDocs) {
+  document.addEventListener("DOMContentLoaded", () => {
+    $("gate").hidden = false;
+    $("gate").innerHTML = "<h2>Old copy of the calculator in your browser</h2><p>Press Ctrl+Shift+R (Cmd+Shift+R on Mac) to load the latest version.</p>";
+  });
+  throw new Error("VoiceCaptures quotes: calc.js / docs.js out of date");
+}
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const clone = o => JSON.parse(JSON.stringify(o));
 const uid = () => Math.random().toString(36).slice(2, 9);
