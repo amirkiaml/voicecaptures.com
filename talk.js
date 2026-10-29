@@ -75,6 +75,22 @@ const CSS = `/* ---- talk-to-it widget ----
 @media(prefers-reduced-motion:reduce){ .vc-orb.is-live::before{animation:none} }
 
 .vc-state{font-size:14px; font-weight:700; color:var(--ink); min-height:20px}
+/* How much of the visit's 90 seconds is left. Shown as a bar rather than a
+   number alone, because a bar is read at a glance mid-conversation. */
+.vc-meter[hidden]{display:none}
+/* Block, because the hero's meter is a <span>: an inline box ignores both
+   max-width and vertical margin, so it ran the full width of the hero. */
+.vc-meter{display:block; margin:0 0 var(--s4)}
+/* display:block because the track is a <span>: inline boxes ignore height,
+   so the bar rendered as nothing while its label showed fine. */
+.vc-meter-track{display:block; height:5px; border-radius:999px;
+  background:var(--f-blue-2); overflow:hidden}
+.vc-meter-fill{display:block; height:100%; width:100%; border-radius:999px;
+  background:var(--blue); transition:width .9s linear}
+.vc-meter-fill.is-low{background:#DC2626}
+.vc-meter-t{display:block; margin-top:6px; font-size:12.5px; font-weight:700;
+  color:var(--muted)}
+@media(prefers-reduced-motion:reduce){ .vc-meter-fill{transition:none} }
 .vc-sub{font-size:13px; line-height:19px; color:var(--muted); margin:6px 0 var(--s4)}
   font-size:13.5px; line-height:19px}
 .vc-body .btn{width:100%}
@@ -117,6 +133,8 @@ const CSS = `/* ---- talk-to-it widget ----
   font-size:14.5px; line-height:19px; color:var(--muted);
   opacity:0; transition:opacity .5s ease}
 .vc-hero-line.in{opacity:1}
+.vc-hero .vc-meter{max-width:260px; margin:var(--s3) auto 0}
+.vc-hero .vc-meter-t{text-align:center}
 .vc-hero-line b{color:var(--ink-2); font-weight:700}
 @media(prefers-reduced-motion:reduce){
   .vc-hero-state::before{animation:none}
@@ -145,6 +163,7 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
     </div>
     <p class="vc-state" id="vc-state">Ready when you are</p>
     <p class="vc-sub" id="vc-sub">It answers in your browser. Ask it anything, book a meeting with sales, or leave a message and it emails the team.</p>
+    <div class="vc-meter" hidden><span class="vc-meter-track"><span class="vc-meter-fill"></span></span><span class="vc-meter-t"></span></div>
     <button class="btn btn-primary" id="vc-go" type="button">Start talking</button>
   </div>
 </div>
@@ -182,8 +201,11 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
 const VAPI_PUBLIC_KEY   = "e321c752-3efd-401d-97f8-6f41eded6660";
 const VAPI_ASSISTANT_ID = "2980a8c6-e543-4440-9f29-5ee97bd15fd0";
 
-const MAX_SECONDS   = 180;  // one session; the assistant is hung up after this
-const MAX_PER_VISIT = 3;    // sessions per browser tab
+/* 90 seconds PER VISIT, not per call. A per-call cap just means starting
+   another call, which is the "over and over" this is meant to stop. The spend
+   is kept in sessionStorage, so closing the panel and reopening it carries on
+   from where it stopped rather than handing out a fresh budget. */
+const BUDGET_SECONDS = 90;
 
 (function(){
   "use strict";
@@ -200,12 +222,25 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
     if (s !== undefined) sub.textContent = s;
     if (inline) heroSay(t);
   };
-  const used = () => +(sessionStorage.getItem("vc-calls") || 0);
+  /* Seconds already spent this visit. sessionStorage is per tab and clears
+     when it closes, which is exactly what "per visit" means here. */
+  function spent(){
+    try { return Math.min(BUDGET_SECONDS, +(sessionStorage.getItem("vc-spent") || 0)); }
+    catch (e) { return 0; }           // private mode: the cap still works in memory
+  }
+  function setSpent(v){
+    try { sessionStorage.setItem("vc-spent", String(Math.min(BUDGET_SECONDS, v))); }
+    catch (e) {}
+  }
+  const remaining = () => Math.max(0, BUDGET_SECONDS - spent());
+  const mmss = (t) => Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
 
   function openPanel(open){
     panel.hidden = !open;
     bubble.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) go.focus();
+    // Someone coming back mid-visit should see what is left before they press
+    // anything, not discover it a second into the call.
+    if (open) { paintMeter(); go.focus(); }
   }
   bubble.addEventListener("click", () => openPanel(panel.hidden));
 
@@ -227,6 +262,7 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
       // error path, stop(), call-end — takes it back out.
       heroCalling(true);
       heroSay("Connecting\u2026");
+      paintMeter();
       start();
       return;
     }
@@ -294,10 +330,31 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
     });
   }
 
+  /* The meter. Both surfaces carry one, and both are driven from here so they
+     cannot disagree about how much time is left. */
+  function paintMeter(){
+    const r = remaining();
+    const pct = (r / BUDGET_SECONDS) * 100;
+    document.querySelectorAll(".vc-meter").forEach((m) => {
+      m.hidden = !(live || spent() > 0);
+      const fill = m.querySelector(".vc-meter-fill");
+      const lbl  = m.querySelector(".vc-meter-t");
+      if (fill) fill.style.width = pct.toFixed(1) + "%";
+      if (fill) fill.classList.toggle("is-low", r <= 20);
+      if (lbl) lbl.textContent = r > 0 ? mmss(r) + " left in this demo"
+                                       : "That is the demo for this visit";
+    });
+  }
+
   function tick(){
-    left--;
-    if (left <= 0) { say("That is the demo limit", "Call the line for a longer one."); stop(); return; }
-    if (left <= 30) sub.textContent = left + "s left in this demo";
+    setSpent(spent() + 1);
+    paintMeter();
+    if (remaining() > 0) return;
+    say("That is the demo limit", "Call (365) 603-9234, or build your own demo assistant.");
+    stop();
+    /* Closed rather than left sitting on a spent meter. Reopening is fine — it
+       just will not start another call. */
+    setTimeout(() => { window.closeSearch && 0; openPanel(false); heroCalling(false); }, 2600);
   }
 
   async function start(){
@@ -305,8 +362,10 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
       say("Not connected yet", "Add the Vapi public key and assistant ID to switch this on.");
       return;
     }
-    if (used() >= MAX_PER_VISIT) {
-      say("That is enough for one visit", "Call the line or build your own demo assistant.");
+    if (remaining() <= 0) {
+      say("That is the demo for this visit",
+          "Call (365) 603-9234, or build your own demo assistant.");
+      paintMeter();
       return;
     }
     go.disabled = true;
@@ -326,9 +385,9 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
         vapi = new Vapi(VAPI_PUBLIC_KEY);
         vapi.on("call-start", () => {
           live = true; go.disabled = false; go.textContent = "End";
-          sessionStorage.setItem("vc-calls", used() + 1);
           say("Listening", "Ask it anything, or ask it to book you a meeting.");
-          left = MAX_SECONDS; timer = setInterval(tick, 1000);
+          timer = setInterval(tick, 1000);
+          paintMeter();
         });
         vapi.on("call-end", () => {
           live = false; go.disabled = false; go.textContent = "Start talking";
@@ -373,7 +432,7 @@ const MAX_PER_VISIT = 3;    // sessions per browser tab
   }
 
   function stop(){
-    clearInterval(timer); speaking(false); heroCalling(false);
+    clearInterval(timer); speaking(false); heroCalling(false); paintMeter();
     try { if (vapi) vapi.stop(); } catch (e) {}
     live = false; go.disabled = false; go.textContent = "Start talking";
   }
