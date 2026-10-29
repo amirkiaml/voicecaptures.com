@@ -2337,7 +2337,7 @@ DEMO_BODY = f"""
     ask that the website never mentions. Setup for that takes about ten minutes
     and we do it with you.</p>
     <p>The demo does not book anything, does not text anyone, and is deleted
-    after 72 hours unless you carry on.</p>
+    after 24 hours unless you carry on.</p>
     <p class="demo-cta-row">
       <a class="btn btn-primary" href="/#contact">Tell us about your line</a>
       <a class="btn btn-ghost" href="/pricing/">See the plans</a>
