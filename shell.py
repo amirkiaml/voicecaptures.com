@@ -118,6 +118,53 @@ def parts() -> dict:
 
 
 
+
+BRIDGE_CSS = """
+/* ---- token bridge, and the colour that was missing ----------------------
+   The carried-over sheet was written against the OLD palette, where the names
+   mean different things: --bg was near-black, --text near-white, --bg2 and
+   --bg3 were raised dark surfaces. Those names were never redefined for the
+   light system, so every ported rule painting with them resolved to NOTHING.
+   That is why these pages came out flat white: a card asking for var(--bg2)
+   got no colour at all and simply disappeared into the page.
+
+   Mapping them onto the new palette brings the surfaces back AND is what
+   makes the tints below possible. */
+.ported{
+  --bg:#FFFFFF;
+  --bg2:var(--bg-soft);
+  --bg3:#FFFFFF;
+  --text:var(--ink);
+  --muted:var(--muted);
+  --faint:var(--faint);
+  --line2:rgba(13,23,41,.16);
+  --blue-glow:color-mix(in srgb, var(--blue) 12%, transparent);
+  --cyan-lt:#7FD4E8;
+  --red:#DC2626;
+  --wb-dk:#6D28D9;
+  --wb-glow:color-mix(in srgb, var(--wb) 12%, transparent);
+  --display:'Manrope',sans-serif;
+  --body:'Manrope',sans-serif;
+  color:var(--ink);
+}
+
+/* The home page alternates white with pale tints of the blue, the cyan and the
+   violet rather than running white all the way down. These pages now do the
+   same: .alt is the carried-over sheet's "this one is shaded" class, so the
+   rotation hangs off it and no markup had to change. */
+.ported .alt{background:var(--bg-soft)}
+.ported section.alt:nth-of-type(6n+2){background:var(--f-blue)}
+.ported section.alt:nth-of-type(6n+4){background:var(--f-cyan)}
+.ported section.alt:nth-of-type(6n+6){background:var(--f-wb)}
+
+/* Cards sit on white so they stay legible whichever tint is behind them. */
+.ported .alt .card, .ported .alt .pr-card, .ported .alt .pay,
+.ported .alt .role, .ported .alt .demo-try > div{background:#fff}
+
+/* The closing band and the contact block, as on the home page. */
+.ported .faq-end{background:var(--f-cyan)}
+"""
+
 TYPE_CSS = """
 /* ---- one typographic system ---------------------------------------------
    The ported bodies were written against a sheet with its own scale: 15.5px
@@ -271,7 +318,17 @@ PRICING_CSS = """
 .ported .faq-top{max-width:720px; margin:0 auto var(--s16); text-align:center}
 .ported .faq-top h1{margin:var(--s3) 0 var(--s4)}
 .ported .faq-top .lede{margin-left:auto; margin-right:auto}
-.ported .faq-g{max-width:760px; margin:0 auto var(--s12)}
+/* The groups carry the rotation here: the page is one long list rather than
+   alternating sections, so the tint hangs off the panels instead. */
+.ported .faq-g{max-width:820px; margin:0 auto var(--s8);
+  border-radius:var(--r-card); padding:var(--s8) var(--s8) var(--s6)}
+.ported .faq-g:nth-of-type(4n+1){background:var(--f-blue)}
+.ported .faq-g:nth-of-type(4n+2){background:var(--f-cyan)}
+.ported .faq-g:nth-of-type(4n+3){background:var(--f-wb)}
+.ported .faq-g:nth-of-type(4n+4){background:var(--bg-soft)}
+.ported .faq-g .faq-list{border-top-color:rgba(13,23,41,.14)}
+.ported .faq-g details{border-bottom-color:rgba(13,23,41,.14)}
+@media(max-width:560px){ .ported .faq-g{padding:var(--s6) var(--s4) var(--s4)} }
 .ported .faq-g h2{font-size:14px; font-weight:800; letter-spacing:.1em;
   text-transform:uppercase; color:var(--wb); margin-bottom:var(--s4);
   text-align:left}
@@ -362,6 +419,7 @@ def build(old_css: str) -> str:
         # they are the page people compare prices on, so they match the rest of
         # the site rather than the stylesheet they came from.
         # Typography first, cards after, so the cards' own sizes win.
+        + BRIDGE_CSS
         + TYPE_CSS
         + PRICING_CSS
         + "\n.ported *{min-width:0}"

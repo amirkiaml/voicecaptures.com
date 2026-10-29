@@ -1305,14 +1305,12 @@ WINBACK_BODY = f"""
       <span class="badge">Results report after every campaign</span>
       <span class="badge badge-live">One price, or own it</span>
     </div>
-    <picture class="wb-art th-light">
-      <source srcset="/winback-light.webp" type="image/webp">
-      <img src="/winback-light.png" alt="A stack of past-customer records on the left, connected by call icons to booked appointments filling a calendar on the right." width="1400" height="788" loading="lazy" decoding="async">
-    </picture>
-    <picture class="wb-art th-dark">
-      <source srcset="/winback-dark.webp" type="image/webp">
-      <img src="/winback-dark.png" alt="" width="1400" height="788" loading="lazy" decoding="async">
-    </picture>
+    <!-- The week-view artwork the home page band uses, so the two places this
+         campaign is described show the same picture. The pair it replaced was a
+         light/dark set with a blank calendar grid and the wordmark baked in;
+         there is no dark theme to switch to any more. -->
+    <img class="wb-art" src="/img/winback.webp" width="1400" height="579" loading="lazy" decoding="async"
+         alt="A stack of past-customer records on the left, connected by call icons to a week of booked callbacks and follow-ups on the right.">
   </div>
 </section>
 
