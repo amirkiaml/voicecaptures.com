@@ -368,10 +368,21 @@ html.mnav-open .vc-bubble{display:none}
 
 /* Device frame. Real product screenshots go inside; the frame is CSS so it
    stays sharp and needs no bespoke render. */
-.hero-art{display:block; width:100%; max-width:none; margin:var(--s12) 0 0;
+/* The art is nearly square (1500x1165), so a full-bleed width turns into
+   height: on an 1800px laptop it rendered 1398px tall — one and a half
+   screens of phone before the next section. Capped near the content rail it
+   reads as a product shot instead of a backdrop, and the screens stay
+   legible, which is the whole point of showing them. Capping exposes the
+   image's own light background against the page tint, so the fade runs on
+   both axes now and the edges dissolve instead of ending. */
+.hero-art{display:block; width:100%; max-width:880px; margin:var(--s12) auto 0;
   border-radius:0;
-  -webkit-mask-image:linear-gradient(180deg,#000 90%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 90%,transparent 100%)}
+  -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent 100%),
+    linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(180deg,#000 88%,transparent 100%),
+    linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);
+  mask-composite:intersect}
 .phone{width:min(300px,78vw); margin:0 auto; border-radius:38px;
   background:#0D1729; padding:10px; border:1px solid rgba(255,255,255,.14)}
 .phone-in{border-radius:29px; overflow:hidden; background:#101A2E; aspect-ratio:9/19}
