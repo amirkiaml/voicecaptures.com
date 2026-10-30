@@ -229,7 +229,7 @@ function newQuote(industry = "clinic") {
     locations: [{ id: uid(), name: "Main location", plan: first.id, coverage: "all_day", volumeMode: "calls", calls: 100, avgMin: 2.5, minutes: 250, addons: { extra_line: 0, history: "" } }],
     items: [], setup: { on: false }, trial: { on: true, days: 14, cap: 100, locationId: null }, term: 1,
     discounts: { multiPct: 0, waiveSetup: false, credits: [], freeAddons: [], manual: [] },
-    tax: { hst: false, number: "" },
+    tax: { hst: true, number: "" },   // registered for HST since Oct 2026 — on by default
     showTermOptions: false, oneTimeAtSigning: false, conditions: "",
     value: { includeInPdf: false, models: { missed: { on: true, missedCalls: 40, bookingRate: 30, avgValue: 250 }, replaced: { on: false, what: "answering service", monthlyCost: 600, hours: 0 }, time: { on: false, hours: 20, hourlyCost: 25 } } },
     invoice: { number: null, issueDate: today(), dueDate: addDays(today(), 15), instructions: "" }
@@ -370,7 +370,7 @@ function renderDeal() {
   <div class="card"><h2>Tax</h2><div class="fg">
     ${chk(`Charge Ontario HST ${pb.hstPct}%`, "tax.hst")}
     ${fld("HST number", "tax.number", { ph: "123456789 RT0001" })}
-  </div><div class="small muted">Off until you're registered for HST.</div></div>`;
+  </div><div class="small muted">Registered since Oct 2026, so this is on by default. Put your HST number in — it has to appear on every invoice.</div></div>`;
 }
 
 const ACTS = {

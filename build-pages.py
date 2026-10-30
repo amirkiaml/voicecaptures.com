@@ -1422,8 +1422,8 @@ WINBACK_BODY = f"""
       </div>
     </div>
 
-    <p class="fine" style="margin-top:16px">All prices in CAD. Most reactivation
-    services won&rsquo;t quote without a sales call. Ours is above.</p>
+    <p class="fine" style="margin-top:16px">All prices in CAD, plus HST. Most
+    reactivation services won&rsquo;t quote without a sales call. Ours is above.</p>
 
     <p class="fine" style="margin-top:10px">The free pilot is the first 20% of
     your list, up to 100 names and never fewer than 25. Custom is a build, so it
@@ -1531,7 +1531,7 @@ WINBACK_BODY = f"""
         pilot. No charge.</p>
 
         <p class="fine" id="co-disc">Estimates only, not a quote or a guarantee.
-        All prices in CAD. Add-ons not included.</p>
+        All prices in CAD, plus HST. Add-ons not included.</p>
 
         <a class="btn btn-primary" href="{CAL}" target="_blank" rel="noopener">Start with a free pilot</a>
 
@@ -1567,7 +1567,7 @@ WINBACK_BODY = f"""
     are a fixed price agreed in writing before work starts. Some software only
     opens its connections to approved partners. If yours doesn&rsquo;t, we use a
     CSV export and Google Calendar instead, and we&rsquo;ll tell you before you
-    pay. All prices in CAD.</p>
+    pay. All prices in CAD, plus HST.</p>
   </div>
 </section>
 
@@ -1983,7 +1983,8 @@ people are usually involved in the decision.</p>
 <h2>Billing and taxes</h2>
 <p>Plans are billed monthly in Canadian dollars, in advance, on the same date each
 month, to the card you gave us, unless you have bought a prepaid term. Prices are in
-Canadian dollars. Where we are required to charge sales tax, it is added to your bill. Add-ons are billed with your plan. One-time setup
+Canadian dollars and exclude tax. HST is added to your bill at the applicable rate
+and shown as a separate line on every invoice, with our HST number on it. Add-ons are billed with your plan. One-time setup
 and integration work is quoted in writing and billed separately. You can update
 your card or download invoices at any time from your billing portal.</p>
 
@@ -2430,8 +2431,9 @@ def _pricing_body():
     <h1>Every plan, <span class="pay">on one page.</span></h1>
     <p class="lede">What each industry pays, what a plan includes, and what the
     extras cost. No quote needed to see a price.</p>
-    <p class="fine">All prices in CAD. Month to month, cancel anytime. Every plan
-    covers one location and answers 24/7 &mdash; after-hours, overflow or all day.</p>
+    <p class="fine">All prices in CAD, plus HST. Month to month, cancel anytime.
+    Every plan covers one location and answers 24/7 &mdash; after-hours, overflow
+    or all day.</p>
     <div class="pr-jump">
       <a href="#p-home">Home services</a><a href="#p-food">Restaurants</a>
       <a href="#p-clinic">Clinics</a><a href="#p-other">Other</a>
