@@ -1550,6 +1550,63 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 })();
 </script>
 
+<script>
+/* Count the collage stats up when they first scroll into view.
+   The final values stay in the HTML, so with no JS, a failed observer or
+   reduce-motion set, the real numbers are what is on the page -- the script
+   only ever animates toward text that is already correct. */
+(function(){
+  var nodes = document.querySelectorAll(".cstats .cstat b");
+  if (!nodes.length) return;
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (still || !("IntersectionObserver" in window)) return;
+
+  var DUR = 1500;
+  function plan(el){
+    var txt = el.textContent;
+    var parts = [], last = 0, re = /\d[\d,]*/g, m;
+    while ((m = re.exec(txt))){
+      if (m.index > last) parts.push({t: txt.slice(last, m.index)});
+      parts.push({n: parseInt(m[0].replace(/,/g, ""), 10), c: m[0].indexOf(",") > -1});
+      last = m.index + m[0].length;
+    }
+    if (last < txt.length) parts.push({t: txt.slice(last)});
+    return parts.some(function(p){ return p.n !== undefined; }) ? parts : null;
+  }
+  function paint(el, parts, k){
+    el.textContent = parts.map(function(p){
+      if (p.n === undefined) return p.t;
+      var v = Math.round(p.n * k);
+      return p.c ? v.toLocaleString("en-US") : String(v);
+    }).join("");
+  }
+  function run(el){
+    var parts = plan(el);
+    if (!parts) return;
+    var w = el.getBoundingClientRect().width;
+    if (w) el.style.minWidth = w + "px";   // hold the width so nothing reflows
+    var t0 = 0;
+    function step(ts){
+      if (!t0) t0 = ts;
+      var k = Math.min(1, (ts - t0) / DUR);
+      paint(el, parts, 1 - Math.pow(1 - k, 3));   // ease-out, lands exactly on 1
+      if (k < 1) requestAnimationFrame(step);
+      else el.style.minWidth = "";
+    }
+    paint(el, parts, 0);
+    requestAnimationFrame(step);
+  }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      run(e.target);
+    });
+  }, {threshold: 0.45});
+  nodes.forEach(function(n){ io.observe(n); });
+})();
+</script>
+
 <script type="module" src="/talk.js?v=e96f24b9"></script>
 </body>
 </html>
