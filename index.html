@@ -600,6 +600,16 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .plisten-row > span{flex:0 0 auto; font-size:14px; font-weight:700; color:var(--ink)}
 .plisten-row audio{flex:1 1 220px; min-width:0; height:36px; max-width:100%}
 .plisten-n{margin:var(--s2) 0 0}
+/* What lands on your phone after each of those calls. The exact text the
+   line sent, masked the same way the recordings are. */
+.psms{margin:0 0 var(--s4); padding:var(--s3) var(--s4);
+  border-radius:14px; background:var(--f-blue); border:1px solid var(--line)}
+.psms-spam{background:var(--f-sand)}
+.psms-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--blue); margin-bottom:var(--s1)}
+.psms-spam .psms-k{color:#B45309}
+.psms p{margin:0; font-size:13px; line-height:20px; color:var(--ink-2)}
+.psms b{color:var(--ink)}
 
 .fcols{display:grid; gap:var(--s8); grid-template-columns:1fr}
 @media(min-width:700px){ .fcols{grid-template-columns:1fr 1fr} }
@@ -689,7 +699,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <a class="mega-feat" href="/demo/?src=nav">
         <b>Build your demo assistant</b>
         <em>Tell it about your business and talk to it in your browser. About 30 seconds, no call.</em>
-        <img src="/img/hero-phones.webp" width="1600" height="900" loading="lazy" alt="">
+        <img src="/img/hero-phones-2.webp" width="1600" height="900" loading="lazy" alt="">
       </a>
     </div>
   </div>
@@ -846,7 +856,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     </div>
   </div>
 
-  <img class="hero-art" src="/img/hero-phones.webp" width="1600" height="900"
+  <img class="hero-art" src="/img/hero-phones-2.webp" width="1600" height="900"
        alt="Two phones: the assistant answering a call, and the text conversation where it books the job">
 </section>
 
@@ -921,13 +931,21 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
             <span>A scam, stopped</span>
             <audio controls preload="metadata" src="/personal-spam.mp3"></audio>
           </div>
+          <div class="psms psms-spam">
+            <span class="psms-k">Text to you</span>
+            <p>URGENCY: <b>SPAM</b><br>Name: Unknown<br>Phone: +1647•••••••<br>Request: [SPAM] Immigration impersonation robocall</p>
+          </div>
           <div class="plisten-row">
             <span>A call worth taking</span>
             <audio controls preload="metadata" src="/personal-bmo.mp3"></audio>
           </div>
+          <div class="psms">
+            <span class="psms-k">Text to you</span>
+            <p>URGENCY: <b>MESSAGE</b><br>Name: •••<br>Phone: +1416•••••••<br>Request: ••• from BMO is checking in with the client and would like a callback</p>
+          </div>
           <p class="fine plisten-n">Real screened calls. Names and numbers are masked.</p>
         </div>
-        <div class="shot"><img src="/img/personal.webp" width="1400" height="872"
+        <div class="shot"><img src="/img/personal-2.webp" width="1400" height="872"
           loading="lazy" alt="A recent-calls list with scam and spam calls already handled"></div>
       </div>
 
@@ -1311,7 +1329,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   "use strict";
   var IMG = "/img/";
   var IX = [
-    ["AI receptionist", "/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone call missed calls after hours overnight voicemail greeting answer", IMG+"hero-phones.webp"],
+    ["AI receptionist", "/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone call missed calls after hours overnight voicemail greeting answer", IMG+"hero-phones-2.webp"],
     ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price pricing cost costs plan plans tier tiers monthly subscription how much cheap expensive quote budget", IMG+"dashboard.webp"],
     ["Extra minutes and overage", "/pricing/", "$1.50 a minute over your plan, or packs of 50 and 100 bought in the dashboard.", "overage extra minutes pack packs bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
     ["Prepaid plans", "/pricing/", "Pay three, six or twelve months up front instead of monthly.", "prepaid annual yearly upfront discount commitment term contract length save", ""],
@@ -1327,7 +1345,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     ["Salons, spas and fitness", "/pricing/", "Bookings and rescheduling for salons, spas, studios and gyms.", "salon salons hair barber nails spa massage esthetics fitness gym studio yoga pilates personal trainer booking reschedule", IMG+"sec-salon.webp"],
     ["Professional services", "/pricing/", "Legal, real estate, accounting and consulting.", "legal lawyer law firm attorney paralegal real estate realtor broker accounting accountant bookkeeping consulting consultant agency office intake", IMG+"sec-pro.webp"],
     ["Any other business", "/pricing/", "If it takes calls, it fits. Tell us the trade and we will say so.", "other business industry sector vertical fit anything else", ""],
-    ["Personal line", "/pricing/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal.webp"],
+    ["Personal line", "/pricing/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal-2.webp"],
     ["Books into your calendar", "/", "It books the job live on the call, into the calendar you already use.", "calendar booking book appointment schedule scheduling availability slot google outlook calendly", ""],
     ["Software it books into", "/", "Google Calendar, Outlook, Jobber, Housecall Pro, ServiceTitan, Square, Jane and more.", "integration integrations jobber housecall pro servicetitan square acuity mindbody jane dentrix open dental eaglesoft opentable resy toast hubspot crm outlook google calendar connect sync", IMG+"integrations.webp"],
     ["Texts and summaries", "/", "The caller's name, number and what they wanted, texted to you before you pick up.", "text texts sms message messages summary transcript notification alert notify email forward", ""],
