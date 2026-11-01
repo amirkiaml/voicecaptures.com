@@ -482,6 +482,31 @@ html.mnav-open .vc-bubble{display:none}
 /* The three figures sit under the photographs rather than inside the grid
    with them: a free cell is only free until a photo's span changes, and
    placing them by hand had them land on top of one. */
+/* Photo above, animation below, the two blended rather than butted: the
+   artwork's own ground continues the picture, so the seam has to disappear.
+   The SVG cannot carry the photo itself -- an <img>-loaded SVG fetches
+   nothing external -- so the card stacks them instead. */
+/* The phone screen in the personal-line photo, replaced by a live one.
+   The panel is baked into the picture, so the animated panel is laid over it
+   at the exact box it occupies (measured off the file: 51.1%/8.9%, 43.4% x
+   85.3%) and covers it completely. */
+.card .shot .shot-over{position:relative; display:block; line-height:0}
+.card .shot .shot-over > img{display:block; width:100%; height:auto}
+/* Must out-rank the sibling rule above, which also matches this element. */
+.card .shot .shot-over > img.shot-screen{position:absolute; left:51.14%; top:8.94%;
+  width:43.43%; height:auto; border-radius:13px;
+  -webkit-mask-image:none; mask-image:none}
+
+.shot-stack{display:block; line-height:0}
+.card .shot .shot-photo{display:block; width:100%; height:auto;
+  -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 72%,transparent 100%)}
+.card .shot .shot-anim{display:block; width:100%; height:auto;
+  margin-top:-7%; position:relative; z-index:1}
+/* The dark card needs more overlap: its photo fades to the card ground,
+   which is not the artwork's ground, and the gap read as a seam. */
+.card .shot-stack.is-dark .shot-anim{margin-top:-13%}
+
 .cstats{display:grid; grid-template-columns:1fr; gap:var(--s8);
   max-width:1060px; margin:var(--s12) auto 0; text-align:center}
 @media(min-width:760px){ .cstats{grid-template-columns:repeat(3,1fr); gap:var(--s6)} }
@@ -904,9 +929,13 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h3>It calls your past customers <span class="pay">back.</span></h3>
         <p>Win-back campaigns ring the customers you already have when they come
         due — never cold lists or purchased leads.</p>
-        <div class="shot"><img src="/img/winback.svg" width="1400" height="579"
-          loading="lazy" decoding="async"
-          alt="Past customers flowing into a week of booked callbacks, filling in one at a time"></div>
+        <div class="shot shot-stack">
+          <img class="shot-photo" src="/img/wb-photo.webp" width="1400" height="511"
+            loading="lazy" decoding="async" alt="">
+          <img class="shot-anim" src="/img/winback.svg" width="1400" height="579"
+            loading="lazy" decoding="async"
+            alt="Past customers flowing into a week of booked callbacks, filling in one at a time">
+        </div>
       </div>
 
       <div class="card c-blue">
@@ -927,8 +956,13 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
           </div>
           <p class="fine plisten-n">Real screened calls. Names and numbers are masked.</p>
         </div>
-        <div class="shot"><img src="/img/personal-2.webp" width="1400" height="872"
-          loading="lazy" alt="A recent-calls list with scam and spam calls already handled"></div>
+        <div class="shot"><div class="shot-over">
+          <img src="/img/personal-2.webp" width="1400" height="872"
+            loading="lazy" decoding="async" alt="">
+          <img class="shot-screen" src="/img/personal.svg" width="608" height="756"
+            loading="lazy" decoding="async"
+            alt="The personal line screen: spam flagged, real callers passed through, each arriving in turn">
+        </div></div>
       </div>
 
       <div class="card c-ink">
@@ -936,8 +970,12 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h3>Books straight into <span class="pay">your software.</span></h3>
         <p>Practice management, field service, POS and CRM integrations, so nobody
         has to work somewhere new. Quoted per system.</p>
-        <div class="shot"><img src="/img/integrations.svg" width="1400" height="933" decoding="async"
-          loading="lazy" alt="Screened calls on the left, the booked plumbing job written into the customer record on the right"></div>
+        <div class="shot shot-stack is-dark">
+          <img class="shot-photo" src="/img/ig-photo.webp" width="1400" height="762"
+            loading="lazy" decoding="async" alt="">
+          <img class="shot-anim" src="/img/integrations.svg" width="1400" height="933"
+            loading="lazy" decoding="async" alt="Screened calls on the left, the booked plumbing job written into the customer record on the right">
+        </div>
       </div>
     </div>
   </div>

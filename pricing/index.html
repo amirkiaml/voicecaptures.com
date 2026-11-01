@@ -483,6 +483,31 @@ html.mnav-open .vc-bubble{display:none}
 /* The three figures sit under the photographs rather than inside the grid
    with them: a free cell is only free until a photo's span changes, and
    placing them by hand had them land on top of one. */
+/* Photo above, animation below, the two blended rather than butted: the
+   artwork's own ground continues the picture, so the seam has to disappear.
+   The SVG cannot carry the photo itself -- an <img>-loaded SVG fetches
+   nothing external -- so the card stacks them instead. */
+/* The phone screen in the personal-line photo, replaced by a live one.
+   The panel is baked into the picture, so the animated panel is laid over it
+   at the exact box it occupies (measured off the file: 51.1%/8.9%, 43.4% x
+   85.3%) and covers it completely. */
+.card .shot .shot-over{position:relative; display:block; line-height:0}
+.card .shot .shot-over > img{display:block; width:100%; height:auto}
+/* Must out-rank the sibling rule above, which also matches this element. */
+.card .shot .shot-over > img.shot-screen{position:absolute; left:51.14%; top:8.94%;
+  width:43.43%; height:auto; border-radius:13px;
+  -webkit-mask-image:none; mask-image:none}
+
+.shot-stack{display:block; line-height:0}
+.card .shot .shot-photo{display:block; width:100%; height:auto;
+  -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 72%,transparent 100%)}
+.card .shot .shot-anim{display:block; width:100%; height:auto;
+  margin-top:-7%; position:relative; z-index:1}
+/* The dark card needs more overlap: its photo fades to the card ground,
+   which is not the artwork's ground, and the gap read as a seam. */
+.card .shot-stack.is-dark .shot-anim{margin-top:-13%}
+
 .cstats{display:grid; grid-template-columns:1fr; gap:var(--s8);
   max-width:1060px; margin:var(--s12) auto 0; text-align:center}
 @media(min-width:760px){ .cstats{grid-template-columns:repeat(3,1fr); gap:var(--s6)} }
