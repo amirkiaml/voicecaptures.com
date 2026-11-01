@@ -600,17 +600,6 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .plisten-row > span{flex:0 0 auto; font-size:14px; font-weight:700; color:var(--ink)}
 .plisten-row audio{flex:1 1 220px; min-width:0; height:36px; max-width:100%}
 .plisten-n{margin:var(--s2) 0 0}
-/* What lands on your phone after each of those calls. The exact text the
-   line sent, masked the same way the recordings are. */
-.psms{margin:0 0 var(--s4); padding:var(--s3) var(--s4);
-  border-radius:14px; background:var(--f-blue); border:1px solid var(--line)}
-.psms-spam{background:var(--f-sand)}
-.psms-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
-  text-transform:uppercase; color:var(--blue); margin-bottom:var(--s1)}
-.psms-spam .psms-k{color:#B45309}
-.psms p{margin:0; font-size:13px; line-height:20px; color:var(--ink-2)}
-.psms b{color:var(--ink)}
-
 .fcols{display:grid; gap:var(--s8); grid-template-columns:1fr}
 @media(min-width:700px){ .fcols{grid-template-columns:1fr 1fr} }
 @media(min-width:1000px){ .fcols{grid-template-columns:1.4fr 1fr 1fr 1fr; gap:var(--s12)} }
@@ -915,8 +904,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h3>It calls your past customers <span class="pay">back.</span></h3>
         <p>Win-back campaigns ring the customers you already have when they come
         due — never cold lists or purchased leads.</p>
-        <div class="shot"><img src="/img/winback.webp" width="1400" height="579"
-          loading="lazy" alt="Past customers flowing into a week of booked callbacks"></div>
+        <div class="shot"><img src="/img/winback.svg" width="1400" height="579"
+          loading="lazy" decoding="async"
+          alt="Past customers flowing into a week of booked callbacks, filling in one at a time"></div>
       </div>
 
       <div class="card c-blue">
@@ -931,17 +921,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
             <span>A scam, stopped</span>
             <audio controls preload="metadata" src="/personal-spam.mp3"></audio>
           </div>
-          <div class="psms psms-spam">
-            <span class="psms-k">Text to you</span>
-            <p>URGENCY: <b>SPAM</b><br>Name: Unknown<br>Phone: +1647•••••••<br>Request: [SPAM] Immigration impersonation robocall</p>
-          </div>
           <div class="plisten-row">
             <span>A call worth taking</span>
             <audio controls preload="metadata" src="/personal-bmo.mp3"></audio>
-          </div>
-          <div class="psms">
-            <span class="psms-k">Text to you</span>
-            <p>URGENCY: <b>MESSAGE</b><br>Name: •••<br>Phone: +1416•••••••<br>Request: ••• from BMO is checking in with the client and would like a callback</p>
           </div>
           <p class="fine plisten-n">Real screened calls. Names and numbers are masked.</p>
         </div>
