@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="d" width="1400" height="938" viewBox="0 0 1400 938" role="img" aria-label="The dashboard: revenue captured, calls answered, appointments booked and when people call, filling in as the week runs">
+<style>
+<![CDATA[
+.d{display:block;width:100%;height:auto}
+.d text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.d .vclogo-t{font-weight:800;letter-spacing:-.01em}
+.d .h1{font-size:30px;font-weight:800;fill:#0D1729}
+.d .sub{font-size:16px;font-weight:500;fill:#55637A}
+.d .nav{font-size:15px}
+.d .lab{font-size:15px;font-weight:600}
+.d .fine{font-size:13px;font-weight:500;fill:#7C8CA3}
+.d .up{font-size:14px;font-weight:700;fill:#16A34A}
+.d .tick{font-size:12px;font-weight:600;fill:#9AA7BB}
+.d .gl{stroke:rgba(13,23,41,.07)}
+.d .cnt text{transform-box:fill-box;transform-origin:center}
+.d g[class^="c"],.d g[class^="hc"],.d .pill{transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion: reduce){
+  .d *{animation:none!important}
+  .d g[class^="c"],.d g[class^="hc"],.d .pill{opacity:1!important}
+  .d .line1,.d .line2{stroke-dasharray:none!important}
+  .d .area{opacity:.10!important} .d .bq{transform:none!important}
+  .d .bar-fill{transform:none!important} .d .sp{stroke-dasharray:none!important}
+  .d .cnt text{opacity:0!important} .d .cnt text:last-child{opacity:1!important}
+}
+
+@keyframes rev0{0%,7.5%{opacity:0;transform:translateY(9px)}8.3%,9.6%{opacity:1;transform:translateY(0)}10.4%,100%{opacity:0;transform:translateY(-9px)}}
+.d .rev0{opacity:0;animation:rev0 20.0s ease-out infinite}
+@keyframes rev1{0%,9.6%{opacity:0;transform:translateY(9px)}10.4%,11.7%{opacity:1;transform:translateY(0)}12.5%,100%{opacity:0;transform:translateY(-9px)}}
+.d .rev1{opacity:0;animation:rev1 20.0s ease-out infinite}
+@keyframes rev2{0%,11.7%{opacity:0;transform:translateY(9px)}12.5%,13.8%{opacity:1;transform:translateY(0)}14.6%,100%{opacity:0;transform:translateY(-9px)}}
+.d .rev2{opacity:0;animation:rev2 20.0s ease-out infinite}
+@keyframes rev3{0%,13.8%{opacity:0;transform:translateY(9px)}14.6%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .rev3{opacity:0;animation:rev3 20.0s ease-out infinite}
+@keyframes s00{0%,10.0%{opacity:0;transform:translateY(9px)}10.8%,12.1%{opacity:1;transform:translateY(0)}12.9%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s00{opacity:0;animation:s00 20.0s ease-out infinite}
+@keyframes s01{0%,12.1%{opacity:0;transform:translateY(9px)}12.9%,14.2%{opacity:1;transform:translateY(0)}15.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s01{opacity:0;animation:s01 20.0s ease-out infinite}
+@keyframes s02{0%,14.2%{opacity:0;transform:translateY(9px)}15.0%,16.3%{opacity:1;transform:translateY(0)}17.1%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s02{opacity:0;animation:s02 20.0s ease-out infinite}
+@keyframes s03{0%,16.3%{opacity:0;transform:translateY(9px)}17.1%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s03{opacity:0;animation:s03 20.0s ease-out infinite}
+@keyframes s10{0%,11.25%{opacity:0;transform:translateY(9px)}12.05%,13.35%{opacity:1;transform:translateY(0)}14.15%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s10{opacity:0;animation:s10 20.0s ease-out infinite}
+@keyframes s11{0%,13.35%{opacity:0;transform:translateY(9px)}14.15%,15.45%{opacity:1;transform:translateY(0)}16.25%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s11{opacity:0;animation:s11 20.0s ease-out infinite}
+@keyframes s12{0%,15.45%{opacity:0;transform:translateY(9px)}16.25%,17.55%{opacity:1;transform:translateY(0)}18.35%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s12{opacity:0;animation:s12 20.0s ease-out infinite}
+@keyframes s13{0%,17.55%{opacity:0;transform:translateY(9px)}18.35%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s13{opacity:0;animation:s13 20.0s ease-out infinite}
+@keyframes s20{0%,12.5%{opacity:0;transform:translateY(9px)}13.3%,14.6%{opacity:1;transform:translateY(0)}15.4%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s20{opacity:0;animation:s20 20.0s ease-out infinite}
+@keyframes s21{0%,14.6%{opacity:0;transform:translateY(9px)}15.4%,16.7%{opacity:1;transform:translateY(0)}17.5%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s21{opacity:0;animation:s21 20.0s ease-out infinite}
+@keyframes s22{0%,16.7%{opacity:0;transform:translateY(9px)}17.5%,18.8%{opacity:1;transform:translateY(0)}19.6%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s22{opacity:0;animation:s22 20.0s ease-out infinite}
+@keyframes s23{0%,18.8%{opacity:0;transform:translateY(9px)}19.6%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s23{opacity:0;animation:s23 20.0s ease-out infinite}
+@keyframes s30{0%,13.75%{opacity:0;transform:translateY(9px)}14.55%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .s30{opacity:0;animation:s30 20.0s ease-out infinite}
+@keyframes br0{0%,17.0%{opacity:0;transform:translateY(9px)}17.8%,19.1%{opacity:1;transform:translateY(0)}19.9%,100%{opacity:0;transform:translateY(-9px)}}
+.d .br0{opacity:0;animation:br0 20.0s ease-out infinite}
+@keyframes br1{0%,19.1%{opacity:0;transform:translateY(9px)}19.9%,21.2%{opacity:1;transform:translateY(0)}22.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .br1{opacity:0;animation:br1 20.0s ease-out infinite}
+@keyframes br2{0%,21.2%{opacity:0;transform:translateY(9px)}22.0%,23.3%{opacity:1;transform:translateY(0)}24.1%,100%{opacity:0;transform:translateY(-9px)}}
+.d .br2{opacity:0;animation:br2 20.0s ease-out infinite}
+@keyframes br3{0%,23.3%{opacity:0;transform:translateY(9px)}24.1%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .br3{opacity:0;animation:br3 20.0s ease-out infinite}
+@keyframes al0{0%,18.0%{opacity:0;transform:translateY(9px)}18.8%,20.1%{opacity:1;transform:translateY(0)}20.9%,100%{opacity:0;transform:translateY(-9px)}}
+.d .al0{opacity:0;animation:al0 20.0s ease-out infinite}
+@keyframes al1{0%,20.1%{opacity:0;transform:translateY(9px)}20.9%,22.2%{opacity:1;transform:translateY(0)}23.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .al1{opacity:0;animation:al1 20.0s ease-out infinite}
+@keyframes al2{0%,22.2%{opacity:0;transform:translateY(9px)}23.0%,92.0%{opacity:1;transform:translateY(0)}92.0%,100%{opacity:0;transform:translateY(-9px)}}
+.d .al2{opacity:0;animation:al2 20.0s ease-out infinite}
+@keyframes c0{0%,5.5%{opacity:0;transform:translateY(16px)}9.25%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c0{opacity:0;animation:c0 20.0s ease-out infinite}
+@keyframes c1{0%,9.0%{opacity:0;transform:translateY(16px)}12.75%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c1{opacity:0;animation:c1 20.0s ease-out infinite}
+@keyframes c2{0%,10.25%{opacity:0;transform:translateY(16px)}14.0%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c2{opacity:0;animation:c2 20.0s ease-out infinite}
+@keyframes c3{0%,11.5%{opacity:0;transform:translateY(16px)}15.25%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c3{opacity:0;animation:c3 20.0s ease-out infinite}
+@keyframes c4{0%,12.75%{opacity:0;transform:translateY(16px)}16.5%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c4{opacity:0;animation:c4 20.0s ease-out infinite}
+@keyframes c5{0%,16.0%{opacity:0;transform:translateY(16px)}19.75%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c5{opacity:0;animation:c5 20.0s ease-out infinite}
+@keyframes c6{0%,17.25%{opacity:0;transform:translateY(16px)}21.0%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c6{opacity:0;animation:c6 20.0s ease-out infinite}
+@keyframes c7{0%,20.0%{opacity:0;transform:translateY(16px)}23.75%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c7{opacity:0;animation:c7 20.0s ease-out infinite}
+@keyframes c8{0%,21.5%{opacity:0;transform:translateY(16px)}25.25%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .c8{opacity:0;animation:c8 20.0s ease-out infinite}
+@keyframes hc0{0%,8.5%{opacity:0;transform:translateY(16px)}12.25%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .hc0{opacity:0;animation:hc0 20.0s ease-out infinite}
+@keyframes hc1{0%,9.75%{opacity:0;transform:translateY(16px)}13.5%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .hc1{opacity:0;animation:hc1 20.0s ease-out infinite}
+@keyframes hc2{0%,11.0%{opacity:0;transform:translateY(16px)}14.75%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .hc2{opacity:0;animation:hc2 20.0s ease-out infinite}
+@keyframes pill{0%,4.5%{opacity:0;transform:translateY(16px)}8.25%,92.0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+.d .pill{opacity:0;animation:pill 20.0s ease-out infinite}
+
+/* The charts draw themselves rather than appearing finished. */
+@keyframes dLine{0%,22.0%{stroke-dashoffset:1400}32.0%,92.0%{stroke-dashoffset:0}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes dLine2{0%,25.0%{stroke-dashoffset:1400}36.0%,92.0%{stroke-dashoffset:0}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes dArea{0%,27.0%{opacity:0}34.0%,92.0%{opacity:.10}100%{opacity:0}}
+@keyframes dPt{0%{opacity:0;transform:scale(.4)}55%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
+@keyframes dBar{0%{transform:scaleY(0)}100%{transform:scaleY(1)}}
+@keyframes dFill{0%,20.0%{transform:scaleX(0)}27.0%,100%{transform:scaleX(1)}}
+@keyframes dSpark{0%,15.0%{stroke-dashoffset:140}22.0%,100%{stroke-dashoffset:0}}
+@keyframes dWave{0%,100%{transform:translateX(0)}50%{transform:translateX(-22px)}}
+
+.d .line1,.d .line2{stroke-dasharray:1400}
+.d .line1{animation:dLine 20.0s ease-in-out infinite}
+.d .line2{animation:dLine2 20.0s ease-in-out infinite}
+.d .area{opacity:0;animation:dArea 20.0s ease-out infinite}
+.d .pt{opacity:0;transform-box:fill-box;transform-origin:center;
+  animation:dPt .5s ease-out forwards,dLine 20.0s linear infinite}
+.d .sp{stroke-dasharray:140;animation:dSpark 20.0s ease-out infinite}
+.d .bar-fill{transform-box:fill-box;transform-origin:left center;
+  animation:dFill 20.0s cubic-bezier(.22,1,.36,1) infinite}
+.d .bq{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);
+  animation:dBar 1.05s cubic-bezier(.22,1,.36,1) forwards}
+.d .hw,.d .hw2{animation:dWave 17s ease-in-out infinite}
+.d .hw2{animation-duration:21s}
+
+.d .b0{animation-delay:4.60s}
+.d .b1{animation-delay:4.67s}
+.d .b2{animation-delay:4.74s}
+.d .b3{animation-delay:4.81s}
+.d .b4{animation-delay:4.88s}
+.d .b5{animation-delay:4.95s}
+.d .b6{animation-delay:5.02s}
+.d .b7{animation-delay:5.09s}
+.d .p0{animation-delay:5.00s, 0s}
+.d .p1{animation-delay:5.24s, 0s}
+.d .p2{animation-delay:5.48s, 0s}
+.d .p3{animation-delay:5.72s, 0s}
+.d .p4{animation-delay:5.96s, 0s}
+.d .p5{animation-delay:6.20s, 0s}
+.d .p6{animation-delay:6.44s, 0s}
+]]>
+</style>
+<defs>
+    <linearGradient id="dv" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#6D28D9"/>
+      <stop offset=".45" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="db" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+</defs>
+<rect width="1400" height="938" fill="#F2F6FD"/>
+<rect x="0" y="0" width="236" height="938" fill="#fff"/><line x1="236" y1="0" x2="236" y2="938" stroke="rgba(13,23,41,.07)"/><g transform="translate(28 40.68) scale(0.26)"><g><path d="M6 33 L29 80 L64 17" fill="none" stroke="url(#dv)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><rect x="60" y="40" width="6" height="23" rx="3" fill="url(#db)"/><rect x="69" y="30" width="6" height="40" rx="3" fill="url(#db)"/><rect x="77.5" y="21" width="6" height="58" rx="3" fill="url(#db)"/><rect x="86" y="29" width="6" height="40" rx="3" fill="url(#db)"/><rect x="94" y="39" width="6" height="20" rx="3" fill="url(#db)"/></g></g><text class="vclogo-t" x="63.9" y="62" font-size="17"><tspan fill="#0D1729">Voice</tspan><tspan fill="#2563EB">Captures</tspan></text><rect x="18" y="124" width="196" height="42" rx="11" fill="#E8EEFB"/><rect x="34" y="136" width="17" height="17" rx="4.5" fill="none" stroke="#2563EB" stroke-width="2"/><text class="nav" x="66" y="150" fill="#2563EB" font-weight="700">Dashboard</text><rect x="34" y="190" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="204" fill="#55637A" font-weight="600">Calls</text><rect x="34" y="244" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="258" fill="#55637A" font-weight="600">Appointments</text><rect x="34" y="298" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="312" fill="#55637A" font-weight="600">Messages</text><rect x="34" y="352" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="366" fill="#55637A" font-weight="600">Customers</text><rect x="34" y="406" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="420" fill="#55637A" font-weight="600">Knowledge Base</text><rect x="34" y="460" width="17" height="17" rx="4.5" fill="none" stroke="#8E9BB3" stroke-width="2"/><text class="nav" x="66" y="474" fill="#55637A" font-weight="600">Settings</text>
+<text class="h1" x="262" y="62">Good morning!</text><text class="sub" x="262" y="90">Here&#8217;s what your AI receptionist handled for you.</text><g class="pill"><rect x="1184" y="38" width="190" height="42" rx="12" fill="#fff" stroke="rgba(13,23,41,.09)"/><text class="lab" x="1206" y="64" fill="#36465C">Last 7 days</text></g>
+<g class="c0"><rect x="262" y="118" width="1112" height="186" rx="16" fill="#FBFCFE" stroke="rgba(13,23,41,.07)"/><text class="lab" x="296" y="158" fill="#55637A">Estimated revenue captured</text><g transform="translate(292 214)" opacity=".5"><path class="hw" d="M0 60 C 120 10 220 96 340 54 S 560 6 700 48 S 880 92 1000 52" fill="none" stroke="#C9D8F6" stroke-width="2.5"/><path class="hw2" d="M0 76 C 130 30 240 108 360 70 S 580 26 720 64 S 900 104 1010 70" fill="none" stroke="#DCC9F3" stroke-width="2.5"/></g><g class="cnt rev" transform="translate(296 226)">
+<text class="rev0" x="0" y="0" font-size="46" font-weight="800" fill="#0D1729" text-anchor="start">$1,250</text>
+<text class="rev1" x="0" y="0" font-size="46" font-weight="800" fill="#0D1729" text-anchor="start">$2,900</text>
+<text class="rev2" x="0" y="0" font-size="46" font-weight="800" fill="#0D1729" text-anchor="start">$4,100</text>
+<text class="rev3" x="0" y="0" font-size="46" font-weight="800" fill="#0D1729" text-anchor="start">$5,500</text>
+</g><text class="up" x="472" y="226">&#8593; +292%</text><text class="fine" x="296" y="264">Appointments booked + emergencies &#215; your average job value of $500.</text><g class="hc0"><rect x="1074" y="152" width="268" height="38" rx="12" fill="#E8EEFB"/><text class="lab" x="1096" y="177" fill="#2563EB" font-weight="700">11 appointments booked</text></g><g class="hc1"><rect x="1074" y="200" width="268" height="38" rx="12" fill="#EFE9FB"/><text class="lab" x="1096" y="225" fill="#7C3AED" font-weight="700">30 after-hours calls</text></g><g class="hc2"><rect x="1074" y="248" width="268" height="38" rx="12" fill="#E2F1F5"/><text class="lab" x="1096" y="273" fill="#0E93B8" font-weight="700">19 leads captured</text></g></g>
+<g class="c1"><rect x="262.0" y="324" width="264.5" height="128" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="284.0" y="344" width="30" height="30" rx="9" fill="#E8EEFB"/><text class="lab" x="324.0" y="364" fill="#55637A">Calls answered</text><g class="cnt s0" transform="translate(286.0 416)">
+<text class="s00" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">12</text>
+<text class="s01" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">28</text>
+<text class="s02" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">41</text>
+<text class="s03" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">51</text>
+</g><text class="up" x="348.0" y="416" fill="#2563EB">&#8593; 292%</text><text class="fine" x="286.0" y="438">19 hung up early</text><g transform="translate(406.5 396)"><path class="sp" d="M0 26 C 18 20 28 30 46 16 S 74 6 96 12" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/></g></g>
+<g class="c2"><rect x="544.5" y="324" width="264.5" height="128" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="566.5" y="344" width="30" height="30" rx="9" fill="#EFE9FB"/><text class="lab" x="606.5" y="364" fill="#55637A">Appointments booked</text><g class="cnt s1" transform="translate(568.5 416)">
+<text class="s10" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">2</text>
+<text class="s11" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">5</text>
+<text class="s12" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">9</text>
+<text class="s13" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">11</text>
+</g><text class="up" x="630.5" y="416" fill="#7C3AED">new</text><g transform="translate(689.0 396)"><path class="sp" d="M0 26 C 18 20 28 30 46 16 S 74 6 96 12" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/></g></g>
+<g class="c3"><rect x="827.0" y="324" width="264.5" height="128" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="849.0" y="344" width="30" height="30" rx="9" fill="#E2F1F5"/><text class="lab" x="889.0" y="364" fill="#55637A">After-hours calls</text><g class="cnt s2" transform="translate(851.0 416)">
+<text class="s20" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">7</text>
+<text class="s21" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">16</text>
+<text class="s22" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">24</text>
+<text class="s23" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">30</text>
+</g><text class="up" x="913.0" y="416" fill="#0E93B8">&#8593; 150%</text><text class="fine" x="851.0" y="438">59% came in while closed</text><g transform="translate(971.5 396)"><path class="sp" d="M0 26 C 18 20 28 30 46 16 S 74 6 96 12" fill="none" stroke="#0E93B8" stroke-width="2.5" stroke-linecap="round"/></g></g>
+<g class="c4"><rect x="1109.5" y="324" width="264.5" height="128" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="1131.5" y="344" width="30" height="30" rx="9" fill="#FBF6EC"/><text class="lab" x="1171.5" y="364" fill="#55637A">Emergencies captured</text><g class="cnt s3" transform="translate(1133.5 416)">
+<text class="s30" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">0</text>
+</g><g transform="translate(1254.0 396)"><path class="sp" d="M0 26 C 18 20 28 30 46 16 S 74 6 96 12" fill="none" stroke="#B45309" stroke-width="2.5" stroke-linecap="round"/></g></g>
+<g class="c5"><rect x="262" y="472" width="547.0" height="120" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="284" y="492" width="30" height="30" rx="9" fill="#E2F1F5"/><text class="lab" x="324" y="512" fill="#55637A">Booking rate</text><g class="cnt br" transform="translate(286 558)">
+<text class="br0" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">9%</text>
+<text class="br1" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">19%</text>
+<text class="br2" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">28%</text>
+<text class="br3" x="0" y="0" font-size="34" font-weight="800" fill="#0D1729" text-anchor="start">34%</text>
+</g><text class="up" x="374" y="558" fill="#0E93B8">&#8593; 34 pts</text><rect x="478" y="538" width="301.0" height="10" rx="5" fill="#E7ECF5"/><rect class="bar-fill" x="478" y="538" width="102" height="10" rx="5" fill="#2563EB"/><text class="fine" x="286" y="580">of calls that stayed on the line</text></g>
+<g class="c6"><rect x="827.0" y="472" width="547.0" height="120" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><rect x="849.0" y="492" width="30" height="30" rx="9" fill="#EFE9FB"/><text class="lab" x="889.0" y="512" fill="#55637A">Avg. call length</text><g class="cnt al" transform="translate(851.0 558)">
+<text class="al0" x="0" y="0" font-size="30" font-weight="800" fill="#0D1729" text-anchor="start">0 min 42 sec</text>
+<text class="al1" x="0" y="0" font-size="30" font-weight="800" fill="#0D1729" text-anchor="start">1 min 18 sec</text>
+<text class="al2" x="0" y="0" font-size="30" font-weight="800" fill="#0D1729" text-anchor="start">1 min 59 sec</text>
+</g><g transform="translate(1204 528)"><path class="sp" d="M0 26 C 20 8 36 34 54 14 S 86 4 110 18" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/></g></g>
+<g class="c7"><rect x="262" y="612" width="547.0" height="300" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><text class="lab" x="286" y="646" fill="#0D1729" font-weight="700">Calls per day</text><text class="fine" x="286" y="668">Total calls and appointments booked</text><line class="gl" x1="302" y1="882" x2="758" y2="882"/><line class="gl" x1="302" y1="818" x2="758" y2="818"/><line class="gl" x1="302" y1="754" x2="758" y2="754"/><line class="gl" x1="302" y1="690" x2="758" y2="690"/><text class="tick" x="288" y="886" text-anchor="end">0</text><text class="tick" x="288" y="822" text-anchor="end">10</text><text class="tick" x="288" y="758" text-anchor="end">20</text><text class="tick" x="288" y="694" text-anchor="end">30</text><text class="tick" x="302" y="908" text-anchor="middle">Sat</text><text class="tick" x="378" y="908" text-anchor="middle">Sun</text><text class="tick" x="454" y="908" text-anchor="middle">Mon</text><text class="tick" x="530" y="908" text-anchor="middle">Tue</text><text class="tick" x="606" y="908" text-anchor="middle">Wed</text><text class="tick" x="682" y="908" text-anchor="middle">Thu</text><text class="tick" x="758" y="908" text-anchor="middle">Fri</text><g transform="translate(302 690)"><path class="area" d="M 0 110 L 76 150 L 152 96 L 228 42 L 304 120 L 380 86 L 456 128 L 456 200 L 0 200 Z" fill="#2563EB" opacity=".10"/><path class="line1" d="M 0 110 L 76 150 L 152 96 L 228 42 L 304 120 L 380 86 L 456 128" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path class="line2" d="M 0 176 L 76 190 L 152 168 L 228 150 L 304 186 L 380 160 L 456 180" fill="none" stroke="#C026D3" stroke-width="2.5" stroke-dasharray="5 6" stroke-linecap="round"/><circle class="pt p0" cx="0" cy="110" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p1" cx="76" cy="150" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p2" cx="152" cy="96" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p3" cx="228" cy="42" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p4" cx="304" cy="120" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p5" cx="380" cy="86" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/><circle class="pt p6" cx="456" cy="128" r="4.5" fill="#fff" stroke="#2563EB" stroke-width="2.5"/></g></g>
+<g class="c8"><rect x="827.0" y="612" width="547.0" height="300" rx="16" fill="#fff" stroke="rgba(13,23,41,.07)"/><text class="lab" x="851.0" y="646" fill="#0D1729" font-weight="700">When people call</text><text class="fine" x="851.0" y="668">By hour of day &#183; open 9am&#8211;6pm weekdays</text><line class="gl" x1="871.0" y1="882" x2="1274.0" y2="882"/><line class="gl" x1="871.0" y1="818" x2="1274.0" y2="818"/><line class="gl" x1="871.0" y1="754" x2="1274.0" y2="754"/><line class="gl" x1="871.0" y1="690" x2="1274.0" y2="690"/><rect class="bq b0" x="871.0" y="830.8" width="12" height="51.2" rx="4" fill="#9BB8F0"/><rect class="bq b1" x="888.0" y="850.0" width="12" height="32.0" rx="4" fill="#9BB8F0"/><rect class="bq b2" x="905.0" y="862.8" width="12" height="19.200000000000003" rx="4" fill="#9BB8F0"/><rect class="bq b3" x="922.0" y="869.2" width="12" height="12.8" rx="4" fill="#9BB8F0"/><rect class="bq b4" x="939.0" y="856.4" width="12" height="25.6" rx="4" fill="#9BB8F0"/><rect class="bq b5" x="956.0" y="837.2" width="12" height="44.800000000000004" rx="4" fill="#9BB8F0"/><rect class="bq b6" x="973.0" y="805.2" width="12" height="76.80000000000001" rx="4" fill="#9BB8F0"/><rect class="bq b7" x="990.0" y="760.4" width="12" height="121.60000000000001" rx="4" fill="#9BB8F0"/><rect class="bq b0" x="1007.0" y="715.6" width="12" height="166.4" rx="4" fill="#9BB8F0"/><rect class="bq b1" x="1024.0" y="728.4" width="12" height="153.60000000000002" rx="4" fill="#2563EB"/><rect class="bq b2" x="1041.0" y="747.6" width="12" height="134.4" rx="4" fill="#2563EB"/><rect class="bq b3" x="1058.0" y="702.8" width="12" height="179.20000000000002" rx="4" fill="#2563EB"/><rect class="bq b4" x="1075.0" y="741.2" width="12" height="140.8" rx="4" fill="#2563EB"/><rect class="bq b5" x="1092.0" y="773.2" width="12" height="108.80000000000001" rx="4" fill="#2563EB"/><rect class="bq b6" x="1109.0" y="792.4" width="12" height="89.60000000000001" rx="4" fill="#2563EB"/><rect class="bq b7" x="1126.0" y="811.6" width="12" height="70.4" rx="4" fill="#2563EB"/><rect class="bq b0" x="1143.0" y="824.4" width="12" height="57.6" rx="4" fill="#2563EB"/><rect class="bq b1" x="1160.0" y="798.8" width="12" height="83.2" rx="4" fill="#2563EB"/><rect class="bq b2" x="1177.0" y="779.6" width="12" height="102.4" rx="4" fill="#9BB8F0"/><rect class="bq b3" x="1194.0" y="805.2" width="12" height="76.80000000000001" rx="4" fill="#9BB8F0"/><rect class="bq b4" x="1211.0" y="837.2" width="12" height="44.800000000000004" rx="4" fill="#9BB8F0"/><rect class="bq b5" x="1228.0" y="850.0" width="12" height="32.0" rx="4" fill="#9BB8F0"/><rect class="bq b6" x="1245.0" y="856.4" width="12" height="25.6" rx="4" fill="#9BB8F0"/><rect class="bq b7" x="1262.0" y="862.8" width="12" height="19.200000000000003" rx="4" fill="#9BB8F0"/><text class="tick" x="871.0" y="908">12am</text><text class="tick" x="973.0" y="908">6am</text><text class="tick" x="1075.0" y="908">12pm</text><text class="tick" x="1177.0" y="908">6pm</text></g>
+</svg>

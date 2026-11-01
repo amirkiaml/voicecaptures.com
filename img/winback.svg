@@ -4,7 +4,7 @@
 <![CDATA[
 .wb-anim{display:block;width:100%;height:auto}
 .wb-anim text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-.wb-anim .brand{font-size:19px;font-weight:800;fill:#0D1729}
+.wb-anim .vclogo-t{font-weight:800;letter-spacing:-.01em}
 .wb-anim .wk{font-size:12px;font-weight:700;fill:#7C8CA3;text-anchor:end}
 .wb-anim .dh{font-size:13px;font-weight:800;fill:#0D1729;text-anchor:middle}
 .wb-anim .dd{font-size:11px;font-weight:600;fill:#7C8CA3;text-anchor:middle}
@@ -144,6 +144,15 @@
 ]]>
 </style>
   <defs>
+    <linearGradient id="wbv" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#6D28D9"/>
+      <stop offset=".45" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="wbb" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
     <linearGradient id="wbbg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#EFE9FB"/><stop offset=".55" stop-color="#EFEFFD"/>
       <stop offset="1" stop-color="#F3EDFC"/>
@@ -300,7 +309,7 @@
   <rect x="772" y="26" width="572" height="54" rx="20" fill="#F7F5FE" fill-opacity=".8"/>
   <rect x="772" y="60" width="572" height="20" fill="#F7F5FE" fill-opacity=".8"/>
   <line class="gl" x1="772" y1="80" x2="1344" y2="80"/>
-  <text class="brand" x="798" y="61">VoiceCaptures</text>
+<g transform="translate(796 41.68) scale(0.26)"><g><path d="M6 33 L29 80 L64 17" fill="none" stroke="url(#wbv)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><rect x="60" y="40" width="6" height="23" rx="3" fill="url(#wbb)"/><rect x="69" y="30" width="6" height="40" rx="3" fill="url(#wbb)"/><rect x="77.5" y="21" width="6" height="58" rx="3" fill="url(#wbb)"/><rect x="86" y="29" width="6" height="40" rx="3" fill="url(#wbb)"/><rect x="94" y="39" width="6" height="20" rx="3" fill="url(#wbb)"/></g></g><text class="vclogo-t" x="831.9" y="63" font-size="19"><tspan fill="#0D1729">Voice</tspan><tspan fill="#2563EB">Captures</tspan></text>
   <text class="wk" x="1318" y="61">This week</text>
 
   <text class="tm" x="820" y="138">8 AM</text>
