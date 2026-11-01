@@ -242,6 +242,33 @@ PRICING_CSS = """
 .ported .pr-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
   margin-top:var(--s8)}
 @media(min-width:860px){ .ported .pr-grid{grid-template-columns:repeat(3,1fr)} }
+/* A single card is a single card. `.pr-grid-1` alone loses to `.ported
+   .pr-grid` above, so the lone personal-line card was being dealt the first
+   of three columns and sat hard against the left edge. */
+@media(min-width:860px){
+  .ported .pr-grid-1{grid-template-columns:minmax(0,380px); justify-content:center}
+}
+
+/* Prepaid term switch, one per sector. */
+.ported .pr-terms{display:flex; flex-wrap:wrap; gap:var(--s2);
+  justify-content:center; margin:0 auto var(--s8); max-width:720px}
+.ported .pr-terms button{font:inherit; cursor:pointer; text-align:center;
+  padding:9px 16px; min-height:46px; border-radius:var(--r-pill);
+  border:1px solid var(--line); background:#fff; color:var(--ink-2);
+  font-size:14px; font-weight:700; line-height:1.15}
+.ported .pr-terms button em{display:block; font-style:normal; font-size:11.5px;
+  font-weight:600; color:var(--muted)}
+.ported .pr-terms button:hover{border-color:var(--blue)}
+.ported .pr-terms button[aria-pressed="true"]{background:var(--blue);
+  border-color:var(--blue); color:#fff}
+.ported .pr-terms button[aria-pressed="true"] em{color:rgba(255,255,255,.82)}
+.ported .pr-termnote{margin:var(--s1) 0 0; font-size:12.5px; font-weight:600;
+  color:var(--blue)}
+/* Compound, so it beats `.ported .pr-price` whatever the source order: a
+   quote is a sentence, not a number, and at price size it wrapped to two
+   lines and shouted over the real prices beside it. */
+.ported .pr-price.pr-quoted{font-size:clamp(20px,2.1vw,24px); line-height:1.25;
+  font-weight:800; letter-spacing:normal; color:var(--ink)}
 .ported .pr-card{display:flex; flex-direction:column; background:#fff;
   border:1px solid var(--line); border-radius:var(--r-card); padding:var(--s8);
   box-shadow:none}

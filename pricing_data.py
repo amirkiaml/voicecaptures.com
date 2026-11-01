@@ -101,15 +101,20 @@ PLANS = {
                 ],
             ],
             [
-                "Multi-Location",
-                "$549",
-                "Up to 500 minutes per location",
+                "Enterprise",
+                None,
+                "More than one location, or a build of your own",
                 "",
                 [
-                    "Everything in Pro",
+                    "Everything in Pro, at every location",
+                    "One account and one bill, however many lines",
+                    "Per-location greetings, hours and calendars",
                 ],
-                "per location",
-                {'from': True, 'scope': None, 'note': 'Priced per location. We set up all your locations on one account and one bill. The free trial covers one location; the rest go live on the paid plan.', 'cta': ['Book a 30-minute call', 'https://calendly.com/hello-voicecaptures/30min']},
+                None,
+                {'quote': True,
+                 'note': 'Priced on a call, as one number rather than a range. '
+                         'The free trial covers one location; the rest go live on the paid plan.',
+                 'cta': ['Book a 30-minute call', 'https://calendly.com/hello-voicecaptures/30min']},
             ],
         ],
     },
@@ -293,7 +298,17 @@ def check() -> None:
         for t in plan["tiers"]:
             # `calls` is allowed to be empty: a per-location tier has no single
             # call estimate to give, and inventing one would be worse than a gap.
-            if len(t) not in (5, 7) or not t[0] or not t[1].startswith("$") or not t[2] or not t[4]:
+            opts = t[6] if len(t) > 6 else {}
+            # A quote-only tier carries no price on purpose: enterprise is
+            # settled on a call, and a "from" number would be the range we
+            # promise not to give. Everything else must still state one.
+            priced = t[1] is not None
+            if opts.get("quote"):
+                if priced:
+                    sys.exit(f"pricing_data: {t[0]!r} is quote-only but carries a price")
+            elif not priced or not t[1].startswith("$"):
+                sys.exit(f"pricing_data: {key!r} tier {t[0]!r} has no usable price")
+            if len(t) not in (5, 7) or not t[0] or not t[2] or not t[4]:
                 sys.exit(f"pricing_data: malformed tier in {key!r}: {t[0]!r}")
 
 
@@ -304,4 +319,4 @@ if __name__ == "__main__":
         for t in PLANS[key]["tiers"]:
             name, price, mins, calls, feats = t[:5]
             extra = "  +opts" if len(t) > 5 else ""
-            print(f"  {name:<20} {price:<8} {mins}  ({calls})  {len(feats)} features{extra}")
+            print(f"  {name:<20} {(price or 'quoted'):<8} {mins}  ({calls})  {len(feats)} features{extra}")

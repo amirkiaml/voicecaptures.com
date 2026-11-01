@@ -2380,11 +2380,21 @@ def _tier_card(t, rec):
     badge = '<span class="pop">Recommended</span>' if rec else ""
     calls = (" &middot; " + t[3]) if t[3] else ""
     btn = "btn-primary" if rec else "btn-ghost"
+    if extra.get("quote"):
+        # No number, by decision: enterprise is settled on a call and a "from"
+        # price would be exactly the range we promise not to quote.
+        price = '<p class="pr-price pr-quoted">Quoted on a call</p>'
+        term = ""
+    else:
+        monthly = int(str(t[1]).replace("$", "").replace(",", ""))
+        price = (f'<p class="pr-price" data-m="{monthly}">{frm}'
+                 f'<span class="pr-n">{t[1]}</span><em>/mo{unit}</em></p>')
+        term = '<p class="pr-termnote" hidden></p>'
     return (
         f'<div class="pr-card{cls}">'
         f'<div class="pr-top"><h3>{t[0]}</h3>{badge}</div>'
-        f'<p class="pr-price">{frm}{t[1]}<em>/mo{unit}</em></p>'
-        f'<p class="pr-min">{t[2]}{calls}</p>'
+        f'{price}'
+        f'<p class="pr-min">{t[2]}{calls}</p>{term}'
         f'<ul class="pr-feat">{feats}</ul>{note}'
         f'<a class="btn {btn}" href="{CAL30}" '
         f'target="_blank" rel="noopener">Book a 30-minute call</a></div>')
@@ -2397,16 +2407,22 @@ def _vertical(key, data, alt):
     cards = "".join(_tier_card(t, i == d["rec"]) for i, t in enumerate(d["tiers"]))
     acls = ' class="alt"' if alt else ""
     subp = f'<p class="pr-sub">{sub}</p>' if sub else ""
+    sw = "".join(
+        f'<button type="button" data-term="{m}" aria-pressed="{"true" if m=="1" else "false"}">'
+        f'{lbl}<em>{sub2}</em></button>'
+        for m, lbl, sub2, _ in pricing_data.TERMS)
+    switch = (f'<div class="pr-terms" role="group" aria-label="Billing term for '
+              f'{d["label"]}">{sw}</div>')
     return (f'<section id="p-{key}"{acls}>'
-            f'<div class="wrap"><h2>{d["label"]}</h2>{subp}'
+            f'<div class="wrap"><h2>{d["label"]}</h2>{subp}{switch}'
             f'<div class="pr-grid">{cards}</div>{note}</div></section>')
 
 
 def _prepaid_table(data):
     """Every distinct monthly price, at each term, using the same arithmetic as
     the homepage switch: 5%, 10%, and 12 months for the price of 10."""
-    prices = sorted({int(t[1].replace("$", "").replace(",", ""))
-                     for d in data.values() for t in d["tiers"]})
+    prices = sorted({int(str(t[1]).replace("$", "").replace(",", ""))
+                     for d in data.values() for t in d["tiers"] if t[1]})
     terms = [(3, 0.05), (6, 0.10), (12, 1 - 10 / 12)]
     rows = ""
     for p in prices:
@@ -2460,22 +2476,23 @@ def _pricing_body():
     <div class="pr-grid pr-grid-2">
       <div class="pr-card">
         <div class="pr-top"><h3>Multi-location</h3></div>
-        <p class="pr-price">From $549<em>/mo per location</em></p>
-        <p class="pr-min">Up to 500 minutes per location</p>
+        <p class="pr-price pr-quoted">Quoted on a call</p>
+        <p class="pr-min">Priced per location, once we know how many and how busy</p>
         <ul class="pr-feat">
           <li>Everything in Pro, at every location</li>
           <li>One account and one bill, however many lines</li>
           <li>Per-location greetings, hours and calendars</li>
           <li>Setup for all of them &mdash; $249 one-time</li>
         </ul>
-        <p class="pr-note">The free trial covers one location; the rest go live
-        on the paid plan.</p>
+        <p class="pr-note">One number, not a range. The free trial covers one
+        location; the rest go live on the paid plan.</p>
         <a class="btn btn-primary" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
       </div>
       <div class="pr-card">
         <div class="pr-top"><h3>Custom build</h3></div>
-        <p class="pr-price">From $500<em> + $39/mo</em></p>
-        <p class="pr-min">Quoted on your software and your call flow</p>
+        <p class="pr-price">From $500</p>
+        <p class="pr-min">The minimum integrations and service fee. The rest is
+        quoted on the call, on your software and your call flow.</p>
         <ul class="pr-feat">
           <li>Practice management, field service, a POS or a CRM, written into the call</li>
           <li>Call flows that do not fit a plan &mdash; triage rules, multi-step transfers</li>
@@ -2764,6 +2781,50 @@ FAQ_BODY = """<main class="wrap faq-page">
 """
 
 
+PRICING_SCRIPT = """
+<script>
+// Prepaid terms. The rates come from pricing_data.TERMS at build time, so the
+// switch cannot drift from the savings table further down the page.
+(function(){
+  var OFF = {"1": 0.0, "3": 0.05, "6": 0.1, "12": 0.166667};
+  function money(n){ return "$" + n.toLocaleString("en-US"); }
+  function apply(section, months){
+    var off = OFF[months] || 0;
+    section.querySelectorAll(".pr-card").forEach(function(card){
+      var el = card.querySelector(".pr-price[data-m]");
+      if (!el) return;                       // quote-only card: nothing to reprice
+      var m = parseInt(el.getAttribute("data-m"), 10);
+      var n = el.querySelector(".pr-n");
+      var note = card.querySelector(".pr-termnote");
+      var per = Math.round(m * (1 - off));
+      n.textContent = money(per);
+      if (months === 1 || !off){
+        if (note) note.hidden = true;
+        return;
+      }
+      var total = Math.round(m * months * (1 - off));
+      var save = Math.round(m * months) - total;
+      if (note){
+        note.textContent = money(total) + " billed up front \u00b7 save " + money(save);
+        note.hidden = false;
+      }
+    });
+  }
+  document.querySelectorAll(".pr-terms").forEach(function(sw){
+    var section = sw.closest("section");
+    sw.addEventListener("click", function(e){
+      var b = e.target.closest("button[data-term]");
+      if (!b) return;
+      sw.querySelectorAll("button[data-term]").forEach(function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      apply(section, parseInt(b.getAttribute("data-term"), 10) || 1);
+    });
+  });
+})();
+</script>
+"""
+
 PAGES = [
     ("faq", "Common questions | VoiceCaptures",
      "How an AI receptionist works, what setup takes, what happens to your "
@@ -2773,7 +2834,7 @@ PAGES = [
     ("pricing", "Pricing | VoiceCaptures",
      "What an AI receptionist costs for home services, restaurants, clinics and "
      "any other business. Every plan, minutes, add-ons and prepaid terms, with "
-     "no quote needed.", PRICING_BODY, ""),
+     "no quote needed.", PRICING_BODY, PRICING_SCRIPT),
 
     ("demo", "Hear your own AI receptionist | VoiceCaptures",
      "Build a demo AI receptionist for your business and talk to it in your "
