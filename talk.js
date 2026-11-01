@@ -109,8 +109,12 @@ const CSS = `/* ---- talk-to-it widget ----
 }
 .vc-hero .vc-orb{width:38%; height:38%}
 .vc-hero .vc-orb svg{width:32%; height:32%; min-width:26px; min-height:26px}
-.vc-hero-can{display:block; max-width:34ch; margin:6px auto 0; font-size:13.5px;
+.vc-hero-can{display:block; max-width:46ch; margin:6px auto 0; font-size:13.5px;
   line-height:19px; color:var(--muted)}
+/* The demo-line number is the one thing in here worth tapping. */
+.vc-hero-can a{color:var(--blue); font-weight:600; text-decoration:none;
+  white-space:nowrap}
+.vc-hero-can a:hover{text-decoration:underline}
 .vc-hero-lbl{display:inline-flex; align-items:center; gap:8px; margin-top:var(--s2);
   font-size:15px; font-weight:700; color:var(--blue)}
 .vc-hero-lbl::before{content:""; width:7px; height:7px; border-radius:50%;
@@ -162,7 +166,7 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
       </div>
     </div>
     <p class="vc-state" id="vc-state">Ready when you are</p>
-    <p class="vc-sub" id="vc-sub">It answers in your browser. Ask it anything, book a meeting with sales, or leave a message and it emails the team.</p>
+    <p class="vc-sub" id="vc-sub">It answers in your browser. Ask it anything, or book a meeting with sales. It can&rsquo;t text or email you from here &mdash; for that, call the demo line on (647)&nbsp;692-1081.</p>
     <div class="vc-meter" hidden><span class="vc-meter-track"><span class="vc-meter-fill"></span></span><span class="vc-meter-t"></span></div>
     <button class="btn btn-primary" id="vc-go" type="button">Start talking</button>
   </div>
