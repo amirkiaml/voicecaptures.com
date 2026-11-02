@@ -1437,65 +1437,67 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pc-who span{font-size:13px; color:var(--muted)}
 .ported .pc-top audio{flex:1 1 240px; min-width:0; height:36px; max-width:100%}
 
-/* The screen: phone-width, not card-width. */
+/* The screen: phone-width, and light, because a navy slab in the middle of
+   a pale page reads as a different site. Every text colour here is stated
+   outright -- `.ported p` and `.ported li` set --ink-2 and will otherwise
+   leak in, which is how the text card ended up dark-on-dark. */
 .ported .pc-screen{width:min(380px,100%); margin:var(--s6) auto;
-  border-radius:26px; background:#11234B; padding:var(--s4) var(--s3) var(--s3);
-  box-shadow:inset 0 0 0 1px rgba(150,170,255,.16)}
+  border-radius:26px; background:#F3F6FC; padding:var(--s4) var(--s3) var(--s3);
+  border:1px solid var(--line)}
 .ported .pc-bar{display:flex; align-items:center; justify-content:space-between;
   padding:0 var(--s2) var(--s3); margin-bottom:var(--s3);
-  border-bottom:1px solid rgba(150,170,255,.14)}
+  border-bottom:1px solid var(--line)}
 .ported .pc-live{display:inline-flex; align-items:center; gap:6px; font-size:10px;
-  font-weight:800; letter-spacing:.1em; text-transform:uppercase;
-  color:rgba(226,235,255,.5)}
-.ported .pc-live i{width:6px; height:6px; border-radius:50%; background:#5A6B8C}
-.ported .pc-screen.is-playing .pc-live{color:#8FE3C0}
-.ported .pc-screen.is-playing .pc-live i{background:#34D399;
+  font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+.ported .pc-live i{width:6px; height:6px; border-radius:50%; background:#B6C0D2}
+.ported .pc-screen.is-playing .pc-live{color:#15803D}
+.ported .pc-screen.is-playing .pc-live i{background:#16A34A;
   animation:pcDot 1.9s ease-in-out infinite}
 @keyframes pcDot{0%,100%{opacity:1}50%{opacity:.25}}
 .ported .pc-screen.is-live .pc-live b{display:none}
 .ported .pc-screen.is-live.is-playing .pc-live b{display:inline}
 .ported .pc-screen.is-live.is-playing .pc-live em{display:none}
 .ported .pc-live em{font-style:normal}
-.ported .pc-clock{font-size:11.5px; font-weight:700; color:rgba(226,235,255,.55);
+.ported .pc-clock{font-size:11.5px; font-weight:700; color:var(--muted);
   font-variant-numeric:tabular-nums}
 
-/* Fixed window. It scrolls itself to the newest line, the way a thread does. */
+/* Fixed window, pinned to the newest line. */
 .ported .pc-lines{list-style:none; margin:0; padding:0 var(--s1);
   display:flex; flex-direction:column; gap:7px;
   height:400px; overflow-y:auto; scrollbar-width:thin;
-  scrollbar-color:rgba(150,170,255,.3) transparent}
+  scrollbar-color:rgba(13,23,41,.18) transparent}
 .ported .pc-lines::-webkit-scrollbar{width:4px}
 .ported .pc-lines::-webkit-scrollbar-track{background:transparent}
-.ported .pc-lines::-webkit-scrollbar-thumb{background:rgba(150,170,255,.28);
+.ported .pc-lines::-webkit-scrollbar-thumb{background:rgba(13,23,41,.16);
   border-radius:100px}
 .ported .pc-l{max-width:80%; padding:7px 11px; font-size:12.5px; line-height:18px}
 .ported .pc-r{display:block; font-size:8.5px; font-weight:800; letter-spacing:.12em;
   text-transform:uppercase; margin-bottom:2px}
-/* Incoming grey, outgoing blue -- what a phone actually looks like. */
-.ported .pc-agent{align-self:flex-start; background:#E8EDF7; color:var(--ink);
-  border-radius:14px 14px 14px 4px}
+.ported .pc-agent{align-self:flex-start; background:#fff; color:var(--ink);
+  border:1px solid var(--line); border-radius:14px 14px 14px 4px}
 .ported .pc-agent .pc-r{color:var(--blue)}
 .ported .pc-caller{align-self:flex-end; background:var(--blue); color:#fff;
   border-radius:14px 14px 4px 14px}
-.ported .pc-caller .pc-r{color:rgba(255,255,255,.72)}
+.ported .pc-caller .pc-r{color:rgba(255,255,255,.76)}
 
 @keyframes pcIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .ported .pc-lines.is-live .pc-l{display:none}
 .ported .pc-lines.is-live .pc-l.is-past{display:block; animation:pcIn .3s ease both}
 .ported .pc-lines.is-live .pc-hint{display:block; align-self:center; max-width:100%;
-  margin:auto 0; padding:0; background:none; font-size:12px;
-  color:rgba(226,235,255,.45); text-align:center}
+  margin:auto 0; padding:0; background:none; border:0; font-size:12px;
+  color:var(--muted); text-align:center}
 .ported .pc-lines.is-live:has(.pc-l.is-past) .pc-hint{display:none}
 
+/* The text it sent: warm, so it is plainly not another spoken line. */
 .ported .pc-sms{display:block; align-self:stretch; max-width:100%; margin-top:7px;
-  padding:9px 12px; border-radius:14px; background:#1C2F57;
-  border:1px solid rgba(150,170,255,.26); color:#DCE5FB}
+  padding:9px 12px; border-radius:14px; background:var(--f-sand);
+  border:1px solid rgba(180,83,9,.22); color:var(--ink-2)}
 .ported .pc-lines.is-live .pc-sms{display:none}
 .ported .pc-lines.is-live .pc-sms.is-past{display:block; animation:pcIn .3s ease both}
 .ported .pc-k{display:block; font-size:8.5px; font-weight:800; letter-spacing:.12em;
-  text-transform:uppercase; color:#7FB0FF; margin-bottom:3px}
-.ported .pc-sms p{margin:0; font-size:11.5px; line-height:17px}
-.ported .pc-sms b{color:#fff}
+  text-transform:uppercase; color:#B45309; margin-bottom:3px}
+.ported .pc-sms p{margin:0; font-size:11.5px; line-height:17px; color:var(--ink-2)}
+.ported .pc-sms b{color:var(--ink)}
 .ported .pc-note{margin:0; padding:0 var(--s6) var(--s6)}
 @media(max-width:620px){
   .ported .pc-screen{margin:var(--s4) auto}
