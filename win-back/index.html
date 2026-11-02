@@ -1437,8 +1437,10 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pc-body{display:grid; grid-template-columns:1fr; gap:var(--s6);
   padding:var(--s6)}
 @media(min-width:900px){ .ported .pc-body{grid-template-columns:1.5fr 1fr} }
-.ported .pc-lines{list-style:none; margin:0; padding:0 var(--s2) 0 0;
-  max-height:360px; overflow-y:auto}
+/* No inner scroller. A 360px window that re-centred itself on every
+   timeupdate crept down the transcript while you were reading it, and hid
+   most of the call besides. The whole conversation is simply on the page. */
+.ported .pc-lines{list-style:none; margin:0; padding:0}
 .ported .pc-l{display:grid; grid-template-columns:76px 1fr; gap:var(--s3);
   padding:var(--s3) 0; align-items:baseline}
 .ported .pc-r{font-size:11px; font-weight:800; letter-spacing:.06em;
@@ -1449,7 +1451,8 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pc-lines.is-live .pc-l{opacity:.35; transition:opacity .25s}
 .ported .pc-lines.is-live .pc-l.is-past{opacity:1}
 .ported .pc-lines.is-live .pc-l.is-now .pc-t{color:var(--ink); font-weight:600}
-.ported .pc-sms{align-self:start; background:var(--f-blue);
+/* Stays in view beside a long transcript. */
+.ported .pc-sms{align-self:start; position:sticky; top:96px; background:var(--f-blue);
   border:1px solid var(--line); border-radius:16px; padding:var(--s5)}
 .ported .pc-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
   text-transform:uppercase; color:var(--blue); margin-bottom:var(--s2)}

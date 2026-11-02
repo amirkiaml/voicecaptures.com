@@ -2962,11 +2962,6 @@ PLAYGROUND_SCRIPT = """
       items[j].classList.toggle("is-now", j === cur);
     }
     if (S) S.hidden = t < SMS_AT;
-    if (cur > -1 && !A.paused){
-      var el = items[cur], p = el.parentNode;
-      if (el.offsetTop < p.scrollTop || el.offsetTop + el.offsetHeight > p.scrollTop + p.clientHeight)
-        p.scrollTo({top: el.offsetTop - p.clientHeight / 2 + el.offsetHeight / 2, behavior: "smooth"});
-    }
   }
   A.addEventListener("timeupdate", function(){ at(A.currentTime); });
   A.addEventListener("seeked",     function(){ at(A.currentTime); });
