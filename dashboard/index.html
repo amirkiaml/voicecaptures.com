@@ -129,6 +129,40 @@
   .p-emergency { background: var(--bad-soft); color: var(--bad); }
   .p-abandoned { background: var(--gray-soft); color: var(--muted); }
   .p-other { background: var(--accent-soft); color: var(--accent); }
+  tr.spam-row td { opacity: .55; }
+  /* Call back list: beside the call log on wide screens, above it otherwise; collapsible */
+  .logrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  .logrow > #cbCard { order: -1; }
+  @media (min-width: 1100px) {
+    .logrow.side { grid-template-columns: minmax(0, 1fr) 360px; }
+    .logrow.side > #cbCard { order: 0; position: sticky; top: 12px; }
+  }
+  .card.cb { padding-top: 14px; padding-bottom: 14px; }
+  .cb-head { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: 0; padding: 4px 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+  .cb-chev { display: inline-block; width: 14px; color: var(--muted); transition: transform .15s; }
+  .cb.closed .cb-chev { transform: rotate(-90deg); }
+  .cb.closed #cbBody { display: none; }
+  .cb-hint { margin-left: auto; color: var(--muted); font-size: 13px; }
+  .cb-count { display: inline-block; min-width: 22px; padding: 1px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 700; text-align: center; }
+  .cb-count.zero { background: var(--good-soft); color: var(--good); }
+  .cb-sub { margin: 2px 0 6px; }
+  .cb-scroll { max-height: min(72vh, 720px); overflow-y: auto; overscroll-behavior: contain; margin: 0 -6px; padding: 0 6px; }
+  @media (max-width: 1099px) { .cb-scroll { max-height: 420px; } }
+  .cb-item { padding: 10px 0; border-top: 1px solid var(--line); }
+  .cb-item.emerg { box-shadow: inset 3px 0 0 var(--bad); padding-left: 10px; }
+  .cb-top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .cb-top b { font-size: 15px; }
+  .cb-item .pill { font-size: 12px; padding: 2px 9px; }
+  .cb-wait { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .cb-req { margin-top: 4px; font-size: 14px; }
+  .cb-sum { margin-top: 2px; font-size: 12px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cb-act { display: flex; gap: 8px; margin-top: 8px; }
+  .cb-act > * { font-size: 13px; padding: 6px 12px; }
+  .cb-act a { text-decoration: none; white-space: nowrap; flex: 1; text-align: center; }
+  .cb-done-item { opacity: .75; }
+  .cb-empty { padding: 12px 0 4px; border-top: 1px solid var(--line); font-size: 14px; }
+  .cb-msg { color: var(--bad); font-size: 13px; }
+  .cb-toggle { margin-top: 10px; font-size: 13px; padding: 6px 12px; }
   .detail td { background: var(--hover); }
   .msgs { display: grid; gap: 8px; margin-top: 6px; max-width: 640px; }
   .msg { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--card); }
@@ -282,7 +316,7 @@
   td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr.row.open td { background: var(--hover); border-bottom: 0; }
   .req { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .caller-num { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .caller-num { color: var(--muted); font-size: 14px; margin-top: 2px; white-space: nowrap; }
   .detail td { background: var(--hover); padding: 0 0 16px; }
   .dcard { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; background: var(--raise); border: 1px solid var(--line); border-radius: 16px; padding: 24px 28px; margin: 0 0 4px; }
   .dcard .k, .detail .k { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
@@ -309,6 +343,69 @@
   .status-row .k { margin: 0 !important; }
   @media (max-width: 860px) { .dcard { grid-template-columns: 1fr; gap: 6px; padding: 18px; } .hero .note { text-align: left; } }
   @media (max-width: 640px) { .kpi .val { font-size: 34px; } .hero .val { font-size: 40px; } .card { padding: 18px; } td { padding: 12px 10px; } }
+
+  /* ---------- Call log fits its own width (it is narrower beside the Call back list) ---------- */
+  [data-section="log"] { container: log / inline-size; }
+  @container log (max-width: 900px) {
+    .dcard { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
+    .dcard .col + .col { border-top: 1px solid var(--line); padding-top: 4px; }
+  }
+  /* Narrow: each call is a small card instead of a table row, so nothing scrolls sideways. */
+  @container log (max-width: 700px) {
+    .table-wrap { overflow-x: visible; }
+    .table-wrap table, .table-wrap tbody { display: block; }
+    .table-wrap thead { display: none; }
+    #log tr.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 3px; padding: 12px 6px; border-bottom: 1px solid var(--line); }
+    #log tr.row td { display: block; padding: 0; border: 0; }
+    #log tr.row td:nth-child(2) { grid-area: 1 / 1; font-weight: 600; }
+    #log tr.row td:nth-child(2) .caller-num { font-weight: 400; font-size: 13px; }
+    #log tr.row td:nth-child(3) { grid-area: 1 / 2 / span 2; text-align: right; }
+    #log tr.row td:nth-child(1) { grid-area: 3 / 1; color: var(--muted); font-size: 13px; }
+    #log tr.row td:nth-child(5) { display: block; grid-area: 3 / 2; color: var(--muted); font-size: 13px; text-align: right; }
+    #log tr.row td:nth-child(4) { display: block; grid-area: 4 / 1 / 5 / 3; font-size: 14px; }
+    #log tr.row .req { -webkit-line-clamp: 2; }
+    #log tr.row:hover td { background: none; }
+    #log tr.row.open { background: var(--hover); border-radius: 12px 12px 0 0; border-bottom: 0; }
+    #log tr.detail { display: block; }
+    #log tr.detail td { display: block; padding: 0 0 12px; border-bottom: 1px solid var(--line); }
+    #log tr.detail[hidden] { display: none; }
+    .msgcount { margin-left: 4px; }
+    #log .pill { font-size: 12px; padding: 3px 10px; }
+    #log .ah-chip { font-size: 11px; }
+  }
+
+  /* ---------- Phones: smaller type and spacing, so the page reads at a glance ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding: 16px 12px 40px; }
+    .topbar { margin-bottom: 14px; }
+    header { margin-bottom: 14px; gap: 10px; }
+    h1 { font-size: 24px; }
+    header .sub { font-size: 13px; }
+    .hdr-right { gap: 8px; flex-wrap: wrap; }
+    .gear { padding: 7px 11px; font-size: 14px; }
+    .range { gap: 6px; }
+    .range button { padding: 7px 12px; font-size: 14px; }
+    .card { padding: 14px; border-radius: 14px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .row2, .stack, .usage, .hero { margin-bottom: 10px; }
+    .row2 { gap: 10px; }
+    .hero { padding: 16px; }
+    .hero .label { font-size: 14px; }
+    .hero .val { font-size: 32px; }
+    .hero .note { font-size: 13px; line-height: 1.5; }
+    .kpi { padding: 14px; }
+    .kpi .label { font-size: 13px; }
+    .kpi .val { font-size: 24px; margin-top: 6px; gap: 6px; }
+    .kpi .note { font-size: 12px; margin-top: 6px; line-height: 1.4; }
+    .delta { font-size: 12px; }
+    .panel-title { font-size: 16px; }
+    .panel-sub { font-size: 13px; }
+    .dcard { padding: 14px; }
+    .dcard .v { font-size: 15px; }
+    .msg-body { font-size: 14px; }
+    .ins .v { font-size: 20px; }
+    footer { margin-top: 18px; }
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
@@ -450,6 +547,7 @@
     </div>
   </div>
 
+  <div class="logrow" id="logRow">
   <div class="card" data-section="log">
     <p class="panel-title">Call log</p>
     <p class="panel-sub">Tap a call for the summary, recording and texts
@@ -465,6 +563,23 @@
     </div>
     <button class="more" id="more" hidden>Show more</button>
   </div>
+  <div class="card cb" id="cbCard" data-section="callbacks" hidden>
+    <button class="cb-head" type="button" id="cbHead" aria-expanded="true" aria-controls="cbBody">
+      <span class="cb-chev" aria-hidden="true">▾</span>
+      <span class="panel-title" style="margin:0">Call back</span>
+      <span class="cb-count" id="cbCount"></span>
+      <span class="cb-hint" id="cbHint"></span>
+    </button>
+    <div id="cbBody">
+      <p class="panel-sub cb-sub">Emergencies first, then whoever has waited longest</p>
+      <div class="cb-scroll">
+        <div id="cbList"></div>
+        <div id="cbDone" hidden></div>
+      </div>
+      <button class="btn-ghost cb-toggle" type="button" id="cbDoneToggle" hidden></button>
+    </div>
+  </div>
+  </div>
 
   <footer>Powered by VoiceCaptures</footer>
   </div>
@@ -474,7 +589,7 @@
 <script>
 let days = 7, shown = 25, allCalls = [], last = null, S = null;
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const SECTION_NAMES = { revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
+const SECTION_NAMES = { callbacks: "Call back list", revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -988,7 +1103,7 @@ function renderLog(everything) {
     const callback = c.phone || c.caller_id || "";
     const same = c.phone && c.caller_id && String(c.phone).replace(/\D/g, "").slice(-10) === String(c.caller_id).replace(/\D/g, "").slice(-10);
     return `
-    <tr class="row${c.silent ? " silent-row" : ""}${open ? " open" : ""}" data-i="${i}">
+    <tr class="row${c.silent ? " silent-row" : ""}${c.outcome === "spam" ? " spam-row" : ""}${open ? " open" : ""}" data-i="${i}">
       <td>${esc(fmtWhen(c.created_at))}${!c.silent && isAfter(c.created_at) ? `<span class="ah-chip">After hours</span>` : ""}</td>
       <td>${esc(c.caller_name || "Unknown")}<div class="caller-num">${esc(fmtPhone(c.caller_id && !/^(UNKNOWN|WEB_CALL)$/.test(c.caller_id) ? c.caller_id : c.phone || ""))}</div></td>
       <td><span class="tag-edit" data-edit="status" title="Change status">${statusPill(c)}</span>${c.messages && c.messages.length ? `<span class="msgcount" title="Texts and emails sent">✉ ${c.messages.length}</span>` : ""}${c.sentiment ? `<div><span class="mood ${c.sentiment} tag-edit" data-edit="mood" title="${esc(c.sentiment_note ? c.sentiment_note + " · change mood" : "Change mood")}">● ${MOOD_LABEL[c.sentiment]}</span></div>` : ""}</td>
@@ -1053,9 +1168,104 @@ function renderLog(everything) {
 
 }
 
+/* ---------- call back list (feature "callbacks") ---------- */
+const hasCallbacks = () => !!(last && last.features && last.features.callbacks);
+let cbData = null, cbShowDone = false, cbBiz = null;
+const fmtWait = iso => {
+  const m = Math.max(0, (Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 60) return `waiting ${Math.max(1, Math.round(m))} min`;
+  if (m < 60 * 24) return `waiting ${Math.round(m / 60)} h`;
+  const d = Math.round(m / 1440); return `waiting ${d} day${d === 1 ? "" : "s"}`;
+};
+function cbPill(c) {
+  const [cls, label] = c.outcome === "emergency" ? ["p-emergency", "Emergency"] : ["p-pending", "Needs callback"];
+  return `<span class="pill ${cls}">${esc(c.custom_status ? c.custom_status.label : label)}</span>`;
+}
+function cbItem(c, done) {
+  const who = esc(c.caller_name || "Unknown caller");
+  const tel = c.phone ? `<a class="btn-ghost" href="tel:${esc(String(c.phone).replace(/[^+\d]/g, ""))}">Call ${esc(fmtPhone(c.phone))}</a>` : `<span class="muted" style="font-size:13px;flex:1">No number left</span>`;
+  const when = done ? `Done by ${esc(c.done_by || "—")} · ${esc(fmtWhen(c.done_at))}`
+    : `${esc(fmtWhen(c.created_at))} · ${esc(fmtWait(c.created_at))}${c.preferred_date ? ` · asked for ${esc(c.preferred_date)} ${esc(c.preferred_time || "")}` : ""}`;
+  return `<div class="cb-item${!done && c.outcome === "emergency" ? " emerg" : ""}${done ? " cb-done-item" : ""}" data-id="${esc(c.id)}">
+    <div class="cb-top"><b>${who}</b>${cbPill(c)}</div>
+    <div class="cb-wait">${when}</div>
+    ${c.request ? `<div class="cb-req">${esc(c.request)}</div>` : ""}
+    ${!done && c.summary ? `<div class="cb-sum" title="${esc(c.summary)}">${esc(c.summary)}</div>` : ""}
+    <div class="cb-act">${done ? `<button class="btn-ghost cb-btn" type="button" data-done="0">Reopen</button>`
+      : `${tel}<button class="btn cb-btn" type="button" data-done="1">Done</button>`}</div>
+    <div class="cb-msg"></div>
+  </div>`;
+}
+// Open or closed is remembered per browser; open by default.
+let cbOpen = true;
+try { cbOpen = localStorage.getItem("vc_cb_open") !== "0"; } catch (e) {}
+function renderCallbacks() {
+  const card = $("cbCard");
+  card.hidden = !hasCallbacks() || S.hiddenSections.includes("callbacks");
+  card.classList.toggle("closed", !cbOpen);
+  $("cbHead").setAttribute("aria-expanded", String(cbOpen));
+  // Beside the call log only while open and the log is showing; closed it is a one-line bar above it.
+  $("logRow").classList.toggle("side", !card.hidden && cbOpen && !S.hiddenSections.includes("log"));
+  if (card.hidden) return;
+  const list = $("cbList"), doneBox = $("cbDone"), tog = $("cbDoneToggle");
+  if (!cbData) { list.innerHTML = `<div class="cb-empty muted">Loading…</div>`; return; }
+  if (cbData.error) {
+    $("cbCount").textContent = ""; tog.hidden = true; doneBox.hidden = true;
+    list.innerHTML = `<div class="cb-empty muted">${esc(cbData.needsMigration
+      ? (last.isAdmin ? "Run migrations/2026-11-02-callback-tasks.sql in Supabase to turn this list on." : "This list is being set up. Check back shortly.")
+      : cbData.error)}</div>`;
+    return;
+  }
+  const n = cbData.open.length;
+  $("cbCount").textContent = n; $("cbCount").classList.toggle("zero", !n);
+  $("cbHint").textContent = cbOpen ? "" : n ? `${n} waiting · show` : "all caught up";
+  list.innerHTML = n ? cbData.open.map(c => cbItem(c, false)).join("")
+    : `<div class="cb-empty muted">All caught up. Nobody is waiting for a call back.</div>`;
+  tog.hidden = !cbData.done.length;
+  tog.textContent = cbShowDone ? "Hide done" : `Show done (${cbData.done.length})`;
+  doneBox.hidden = !cbShowDone || !cbData.done.length;
+  doneBox.innerHTML = cbData.done.map(c => cbItem(c, true)).join("");
+  document.querySelectorAll("#cbCard .cb-btn").forEach(b => b.onclick = () => setCallback(b));
+}
+async function loadCallbacks() {
+  if (!hasCallbacks()) { $("cbCard").hidden = true; return; }
+  if (cbBiz !== business) { cbData = null; cbBiz = business; } // switched business: don't show the other one's list
+  renderCallbacks();
+  try {
+    const r = await api("/api/dashboard/callbacks");
+    const d = await r.json();
+    cbData = r.ok ? d : { error: d.error || "Could not load the list", needsMigration: !!d.needsMigration };
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    cbData = { error: "Could not load the list" };
+  }
+  renderCallbacks();
+}
+async function setCallback(btn) {
+  const item = btn.closest(".cb-item"), msg = item.querySelector(".cb-msg");
+  btn.disabled = true; msg.textContent = "";
+  try {
+    const r = await api(`/api/dashboard/calls/${encodeURIComponent(item.dataset.id)}/callback`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ done: btn.dataset.done === "1" })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Could not save");
+    await loadCallbacks();
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    btn.disabled = false; msg.textContent = e.message;
+  }
+}
+$("cbDoneToggle").onclick = () => { cbShowDone = !cbShowDone; renderCallbacks(); };
+$("cbHead").onclick = () => {
+  cbOpen = !cbOpen;
+  try { localStorage.setItem("vc_cb_open", cbOpen ? "1" : "0"); } catch (e) {}
+  renderCallbacks();
+};
+
 function applySections() {
   document.querySelectorAll("[data-section]").forEach(el => {
-    if (el.id === "hero") return; // hero has its own visibility rule
+    if (el.id === "hero" || el.id === "cbCard") return; // these have their own visibility rules
     el.hidden = S.hiddenSections.includes(el.dataset.section);
   });
   document.querySelectorAll(".row2").forEach(row => {
@@ -1064,6 +1274,7 @@ function applySections() {
     row.classList.toggle("single", visible === 1);
   });
   document.querySelectorAll(".bl").forEach(el => el.textContent = `${S.bookingLabel} booked`);
+  renderCallbacks();
 }
 
 /* Minutes this period — minutes only, never cost. Hidden until a plan is set. */
@@ -1207,6 +1418,7 @@ async function load() {
     renderAll(data);
     allCalls = data.calls;
     renderLog(allCalls);
+    loadCallbacks();
   } catch (e) {
     if (e.message === "Signed out") return;
     $("app").hidden = false;
@@ -1227,7 +1439,7 @@ function openSettings() {
   $("sTz").innerHTML = tzs.map(z => `<option value="${esc(z)}" ${z === S.timezone ? "selected" : ""}>${esc(tzLabel(z))}</option>`).join("");
   $("sDays").innerHTML = DAY_NAMES.map((d, i) =>
     `<label class="chip"><input type="checkbox" value="${i}" ${S.openDays.includes(i) ? "checked" : ""}>${d}</label>`).join("");
-  $("sSections").innerHTML = Object.entries(SECTION_NAMES).map(([k, v]) =>
+  $("sSections").innerHTML = Object.entries(SECTION_NAMES).filter(([k]) => k !== "callbacks" || hasCallbacks()).map(([k, v]) =>
     `<label class="chip"><input type="checkbox" value="${k}" ${S.hiddenSections.includes(k) ? "" : "checked"}>${v}</label>`).join("");
   statusDraft = (S.customStatuses || []).map(x => ({ ...x }));
   renderStatusDraft();
