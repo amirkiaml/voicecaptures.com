@@ -146,7 +146,7 @@
   .cb-count { display: inline-block; min-width: 22px; padding: 1px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 700; text-align: center; }
   .cb-count.zero { background: var(--good-soft); color: var(--good); }
   .cb-sub { margin: 2px 0 6px; }
-  .cb-scroll { max-height: 560px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -6px; padding: 0 6px; }
+  .cb-scroll { max-height: min(72vh, 720px); overflow-y: auto; overscroll-behavior: contain; margin: 0 -6px; padding: 0 6px; }
   @media (max-width: 1099px) { .cb-scroll { max-height: 420px; } }
   .cb-item { padding: 10px 0; border-top: 1px solid var(--line); }
   .cb-item.emerg { box-shadow: inset 3px 0 0 var(--bad); padding-left: 10px; }
@@ -343,6 +343,69 @@
   .status-row .k { margin: 0 !important; }
   @media (max-width: 860px) { .dcard { grid-template-columns: 1fr; gap: 6px; padding: 18px; } .hero .note { text-align: left; } }
   @media (max-width: 640px) { .kpi .val { font-size: 34px; } .hero .val { font-size: 40px; } .card { padding: 18px; } td { padding: 12px 10px; } }
+
+  /* ---------- Call log fits its own width (it is narrower beside the Call back list) ---------- */
+  [data-section="log"] { container: log / inline-size; }
+  @container log (max-width: 900px) {
+    .dcard { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
+    .dcard .col + .col { border-top: 1px solid var(--line); padding-top: 4px; }
+  }
+  /* Narrow: each call is a small card instead of a table row, so nothing scrolls sideways. */
+  @container log (max-width: 700px) {
+    .table-wrap { overflow-x: visible; }
+    .table-wrap table, .table-wrap tbody { display: block; }
+    .table-wrap thead { display: none; }
+    #log tr.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 3px; padding: 12px 6px; border-bottom: 1px solid var(--line); }
+    #log tr.row td { display: block; padding: 0; border: 0; }
+    #log tr.row td:nth-child(2) { grid-area: 1 / 1; font-weight: 600; }
+    #log tr.row td:nth-child(2) .caller-num { font-weight: 400; font-size: 13px; }
+    #log tr.row td:nth-child(3) { grid-area: 1 / 2 / span 2; text-align: right; }
+    #log tr.row td:nth-child(1) { grid-area: 3 / 1; color: var(--muted); font-size: 13px; }
+    #log tr.row td:nth-child(5) { display: block; grid-area: 3 / 2; color: var(--muted); font-size: 13px; text-align: right; }
+    #log tr.row td:nth-child(4) { display: block; grid-area: 4 / 1 / 5 / 3; font-size: 14px; }
+    #log tr.row .req { -webkit-line-clamp: 2; }
+    #log tr.row:hover td { background: none; }
+    #log tr.row.open { background: var(--hover); border-radius: 12px 12px 0 0; border-bottom: 0; }
+    #log tr.detail { display: block; }
+    #log tr.detail td { display: block; padding: 0 0 12px; border-bottom: 1px solid var(--line); }
+    #log tr.detail[hidden] { display: none; }
+    .msgcount { margin-left: 4px; }
+    #log .pill { font-size: 12px; padding: 3px 10px; }
+    #log .ah-chip { font-size: 11px; }
+  }
+
+  /* ---------- Phones: smaller type and spacing, so the page reads at a glance ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding: 16px 12px 40px; }
+    .topbar { margin-bottom: 14px; }
+    header { margin-bottom: 14px; gap: 10px; }
+    h1 { font-size: 24px; }
+    header .sub { font-size: 13px; }
+    .hdr-right { gap: 8px; flex-wrap: wrap; }
+    .gear { padding: 7px 11px; font-size: 14px; }
+    .range { gap: 6px; }
+    .range button { padding: 7px 12px; font-size: 14px; }
+    .card { padding: 14px; border-radius: 14px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .row2, .stack, .usage, .hero { margin-bottom: 10px; }
+    .row2 { gap: 10px; }
+    .hero { padding: 16px; }
+    .hero .label { font-size: 14px; }
+    .hero .val { font-size: 32px; }
+    .hero .note { font-size: 13px; line-height: 1.5; }
+    .kpi { padding: 14px; }
+    .kpi .label { font-size: 13px; }
+    .kpi .val { font-size: 24px; margin-top: 6px; gap: 6px; }
+    .kpi .note { font-size: 12px; margin-top: 6px; line-height: 1.4; }
+    .delta { font-size: 12px; }
+    .panel-title { font-size: 16px; }
+    .panel-sub { font-size: 13px; }
+    .dcard { padding: 14px; }
+    .dcard .v { font-size: 15px; }
+    .msg-body { font-size: 14px; }
+    .ins .v { font-size: 20px; }
+    footer { margin-top: 18px; }
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
