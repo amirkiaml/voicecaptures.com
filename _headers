@@ -1,0 +1,4 @@
+# Cloudflare Pages only (GitHub Pages, the live site, ignores this file).
+# Keeps preview copies on *.pages.dev out of search results.
+/*
+  X-Robots-Tag: noindex
