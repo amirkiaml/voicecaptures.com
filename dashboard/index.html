@@ -130,24 +130,39 @@
   .p-abandoned { background: var(--gray-soft); color: var(--muted); }
   .p-other { background: var(--accent-soft); color: var(--accent); }
   tr.spam-row td { opacity: .55; }
-  /* Call back list */
-  .cb { margin-bottom: 16px; }
-  .cb-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  .cb-count { display: inline-block; min-width: 22px; padding: 1px 8px; margin-left: 6px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 700; text-align: center; vertical-align: 2px; }
+  /* Call back list: beside the call log on wide screens, above it otherwise; collapsible */
+  .logrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  .logrow > #cbCard { order: -1; }
+  @media (min-width: 1100px) {
+    .logrow.side { grid-template-columns: minmax(0, 1fr) 360px; }
+    .logrow.side > #cbCard { order: 0; position: sticky; top: 12px; }
+  }
+  .card.cb { padding-top: 14px; padding-bottom: 14px; }
+  .cb-head { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: 0; padding: 4px 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+  .cb-chev { display: inline-block; width: 14px; color: var(--muted); transition: transform .15s; }
+  .cb.closed .cb-chev { transform: rotate(-90deg); }
+  .cb.closed #cbBody { display: none; }
+  .cb-hint { margin-left: auto; color: var(--muted); font-size: 13px; }
+  .cb-count { display: inline-block; min-width: 22px; padding: 1px 8px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 700; text-align: center; }
   .cb-count.zero { background: var(--good-soft); color: var(--good); }
-  .cb-item { display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
-  .cb-item.emerg { box-shadow: inset 3px 0 0 var(--bad); padding-left: 12px; }
-  .cb-main { min-width: 0; flex: 1; }
-  .cb-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .cb-wait { color: var(--muted); font-size: 13px; }
-  .cb-req { margin-top: 4px; }
-  .cb-sum { margin-top: 2px; font-size: 13px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .cb-act { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-  .cb-act a { text-decoration: none; white-space: nowrap; }
+  .cb-sub { margin: 2px 0 6px; }
+  .cb-scroll { max-height: 560px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -6px; padding: 0 6px; }
+  @media (max-width: 1099px) { .cb-scroll { max-height: 420px; } }
+  .cb-item { padding: 10px 0; border-top: 1px solid var(--line); }
+  .cb-item.emerg { box-shadow: inset 3px 0 0 var(--bad); padding-left: 10px; }
+  .cb-top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .cb-top b { font-size: 15px; }
+  .cb-item .pill { font-size: 12px; padding: 2px 9px; }
+  .cb-wait { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .cb-req { margin-top: 4px; font-size: 14px; }
+  .cb-sum { margin-top: 2px; font-size: 12px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cb-act { display: flex; gap: 8px; margin-top: 8px; }
+  .cb-act > * { font-size: 13px; padding: 6px 12px; }
+  .cb-act a { text-decoration: none; white-space: nowrap; flex: 1; text-align: center; }
   .cb-done-item { opacity: .75; }
-  .cb-empty { padding: 14px 0 4px; border-top: 1px solid var(--line); }
+  .cb-empty { padding: 12px 0 4px; border-top: 1px solid var(--line); font-size: 14px; }
   .cb-msg { color: var(--bad); font-size: 13px; }
-  @media (max-width: 640px) { .cb-item { flex-direction: column; } .cb-act { width: 100%; } .cb-act > * { flex: 1; text-align: center; } }
+  .cb-toggle { margin-top: 10px; font-size: 13px; padding: 6px 12px; }
   .detail td { background: var(--hover); }
   .msgs { display: grid; gap: 8px; margin-top: 6px; max-width: 640px; }
   .msg { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--card); }
@@ -301,7 +316,7 @@
   td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr.row.open td { background: var(--hover); border-bottom: 0; }
   .req { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .caller-num { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .caller-num { color: var(--muted); font-size: 14px; margin-top: 2px; white-space: nowrap; }
   .detail td { background: var(--hover); padding: 0 0 16px; }
   .dcard { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; background: var(--raise); border: 1px solid var(--line); border-radius: 16px; padding: 24px 28px; margin: 0 0 4px; }
   .dcard .k, .detail .k { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
@@ -431,17 +446,6 @@
   <div class="card paused-card" id="pausedCard" hidden></div>
   <div class="card usage" id="usageCard" hidden></div>
   <div class="muted" id="retentionNote" style="font-size:12px;margin:-4px 2px 12px" hidden></div>
-  <div class="card cb" id="cbCard" data-section="callbacks" hidden>
-    <div class="cb-head">
-      <div>
-        <p class="panel-title">Call back <span class="cb-count" id="cbCount"></span></p>
-        <p class="panel-sub" id="cbSub">People waiting to hear from you · emergencies first, then whoever has waited longest</p>
-      </div>
-      <button class="btn-ghost" type="button" id="cbDoneToggle" hidden></button>
-    </div>
-    <div id="cbList"></div>
-    <div id="cbDone" hidden></div>
-  </div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
   <div class="grid" id="kpis"></div>
 
@@ -480,6 +484,7 @@
     </div>
   </div>
 
+  <div class="logrow" id="logRow">
   <div class="card" data-section="log">
     <p class="panel-title">Call log</p>
     <p class="panel-sub">Tap a call for the summary, recording and texts
@@ -494,6 +499,23 @@
       </table>
     </div>
     <button class="more" id="more" hidden>Show more</button>
+  </div>
+  <div class="card cb" id="cbCard" data-section="callbacks" hidden>
+    <button class="cb-head" type="button" id="cbHead" aria-expanded="true" aria-controls="cbBody">
+      <span class="cb-chev" aria-hidden="true">▾</span>
+      <span class="panel-title" style="margin:0">Call back</span>
+      <span class="cb-count" id="cbCount"></span>
+      <span class="cb-hint" id="cbHint"></span>
+    </button>
+    <div id="cbBody">
+      <p class="panel-sub cb-sub">Emergencies first, then whoever has waited longest</p>
+      <div class="cb-scroll">
+        <div id="cbList"></div>
+        <div id="cbDone" hidden></div>
+      </div>
+      <button class="btn-ghost cb-toggle" type="button" id="cbDoneToggle" hidden></button>
+    </div>
+  </div>
   </div>
 
   <footer>Powered by VoiceCaptures</footer>
@@ -1098,25 +1120,29 @@ function cbPill(c) {
 }
 function cbItem(c, done) {
   const who = esc(c.caller_name || "Unknown caller");
-  const tel = c.phone ? `<a class="btn-ghost" href="tel:${esc(String(c.phone).replace(/[^+\d]/g, ""))}">Call ${esc(fmtPhone(c.phone))}</a>` : `<span class="muted" style="font-size:13px">No number left</span>`;
-  const pref = c.preferred_date ? `<div class="cb-wait">Asked for ${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : "";
-  const top = `<div class="cb-top"><b>${who}</b>${cbPill(c)}<span class="cb-wait">${done
-    ? `Done by ${esc(c.done_by || "—")} · ${esc(fmtWhen(c.done_at))}`
-    : `${esc(fmtWhen(c.created_at))} · ${esc(fmtWait(c.created_at))}`}</span></div>`;
+  const tel = c.phone ? `<a class="btn-ghost" href="tel:${esc(String(c.phone).replace(/[^+\d]/g, ""))}">Call ${esc(fmtPhone(c.phone))}</a>` : `<span class="muted" style="font-size:13px;flex:1">No number left</span>`;
+  const when = done ? `Done by ${esc(c.done_by || "—")} · ${esc(fmtWhen(c.done_at))}`
+    : `${esc(fmtWhen(c.created_at))} · ${esc(fmtWait(c.created_at))}${c.preferred_date ? ` · asked for ${esc(c.preferred_date)} ${esc(c.preferred_time || "")}` : ""}`;
   return `<div class="cb-item${!done && c.outcome === "emergency" ? " emerg" : ""}${done ? " cb-done-item" : ""}" data-id="${esc(c.id)}">
-    <div class="cb-main">${top}
-      ${c.request ? `<div class="cb-req">${esc(c.request)}</div>` : ""}
-      ${!done && c.summary ? `<div class="cb-sum">${esc(c.summary)}</div>` : ""}
-      ${done ? "" : pref}
-      <div class="cb-msg"></div>
-    </div>
+    <div class="cb-top"><b>${who}</b>${cbPill(c)}</div>
+    <div class="cb-wait">${when}</div>
+    ${c.request ? `<div class="cb-req">${esc(c.request)}</div>` : ""}
+    ${!done && c.summary ? `<div class="cb-sum" title="${esc(c.summary)}">${esc(c.summary)}</div>` : ""}
     <div class="cb-act">${done ? `<button class="btn-ghost cb-btn" type="button" data-done="0">Reopen</button>`
       : `${tel}<button class="btn cb-btn" type="button" data-done="1">Done</button>`}</div>
+    <div class="cb-msg"></div>
   </div>`;
 }
+// Open or closed is remembered per browser; open by default.
+let cbOpen = true;
+try { cbOpen = localStorage.getItem("vc_cb_open") !== "0"; } catch (e) {}
 function renderCallbacks() {
   const card = $("cbCard");
   card.hidden = !hasCallbacks() || S.hiddenSections.includes("callbacks");
+  card.classList.toggle("closed", !cbOpen);
+  $("cbHead").setAttribute("aria-expanded", String(cbOpen));
+  // Beside the call log only while open and the log is showing; closed it is a one-line bar above it.
+  $("logRow").classList.toggle("side", !card.hidden && cbOpen && !S.hiddenSections.includes("log"));
   if (card.hidden) return;
   const list = $("cbList"), doneBox = $("cbDone"), tog = $("cbDoneToggle");
   if (!cbData) { list.innerHTML = `<div class="cb-empty muted">Loading…</div>`; return; }
@@ -1129,6 +1155,7 @@ function renderCallbacks() {
   }
   const n = cbData.open.length;
   $("cbCount").textContent = n; $("cbCount").classList.toggle("zero", !n);
+  $("cbHint").textContent = cbOpen ? "" : n ? `${n} waiting · show` : "all caught up";
   list.innerHTML = n ? cbData.open.map(c => cbItem(c, false)).join("")
     : `<div class="cb-empty muted">All caught up. Nobody is waiting for a call back.</div>`;
   tog.hidden = !cbData.done.length;
@@ -1167,6 +1194,11 @@ async function setCallback(btn) {
   }
 }
 $("cbDoneToggle").onclick = () => { cbShowDone = !cbShowDone; renderCallbacks(); };
+$("cbHead").onclick = () => {
+  cbOpen = !cbOpen;
+  try { localStorage.setItem("vc_cb_open", cbOpen ? "1" : "0"); } catch (e) {}
+  renderCallbacks();
+};
 
 function applySections() {
   document.querySelectorAll("[data-section]").forEach(el => {
