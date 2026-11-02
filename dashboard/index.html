@@ -130,6 +130,30 @@
   .p-abandoned { background: var(--gray-soft); color: var(--muted); }
   .p-other { background: var(--accent-soft); color: var(--accent); }
   tr.spam-row td { opacity: .55; }
+  /* Top callers */
+  .tc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; margin-top: 6px; }
+  .tc-h { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 6px 0 4px; }
+  .tc-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+  .tc-rank { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .tc-who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tc-who b { font-weight: 600; }
+  .tc-num { color: var(--muted); font-size: 13px; margin-left: 6px; }
+  .tc-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tc-meta { grid-column: 2 / 4; color: var(--muted); font-size: 12px; }
+  .tc-bar { grid-column: 2 / 4; height: 4px; border-radius: 3px; background: var(--gray-soft); overflow: hidden; }
+  .tc-bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  .tc-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); margin-left: 4px; }
+  .tc-empty { color: var(--muted); font-size: 14px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .tc-switch { display: none; }
+  @media (max-width: 640px) {
+    .tc-grid { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .tc-h { display: none; }
+    .tc-grid[data-show="calls"] .tc-col[data-k="time"], .tc-grid[data-show="time"] .tc-col[data-k="calls"] { display: none; }
+    .tc-switch { display: inline-flex; gap: 4px; margin: 4px 0 8px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; }
+    .tc-switch button { border: 0; background: none; font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 7px; color: var(--muted); cursor: pointer; }
+    .tc-switch button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+    .tc-meta { font-size: 11px; }
+  }
   /* Call back list: beside the call log on wide screens, above it otherwise; collapsible */
   .logrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
   .logrow > #cbCard { order: -1; }
@@ -572,6 +596,18 @@
     </div>
   </div>
 
+  <div class="card stack" data-section="callers">
+    <p class="panel-title">Top callers</p>
+    <p class="panel-sub">Who calls most in this period · spam left out</p>
+    <div class="tc-switch" role="tablist">
+      <button type="button" class="on" data-tc="calls">Most calls</button><button type="button" data-tc="time">Most talk time</button>
+    </div>
+    <div class="tc-grid" id="tcGrid" data-show="calls">
+      <div class="tc-col" data-k="calls"><div class="tc-h">Most calls</div><div id="tcCalls"></div></div>
+      <div class="tc-col" data-k="time"><div class="tc-h">Most talk time</div><div id="tcTime"></div></div>
+    </div>
+  </div>
+
   <div class="logrow" id="logRow">
   <div class="card" data-section="log">
     <p class="panel-title">Call log</p>
@@ -614,7 +650,7 @@
 <script>
 let days = 7, shown = 25, allCalls = [], last = null, S = null;
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const SECTION_NAMES = { callbacks: "Call back list", revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", log: "Call log" };
+const SECTION_NAMES = { callbacks: "Call back list", revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", callers: "Top callers", log: "Call log" };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -1288,6 +1324,32 @@ $("cbHead").onclick = () => {
   renderCallbacks();
 };
 
+/* ---------- top callers ---------- */
+function renderTopCallers(t) {
+  const fmtT = s => s >= 3600 ? `${Math.floor(s / 3600)}h ${Math.round(s % 3600 / 60)}m` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const list = (rows, key) => {
+    if (!rows || !rows.length) return `<div class="tc-empty">No callers with a number in this period yet.</div>`;
+    const max = Math.max(...rows.map(r => r[key])) || 1;
+    return rows.map((r, i) => {
+      const meta = [`${r.calls} call${r.calls === 1 ? "" : "s"}`, `${fmtT(r.seconds)} talk time`, r.booked ? `${r.booked} booked` : "",
+        `last ${fmtWhen(r.lastAt)}`].filter(Boolean).join(" · ");
+      return `<div class="tc-row">
+        <span class="tc-rank">${i + 1}</span>
+        <span class="tc-who"><b>${esc(r.name || "Unknown")}</b><span class="tc-num">${esc(fmtPhone(r.number))}</span>${r.returning ? `<span class="tc-tag" title="Also called in the previous period">returning</span>` : ""}</span>
+        <span class="tc-val">${esc(key === "calls" ? r.calls : fmtT(r.seconds))}</span>
+        <div class="tc-bar"><span style="width:${Math.max(4, Math.round(r[key] / max * 100))}%"></span></div>
+        <div class="tc-meta">${esc(meta)}</div>
+      </div>`;
+    }).join("");
+  };
+  document.querySelectorAll(".tc-switch button").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".tc-switch button").forEach(x => x.classList.toggle("on", x === b));
+    $("tcGrid").dataset.show = b.dataset.tc;
+  });
+  $("tcCalls").innerHTML = list(t && t.byCalls, "calls");
+  $("tcTime").innerHTML = list(t && t.byTime, "seconds");
+}
+
 function applySections() {
   document.querySelectorAll("[data-section]").forEach(el => {
     if (el.id === "hero" || el.id === "cbCard") return; // these have their own visibility rules
@@ -1379,6 +1441,7 @@ function renderAll(data) {
   renderOutcomes(data.outcomes, data.totals.totalCalls + (data.totals.silent || 0));
   $("tzNote").textContent = `times in ${tzLabel(TZ())}`;
   renderInsights(data);
+  renderTopCallers(data.topCallers);
 }
 
 /* ---------- auth ---------- */
