@@ -2871,13 +2871,15 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
           <span class="pc-live"><i></i><b>On the call</b><em>Call recording</em></span>
           <span class="pc-clock" id="pc-clock">0:00</span>
         </div>
-        <ol class="pc-lines" id="pc-lines"></ol>
-        <aside class="pc-sms" id="pc-sms">
-          <span class="pc-k">Text to the owner</span>
-          <p><b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 &bull;&bull;&bull;-&bull;&bull;&bull;&bull;<br>
-          <b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from
-          under the kitchen sink, steady flow, unable to stop it.</p>
-        </aside>
+        <ol class="pc-lines" id="pc-lines">
+          <li class="pc-hint">Press play to hear the call</li>
+          <li class="pc-sms" id="pc-sms">
+            <span class="pc-k">Text to the owner</span>
+            <p><b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 &bull;&bull;&bull;-&bull;&bull;&bull;&bull;<br>
+            <b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from
+            under the kitchen sink, steady flow, unable to stop it.</p>
+          </li>
+        </ol>
       </div>
 
       <p class="fine pc-note">A real call to the demo line. The business, caller and
@@ -2950,6 +2952,7 @@ PLAYGROUND_SCRIPT = """
   ];
   var SMS_AT = 66.9;
 
+  var made = [];
   CONVO.forEach(function(c){
     var li = document.createElement("li");
     li.className = "pc-l pc-" + c[1];
@@ -2957,7 +2960,15 @@ PLAYGROUND_SCRIPT = """
                    '</span><span class="pc-t"></span>';
     li.querySelector(".pc-t").textContent = c[2];
     L.appendChild(li);
+    made.push(li);
   });
+  /* The text goes where it happened in the call, not at the top of the list
+     where its markup happens to sit. */
+  if (S){
+    for (var k = 0; k < CONVO.length; k++){
+      if (CONVO[k][0] > SMS_AT){ L.insertBefore(S, made[k]); break; }
+    }
+  }
   var items = L.querySelectorAll(".pc-l");
   var screen = document.querySelector(".pc-screen");
   var clock = document.getElementById("pc-clock");
@@ -2966,12 +2977,21 @@ PLAYGROUND_SCRIPT = """
     t = Math.max(0, Math.floor(t));
     return Math.floor(t / 60) + ":" + ("0" + (t % 60)).slice(-2);
   }
+  var shown = -2, smsShown = null;
   function at(t){
     var cur = -1;
     for (var i = 0; i < CONVO.length; i++) if (t >= CONVO[i][0]) cur = i;
     for (var j = 0; j < items.length; j++) items[j].classList.toggle("is-past", j <= cur);
     if (S) S.classList.toggle("is-past", t >= SMS_AT);
     if (clock) clock.textContent = mmss(t);
+    /* Only when the thread actually changed, and straight to the bottom. The
+       first attempt re-centred on every timeupdate -- four times a second,
+       each restarting a smooth scroll -- and crept under the reader. */
+    var smsOn = S ? S.classList.contains("is-past") : false;
+    if (cur !== shown || smsOn !== smsShown){
+      shown = cur; smsShown = smsOn;
+      L.scrollTop = L.scrollHeight;
+    }
   }
   /* The live dot is a lie while the audio is paused. */
   var setLive = function(){ if (screen) screen.classList.toggle("is-playing", !A.paused); };

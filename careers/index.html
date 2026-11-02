@@ -1423,78 +1423,83 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 @media(max-width:700px){ .ported .calframe iframe{height:480px} }
 .ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
 
-/* The sample call, as a phone screen. Bubbles arrive as they are spoken,
-   the way the old site had it -- a transcript that is merely dimmed reads
-   like a document, not like listening to a call. */
-.ported .pc{max-width:760px; margin:0 auto; background:#fff;
+/* The sample call, on a phone screen. Fixed height, pinned to the newest
+   line: a chat that grows pushes the page around, and a chat you have to
+   scroll yourself is not what a call looks like. Colours are the site's own
+   -- the first pass invented a cyan and an amber that appear nowhere else. */
+.ported .pc{max-width:560px; margin:0 auto; background:#fff;
   border:1px solid var(--line); border-radius:24px; overflow:hidden;
   box-shadow:0 18px 50px rgba(13,23,41,.08)}
-.ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s4);
-  padding:var(--s6); border-bottom:1px solid var(--line); background:var(--bg-soft)}
-.ported .pc-who{flex:1 1 200px; min-width:0}
-.ported .pc-who b{display:block; font-size:17px; font-weight:800; color:var(--ink)}
-.ported .pc-who span{font-size:13.5px; color:var(--muted)}
-.ported .pc-top audio{flex:1 1 280px; min-width:0; height:40px; max-width:100%}
+.ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3);
+  padding:var(--s5); border-bottom:1px solid var(--line); background:var(--bg-soft)}
+.ported .pc-who{flex:1 1 170px; min-width:0}
+.ported .pc-who b{display:block; font-size:16px; font-weight:800; color:var(--ink)}
+.ported .pc-who span{font-size:13px; color:var(--muted)}
+.ported .pc-top audio{flex:1 1 240px; min-width:0; height:36px; max-width:100%}
 
-/* The screen itself. */
-.ported .pc-screen{margin:var(--s6); padding:var(--s5) var(--s5) var(--s6);
-  border-radius:22px; background:linear-gradient(168deg,#1A2B4D 0%,#111C33 55%,#0C1322 100%);
-  box-shadow:inset 0 0 0 1px rgba(150,170,255,.14)}
+/* The screen: phone-width, not card-width. */
+.ported .pc-screen{width:min(380px,100%); margin:var(--s6) auto;
+  border-radius:26px; background:#11234B; padding:var(--s4) var(--s3) var(--s3);
+  box-shadow:inset 0 0 0 1px rgba(150,170,255,.16)}
 .ported .pc-bar{display:flex; align-items:center; justify-content:space-between;
-  padding:0 var(--s2) var(--s4); border-bottom:1px solid rgba(150,170,255,.14);
-  margin-bottom:var(--s4)}
-.ported .pc-live{display:inline-flex; align-items:center; gap:7px; font-size:11px;
-  font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#7FE3C4}
-.ported .pc-live i{width:7px; height:7px; border-radius:50%; background:#5A6B8C}
+  padding:0 var(--s2) var(--s3); margin-bottom:var(--s3);
+  border-bottom:1px solid rgba(150,170,255,.14)}
+.ported .pc-live{display:inline-flex; align-items:center; gap:6px; font-size:10px;
+  font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(226,235,255,.5)}
+.ported .pc-live i{width:6px; height:6px; border-radius:50%; background:#5A6B8C}
+.ported .pc-screen.is-playing .pc-live{color:#8FE3C0}
 .ported .pc-screen.is-playing .pc-live i{background:#34D399;
   animation:pcDot 1.9s ease-in-out infinite}
+@keyframes pcDot{0%,100%{opacity:1}50%{opacity:.25}}
 .ported .pc-screen.is-live .pc-live b{display:none}
 .ported .pc-screen.is-live.is-playing .pc-live b{display:inline}
 .ported .pc-screen.is-live.is-playing .pc-live em{display:none}
 .ported .pc-live em{font-style:normal}
-.ported .pc-screen.is-playing .pc-live{color:#7FE3C4}
-.ported .pc-live{color:rgba(226,235,255,.5)}
-@keyframes pcDot{0%,100%{opacity:1}50%{opacity:.25}}
-.ported .pc-clock{font-size:12.5px; font-weight:700; color:rgba(226,235,255,.6);
+.ported .pc-clock{font-size:11.5px; font-weight:700; color:rgba(226,235,255,.55);
   font-variant-numeric:tabular-nums}
 
-.ported .pc-lines{list-style:none; margin:0; padding:0;
-  display:flex; flex-direction:column; gap:var(--s3); min-height:76px}
-/* Before the first line lands, say so rather than showing a blank screen. */
-.ported .pc-lines.is-live:empty::before,
-.ported .pc-lines.is-live::after{content:"Press play to hear the call";
-  display:block; font-size:13.5px; color:rgba(226,235,255,.45); padding:var(--s4) var(--s2)}
-.ported .pc-lines.is-live:has(.is-past)::after{display:none}
-.ported .pc-l{max-width:86%; padding:10px 14px; font-size:14.5px; line-height:21px}
-.ported .pc-r{display:block; font-size:9px; font-weight:800; letter-spacing:.13em;
-  text-transform:uppercase; margin-bottom:3px}
-.ported .pc-agent{align-self:flex-start; background:rgba(34,211,238,.10);
-  border:1px solid rgba(34,211,238,.26); border-radius:15px 15px 15px 5px; color:#E6EEFF}
-.ported .pc-agent .pc-r{color:#5BD6EE}
+/* Fixed window. It scrolls itself to the newest line, the way a thread does. */
+.ported .pc-lines{list-style:none; margin:0; padding:0 var(--s1);
+  display:flex; flex-direction:column; gap:7px;
+  height:400px; overflow-y:auto; scrollbar-width:thin;
+  scrollbar-color:rgba(150,170,255,.3) transparent}
+.ported .pc-lines::-webkit-scrollbar{width:4px}
+.ported .pc-lines::-webkit-scrollbar-track{background:transparent}
+.ported .pc-lines::-webkit-scrollbar-thumb{background:rgba(150,170,255,.28);
+  border-radius:100px}
+.ported .pc-l{max-width:80%; padding:7px 11px; font-size:12.5px; line-height:18px}
+.ported .pc-r{display:block; font-size:8.5px; font-weight:800; letter-spacing:.12em;
+  text-transform:uppercase; margin-bottom:2px}
+/* Incoming grey, outgoing blue -- what a phone actually looks like. */
+.ported .pc-agent{align-self:flex-start; background:#E8EDF7; color:var(--ink);
+  border-radius:14px 14px 14px 4px}
+.ported .pc-agent .pc-r{color:var(--blue)}
 .ported .pc-caller{align-self:flex-end; background:var(--blue); color:#fff;
-  border-radius:15px 15px 5px 15px}
+  border-radius:14px 14px 4px 14px}
 .ported .pc-caller .pc-r{color:rgba(255,255,255,.72)}
 
-/* The thread GROWS, as the old site had it. Reserving the full height
-   instead left a 1600px slab of empty screen staring back before playback,
-   which is worse than the page settling as the call runs. */
-@keyframes pcIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes pcIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .ported .pc-lines.is-live .pc-l{display:none}
-.ported .pc-lines.is-live .pc-l.is-past{display:block; animation:pcIn .34s ease both}
+.ported .pc-lines.is-live .pc-l.is-past{display:block; animation:pcIn .3s ease both}
+.ported .pc-lines.is-live .pc-hint{display:block; align-self:center; max-width:100%;
+  margin:auto 0; padding:0; background:none; font-size:12px;
+  color:rgba(226,235,255,.45); text-align:center}
+.ported .pc-lines.is-live:has(.pc-l.is-past) .pc-hint{display:none}
 
-.ported .pc-sms{display:block; margin-top:var(--s4); padding:12px 14px;
-  border-radius:15px; background:rgba(245,158,11,.11);
-  border:1px solid rgba(245,158,11,.34); color:#F0E4CC}
-.ported .pc-screen.is-live .pc-sms{display:none}
-.ported .pc-screen.is-live .pc-sms.is-past{display:block; animation:pcIn .34s ease both}
-.ported .pc-k{display:block; font-size:9px; font-weight:800; letter-spacing:.13em;
-  text-transform:uppercase; color:#FBBF24; margin-bottom:4px}
-.ported .pc-sms p{margin:0; font-size:13.5px; line-height:21px}
+.ported .pc-sms{display:block; align-self:stretch; max-width:100%; margin-top:7px;
+  padding:9px 12px; border-radius:14px; background:#1C2F57;
+  border:1px solid rgba(150,170,255,.26); color:#DCE5FB}
+.ported .pc-lines.is-live .pc-sms{display:none}
+.ported .pc-lines.is-live .pc-sms.is-past{display:block; animation:pcIn .3s ease both}
+.ported .pc-k{display:block; font-size:8.5px; font-weight:800; letter-spacing:.12em;
+  text-transform:uppercase; color:#7FB0FF; margin-bottom:3px}
+.ported .pc-sms p{margin:0; font-size:11.5px; line-height:17px}
 .ported .pc-sms b{color:#fff}
 .ported .pc-note{margin:0; padding:0 var(--s6) var(--s6)}
 @media(max-width:620px){
-  .ported .pc-screen{margin:var(--s4); padding:var(--s4)}
-  .ported .pc-l{max-width:94%; font-size:14px}
+  .ported .pc-screen{margin:var(--s4) auto}
+  .ported .pc-lines{height:340px}
 }
 
 .ported *{min-width:0}
