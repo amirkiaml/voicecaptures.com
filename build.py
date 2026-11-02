@@ -86,6 +86,34 @@ def sitemap(slugs) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}\n</urlset>\n'
 
 
+# Undefined custom properties. `padding: var(--s5)` where --s5 does not exist
+# is not an error anywhere: the declaration is simply dropped, so the element
+# renders with NO padding and nothing says why. That shipped once -- the call
+# player's header sat flush against the card edge -- and the scale really does
+# skip 5 (1,2,3,4,6,8,12,16,24). A var() with a fallback is fine; it has one.
+def check_vars() -> None:
+    import re as _re
+    srcs = {}
+    for name in ("index.html", "shell.py", "build-pages.py"):
+        f = ROOT / name
+        if f.exists():
+            srcs[name] = f.read_text(encoding="utf-8")
+    defined = set()
+    for text in srcs.values():
+        defined |= set(_re.findall(r"(--[a-z0-9-]+)\s*:\s*[^;]+;", text))
+    bad = []
+    for name, text in srcs.items():
+        for m in _re.finditer(r"var\((--[a-z0-9-]+)\s*(,?)", text):
+            if m.group(2):          # has a fallback, so a miss is harmless
+                continue
+            if m.group(1) not in defined:
+                line = text[: m.start()].count("\n") + 1
+                bad.append(f"  {name}:{line}  var({m.group(1)})")
+    if bad:
+        sys.exit("undefined custom properties (the declaration is silently "
+                 "dropped):\n" + "\n".join(sorted(set(bad))))
+
+
 # Mojibake guard. index.html once reached production with every em dash stored
 # as "\u00e2\u20ac\u201d" — a UTF-8 em dash that some editor read as cp1252 and
 # saved back as UTF-8. It is invisible in most editors and shows up in the
@@ -125,6 +153,7 @@ def main():
     raw = SRC.read_bytes()
     src = SRC.read_text(encoding="utf-8")
     check_encoding(raw, src)
+    check_vars()
 
     for key, meta in PAGES.items():
         folder = ROOT / meta["slug"]

@@ -273,7 +273,7 @@ PLAYGROUND_CSS = """
   border:1px solid var(--line); border-radius:24px; overflow:hidden;
   box-shadow:0 18px 50px rgba(13,23,41,.08)}
 .ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3);
-  padding:var(--s5); border-bottom:1px solid var(--line); background:var(--bg-soft)}
+  padding:var(--s6); border-bottom:1px solid var(--line); background:var(--bg-soft)}
 .ported .pc-who{flex:1 1 170px; min-width:0}
 .ported .pc-who b{display:block; font-size:16px; font-weight:800; color:var(--ink)}
 .ported .pc-who span{font-size:13px; color:var(--muted)}
