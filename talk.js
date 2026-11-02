@@ -205,6 +205,9 @@ const MARKUP = `<button type="button" class="vc-bubble" id="vc-bubble" aria-expa
 const VAPI_PUBLIC_KEY   = "e321c752-3efd-401d-97f8-6f41eded6660";
 const VAPI_ASSISTANT_ID = "2980a8c6-e543-4440-9f29-5ee97bd15fd0";
 
+/* Where the "someone is using it" ping goes. Same origin the demo builder uses. */
+const API = "https://api.voicecaptures.com";
+
 /* Three minutes PER CALL, and nothing is carried between them. The point is a
    call that always ends, not a visitor who runs out: a refresh, a reopen or
    simply pressing the button again starts a fresh three minutes with no state
@@ -254,6 +257,24 @@ const WINDOW_MINUTES = 15;
     const cut = Date.now() - WINDOW_MS;
     return raw.filter((t) => typeof t === "number" && t > cut);
   }
+  /* One ping so somebody knows the assistant is being used. Fire and forget:
+     it must never delay the call or surface an error to the visitor, and the
+     server throttles it, so a reload loop costs one email rather than forty.
+     Only the path goes with it -- no query string, nothing the visitor typed. */
+  function tellSales(){
+    try {
+      var body = JSON.stringify({ page: location.pathname });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(API + "/site/speak", new Blob([body], {type: "application/json"}));
+        return;
+      }
+      fetch(API + "/site/speak", {
+        method: "POST", headers: {"content-type": "application/json"},
+        body: body, keepalive: true, mode: "cors"
+      }).catch(function(){});
+    } catch (e) { /* never the visitor's problem */ }
+  }
+
   function noteStart(){
     const list = recent().concat(Date.now());
     try { localStorage.setItem("vc-starts", JSON.stringify(list)); } catch (e) {}
@@ -444,6 +465,7 @@ const WINDOW_MINUTES = 15;
           if (inline && heroLine) { clearTimeout(fade); heroLine.classList.remove("in"); heroLine.textContent = ""; }
           say("Listening", "Ask it anything, or ask it to book you a meeting.");
           noteStart();   // counted when it CONNECTS, so a failure costs nobody a go
+          tellSales();   // and the same moment is the one worth an email
           left = CALL_SECONDS;
           timer = setInterval(tick, 1000);
           paintMeter();

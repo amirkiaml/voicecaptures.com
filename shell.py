@@ -264,6 +264,40 @@ PLAYGROUND_CSS = """
 .ported .calframe iframe{border:0; width:100%; height:620px; display:block}
 @media(max-width:700px){ .ported .calframe iframe{height:480px} }
 .ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
+
+/* The sample call: audio on the left of its own header, transcript below,
+   the text it sent alongside. */
+.ported .pc{max-width:1000px; margin:0 auto; background:#fff;
+  border:1px solid var(--line); border-radius:20px; overflow:hidden;
+  box-shadow:0 18px 50px rgba(13,23,41,.07)}
+.ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s4);
+  padding:var(--s6); border-bottom:1px solid var(--line); background:var(--bg-soft)}
+.ported .pc-who{flex:1 1 220px; min-width:0}
+.ported .pc-who b{display:block; font-size:17px; font-weight:800; color:var(--ink)}
+.ported .pc-who span{font-size:13.5px; color:var(--muted)}
+.ported .pc-top audio{flex:1 1 300px; min-width:0; height:40px; max-width:100%}
+.ported .pc-body{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  padding:var(--s6)}
+@media(min-width:900px){ .ported .pc-body{grid-template-columns:1.5fr 1fr} }
+.ported .pc-lines{list-style:none; margin:0; padding:0 var(--s2) 0 0;
+  max-height:360px; overflow-y:auto}
+.ported .pc-l{display:grid; grid-template-columns:76px 1fr; gap:var(--s3);
+  padding:var(--s3) 0; align-items:baseline}
+.ported .pc-r{font-size:11px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--blue)}
+.ported .pc-caller .pc-r{color:var(--wb)}
+.ported .pc-t{font-size:15px; line-height:23px; color:var(--ink-2)}
+/* Dim only once the script is driving it; without JS every line reads normally. */
+.ported .pc-lines.is-live .pc-l{opacity:.35; transition:opacity .25s}
+.ported .pc-lines.is-live .pc-l.is-past{opacity:1}
+.ported .pc-lines.is-live .pc-l.is-now .pc-t{color:var(--ink); font-weight:600}
+.ported .pc-sms{align-self:start; background:var(--f-blue);
+  border:1px solid var(--line); border-radius:16px; padding:var(--s5)}
+.ported .pc-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--blue); margin-bottom:var(--s2)}
+.ported .pc-sms p{margin:0; font-size:13.5px; line-height:21px; color:var(--ink-2)}
+.ported .pc-sms b{color:var(--ink)}
+.ported .pc-note{margin:0; padding:0 var(--s6) var(--s6)}
 """
 
 

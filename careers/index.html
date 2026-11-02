@@ -1423,6 +1423,40 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 @media(max-width:700px){ .ported .calframe iframe{height:480px} }
 .ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
 
+/* The sample call: audio on the left of its own header, transcript below,
+   the text it sent alongside. */
+.ported .pc{max-width:1000px; margin:0 auto; background:#fff;
+  border:1px solid var(--line); border-radius:20px; overflow:hidden;
+  box-shadow:0 18px 50px rgba(13,23,41,.07)}
+.ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s4);
+  padding:var(--s6); border-bottom:1px solid var(--line); background:var(--bg-soft)}
+.ported .pc-who{flex:1 1 220px; min-width:0}
+.ported .pc-who b{display:block; font-size:17px; font-weight:800; color:var(--ink)}
+.ported .pc-who span{font-size:13.5px; color:var(--muted)}
+.ported .pc-top audio{flex:1 1 300px; min-width:0; height:40px; max-width:100%}
+.ported .pc-body{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  padding:var(--s6)}
+@media(min-width:900px){ .ported .pc-body{grid-template-columns:1.5fr 1fr} }
+.ported .pc-lines{list-style:none; margin:0; padding:0 var(--s2) 0 0;
+  max-height:360px; overflow-y:auto}
+.ported .pc-l{display:grid; grid-template-columns:76px 1fr; gap:var(--s3);
+  padding:var(--s3) 0; align-items:baseline}
+.ported .pc-r{font-size:11px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--blue)}
+.ported .pc-caller .pc-r{color:var(--wb)}
+.ported .pc-t{font-size:15px; line-height:23px; color:var(--ink-2)}
+/* Dim only once the script is driving it; without JS every line reads normally. */
+.ported .pc-lines.is-live .pc-l{opacity:.35; transition:opacity .25s}
+.ported .pc-lines.is-live .pc-l.is-past{opacity:1}
+.ported .pc-lines.is-live .pc-l.is-now .pc-t{color:var(--ink); font-weight:600}
+.ported .pc-sms{align-self:start; background:var(--f-blue);
+  border:1px solid var(--line); border-radius:16px; padding:var(--s5)}
+.ported .pc-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--blue); margin-bottom:var(--s2)}
+.ported .pc-sms p{margin:0; font-size:13.5px; line-height:21px; color:var(--ink-2)}
+.ported .pc-sms b{color:var(--ink)}
+.ported .pc-note{margin:0; padding:0 var(--s6) var(--s6)}
+
 .ported *{min-width:0}
 .ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}
 .ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}
@@ -1439,10 +1473,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         AI receptionist
         <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button type="button" class="nav-a" id="t-wb" aria-expanded="false" aria-controls="m-wb">
-        Win-back
-        <svg class="car" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      <a class="nav-a" href="/win-back/">Win-back</a>
       <a class="nav-a" href="/pricing/">Pricing</a>
       <button type="button" class="nav-a" id="t-co" aria-expanded="false" aria-controls="m-co">
         Company
@@ -1473,6 +1504,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <a href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
         <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
         <a href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
+        <a href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
         <a href="/#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Talk to us</b><em>One form, and we come back within a day</em></span></a>
       </div>
       <a class="mega-feat" href="/demo/?src=nav">
@@ -1483,20 +1515,6 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     </div>
   </div>
 
-  <div class="mega" id="m-wb" hidden>
-    <div class="mega-in">
-      <div class="mega-grid">
-        <a href="/win-back/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2v6h-2V5.4l-5.3 5.3-1.4-1.4L16.6 4H14V2zM6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How win-back works</b><em>We call your own past customers when they come due</em></span></a>
-        <a href="/win-back/#pay"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Ways to pay</b><em>One-time campaign, always-on, or a build you own</em></span></a>
-        <a href="/win-back/#calc"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9z"/></svg></i><span><b>What it is worth</b><em>Run it on your own list size and job value</em></span></a>
-        <a href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg></i><span><b>Start with a free pilot</b><em>The first 20% of your list, so you see your real rate first</em></span></a>
-      </div>
-      <a class="mega-feat" href="/win-back/">
-        <b>$2.50 per customer called</b>
-        <em>Priced up front. Most reactivation services will not quote without a sales call.</em>
-        <img src="/img/winback.webp" width="1400" height="579" loading="lazy" alt="">
-      </a>
-    </div>
   </div>
 
   <div class="mega" id="m-co" hidden>
@@ -1560,6 +1578,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <a class="mnav-a" href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
       <a class="mnav-a" href="/pricing/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Plans &amp; pricing</b><em>Every plan on one page, no quote needed</em></span></a>
       <a class="mnav-a" href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
+        <a class="mnav-a" href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
       </div>
 
       <div class="mnav-g2">
@@ -2350,6 +2369,6 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 })();
 </script>
 
-<script type="module" src="/talk.js?v=e96f24b9"></script>
+<script type="module" src="/talk.js?v=43bb9250"></script>
 </body>
 </html>

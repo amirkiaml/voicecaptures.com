@@ -1309,7 +1309,7 @@ WINBACK_BODY = f"""
          campaign is described show the same picture. The pair it replaced was a
          light/dark set with a blank calendar grid and the wordmark baked in;
          there is no dark theme to switch to any more. -->
-    <img class="wb-art" src="/img/winback.webp" width="1400" height="579" loading="lazy" decoding="async"
+    <img class="wb-art" src="/img/winback.svg" width="1400" height="579" loading="lazy" decoding="async"
          alt="A stack of past-customer records on the left, connected by call icons to a week of booked callbacks and follow-ups on the right.">
   </div>
 </section>
@@ -2829,7 +2829,7 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
   <div class="wrap">
     <div class="pg-hero">
       <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Playground</p>
-      <h1>Call it, and watch it <span class="pay">book you in.</span></h1>
+      <h1>Call it, and watch it<br><span class="pay">book you in.</span></h1>
       <p class="lede" style="margin-left:auto;margin-right:auto">This is the same
       assistant our customers put on their own line, answering as a demo business.
       Book yourself an appointment on the phone, then watch it land on the calendar
@@ -2851,6 +2851,33 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
       <li><b>3</b><span>Refresh this page. Your booking is on the calendar, put
       there by the assistant and nobody else.</span></li>
     </ol>
+  </div>
+</section>
+
+<section id="pg-call">
+  <div class="wrap">
+    <h2 style="text-align:center">What that call sounds like</h2>
+    <p class="pr-sub" style="text-align:center">A real call to this line, played
+    back with the conversation as it happened and the text it sent at the end.</p>
+
+    <div class="pc">
+      <div class="pc-top">
+        <div class="pc-who"><b>Maple Ridge Plumbing</b><span>Inbound call &middot; 1:15</span></div>
+        <audio id="pc-audio" controls preload="metadata" src="/sample-call.mp3"></audio>
+      </div>
+      <div class="pc-body">
+        <ol class="pc-lines" id="pc-lines"></ol>
+        <aside class="pc-sms" id="pc-sms" hidden>
+          <span class="pc-k">Text to the owner</span>
+          <p><b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 &bull;&bull;&bull;-&bull;&bull;&bull;&bull;<br>
+          <b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from
+          under the kitchen sink, steady flow, unable to stop it.</p>
+        </aside>
+      </div>
+      <p class="fine pc-note">A real call to the demo line. The business, caller and
+      address are invented &mdash; the conversation is not. Lookup pauses were
+      shortened and the callback number is masked.</p>
+    </div>
   </div>
 </section>
 
@@ -2884,6 +2911,73 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
 """
 
 
+PLAYGROUND_SCRIPT = """
+<script>
+/* The sample call, with its transcript running in step with the audio.
+   Timings are the real ones from the recording. The whole transcript is
+   written into the page up front, so it reads as a transcript with no JS --
+   the script only dims the lines that have not been reached yet. */
+(function(){
+  var A = document.getElementById("pc-audio"),
+      L = document.getElementById("pc-lines"),
+      S = document.getElementById("pc-sms");
+  if (!A || !L) return;
+
+  var CONVO = [
+    [ 5.15,"agent","Maple Ridge Plumbing, this is Andy. What\\u2019s going on?"],
+    [ 8.53,"caller","Oh yeah, hi \\u2014 I\\u2019ve got water coming out from under my kitchen sink and I can\\u2019t get it to stop."],
+    [15.15,"agent","That sounds urgent. Let me get the on-call tech on it right away. What\\u2019s the service address?"],
+    [20.27,"caller","It\\u2019s 105 Maple Street."],
+    [25.03,"agent","Let me confirm that \\u2014 105 Maple Street, is that correct?"],
+    [28.65,"caller","That\\u2019s right."],
+    [31.40,"agent","Great, I\\u2019ll get someone out there today. Could you tell me what\\u2019s happening under the sink?"],
+    [36.53,"caller","Uh, there\\u2019s just some water coming out. It\\u2019s pretty steady. I can\\u2019t stop it. I don\\u2019t know what\\u2019s happening."],
+    [42.90,"agent","Just a sec."],
+    [44.93,"agent","And who should they ask for when they arrive?"],
+    [48.80,"caller","It\\u2019s Dave Morrison."],
+    [51.53,"agent","This\\u2019ll just take a sec."],
+    [55.15,"agent","And is this the best number to text the details to? I have 647 \\u2022\\u2022\\u2022-\\u2022\\u2022\\u2022\\u2022."],
+    [62.65,"caller","Yeah, that\\u2019s right."],
+    [64.53,"agent","All right, Dave \\u2014 someone will call you within 30 minutes. I\\u2019ve sent you a text with the details. Call back if you haven\\u2019t heard anything. Hang in there."],
+    [71.15,"caller","Perfect, thanks."],
+    [73.15,"agent","Thanks for calling. Have a good one."]
+  ];
+  var SMS_AT = 66.9;
+
+  CONVO.forEach(function(c){
+    var li = document.createElement("li");
+    li.className = "pc-l pc-" + c[1];
+    li.innerHTML = '<span class="pc-r">' + (c[1] === "agent" ? "Assistant" : "Caller") +
+                   '</span><span class="pc-t"></span>';
+    li.querySelector(".pc-t").textContent = c[2];
+    L.appendChild(li);
+  });
+  var items = L.querySelectorAll(".pc-l");
+
+  function at(t){
+    var cur = -1;
+    for (var i = 0; i < CONVO.length; i++) if (t >= CONVO[i][0]) cur = i;
+    for (var j = 0; j < items.length; j++){
+      items[j].classList.toggle("is-past", j <= cur);
+      items[j].classList.toggle("is-now", j === cur);
+    }
+    if (S) S.hidden = t < SMS_AT;
+    if (cur > -1 && !A.paused){
+      var el = items[cur], p = el.parentNode;
+      if (el.offsetTop < p.scrollTop || el.offsetTop + el.offsetHeight > p.scrollTop + p.clientHeight)
+        p.scrollTo({top: el.offsetTop - p.clientHeight / 2 + el.offsetHeight / 2, behavior: "smooth"});
+    }
+  }
+  A.addEventListener("timeupdate", function(){ at(A.currentTime); });
+  A.addEventListener("seeked",     function(){ at(A.currentTime); });
+  A.addEventListener("ended",      function(){ at(1e9); });
+  L.classList.add("is-live");          // only now do the un-played lines dim
+  at(0);
+})();
+</script>
+"""
+
+
 PAGES = [
     ("faq", "Common questions | VoiceCaptures",
      "How an AI receptionist works, what setup takes, what happens to your "
@@ -2897,7 +2991,7 @@ PAGES = [
 
     ("playground", "Playground \u2014 call the demo line | VoiceCaptures",
      "Call our live demo line, book yourself an appointment on the phone, and "
-     "watch it appear on the calendar. No signup.", PLAYGROUND_BODY, ""),
+     "watch it appear on the calendar. No signup.", PLAYGROUND_BODY, PLAYGROUND_SCRIPT),
 
     ("demo", "Hear your own AI receptionist | VoiceCaptures",
      "Build a demo AI receptionist for your business and talk to it in your "
