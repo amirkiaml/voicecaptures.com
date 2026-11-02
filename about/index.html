@@ -1423,42 +1423,79 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 @media(max-width:700px){ .ported .calframe iframe{height:480px} }
 .ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
 
-/* The sample call: audio on the left of its own header, transcript below,
-   the text it sent alongside. */
-.ported .pc{max-width:1000px; margin:0 auto; background:#fff;
-  border:1px solid var(--line); border-radius:20px; overflow:hidden;
-  box-shadow:0 18px 50px rgba(13,23,41,.07)}
+/* The sample call, as a phone screen. Bubbles arrive as they are spoken,
+   the way the old site had it -- a transcript that is merely dimmed reads
+   like a document, not like listening to a call. */
+.ported .pc{max-width:760px; margin:0 auto; background:#fff;
+  border:1px solid var(--line); border-radius:24px; overflow:hidden;
+  box-shadow:0 18px 50px rgba(13,23,41,.08)}
 .ported .pc-top{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s4);
   padding:var(--s6); border-bottom:1px solid var(--line); background:var(--bg-soft)}
-.ported .pc-who{flex:1 1 220px; min-width:0}
+.ported .pc-who{flex:1 1 200px; min-width:0}
 .ported .pc-who b{display:block; font-size:17px; font-weight:800; color:var(--ink)}
 .ported .pc-who span{font-size:13.5px; color:var(--muted)}
-.ported .pc-top audio{flex:1 1 300px; min-width:0; height:40px; max-width:100%}
-.ported .pc-body{display:grid; grid-template-columns:1fr; gap:var(--s6);
-  padding:var(--s6)}
-@media(min-width:900px){ .ported .pc-body{grid-template-columns:1.5fr 1fr} }
-/* No inner scroller. A 360px window that re-centred itself on every
-   timeupdate crept down the transcript while you were reading it, and hid
-   most of the call besides. The whole conversation is simply on the page. */
-.ported .pc-lines{list-style:none; margin:0; padding:0}
-.ported .pc-l{display:grid; grid-template-columns:76px 1fr; gap:var(--s3);
-  padding:var(--s3) 0; align-items:baseline}
-.ported .pc-r{font-size:11px; font-weight:800; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--blue)}
-.ported .pc-caller .pc-r{color:var(--wb)}
-.ported .pc-t{font-size:15px; line-height:23px; color:var(--ink-2)}
-/* Dim only once the script is driving it; without JS every line reads normally. */
-.ported .pc-lines.is-live .pc-l{opacity:.35; transition:opacity .25s}
-.ported .pc-lines.is-live .pc-l.is-past{opacity:1}
-.ported .pc-lines.is-live .pc-l.is-now .pc-t{color:var(--ink); font-weight:600}
-/* Stays in view beside a long transcript. */
-.ported .pc-sms{align-self:start; position:sticky; top:96px; background:var(--f-blue);
-  border:1px solid var(--line); border-radius:16px; padding:var(--s5)}
-.ported .pc-k{display:block; font-size:11px; font-weight:800; letter-spacing:.08em;
-  text-transform:uppercase; color:var(--blue); margin-bottom:var(--s2)}
-.ported .pc-sms p{margin:0; font-size:13.5px; line-height:21px; color:var(--ink-2)}
-.ported .pc-sms b{color:var(--ink)}
+.ported .pc-top audio{flex:1 1 280px; min-width:0; height:40px; max-width:100%}
+
+/* The screen itself. */
+.ported .pc-screen{margin:var(--s6); padding:var(--s5) var(--s5) var(--s6);
+  border-radius:22px; background:linear-gradient(168deg,#1A2B4D 0%,#111C33 55%,#0C1322 100%);
+  box-shadow:inset 0 0 0 1px rgba(150,170,255,.14)}
+.ported .pc-bar{display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--s2) var(--s4); border-bottom:1px solid rgba(150,170,255,.14);
+  margin-bottom:var(--s4)}
+.ported .pc-live{display:inline-flex; align-items:center; gap:7px; font-size:11px;
+  font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#7FE3C4}
+.ported .pc-live i{width:7px; height:7px; border-radius:50%; background:#5A6B8C}
+.ported .pc-screen.is-playing .pc-live i{background:#34D399;
+  animation:pcDot 1.9s ease-in-out infinite}
+.ported .pc-screen.is-live .pc-live b{display:none}
+.ported .pc-screen.is-live.is-playing .pc-live b{display:inline}
+.ported .pc-screen.is-live.is-playing .pc-live em{display:none}
+.ported .pc-live em{font-style:normal}
+.ported .pc-screen.is-playing .pc-live{color:#7FE3C4}
+.ported .pc-live{color:rgba(226,235,255,.5)}
+@keyframes pcDot{0%,100%{opacity:1}50%{opacity:.25}}
+.ported .pc-clock{font-size:12.5px; font-weight:700; color:rgba(226,235,255,.6);
+  font-variant-numeric:tabular-nums}
+
+.ported .pc-lines{list-style:none; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:var(--s3); min-height:76px}
+/* Before the first line lands, say so rather than showing a blank screen. */
+.ported .pc-lines.is-live:empty::before,
+.ported .pc-lines.is-live::after{content:"Press play to hear the call";
+  display:block; font-size:13.5px; color:rgba(226,235,255,.45); padding:var(--s4) var(--s2)}
+.ported .pc-lines.is-live:has(.is-past)::after{display:none}
+.ported .pc-l{max-width:86%; padding:10px 14px; font-size:14.5px; line-height:21px}
+.ported .pc-r{display:block; font-size:9px; font-weight:800; letter-spacing:.13em;
+  text-transform:uppercase; margin-bottom:3px}
+.ported .pc-agent{align-self:flex-start; background:rgba(34,211,238,.10);
+  border:1px solid rgba(34,211,238,.26); border-radius:15px 15px 15px 5px; color:#E6EEFF}
+.ported .pc-agent .pc-r{color:#5BD6EE}
+.ported .pc-caller{align-self:flex-end; background:var(--blue); color:#fff;
+  border-radius:15px 15px 5px 15px}
+.ported .pc-caller .pc-r{color:rgba(255,255,255,.72)}
+
+/* The thread GROWS, as the old site had it. Reserving the full height
+   instead left a 1600px slab of empty screen staring back before playback,
+   which is worse than the page settling as the call runs. */
+@keyframes pcIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.ported .pc-lines.is-live .pc-l{display:none}
+.ported .pc-lines.is-live .pc-l.is-past{display:block; animation:pcIn .34s ease both}
+
+.ported .pc-sms{display:block; margin-top:var(--s4); padding:12px 14px;
+  border-radius:15px; background:rgba(245,158,11,.11);
+  border:1px solid rgba(245,158,11,.34); color:#F0E4CC}
+.ported .pc-screen.is-live .pc-sms{display:none}
+.ported .pc-screen.is-live .pc-sms.is-past{display:block; animation:pcIn .34s ease both}
+.ported .pc-k{display:block; font-size:9px; font-weight:800; letter-spacing:.13em;
+  text-transform:uppercase; color:#FBBF24; margin-bottom:4px}
+.ported .pc-sms p{margin:0; font-size:13.5px; line-height:21px}
+.ported .pc-sms b{color:#fff}
 .ported .pc-note{margin:0; padding:0 var(--s6) var(--s6)}
+@media(max-width:620px){
+  .ported .pc-screen{margin:var(--s4); padding:var(--s4)}
+  .ported .pc-l{max-width:94%; font-size:14px}
+}
 
 .ported *{min-width:0}
 .ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}

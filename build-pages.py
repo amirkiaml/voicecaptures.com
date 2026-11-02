@@ -2857,23 +2857,29 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
 <section id="pg-call">
   <div class="wrap">
     <h2 style="text-align:center">What that call sounds like</h2>
-    <p class="pr-sub" style="text-align:center">A real call to this line, played
-    back with the conversation as it happened and the text it sent at the end.</p>
+    <p class="pr-sub" style="text-align:center">A real call to this line, played back
+    with the conversation as it happened and the text it sent at the end.</p>
 
     <div class="pc">
       <div class="pc-top">
         <div class="pc-who"><b>Maple Ridge Plumbing</b><span>Inbound call &middot; 1:15</span></div>
         <audio id="pc-audio" controls preload="metadata" src="/sample-call.mp3"></audio>
       </div>
-      <div class="pc-body">
+
+      <div class="pc-screen">
+        <div class="pc-bar">
+          <span class="pc-live"><i></i><b>On the call</b><em>Call recording</em></span>
+          <span class="pc-clock" id="pc-clock">0:00</span>
+        </div>
         <ol class="pc-lines" id="pc-lines"></ol>
-        <aside class="pc-sms" id="pc-sms" hidden>
+        <aside class="pc-sms" id="pc-sms">
           <span class="pc-k">Text to the owner</span>
           <p><b>Name:</b> Dave Morrison<br><b>Phone:</b> +1 647 &bull;&bull;&bull;-&bull;&bull;&bull;&bull;<br>
           <b>Address:</b> 105 Maple Street<br><b>Request:</b> Water coming out from
           under the kitchen sink, steady flow, unable to stop it.</p>
         </aside>
       </div>
+
       <p class="fine pc-note">A real call to the demo line. The business, caller and
       address are invented &mdash; the conversation is not. Lookup pauses were
       shortened and the callback number is masked.</p>
@@ -2953,20 +2959,32 @@ PLAYGROUND_SCRIPT = """
     L.appendChild(li);
   });
   var items = L.querySelectorAll(".pc-l");
+  var screen = document.querySelector(".pc-screen");
+  var clock = document.getElementById("pc-clock");
 
+  function mmss(t){
+    t = Math.max(0, Math.floor(t));
+    return Math.floor(t / 60) + ":" + ("0" + (t % 60)).slice(-2);
+  }
   function at(t){
     var cur = -1;
     for (var i = 0; i < CONVO.length; i++) if (t >= CONVO[i][0]) cur = i;
-    for (var j = 0; j < items.length; j++){
-      items[j].classList.toggle("is-past", j <= cur);
-      items[j].classList.toggle("is-now", j === cur);
-    }
-    if (S) S.hidden = t < SMS_AT;
+    for (var j = 0; j < items.length; j++) items[j].classList.toggle("is-past", j <= cur);
+    if (S) S.classList.toggle("is-past", t >= SMS_AT);
+    if (clock) clock.textContent = mmss(t);
   }
+  /* The live dot is a lie while the audio is paused. */
+  var setLive = function(){ if (screen) screen.classList.toggle("is-playing", !A.paused); };
+  A.addEventListener("play",  setLive);
+  A.addEventListener("pause", setLive);
+  A.addEventListener("ended", setLive);
   A.addEventListener("timeupdate", function(){ at(A.currentTime); });
   A.addEventListener("seeked",     function(){ at(A.currentTime); });
   A.addEventListener("ended",      function(){ at(1e9); });
-  L.classList.add("is-live");          // only now do the un-played lines dim
+  /* Only now do the bubbles hide: with no JS the whole thread is simply there. */
+  L.classList.add("is-live");
+  if (screen) screen.classList.add("is-live");
+  setLive();
   at(0);
 })();
 </script>
