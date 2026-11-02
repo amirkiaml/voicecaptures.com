@@ -2825,6 +2825,65 @@ PRICING_SCRIPT = """
 </script>
 """
 
+PLAYGROUND_BODY = f"""<section class="pr-hero">
+  <div class="wrap">
+    <div class="pg-hero">
+      <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Playground</p>
+      <h1>Call it, and watch it <span class="pay">book you in.</span></h1>
+      <p class="lede" style="margin-left:auto;margin-right:auto">This is the same
+      assistant our customers put on their own line, answering as a demo business.
+      Book yourself an appointment on the phone, then watch it land on the calendar
+      below.</p>
+
+      <a class="pg-dial" href="tel:+16476921081">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg>
+        <span class="pg-num">(647)&nbsp;692-1081</span>
+      </a>
+      <p class="fine">Answers 24/7. A normal call &mdash; standard rates from your
+      carrier, and we do not keep your number.</p>
+    </div>
+
+    <ol class="pg-steps">
+      <li><b>1</b><span>Call the number and talk to it like you would a
+      receptionist. Ask for an appointment.</span></li>
+      <li><b>2</b><span>It takes your details, books the slot while you are still
+      on the line, and texts you the confirmation.</span></li>
+      <li><b>3</b><span>Refresh this page. Your booking is on the calendar, put
+      there by the assistant and nobody else.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2 style="text-align:center">The calendar it books into</h2>
+    <p class="pr-sub" style="text-align:center">Live, and shared by everyone trying
+    the demo &mdash; so use a made-up name, and keep anything private off it.</p>
+    <div class="calframe">
+      <iframe title="Live demo calendar" loading="lazy"
+        src="https://calendar.google.com/calendar/embed?src=voicecaptures%40gmail.com&amp;ctz=America%2FToronto&amp;mode=WEEK&amp;showTitle=0&amp;showNav=1&amp;showPrint=0&amp;showTabs=0&amp;showCalendars=0&amp;bgcolor=%23FFFFFF&amp;color=%232563EB"></iframe>
+    </div>
+    <p class="fine pg-note">Bookings can take a few seconds to appear. If the
+    calendar does not load, your browser is blocking Google Calendar &mdash; the
+    call still works.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap pg-hero">
+    <h2>Want one answering your own number?</h2>
+    <p class="lede" style="margin-left:auto;margin-right:auto">Build a demo
+    assistant from your own website in about 30 seconds, or talk to us about
+    putting it on your real line.</p>
+    <p class="btns" style="margin-top:var(--s8)">
+      <a class="btn btn-primary" href="/demo/?src=playground">Build your demo<em class="beta">(beta)</em></a>
+      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
+    </p>
+  </div>
+</section>
+"""
+
+
 PAGES = [
     ("faq", "Common questions | VoiceCaptures",
      "How an AI receptionist works, what setup takes, what happens to your "
@@ -2835,6 +2894,10 @@ PAGES = [
      "What an AI receptionist costs for home services, restaurants, clinics and "
      "any other business. Every plan, minutes, add-ons and prepaid terms, with "
      "no quote needed.", PRICING_BODY, PRICING_SCRIPT),
+
+    ("playground", "Playground \u2014 call the demo line | VoiceCaptures",
+     "Call our live demo line, book yourself an appointment on the phone, and "
+     "watch it appear on the calendar. No signup.", PLAYGROUND_BODY, ""),
 
     ("demo", "Hear your own AI receptionist | VoiceCaptures",
      "Build a demo AI receptionist for your business and talk to it in your "

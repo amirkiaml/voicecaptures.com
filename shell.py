@@ -237,6 +237,36 @@ TYPE_CSS = """
 }
 """
 
+PLAYGROUND_CSS = """
+/* Playground: the demo number, and the calendar it books into. */
+.ported .pg-hero{text-align:center; max-width:760px; margin:0 auto var(--s12)}
+.ported .pg-dial{display:inline-flex; align-items:center; gap:var(--s4);
+  margin:var(--s8) 0 var(--s4); padding:var(--s4) var(--s8);
+  border-radius:var(--r-pill); background:var(--blue); color:#fff;
+  text-decoration:none; font-weight:800; min-height:68px;
+  box-shadow:0 10px 30px rgba(37,99,235,.28)}
+.ported .pg-dial:hover{background:var(--blue-dk)}
+.ported .pg-dial .pg-num{font-size:clamp(24px,3.4vw,32px); letter-spacing:-.01em;
+  white-space:nowrap}
+.ported .pg-dial svg{width:26px; height:26px; flex:0 0 auto}
+.ported .pg-steps{display:grid; gap:var(--s4); grid-template-columns:1fr;
+  max-width:980px; margin:0 auto var(--s12); padding:0; list-style:none}
+@media(min-width:760px){ .ported .pg-steps{grid-template-columns:repeat(3,1fr)} }
+.ported .pg-steps li{display:flex; gap:var(--s4); align-items:flex-start;
+  background:#fff; border:1px solid var(--line); border-radius:16px;
+  padding:var(--s6)}
+.ported .pg-steps b{display:grid; place-items:center; flex:0 0 auto;
+  width:34px; height:34px; border-radius:50%; background:var(--f-blue);
+  color:var(--blue); font-size:15px; font-weight:800}
+.ported .pg-steps span{font-size:15px; line-height:23px; color:var(--ink-2)}
+.ported .calframe{border-radius:20px; overflow:hidden; border:1px solid var(--line);
+  background:#fff; box-shadow:0 18px 50px rgba(13,23,41,.08)}
+.ported .calframe iframe{border:0; width:100%; height:620px; display:block}
+@media(max-width:700px){ .ported .calframe iframe{height:480px} }
+.ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
+"""
+
+
 PRICING_CSS = """
 /* ---- pricing cards, in the main page's system ------------------------- */
 .ported .pr-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
@@ -465,6 +495,7 @@ def build(old_css: str) -> str:
         + BRIDGE_CSS
         + TYPE_CSS.replace("@@H1@@", p["h1_decl"]).replace("@@H2@@", p["h2_decl"])
         + PRICING_CSS
+        + PLAYGROUND_CSS
         + "\n.ported *{min-width:0}"
         + "\n.ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}"
         "\n.ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}"

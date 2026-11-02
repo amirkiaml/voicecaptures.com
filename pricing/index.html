@@ -1396,6 +1396,33 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   .ported .faq-list summary::after{transition:none}
 }
 
+/* Playground: the demo number, and the calendar it books into. */
+.ported .pg-hero{text-align:center; max-width:760px; margin:0 auto var(--s12)}
+.ported .pg-dial{display:inline-flex; align-items:center; gap:var(--s4);
+  margin:var(--s8) 0 var(--s4); padding:var(--s4) var(--s8);
+  border-radius:var(--r-pill); background:var(--blue); color:#fff;
+  text-decoration:none; font-weight:800; min-height:68px;
+  box-shadow:0 10px 30px rgba(37,99,235,.28)}
+.ported .pg-dial:hover{background:var(--blue-dk)}
+.ported .pg-dial .pg-num{font-size:clamp(24px,3.4vw,32px); letter-spacing:-.01em;
+  white-space:nowrap}
+.ported .pg-dial svg{width:26px; height:26px; flex:0 0 auto}
+.ported .pg-steps{display:grid; gap:var(--s4); grid-template-columns:1fr;
+  max-width:980px; margin:0 auto var(--s12); padding:0; list-style:none}
+@media(min-width:760px){ .ported .pg-steps{grid-template-columns:repeat(3,1fr)} }
+.ported .pg-steps li{display:flex; gap:var(--s4); align-items:flex-start;
+  background:#fff; border:1px solid var(--line); border-radius:16px;
+  padding:var(--s6)}
+.ported .pg-steps b{display:grid; place-items:center; flex:0 0 auto;
+  width:34px; height:34px; border-radius:50%; background:var(--f-blue);
+  color:var(--blue); font-size:15px; font-weight:800}
+.ported .pg-steps span{font-size:15px; line-height:23px; color:var(--ink-2)}
+.ported .calframe{border-radius:20px; overflow:hidden; border:1px solid var(--line);
+  background:#fff; box-shadow:0 18px 50px rgba(13,23,41,.08)}
+.ported .calframe iframe{border:0; width:100%; height:620px; display:block}
+@media(max-width:700px){ .ported .calframe iframe{height:480px} }
+.ported .pg-note{max-width:760px; margin:var(--s6) auto 0; text-align:center}
+
 .ported *{min-width:0}
 .ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}
 .ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}
@@ -1805,6 +1832,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h4>Get started</h4>
         <ul>
           <li><a href="/demo/?src=preview">Build a demo assistant</a></li>
+          <li><a href="/playground/">Playground &mdash; call it live</a></li>
           <li><a href="tel:+16476921081">Call the demo line</a></li>
           <li><a href="/login">Client dashboard</a></li>
         </ul>
@@ -1934,6 +1962,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     ["Salons, spas and fitness", "/pricing/", "Bookings and rescheduling for salons, spas, studios and gyms.", "salon salons hair barber nails spa massage esthetics fitness gym studio yoga pilates personal trainer booking reschedule", IMG+"sec-salon.webp"],
     ["Professional services", "/pricing/", "Legal, real estate, accounting and consulting.", "legal lawyer law firm attorney paralegal real estate realtor broker accounting accountant bookkeeping consulting consultant agency office intake", IMG+"sec-pro.webp"],
     ["Any other business", "/pricing/", "If it takes calls, it fits. Tell us the trade and we will say so.", "other business industry sector vertical fit anything else", ""],
+    ["Playground", "/playground/", "Call the demo line and watch your booking land on the live calendar.", "playground try test live demo number call calendar booking see it in action sandbox", IMG+"winback.svg"],
     ["Personal line", "/pricing/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal-2.webp"],
     ["Books into your calendar", "/", "It books the job live on the call, into the calendar you already use.", "calendar booking book appointment schedule scheduling availability slot google outlook calendly", ""],
     ["Software it books into", "/", "Google Calendar, Outlook, Jobber, Housecall Pro, ServiceTitan, Square, Jane and more.", "integration integrations jobber housecall pro servicetitan square acuity mindbody jane dentrix open dental eaglesoft opentable resy toast hubspot crm outlook google calendar connect sync", IMG+"integrations.webp"],
