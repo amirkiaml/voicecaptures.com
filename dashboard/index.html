@@ -346,8 +346,11 @@
 
   /* ---------- Call log fits its own width (it is narrower beside the Call back list) ---------- */
   [data-section="log"] { container: log / inline-size; }
+  .dcard > .col { min-width: 0; }
+  .turn { grid-template-columns: 74px minmax(0, 1fr); }
+  .turn .bub { overflow-wrap: anywhere; }
   @container log (max-width: 900px) {
-    .dcard { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
+    .dcard { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 16px 18px; }
     .dcard .col + .col { border-top: 1px solid var(--line); padding-top: 4px; }
   }
   /* Narrow: each call is a small card instead of a table row, so nothing scrolls sideways. */
@@ -371,6 +374,28 @@
     #log tr.detail[hidden] { display: none; }
     .msgcount { margin-left: 4px; }
     #log .pill { font-size: 12px; padding: 3px 10px; }
+    /* An opened call on a phone: compact player, transcript in its own short scroll box */
+    .dcard { padding: 12px; border-radius: 12px; }
+    .dcard .k, .detail .k { font-size: 11px; letter-spacing: .1em; margin: 12px 0 4px; }
+    .dcard .v { font-size: 14px; line-height: 1.45; }
+    .status-sel { font-size: 13px; padding: 4px 6px; max-width: 100%; }
+    .player { gap: 8px; padding: 6px 10px 6px 6px; border-radius: 12px; max-width: 100%; }
+    .player .pp { width: 34px; height: 34px; }
+    .player .pp svg { width: 14px; height: 14px; }
+    .player .wf { height: 26px; }
+    .player .tm { font-size: 12px; min-width: 0; }
+    .tx { max-height: 300px; padding: 8px; gap: 6px; border-radius: 10px; }
+    .turn { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    .turn .who { font-size: 11px; padding-top: 0; display: flex; gap: 6px; }
+    .turn.assistant .who { justify-content: flex-end; }
+    .turn .bub { font-size: 13px; line-height: 1.4; padding: 6px 10px; }
+    .turn.assistant .bub { margin-left: 14%; }
+    .turn.caller .bub { margin-right: 14%; }
+    .tx-btn { font-size: 13px; padding: 6px 12px; }
+    .chk-inline { font-size: 12px; }
+    .msg { padding: 8px 10px; }
+    .msg-body { font-size: 13px; line-height: 1.45; }
+    .del-confirm { font-size: 13px; }
     #log .ah-chip { font-size: 11px; }
   }
 
