@@ -48,6 +48,9 @@
   .btn, select, input[type=search] { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 9px; padding: 7px 11px; }
   .btn { cursor: pointer; color: var(--ink2); }
   a.btn { text-decoration: none; }
+  .fx-btn { font-size: 13px; padding: 5px 10px; margin: 2px 4px 2px 0; }
+  .fx-btn[data-armed] { border-color: var(--warn); color: var(--warn); font-weight: 600; }
+  .fx-btn:disabled { opacity: .45; cursor: default; }
   h1 { margin: 0 0 4px; font-size: 26px; }
   .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -190,6 +193,7 @@
     <button type="button" data-tab="calls">All calls</button>
     <button type="button" data-tab="money">Vapi cost detail</button>
     <button type="button" data-tab="notif">Notifications</button>
+    <button type="button" data-tab="features">Features</button>
     <button type="button" data-tab="health">System check</button>
     <a href="/admin/quotes/" style="color:var(--muted);text-decoration:none;padding:9px 12px;font-size:14px">Quotes ↗</a>
   </nav>
@@ -320,6 +324,17 @@
       <thead><tr><th>Client</th><th>Conversations</th><th>Owner notified</th><th>Failed</th><th>Nothing sent</th><th class="hide-sm">Set up</th></tr></thead>
       <tbody id="nBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
     </table></div></div>
+  </section>
+
+  <section id="tab-features" hidden>
+    <h1>Features</h1>
+    <div class="sub">Which clients have each dashboard feature switched on. Roll a feature out to every client, or back, in one click.
+      Website and dashboard design changes need no switch: they go live for everyone when the PR is merged.</div>
+    <div class="card"><div class="table-wrap"><table>
+      <thead><tr><th>Feature</th><th>Switched on</th><th>New clients</th><th>Every client at once</th></tr></thead>
+      <tbody id="fxBody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+    </table></div>
+    <div class="muted small" id="fxMsg" style="margin-top:8px"></div></div>
   </section>
 
   <section id="tab-health" hidden>
@@ -550,9 +565,9 @@ $("more").onclick = () => load(true);
 const loaded = {};
 function showTab(name) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
-  ["overview", "quality", "calls", "money", "notif", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
+  ["overview", "quality", "calls", "money", "notif", "features", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
   if (name !== "client") history.replaceState(null, "", name === "overview" ? location.pathname : "#" + name);
-  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), money: loadMoney, notif: loadNotif, health: loadHealth }[name] || (() => {}))(); }
+  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), money: loadMoney, notif: loadNotif, features: loadFeatures, health: loadHealth }[name] || (() => {}))(); }
 }
 $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); };
 
@@ -655,6 +670,42 @@ $("nDays").onchange = loadNotif;
 $("nRefresh").onclick = loadNotif;
 
 /* ---------------- system check ---------------- */
+/* ---------------- features: roll out to every client ---------------- */
+async function loadFeatures() {
+  try {
+    const d = await api(`/api/dashboard/admin/features/rollout`);
+    const list = names => names.length ? `<div class="muted small">${esc(names.join(", "))}</div>` : "";
+    $("fxBody").innerHTML = d.features.map(f => {
+      const n = f.on.length, all = n === d.total, none = n === 0;
+      const act = f.bulk
+        ? `<button class="btn fx-btn" type="button" data-f="${esc(f.key)}" data-on="1" ${all ? "disabled" : ""}>Turn on for everyone</button>
+           <button class="btn fx-btn" type="button" data-f="${esc(f.key)}" data-on="0" ${none ? "disabled" : ""}>Turn off for everyone</button>`
+        : `<span class="muted small">Per client only (open the client)${f.key === "sentiment" ? ": paid add-on" : /delete|purge/.test(f.key) ? ": deletes data" : ""}</span>`;
+      return `<tr><td><b>${esc(f.label)}</b></td>
+        <td><span class="pill ${all ? "good" : none ? "" : "warn"}">${n} of ${d.total}</span>${!all && !none ? (n <= d.total / 2 ? list(f.on) : `<div class="muted small">Off: ${esc(f.off.join(", "))}</div>`) : ""}</td>
+        <td class="small">${f.defaultOn ? "On" : "Off"}</td>
+        <td style="white-space:nowrap">${act}</td></tr>`;
+    }).join("");
+    document.querySelectorAll("#fxBody .fx-btn").forEach(b => b.onclick = () => rollout(b, d.total));
+  } catch (e) { if (e.message !== "Signed out") $("fxBody").innerHTML = `<tr><td colspan="4" class="err">${esc(e.message)}</td></tr>`; }
+}
+// Two clicks: the first arms the button ("Click again to confirm"), so nothing changes by accident.
+async function rollout(b, total) {
+  const on = b.dataset.on === "1";
+  if (!b.dataset.armed) {
+    document.querySelectorAll("#fxBody .fx-btn[data-armed]").forEach(x => { delete x.dataset.armed; x.textContent = x.dataset.on === "1" ? "Turn on for everyone" : "Turn off for everyone"; });
+    b.dataset.armed = "1"; b.textContent = `Click again: ${on ? "on" : "off"} for all ${total}`;
+    return;
+  }
+  b.disabled = true; b.textContent = "Saving…";
+  try {
+    const r = await api(`/api/dashboard/admin/features/rollout`, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ feature: b.dataset.f, on, confirm: "ALL" }) });
+    $("fxMsg").textContent = `${r.changed} client${r.changed === 1 ? "" : "s"} switched ${on ? "on" : "off"}. They see it on their next page load.`;
+  } catch (e) { if (e.message !== "Signed out") $("fxMsg").textContent = e.message; }
+  loadFeatures();
+}
+
 async function loadHealth() {
   $("hBody").innerHTML = `<div class="muted">Checking…</div>`;
   try {
@@ -1053,7 +1104,7 @@ async function loadClient() {
           <label class="feat"><input type="checkbox" data-feat="review" ${r.features.review ? "checked" : ""}><span><b>Call review</b><br><span class="muted small">Tool calls and Vapi scoring per call</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="sentiment" ${r.features.sentiment ? "checked" : ""}><span><b>Caller sentiment</b> <span class="muted small">paid add-on</span><br><span class="muted small">Mood per call + unhappy callers. Turning it on books the add-on in their revenue.${r.sentimentKey ? "" : ` <span class="bad-t">OPENAI_API_KEY not set on Render.</span>`}</span>
             ${r.features.sentiment ? `<br><button class="linkbtn" type="button" id="sentBackfill">Score the last 30 days</button>` : ""}</span></label>
-          <label class="feat"><input type="checkbox" data-feat="callbacks" ${r.features.callbacks ? "checked" : ""}><span><b>Call back list</b><br><span class="muted small">A list at the top of their dashboard of everyone who needs a call back (Needs callback and Emergency), with Done and Reopen. Needs migrations/2026-11-02-callback-tasks.sql.</span></span></label>
+          <label class="feat"><input type="checkbox" data-feat="callbacks" ${r.features.callbacks ? "checked" : ""}><span><b>Call back list</b><br><span class="muted small">A list at the top of their dashboard of everyone who needs a call back (Needs callback and Emergency), with Done and Reopen. On by default.</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="call_delete" ${r.features.call_delete ? "checked" : ""}><span><b>Client can delete calls</b><br><span class="muted small">"Delete this call" on their dashboard, with a confirmation. Each deletion is logged below.</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="full_delete" ${r.features.full_delete ? "checked" : ""}><span><b>Full delete</b> <span class="muted small">clinics</span><br><span class="muted small">Deleting a call also removes the texts we sent about it, its report and events, and Twilio's call log and messages. Calls past their retention period are fully deleted too. Only a no-name stub (time, length) stays for billing.</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="vapi_purge" ${r.features.vapi_purge ? "checked" : ""}><span><b>Remove calls from Vapi</b><br><span class="muted small">Delete each call (and its logs) at Vapi once our transcript and recording copy is saved. Vapi's delete may be soft. You lose Vapi's own logs for these calls.</span>
@@ -1396,7 +1447,7 @@ vcAuth.client().then(async ({ sb }) => {
   await loadRate();
   const want = (location.hash || "").replace("#", "");
   if (want.startsWith("client/")) { loaded.overview = false; openClient(decodeURIComponent(want.slice(7))); }
-  else showTab(["quality", "calls", "money", "notif", "health"].includes(want) ? want : "overview");
+  else showTab(["quality", "calls", "money", "notif", "features", "health"].includes(want) ? want : "overview");
 }).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>
