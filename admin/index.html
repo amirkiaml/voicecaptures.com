@@ -167,6 +167,30 @@
   .bars2 .t { height: 10px; background: var(--gray-soft); border-radius: 99px; overflow: hidden; }
   .bars2 .t span { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats, .stats.six { grid-template-columns: repeat(2, 1fr); } .cols2 { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr 1fr; } }
+  .ck-rule { white-space: pre-wrap; font-size: 13px; color: var(--ink2); margin-top: 3px; max-width: 560px; }
+  .ck-ed { margin-bottom: 14px; }
+  .ck-ed .form-grid { grid-template-columns: 1fr 1fr; }
+  .ck-ed .wide { grid-column: 1 / -1; }
+  .ck-ed textarea { min-height: 96px; resize: vertical; }
+  .ck-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .ck-rcpt { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px 14px; align-items: end; }
+  .ck-rcpt textarea { min-height: 58px; resize: vertical; }
+  .ck-warn { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); font-size: 14px; margin-bottom: 14px; }
+  .ck-ev { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); margin-top: 3px; white-space: pre-wrap; }
+  .hide-wide { display: none; }
+  @media (max-width: 640px) { .hide-wide { display: inline; } }
+  .ck-sub { margin-top: 4px; }
+  .ck-fl + .ck-fl { margin-top: 8px; }
+  @media (max-width: 760px) { .ck-rcpt, .ck-ed .form-grid { grid-template-columns: 1fr; } }
+  /* Phone: checks and failures as stacked cards, no sideways scrolling. */
+  @media (max-width: 640px) {
+    #tab-checks .ck-list thead { display: none; }
+    #tab-checks .ck-list tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    #tab-checks .ck-list td { display: block; border: 0; padding: 2px 4px; }
+    #tab-checks .ck-list td.ck-meta { display: inline-block; color: var(--muted); font-size: 13px; }
+    #tab-checks .ck-list tr.detail td { padding: 6px 0; }
+  }
   @media (max-width: 640px) { .hide-sm { display: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -191,6 +215,7 @@
     <button type="button" data-tab="overview" class="on">Overview</button>
     <button type="button" data-tab="quality">Quality</button>
     <button type="button" data-tab="calls">All calls</button>
+    <button type="button" data-tab="checks">Checks</button>
     <button type="button" data-tab="money">Vapi cost detail</button>
     <button type="button" data-tab="notif">Notifications</button>
     <button type="button" data-tab="features">Features</button>
@@ -294,6 +319,73 @@
         </table>
       </div>
       <button class="btn more" id="more" type="button" hidden>Load older calls</button>
+    </div>
+  </section>
+
+  <section id="tab-checks" hidden>
+    <h1>Call checks</h1>
+    <div class="sub">Rules every call is checked against when it ends. Write a rule once, then switch it on for all assistants or just the ones it fits.
+      Any tool that fails is caught automatically. If a check fails you get an email and a text with what failed and why.</div>
+    <div class="card ck-warn" id="ckReady" hidden></div>
+    <div class="card" style="margin-bottom:14px">
+      <h3 style="margin:0 0 8px">Alerts go to</h3>
+      <div class="ck-rcpt form-grid">
+        <label>Emails (one per line)<textarea id="ckEmails" spellcheck="false"></textarea></label>
+        <label>Phones for texts (one per line)<textarea id="ckPhones" spellcheck="false"></textarea></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="ckSaveTo">Save</button><button class="btn" type="button" id="ckTestTo">Send test alert</button></div>
+      </div>
+      <div class="muted small" id="ckToMsg" style="margin-top:6px"></div>
+    </div>
+    <nav class="tabs ck-sub" id="ckTabs">
+      <button type="button" data-ck="rules" class="on">Rules</button>
+      <button type="button" data-ck="assistants">Assistants</button>
+      <button type="button" data-ck="fails">Failed calls</button>
+    </nav>
+
+    <div id="ckRules">
+      <div class="filters"><button class="btn primary" type="button" id="ckNew">+ New rule</button><button class="btn" type="button" id="ckRefresh">↻ Refresh</button></div>
+      <div class="card ck-ed" id="ckEd" hidden>
+        <h3 style="margin:0 0 10px" id="ckEdTitle">New rule</h3>
+        <div class="form-grid">
+          <label class="wide">Name<input id="ckEdName" maxlength="80" placeholder="e.g. Confirms the caller's name spelling"></label>
+          <label class="wide">Rule<textarea id="ckEdRule" maxlength="1500" placeholder="Whenever the caller gives their name, the receptionist must ask them to spell it or read the spelling back to confirm it."></textarea>
+            <span class="muted small">Say what must happen (or must never happen) and when. Calls where that moment never comes up count as "not applicable".</span></label>
+          <label class="chk wide"><input type="checkbox" id="ckEdAll"> On for all assistants (new ones too). Leave off to choose assistants under <b>Assistants</b>.</label>
+          <label>Try on<select id="ckEdTryOn"></select></label>
+          <label>How far back<select id="ckEdDays"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select></label>
+        </div>
+        <div class="ck-btns">
+          <button class="btn primary" type="button" id="ckEdSave">Save</button>
+          <button class="btn" type="button" id="ckEdTry">Try on recent calls</button>
+          <button class="btn" type="button" id="ckEdCancel">Cancel</button>
+          <span class="muted small" id="ckEdMsg"></span>
+        </div>
+        <div id="ckTry"></div>
+      </div>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>Rule</th><th>Runs on</th><th>Last 7 days</th><th></th></tr></thead>
+        <tbody id="ckBody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
+    </div>
+
+    <div id="ckAssts" hidden>
+      <div class="filters">
+        <select id="ckAddSel" aria-label="Assistant to add"></select>
+        <button class="btn primary" type="button" id="ckAdd">+ Add assistant</button>
+        <button class="btn" type="button" id="ckAddAll">Add all</button>
+      </div>
+      <div class="muted small" style="margin:-6px 0 12px">Checks only run on assistants in this list. Open one to switch rules on or off for it and test it on its recent calls.</div>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>Assistant</th><th>Rules on</th><th>Last 7 days</th><th></th></tr></thead>
+        <tbody id="ckABody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
+    </div>
+
+    <div id="ckFailsBox" hidden>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>When</th><th>Assistant</th><th>What failed</th><th class="hide-sm">Alert</th></tr></thead>
+        <tbody id="ckFails"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
     </div>
   </section>
 
@@ -565,11 +657,269 @@ $("more").onclick = () => load(true);
 const loaded = {};
 function showTab(name) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
-  ["overview", "quality", "calls", "money", "notif", "features", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
+  ["overview", "quality", "calls", "checks", "money", "notif", "features", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
   if (name !== "client") history.replaceState(null, "", name === "overview" ? location.pathname : "#" + name);
-  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), money: loadMoney, notif: loadNotif, features: loadFeatures, health: loadHealth }[name] || (() => {}))(); }
+  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), checks: loadChecks, money: loadMoney, notif: loadNotif, features: loadFeatures, health: loadHealth }[name] || (() => {}))(); }
 }
 $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); };
+
+
+/* ---------------- call checks ---------------- */
+let ck = null, ckEditing = null, ckSub = "rules";
+try { ckSub = localStorage.getItem("vc_ck_sub") || "rules"; } catch (e) {}
+const ckVerdict = v => `<span class="pill ${v === "fail" ? "bad" : v === "pass" ? "good" : v === "error" ? "warn" : ""}">${v === "n/a" ? "not applicable" : v === "error" ? "couldn't run" : v}</span>`;
+const ckName = id => (ck && ((ck.monitored || []).find(a => a.id === id) || ck.assistants.find(a => a.id === id) || {}).name) || id || "—";
+// Library rules only (assistant_id null). On for an assistant: all-assistants, or switched on for it.
+const ckLib = () => ck.checks.filter(c => c.global);
+const ckOn = (c, a) => c.defaultOn || c.perAssistant[a] === true;
+const ckPost = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+const ckWhat = c => c.builtin === "tool_errors" ? "Built in: any tool the assistant calls returns an error, times out, never answers, or a transfer doesn't connect." : c.rule;
+
+function ckShowSub(name) {
+  ckSub = name; try { localStorage.setItem("vc_ck_sub", name); } catch (e) {}
+  document.querySelectorAll("#ckTabs button").forEach(b => b.classList.toggle("on", b.dataset.ck === name));
+  $("ckRules").hidden = name !== "rules"; $("ckAssts").hidden = name !== "assistants"; $("ckFailsBox").hidden = name !== "fails";
+}
+$("ckTabs").onclick = e => { const b = e.target.closest("button[data-ck]"); if (b) ckShowSub(b.dataset.ck); };
+
+async function loadChecks() {
+  try {
+    ck = await api(`/api/dashboard/admin/checks`);
+    const miss = [];
+    if (!ck.ready.openai) miss.push("OPENAI_API_KEY (rules can't be judged)");
+    if (!ck.ready.email) miss.push("RESEND_API_KEY (no alert emails)");
+    if (!ck.ready.sms) miss.push("ADMIN_SMS_FROM and Twilio (no alert texts)");
+    if (!ck.ready.vapi) miss.push("VAPI_API_KEY (assistant names)");
+    if (!ck.monitored) miss.push("run migrations/2026-11-05-call-checks-library.sql in Supabase");
+    $("ckReady").hidden = !miss.length;
+    $("ckReady").innerHTML = miss.length ? `Needs: ${miss.map(esc).join(" · ")}` : "";
+    if (document.activeElement !== $("ckEmails")) $("ckEmails").value = ck.recipients.emails.join("\n");
+    if (document.activeElement !== $("ckPhones")) $("ckPhones").value = ck.recipients.phones.join("\n");
+    const mon = ck.monitored || [];
+    const tryOpts = (mon.length ? mon : ck.assistants).map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+    const curT = $("ckEdTryOn").value; $("ckEdTryOn").innerHTML = tryOpts; if (curT) $("ckEdTryOn").value = curT;
+    const notMon = ck.assistants.filter(a => !mon.some(m => m.id === a.id));
+    $("ckAddSel").innerHTML = notMon.length ? notMon.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("") : `<option value="">Every assistant is already listed</option>`;
+    $("ckAdd").disabled = !notMon.length; $("ckAddAll").disabled = !notMon.length;
+    ckShowSub(ckSub);
+    renderRules(); renderAssts(); renderFails();
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    $("ckBody").innerHTML = `<tr><td colspan="4" class="empty err">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function renderRules() {
+  const mon = ck.monitored || [];
+  const list = ckLib().sort((a, b) => (b.builtin ? 1 : 0) - (a.builtin ? 1 : 0));
+  $("ckBody").innerHTML = list.length ? list.map(c => {
+    const w = c.week, on = mon.filter(a => ckOn(c, a.id));
+    return `<tr>
+      <td><b>${esc(c.name)}</b>${c.builtin ? ' <span class="pill">built in</span>' : ""}<div class="ck-rule">${esc(ckWhat(c))}</div></td>
+      <td class="ck-meta"><label class="chk"><input type="checkbox" data-ckall="${esc(c.id)}" ${c.defaultOn ? "checked" : ""}> All assistants</label>
+        <div class="small muted">${c.defaultOn ? `all ${mon.length} listed` : on.length ? esc(on.map(a => a.name).join(", ")) : "none yet: switch it on under Assistants"}</div></td>
+      <td class="num ck-meta">${w.runs ? `${w.runs} call${w.runs === 1 ? "" : "s"}` : '<span class="muted">no calls yet</span>'}
+        ${w.fail ? `<div><span class="pill bad">${w.fail} failed</span></div>` : w.runs ? `<div class="small good-t">no failures</div>` : ""}
+        ${w.error ? `<div class="small warn-t">${w.error} couldn't run</div>` : ""}</td>
+      <td style="white-space:nowrap">${c.builtin ? "" : `<button class="btn fx-btn" type="button" data-ckedit="${esc(c.id)}">Edit</button><button class="btn fx-btn" type="button" data-ckdel="${esc(c.id)}">Delete</button>`}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No rules yet. Click <b>+ New rule</b>.</td></tr>`;
+  $("ckBody").querySelectorAll("[data-ckedit]").forEach(b => b.onclick = () => ckOpen(ck.checks.find(c => c.id === b.dataset.ckedit)));
+  $("ckBody").querySelectorAll("[data-ckall]").forEach(b => b.onchange = async () => {
+    const c = ck.checks.find(x => x.id === b.dataset.ckall);
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks`, { ...ckBody(c), defaultOn: b.checked }); } catch (e) { b.checked = !b.checked; alert(e.message); }
+    loadChecks();
+  });
+  $("ckBody").querySelectorAll("[data-ckdel]").forEach(b => b.onclick = async () => {
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to delete"; return; }
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckdel)}/delete`, { confirm: true }); } catch (e) { alert(e.message); }
+    loadChecks();
+  });
+}
+const ckBody = c => ({ id: c.id, assistantId: "*", name: c.name, kind: c.kind, rule: c.rule, tools: c.tools, enabled: true, defaultOn: c.defaultOn });
+
+const ckOpenA = new Set();
+function renderAssts() {
+  const mon = ck.monitored || [];
+  const lib = ckLib();
+  $("ckABody").innerHTML = mon.length ? mon.map(a => {
+    const n = lib.filter(c => ckOn(c, a.id)).length;
+    return `<tr class="row" data-cka="${esc(a.id)}" style="cursor:pointer">
+      <td><b>${esc(a.name)}</b></td>
+      <td class="ck-meta">${n} of ${lib.length}</td>
+      <td class="num ck-meta">${a.week.calls ? `${a.week.calls} call${a.week.calls === 1 ? "" : "s"}` : '<span class="muted">no calls yet</span>'}
+        ${a.week.failed ? `<div><span class="pill bad">${a.week.failed} failed</span></div>` : a.week.calls ? `<div class="small good-t">no failures</div>` : ""}</td>
+      <td style="white-space:nowrap"><button class="btn fx-btn" type="button" data-ckrm="${esc(a.id)}">Remove</button></td>
+    </tr><tr class="detail" id="cka-${esc(a.id)}" ${ckOpenA.has(a.id) ? "" : "hidden"}><td colspan="4">
+      <div class="k2">Rules for ${esc(a.name)}</div>
+      ${lib.map(c => `<div class="check"><span><input type="checkbox" data-ckfor="${esc(c.id)}" data-a="${esc(a.id)}" ${ckOn(c, a.id) ? "checked" : ""} ${c.defaultOn ? "disabled" : ""} aria-label="${esc(c.name)} for ${esc(a.name)}"></span>
+        <div><b>${esc(c.name)}</b>${c.defaultOn ? ' <span class="pill">all assistants</span>' : ""}<div class="muted small">${esc(ckWhat(c))}</div></div></div>`).join("")}
+      <div class="muted small" style="margin:6px 0 10px">Rules marked "all assistants" run on every listed assistant; untick "All assistants" on the Rules tab to choose per assistant.</div>
+      <div class="ck-btns"><select data-ckdays="${esc(a.id)}" aria-label="How far back"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select><button class="btn" type="button" data-cktest="${esc(a.id)}">Run tests</button><span class="muted small" data-cktestmsg="${esc(a.id)}"></span></div>
+      <div data-cktestout="${esc(a.id)}"></div>
+    </td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No assistants yet. Add one above.</td></tr>`;
+  $("ckABody").querySelectorAll("tr.row").forEach(r => r.onclick = e => {
+    if (e.target.closest("button,input")) return;
+    const id = r.dataset.cka, d = $("cka-" + id); d.hidden = !d.hidden;
+    if (d.hidden) ckOpenA.delete(id); else ckOpenA.add(id);
+  });
+  $("ckABody").querySelectorAll("[data-ckfor]").forEach(b => b.onchange = async () => {
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckfor)}/assistant`, { assistantId: b.dataset.a, enabled: b.checked }); }
+    catch (e) { b.checked = !b.checked; alert(e.message); }
+    loadChecks();
+  });
+  $("ckABody").querySelectorAll("[data-ckrm]").forEach(b => b.onclick = async () => {
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to remove"; return; }
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks/monitored`, { assistantId: b.dataset.ckrm, monitored: false }); } catch (e) { alert(e.message); }
+    loadChecks();
+  });
+  $("ckABody").querySelectorAll("[data-cktest]").forEach(b => b.onclick = () => ckTestAsst(b.dataset.cktest, b));
+  ckRuns.forEach((_, id) => ckRenderRun(id));
+}
+// Test results per assistant, kept across re-renders; "older" pages append.
+const ckRuns = new Map();
+const ckRow = (c, checks) => `<tr><td class="num">${esc(fmtWhen(c.at))}</td><td class="small">${esc(c.caller || "web call")}${c.seconds != null ? `<div class="muted">${esc(fmtDur(c.seconds))}</div>` : ""}${c.source && c.source !== "vapi" ? `<div class="muted">read from ${esc(c.source)}</div>` : ""}</td>${
+  checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}</td>`; }).join("")}</tr>`;
+function ckRenderRun(id) {
+  const st = ckRuns.get(id);
+  const msg = document.querySelector(`[data-cktestmsg="${CSS.escape(id)}"]`), out = document.querySelector(`[data-cktestout="${CSS.escape(id)}"]`);
+  if (!st || !msg || !out) return;
+  const sel = document.querySelector(`[data-ckdays="${CSS.escape(id)}"]`); if (sel) sel.value = String(st.days);
+  if (st.busy) msg.textContent = st.calls.length ? "Checking older calls…" : "Checking calls… (20–60 seconds)";
+  else if (st.error) msg.textContent = st.error;
+  else if (!st.checks.length) msg.textContent = "No rules are on for this assistant.";
+  else {
+    const fails = st.calls.filter(c => Object.values(c.verdicts).some(v => v.verdict === "fail")).length;
+    msg.textContent = st.calls.length ? `${st.calls.length} call${st.calls.length === 1 ? "" : "s"} from the last ${st.days} days: ${fails} would have alerted. Nothing was saved or sent.` : `No calls in the last ${st.days} days.`;
+  }
+  out.innerHTML = st.calls.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th>${st.checks.map(c => `<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${
+    st.calls.map(c => ckRow(c, st.checks)).join("")}</tbody></table></div>
+    ${st.more ? `<button class="btn more" type="button" data-ckolder="${esc(id)}" ${st.busy ? "disabled" : ""}>Test 10 older calls</button>` : st.calls.length ? `<div class="muted small" style="margin-top:8px">That's every call in the last ${st.days} days. Pick a longer period to go further back.</div>` : ""}` : "";
+  const ob = out.querySelector("[data-ckolder]"); if (ob) ob.onclick = () => ckTestAsst(id, null, true);
+}
+async function ckTestAsst(id, b, older = false) {
+  const prev = ckRuns.get(id);
+  const days = older && prev ? prev.days : Number((document.querySelector(`[data-ckdays="${CSS.escape(id)}"]`) || {}).value || 30);
+  const st = older && prev ? prev : { days, checks: [], calls: [], more: false, next: null };
+  st.busy = true; st.error = null; ckRuns.set(id, st); ckRenderRun(id);
+  if (b) b.disabled = true;
+  try {
+    const d = await ckPost(`/api/dashboard/admin/checks/test-assistant`, { assistantId: id, limit: 10, days, before: older ? st.next : undefined });
+    st.checks = d.checks; st.calls = st.calls.concat(d.calls); st.more = d.more; st.next = d.next;
+  } catch (e) { st.error = e.message; }
+  st.busy = false; if (b) b.disabled = false; ckRenderRun(id);
+}
+$("ckAdd").onclick = async () => { const id = $("ckAddSel").value; if (!id) return; try { await ckPost(`/api/dashboard/admin/checks/monitored`, { assistantId: id }); ckOpenA.add(id); } catch (e) { alert(e.message); } loadChecks(); };
+$("ckAddAll").onclick = async () => {
+  const b = $("ckAddAll");
+  if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again: add every assistant"; return; }
+  delete b.dataset.armed; b.textContent = "Add all";
+  try { await ckPost(`/api/dashboard/admin/checks/monitored`, { all: true }); } catch (e) { alert(e.message); }
+  loadChecks();
+};
+
+function renderFails() {
+  const byCall = new Map();
+  for (const r of ck.recent) {
+    if (!byCall.has(r.callId)) byCall.set(r.callId, { ...r, items: [] });
+    byCall.get(r.callId).items.push(r);
+  }
+  const fails = [...byCall.values()];
+  $("ckFails").innerHTML = fails.length ? fails.map(r => `<tr class="row" data-ck-call="${esc(r.callId)}" style="cursor:pointer">
+      <td class="num ck-meta">${esc(fmtWhen(r.at))}</td><td class="ck-meta">${esc(ckName(r.assistantId))}</td>
+      <td>${r.items.map(x => `<div class="ck-fl"><b>${esc(x.checkName || "—")}</b> ${x.verdict === "error" ? ckVerdict("error") : ""}<div class="small">${esc(x.reason || "")}</div>${x.evidence ? `<div class="ck-ev">${esc(x.evidence)}</div>` : ""}</div>`).join("")}</td>
+      <td class="hide-sm small">${r.alert ? `${r.alert.email === "sent" ? "✉ sent" : "✉ " + esc(r.alert.email || "—")} · ${r.alert.sms === "sent" ? "📱 sent" : "📱 " + esc(r.alert.sms || "—")}${r.alert.error ? `<div class="err">${esc(r.alert.error)}</div>` : ""}` : '<span class="muted">no alert</span>'}</td>
+    </tr><tr class="detail" hidden><td colspan="4"><div class="ckcall muted small">Loading call…</div></td></tr>`).join("")
+    : `<tr><td colspan="4" class="empty">No failed checks in the last 30 days.</td></tr>`;
+  $("ckFails").querySelectorAll("tr.row").forEach(r => r.onclick = () => {
+    const d = r.nextElementSibling; d.hidden = !d.hidden;
+    if (!d.hidden && !d.dataset.loaded) { d.dataset.loaded = "1"; ckCall(r.dataset.ckCall, d.querySelector(".ckcall")); }
+  });
+  const btn = document.querySelector('#ckTabs [data-ck="fails"]');
+  btn.textContent = fails.length ? `Failed calls (${fails.length})` : "Failed calls";
+}
+async function ckCall(id, box) {
+  try {
+    const [d, v] = await Promise.all([api(`/api/dashboard/admin/vapi/calls/${encodeURIComponent(id)}`), api(`/api/dashboard/admin/checks/call/${encodeURIComponent(id)}`)]);
+    const timeline = d.turns.map(t => ({ ...t, kind: t.role })).concat((d.tools || []).map(t => ({ ...t, kind: "tool", text: (t.role === "tool_calls" ? "→ " : "← ") + t.detail })))
+      .sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
+    box.className = "";
+    box.innerHTML = `<div class="cols"><div><div class="k2">Call</div>${timeline.length ? `<div class="tx">${timeline.map(t => `
+        <div class="turn ${t.kind === "caller" ? "caller" : t.kind === "tool" ? "tool" : "assistant"}"><div class="who">${t.kind === "caller" ? "Caller" : t.kind === "tool" ? "Tool" : "Assistant"}${t.t != null ? `<br>${fmtT(t.t)}` : ""}</div><div class="bub">${esc(t.text)}</div></div>`).join("")}</div>`
+        : `<div class="muted small">No transcript.</div>`}</div>
+      <div><div class="k2">Every check on this call</div>${v.results.map(x => `<div class="check"><span>${x.verdict === "fail" ? "✗" : x.verdict === "pass" ? "✓" : "–"}</span>
+        <div><b>${esc(x.check_name || "")}</b> ${ckVerdict(x.verdict)}<div class="muted small">${esc(x.reason || "")}</div>${x.evidence ? `<div class="ck-ev">${esc(x.evidence)}</div>` : ""}</div></div>`).join("")}
+        ${d.summary ? kvBlock("Summary", d.summary) : ""}<div class="kv" style="margin-top:8px"><div class="k">Vapi call id</div><div class="small">${esc(id)}</div></div></div></div>`;
+  } catch (e) { if (e.message !== "Signed out") { box.className = "err"; box.textContent = e.message; } }
+}
+function ckOpen(c) {
+  ckEditing = c ? c.id : null;
+  $("ckEdTitle").textContent = c ? `Edit: ${c.name}` : "New rule";
+  $("ckEdName").value = c ? c.name : "";
+  $("ckEdRule").value = c && c.rule || "";
+  $("ckEdAll").checked = c ? c.defaultOn : false;
+  $("ckEdMsg").textContent = ""; ckTryState = null; $("ckTry").innerHTML = "";
+  $("ckEd").hidden = false; $("ckEdName").focus();
+}
+function ckForm() {
+  return { id: ckEditing || undefined, assistantId: "*", name: $("ckEdName").value, kind: "rule", rule: $("ckEdRule").value,
+    enabled: true, defaultOn: $("ckEdAll").checked, tryAssistantId: $("ckEdTryOn").value };
+}
+$("ckNew").onclick = () => ckOpen(null);
+$("ckEdCancel").onclick = () => { $("ckEd").hidden = true; };
+$("ckRefresh").onclick = loadChecks;
+$("ckEdSave").onclick = async () => {
+  const b = $("ckEdSave"); b.disabled = true; $("ckEdMsg").textContent = "Saving…";
+  try { await ckPost(`/api/dashboard/admin/checks`, ckForm()); $("ckEd").hidden = true; await loadChecks(); }
+  catch (e) { $("ckEdMsg").textContent = e.message; }
+  b.disabled = false;
+};
+let ckTryState = null;
+function ckRenderTry() {
+  const st = ckTryState;
+  if (!st) { $("ckTry").innerHTML = ""; return; }
+  const n = st.results.reduce((a, r) => (a[r.verdict] = (a[r.verdict] || 0) + 1, a), {});
+  $("ckEdMsg").textContent = st.busy ? (st.results.length ? "Checking older calls…" : "Checking calls… (20–40 seconds)") : st.error ? st.error
+    : st.results.length ? `${st.results.length} call${st.results.length === 1 ? "" : "s"} from the last ${st.days} days: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.`
+    : `No calls in the last ${st.days} days for this assistant.`;
+  $("ckTry").innerHTML = st.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
+    st.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}${r.source && r.source !== "vapi" ? `<div class="muted">read from ${esc(r.source)}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
+      <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>
+    ${st.more ? `<button class="btn more" type="button" id="ckTryOlder" ${st.busy ? "disabled" : ""}>Try 10 older calls</button>` : `<div class="muted small" style="margin-top:8px">That's every call in the last ${st.days} days.</div>`}` : "";
+  if ($("ckTryOlder")) $("ckTryOlder").onclick = () => ckRunTry(true);
+}
+async function ckRunTry(older = false) {
+  const days = older && ckTryState ? ckTryState.days : Number($("ckEdDays").value || 30);
+  const st = older && ckTryState ? ckTryState : { days, results: [], more: false, next: null };
+  st.busy = true; st.error = null; ckTryState = st; ckRenderTry();
+  $("ckEdTry").disabled = true;
+  try {
+    const d = await ckPost(`/api/dashboard/admin/checks/try`, { ...ckForm(), name: ckForm().name || "Draft", limit: 10, days, before: older ? st.next : undefined });
+    st.results = st.results.concat(d.results); st.more = d.more; st.next = d.next;
+  } catch (e) { st.error = e.message; }
+  st.busy = false; $("ckEdTry").disabled = false; ckRenderTry();
+}
+$("ckEdTry").onclick = () => ckRunTry(false);
+$("ckSaveTo").onclick = async () => {
+  $("ckToMsg").textContent = "Saving…";
+  try {
+    const d = await api(`/api/dashboard/admin/checks/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ emails: $("ckEmails").value, phones: $("ckPhones").value.replace(/\n/g, ",") }) });
+    $("ckEmails").value = d.emails.join("\n"); $("ckPhones").value = d.phones.join("\n");
+    $("ckToMsg").textContent = "Saved. Alerts go to these from the next failed call.";
+  } catch (e) { $("ckToMsg").textContent = e.message; }
+};
+$("ckTestTo").onclick = async () => {
+  $("ckToMsg").textContent = "Sending…";
+  try {
+    const d = await api(`/api/dashboard/admin/checks/test-alert`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    $("ckToMsg").textContent = `Email: ${d.email.status}${d.email.error ? ` (${d.email.error})` : ""} · Text: ${d.sms.status}${d.sms.error ? ` (${d.sms.error})` : ""}. Uses the saved recipients.`;
+  } catch (e) { $("ckToMsg").textContent = e.message; }
+};
 
 /* ---------------- costs & margin ---------------- */
 const perMinClass = v => v == null ? "" : v > 0.2 ? "bad-t" : v > 0.15 ? "warn-t" : "good-t";
@@ -1447,7 +1797,7 @@ vcAuth.client().then(async ({ sb }) => {
   await loadRate();
   const want = (location.hash || "").replace("#", "");
   if (want.startsWith("client/")) { loaded.overview = false; openClient(decodeURIComponent(want.slice(7))); }
-  else showTab(["quality", "calls", "money", "notif", "features", "health"].includes(want) ? want : "overview");
+  else showTab(["quality", "calls", "checks", "money", "notif", "features", "health"].includes(want) ? want : "overview");
 }).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>
