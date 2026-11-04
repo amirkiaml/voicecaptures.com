@@ -167,6 +167,29 @@
   .bars2 .t { height: 10px; background: var(--gray-soft); border-radius: 99px; overflow: hidden; }
   .bars2 .t span { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .stats, .stats.six { grid-template-columns: repeat(2, 1fr); } .cols2 { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr 1fr; } }
+  .ck-rule { white-space: pre-wrap; font-size: 13px; color: var(--ink2); margin-top: 3px; max-width: 560px; }
+  .ck-ed { margin-bottom: 14px; }
+  .ck-ed .form-grid { grid-template-columns: 1fr 1fr; }
+  .ck-ed .wide { grid-column: 1 / -1; }
+  .ck-ed textarea { min-height: 96px; resize: vertical; }
+  .ck-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .ck-rcpt { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px 14px; align-items: end; }
+  .ck-rcpt textarea { min-height: 58px; resize: vertical; }
+  .ck-warn { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); font-size: 14px; margin-bottom: 14px; }
+  .ck-ev { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); margin-top: 3px; white-space: pre-wrap; }
+  .hide-wide { display: none; }
+  @media (max-width: 640px) { .hide-wide { display: inline; } }
+  .ck-fl + .ck-fl { margin-top: 8px; }
+  @media (max-width: 760px) { .ck-rcpt, .ck-ed .form-grid { grid-template-columns: 1fr; } }
+  /* Phone: checks and failures as stacked cards, no sideways scrolling. */
+  @media (max-width: 640px) {
+    #tab-checks .ck-list thead { display: none; }
+    #tab-checks .ck-list tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    #tab-checks .ck-list td { display: block; border: 0; padding: 2px 4px; }
+    #tab-checks .ck-list td.ck-meta { display: inline-block; color: var(--muted); font-size: 13px; }
+    #tab-checks .ck-list tr.detail td { padding: 6px 0; }
+  }
   @media (max-width: 640px) { .hide-sm { display: none; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
@@ -191,6 +214,7 @@
     <button type="button" data-tab="overview" class="on">Overview</button>
     <button type="button" data-tab="quality">Quality</button>
     <button type="button" data-tab="calls">All calls</button>
+    <button type="button" data-tab="checks">Checks</button>
     <button type="button" data-tab="money">Vapi cost detail</button>
     <button type="button" data-tab="notif">Notifications</button>
     <button type="button" data-tab="features">Features</button>
@@ -295,6 +319,56 @@
       </div>
       <button class="btn more" id="more" type="button" hidden>Load older calls</button>
     </div>
+  </section>
+
+  <section id="tab-checks" hidden>
+    <h1>Call checks</h1>
+    <div class="sub">Standing tests per assistant, run on every call when it ends. If one fails you get an email and a text with what failed and why.
+      <b>Tool failures</b> are spotted automatically; a <b>rule</b> is plain English, judged by AI from the whole call including every tool call and its result.</div>
+    <div class="card ck-warn" id="ckReady" hidden></div>
+    <div class="card mb" style="margin-bottom:14px">
+      <h3 style="margin:0 0 8px">Alerts go to</h3>
+      <div class="ck-rcpt form-grid">
+        <label>Emails (one per line)<textarea id="ckEmails" spellcheck="false"></textarea></label>
+        <label>Phones for texts (one per line)<textarea id="ckPhones" spellcheck="false"></textarea></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="ckSaveTo">Save</button><button class="btn" type="button" id="ckTestTo">Send test alert</button></div>
+      </div>
+      <div class="muted small" id="ckToMsg" style="margin-top:6px"></div>
+    </div>
+    <div class="filters">
+      <select id="ckAsst" aria-label="Assistant"><option value="">All assistants</option></select>
+      <button class="btn primary" type="button" id="ckNew">+ New check</button>
+      <button class="btn" type="button" id="ckRefresh">↻ Refresh</button>
+    </div>
+    <div class="card ck-ed" id="ckEd" hidden>
+      <h3 style="margin:0 0 10px" id="ckEdTitle">New check</h3>
+      <div class="form-grid">
+        <label>Assistant<select id="ckEdAsst"></select></label>
+        <label>Name<input id="ckEdName" maxlength="80" placeholder="e.g. Books when asked"></label>
+        <label>Kind<select id="ckEdKind"><option value="rule">Rule (plain English, judged by AI)</option><option value="tool_errors">Tool failures (automatic)</option></select></label>
+        <label class="chk"><input type="checkbox" id="ckEdOn" checked> Run on every call</label>
+        <label class="wide" id="ckEdRuleL">Rule<textarea id="ckEdRule" maxlength="1500" placeholder="If the caller asks to book and gives a day and time, the receptionist must check availability, call book_appointment, and confirm the booked time. It must never say it can't access the calendar."></textarea>
+          <span class="muted small">Say what must happen (or must never happen) and when. Calls where the situation never comes up count as "not applicable", not as passes or failures.</span></label>
+        <label class="wide" id="ckEdToolsL" hidden>Only these tools (optional, comma separated)<input id="ckEdTools" placeholder="book_appointment, check_availability — leave empty for every tool">
+          <span class="muted small">Fails when a tool answers with an error, times out, or never answers.</span></label>
+      </div>
+      <div class="ck-btns">
+        <button class="btn primary" type="button" id="ckEdSave">Save</button>
+        <button class="btn" type="button" id="ckEdTry">Try on recent calls</button>
+        <button class="btn" type="button" id="ckEdCancel">Cancel</button>
+        <span class="muted small" id="ckEdMsg"></span>
+      </div>
+      <div id="ckTry"></div>
+    </div>
+    <div class="card" style="margin-bottom:14px"><div class="table-wrap"><table class="ck-list">
+      <thead><tr><th>Check</th><th>Assistant</th><th>Last 7 days</th><th>On</th><th></th></tr></thead>
+      <tbody id="ckBody"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+    </table></div></div>
+    <h3>Calls that failed a check <span class="muted small">last 30 days</span></h3>
+    <div class="card"><div class="table-wrap"><table class="ck-list">
+      <thead><tr><th>When</th><th>Assistant</th><th>What failed</th><th class="hide-sm">Alert</th></tr></thead>
+      <tbody id="ckFails"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+    </table></div></div>
   </section>
 
   <section id="tab-money" hidden>
@@ -565,11 +639,163 @@ $("more").onclick = () => load(true);
 const loaded = {};
 function showTab(name) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
-  ["overview", "quality", "calls", "money", "notif", "features", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
+  ["overview", "quality", "calls", "checks", "money", "notif", "features", "health", "client"].forEach(t => $("tab-" + t).hidden = t !== name);
   if (name !== "client") history.replaceState(null, "", name === "overview" ? location.pathname : "#" + name);
-  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), money: loadMoney, notif: loadNotif, features: loadFeatures, health: loadHealth }[name] || (() => {}))(); }
+  if (!loaded[name]) { loaded[name] = true; ({ overview: loadOverview, quality: loadQuality, calls: () => load(), checks: loadChecks, money: loadMoney, notif: loadNotif, features: loadFeatures, health: loadHealth }[name] || (() => {}))(); }
 }
 $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); };
+
+
+/* ---------------- call checks ---------------- */
+let ck = null, ckEditing = null;
+const ckAsstName = id => (ck && (ck.assistants.find(a => a.id === id) || {}).name) || (ck && (ck.checks.find(c => c.assistantId === id) || {}).assistantName) || id;
+const ckVerdict = v => `<span class="pill ${v === "fail" ? "bad" : v === "pass" ? "good" : v === "error" ? "warn" : ""}">${v === "n/a" ? "not applicable" : v === "error" ? "couldn't run" : v}</span>`;
+async function loadChecks() {
+  try {
+    ck = await api(`/api/dashboard/admin/checks`);
+    const miss = [];
+    if (!ck.ready.openai) miss.push("OPENAI_API_KEY (rule checks can't run)");
+    if (!ck.ready.email) miss.push("RESEND_API_KEY (no alert emails)");
+    if (!ck.ready.sms) miss.push("ADMIN_SMS_FROM and Twilio (no alert texts)");
+    if (!ck.ready.vapi) miss.push("VAPI_API_KEY (assistant list, trying checks)");
+    $("ckReady").hidden = !miss.length;
+    $("ckReady").innerHTML = miss.length ? `Set on Render: ${miss.map(esc).join(" · ")}` : "";
+    if (document.activeElement !== $("ckEmails")) $("ckEmails").value = ck.recipients.emails.join("\n");
+    if (document.activeElement !== $("ckPhones")) $("ckPhones").value = ck.recipients.phones.join("\n");
+    const ids = [...new Set(ck.assistants.map(a => a.id).concat(ck.checks.map(c => c.assistantId)))];
+    const opts = ids.map(id => `<option value="${esc(id)}">${esc(ckAsstName(id))}</option>`).join("");
+    const cur = $("ckAsst").value;
+    $("ckAsst").innerHTML = `<option value="">All assistants</option>` + opts; $("ckAsst").value = ids.includes(cur) ? cur : "";
+    const curE = $("ckEdAsst").value;
+    $("ckEdAsst").innerHTML = opts; if (curE) $("ckEdAsst").value = curE;
+    renderChecks();
+  } catch (e) {
+    if (e.message === "Signed out") return;
+    $("ckBody").innerHTML = `<tr><td colspan="5" class="empty err">${esc(e.message)}</td></tr>`;
+    $("ckFails").innerHTML = "";
+  }
+}
+function renderChecks() {
+  const f = $("ckAsst").value;
+  const list = ck.checks.filter(c => !f || c.assistantId === f);
+  $("ckBody").innerHTML = list.length ? list.map(c => {
+    const w = c.week;
+    return `<tr>
+      <td><b>${esc(c.name)}</b> <span class="pill">${c.kind === "rule" ? "rule" : "tool failures"}</span>
+        <div class="ck-rule">${c.kind === "rule" ? esc(c.rule) : c.tools.length ? "Tools: " + esc(c.tools.join(", ")) : "Every tool"}</div></td>
+      <td class="ck-meta">${esc(ckAsstName(c.assistantId))}</td>
+      <td class="num ck-meta">${w.runs ? `${w.runs} call${w.runs === 1 ? "" : "s"}` : '<span class="muted">no calls yet</span>'}
+        ${w.fail ? `<div><span class="pill bad">${w.fail} failed</span></div>` : w.runs ? `<div class="small good-t">no failures</div>` : ""}
+        ${w.error ? `<div class="small warn-t">${w.error} couldn't run</div>` : ""}</td>
+      <td class="ck-meta"><label class="chk"><input type="checkbox" data-ckon="${esc(c.id)}" ${c.enabled ? "checked" : ""} aria-label="Run ${esc(c.name)} on every call"><span class="hide-wide">On</span></label></td>
+      <td style="white-space:nowrap"><button class="btn fx-btn" type="button" data-ckedit="${esc(c.id)}">Edit</button><button class="btn fx-btn" type="button" data-ckdel="${esc(c.id)}">Delete</button></td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">No checks${f ? " for this assistant" : ""} yet. Click <b>+ New check</b>.</td></tr>`;
+  $("ckBody").querySelectorAll("[data-ckedit]").forEach(b => b.onclick = () => ckOpen(ck.checks.find(c => c.id === b.dataset.ckedit)));
+  $("ckBody").querySelectorAll("[data-ckon]").forEach(b => b.onchange = async () => {
+    const c = ck.checks.find(x => x.id === b.dataset.ckon);
+    b.disabled = true;
+    try { await ckSave({ ...c, enabled: b.checked }); } catch (e) { b.checked = !b.checked; alert(e.message); }
+    b.disabled = false; loadChecks();
+  });
+  $("ckBody").querySelectorAll("[data-ckdel]").forEach(b => b.onclick = async () => {
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to delete"; return; }
+    b.disabled = true;
+    try { await api(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckdel)}/delete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }) }); }
+    catch (e) { alert(e.message); }
+    loadChecks();
+  });
+  // One row per call, listing every check it failed.
+  const byCall = new Map();
+  for (const r of ck.recent.filter(r => !f || r.assistantId === f)) {
+    if (!byCall.has(r.callId)) byCall.set(r.callId, { ...r, items: [] });
+    byCall.get(r.callId).items.push(r);
+  }
+  const fails = [...byCall.values()];
+  $("ckFails").innerHTML = fails.length ? fails.map(r => `<tr class="row" data-ck-call="${esc(r.callId)}" style="cursor:pointer">
+      <td class="num ck-meta">${esc(fmtWhen(r.at))}</td><td class="ck-meta">${esc(ckAsstName(r.assistantId))}</td>
+      <td>${r.items.map(x => `<div class="ck-fl"><b>${esc(x.checkName || "—")}</b> ${x.verdict === "error" ? ckVerdict("error") : ""}<div class="small">${esc(x.reason || "")}</div>${x.evidence ? `<div class="ck-ev">${esc(x.evidence)}</div>` : ""}</div>`).join("")}</td>
+      <td class="hide-sm small">${r.alert ? `${r.alert.email === "sent" ? "✉ sent" : "✉ " + esc(r.alert.email || "—")} · ${r.alert.sms === "sent" ? "📱 sent" : "📱 " + esc(r.alert.sms || "—")}${r.alert.error ? `<div class="err">${esc(r.alert.error)}</div>` : ""}` : '<span class="muted">no alert</span>'}</td>
+    </tr><tr class="detail" hidden><td colspan="4"><div class="ckcall muted small">Loading call…</div></td></tr>`).join("")
+    : `<tr><td colspan="4" class="empty">No failed checks in the last 30 days.</td></tr>`;
+  $("ckFails").querySelectorAll("tr.row").forEach(r => r.onclick = () => {
+    const d = r.nextElementSibling; d.hidden = !d.hidden;
+    if (!d.hidden && !d.dataset.loaded) { d.dataset.loaded = "1"; ckCall(r.dataset.ckCall, d.querySelector(".ckcall")); }
+  });
+}
+async function ckCall(id, box) {
+  try {
+    const [d, v] = await Promise.all([api(`/api/dashboard/admin/vapi/calls/${encodeURIComponent(id)}`), api(`/api/dashboard/admin/checks/call/${encodeURIComponent(id)}`)]);
+    const timeline = d.turns.map(t => ({ ...t, kind: t.role })).concat((d.tools || []).map(t => ({ ...t, kind: "tool", text: (t.role === "tool_calls" ? "→ " : "← ") + t.detail })))
+      .sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
+    box.className = "";
+    box.innerHTML = `<div class="cols"><div><div class="k2">Call</div>${timeline.length ? `<div class="tx">${timeline.map(t => `
+        <div class="turn ${t.kind === "caller" ? "caller" : t.kind === "tool" ? "tool" : "assistant"}"><div class="who">${t.kind === "caller" ? "Caller" : t.kind === "tool" ? "Tool" : "Assistant"}${t.t != null ? `<br>${fmtT(t.t)}` : ""}</div><div class="bub">${esc(t.text)}</div></div>`).join("")}</div>`
+        : `<div class="muted small">No transcript.</div>`}</div>
+      <div><div class="k2">Every check on this call</div>${v.results.map(x => `<div class="check"><span>${x.verdict === "fail" ? "✗" : x.verdict === "pass" ? "✓" : "–"}</span>
+        <div><b>${esc(x.check_name || "")}</b> ${ckVerdict(x.verdict)}<div class="muted small">${esc(x.reason || "")}</div>${x.evidence ? `<div class="ck-ev">${esc(x.evidence)}</div>` : ""}</div></div>`).join("")}
+        ${d.summary ? kvBlock("Summary", d.summary) : ""}<div class="kv" style="margin-top:8px"><div class="k">Vapi call id</div><div class="small">${esc(id)}</div></div></div></div>`;
+  } catch (e) { if (e.message !== "Signed out") { box.className = "err"; box.textContent = e.message; } }
+}
+function ckOpen(c) {
+  ckEditing = c ? c.id : null;
+  $("ckEdTitle").textContent = c ? `Edit: ${c.name}` : "New check";
+  $("ckEdAsst").value = c ? c.assistantId : ($("ckAsst").value || $("ckEdAsst").value);
+  $("ckEdName").value = c ? c.name : "";
+  $("ckEdKind").value = c ? c.kind : "rule";
+  $("ckEdRule").value = c && c.rule || "";
+  $("ckEdTools").value = c ? c.tools.join(", ") : "";
+  $("ckEdOn").checked = c ? c.enabled : true;
+  $("ckEdMsg").textContent = ""; $("ckTry").innerHTML = "";
+  ckKind();
+  $("ckEd").hidden = false; $("ckEdName").focus();
+}
+function ckKind() { const r = $("ckEdKind").value === "rule"; $("ckEdRuleL").hidden = !r; $("ckEdToolsL").hidden = r; }
+function ckForm() {
+  const a = $("ckEdAsst").value;
+  return { id: ckEditing || undefined, assistantId: a, assistantName: ckAsstName(a), name: $("ckEdName").value, kind: $("ckEdKind").value,
+    rule: $("ckEdRule").value, tools: $("ckEdTools").value, enabled: $("ckEdOn").checked };
+}
+const ckSave = c => api(`/api/dashboard/admin/checks`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(c) });
+$("ckEdKind").onchange = ckKind;
+$("ckNew").onclick = () => ckOpen(null);
+$("ckEdCancel").onclick = () => { $("ckEd").hidden = true; };
+$("ckAsst").onchange = () => ck && renderChecks();
+$("ckRefresh").onclick = loadChecks;
+$("ckEdSave").onclick = async () => {
+  const b = $("ckEdSave"); b.disabled = true; $("ckEdMsg").textContent = "Saving…";
+  try { await ckSave(ckForm()); $("ckEd").hidden = true; await loadChecks(); }
+  catch (e) { $("ckEdMsg").textContent = e.message; }
+  b.disabled = false;
+};
+$("ckEdTry").onclick = async () => {
+  const b = $("ckEdTry"); b.disabled = true;
+  $("ckEdMsg").textContent = "Checking the last calls… (this can take 20–40 seconds)"; $("ckTry").innerHTML = "";
+  try {
+    const d = await api(`/api/dashboard/admin/checks/try`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ckForm(), name: ckForm().name || "Draft", limit: 8 }) });
+    const n = d.counts;
+    $("ckEdMsg").textContent = d.results.length ? `${d.results.length} recent calls: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.` : "No ended calls in the last 13 days for this assistant.";
+    $("ckTry").innerHTML = d.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
+      d.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
+        <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>` : "";
+  } catch (e) { $("ckEdMsg").textContent = e.message; }
+  b.disabled = false;
+};
+$("ckSaveTo").onclick = async () => {
+  $("ckToMsg").textContent = "Saving…";
+  try {
+    const d = await api(`/api/dashboard/admin/checks/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ emails: $("ckEmails").value, phones: $("ckPhones").value.replace(/\n/g, ",") }) });
+    $("ckEmails").value = d.emails.join("\n"); $("ckPhones").value = d.phones.join("\n");
+    $("ckToMsg").textContent = "Saved. Alerts go to these from the next failed call.";
+  } catch (e) { $("ckToMsg").textContent = e.message; }
+};
+$("ckTestTo").onclick = async () => {
+  $("ckToMsg").textContent = "Sending…";
+  try {
+    const d = await api(`/api/dashboard/admin/checks/test-alert`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    $("ckToMsg").textContent = `Email: ${d.email.status}${d.email.error ? ` (${d.email.error})` : ""} · Text: ${d.sms.status}${d.sms.error ? ` (${d.sms.error})` : ""}. Uses the saved recipients.`;
+  } catch (e) { $("ckToMsg").textContent = e.message; }
+};
 
 /* ---------------- costs & margin ---------------- */
 const perMinClass = v => v == null ? "" : v > 0.2 ? "bad-t" : v > 0.15 ? "warn-t" : "good-t";
@@ -1447,7 +1673,7 @@ vcAuth.client().then(async ({ sb }) => {
   await loadRate();
   const want = (location.hash || "").replace("#", "");
   if (want.startsWith("client/")) { loaded.overview = false; openClient(decodeURIComponent(want.slice(7))); }
-  else showTab(["quality", "calls", "money", "notif", "features", "health"].includes(want) ? want : "overview");
+  else showTab(["quality", "calls", "checks", "money", "notif", "features", "health"].includes(want) ? want : "overview");
 }).catch(err => showGate(`<h2>Can't reach the server</h2><p>${esc(err.message)}</p>`));
 </script>
 </body>
