@@ -180,6 +180,7 @@
   .ck-ev { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink2); margin-top: 3px; white-space: pre-wrap; }
   .hide-wide { display: none; }
   @media (max-width: 640px) { .hide-wide { display: inline; } }
+  .ck-sub { margin-top: 4px; }
   .ck-fl + .ck-fl { margin-top: 8px; }
   @media (max-width: 760px) { .ck-rcpt, .ck-ed .form-grid { grid-template-columns: 1fr; } }
   /* Phone: checks and failures as stacked cards, no sideways scrolling. */
@@ -323,10 +324,10 @@
 
   <section id="tab-checks" hidden>
     <h1>Call checks</h1>
-    <div class="sub">Standing tests, run on every call when it ends. Make a check for one assistant, or for <b>all assistants</b> and switch it off where it doesn't fit. If one fails you get an email and a text with what failed and why.
-      <b>Tool failures</b> are spotted automatically; a <b>rule</b> is plain English, judged by AI from the whole call including every tool call and its result.</div>
+    <div class="sub">Rules every call is checked against when it ends. Write a rule once, then switch it on for all assistants or just the ones it fits.
+      Any tool that fails is caught automatically. If a check fails you get an email and a text with what failed and why.</div>
     <div class="card ck-warn" id="ckReady" hidden></div>
-    <div class="card mb" style="margin-bottom:14px">
+    <div class="card" style="margin-bottom:14px">
       <h3 style="margin:0 0 8px">Alerts go to</h3>
       <div class="ck-rcpt form-grid">
         <label>Emails (one per line)<textarea id="ckEmails" spellcheck="false"></textarea></label>
@@ -335,43 +336,56 @@
       </div>
       <div class="muted small" id="ckToMsg" style="margin-top:6px"></div>
     </div>
-    <div class="filters">
-      <select id="ckAsst" aria-label="Assistant"><option value="">All assistants</option></select>
-      <button class="btn primary" type="button" id="ckNew">+ New check</button>
-      <button class="btn" type="button" id="ckNewG">+ New check for all assistants</button>
-      <button class="btn" type="button" id="ckRefresh">↻ Refresh</button>
-    </div>
-    <div class="card ck-ed" id="ckEd" hidden>
-      <h3 style="margin:0 0 10px" id="ckEdTitle">New check</h3>
-      <div class="form-grid">
-        <label>Applies to<select id="ckEdAsst"></select></label>
-        <label>Name<input id="ckEdName" maxlength="80" placeholder="e.g. Books when asked"></label>
-        <label>Kind<select id="ckEdKind"><option value="rule">Rule (plain English, judged by AI)</option><option value="tool_errors">Tool failures (automatic)</option></select></label>
-        <label class="chk"><input type="checkbox" id="ckEdOn" checked> Run on every call</label>
-        <label class="chk" id="ckEdDefL" hidden><input type="checkbox" id="ckEdDef" checked> On for every assistant unless switched off (new ones too)</label>
-        <label id="ckEdTryOnL" hidden>Try on<select id="ckEdTryOn"></select></label>
-        <label class="wide" id="ckEdRuleL">Rule<textarea id="ckEdRule" maxlength="1500" placeholder="If the caller asks to book and gives a day and time, the receptionist must check availability, call book_appointment, and confirm the booked time. It must never say it can't access the calendar."></textarea>
-          <span class="muted small">Say what must happen (or must never happen) and when. Calls where the situation never comes up count as "not applicable", not as passes or failures.</span></label>
-        <label class="wide" id="ckEdToolsL" hidden>Only these tools (optional, comma separated)<input id="ckEdTools" placeholder="book_appointment, check_availability — leave empty for every tool">
-          <span class="muted small">Fails when a tool answers with an error, times out, or never answers.</span></label>
+    <nav class="tabs ck-sub" id="ckTabs">
+      <button type="button" data-ck="rules" class="on">Rules</button>
+      <button type="button" data-ck="assistants">Assistants</button>
+      <button type="button" data-ck="fails">Failed calls</button>
+    </nav>
+
+    <div id="ckRules">
+      <div class="filters"><button class="btn primary" type="button" id="ckNew">+ New rule</button><button class="btn" type="button" id="ckRefresh">↻ Refresh</button></div>
+      <div class="card ck-ed" id="ckEd" hidden>
+        <h3 style="margin:0 0 10px" id="ckEdTitle">New rule</h3>
+        <div class="form-grid">
+          <label class="wide">Name<input id="ckEdName" maxlength="80" placeholder="e.g. Confirms the caller's name spelling"></label>
+          <label class="wide">Rule<textarea id="ckEdRule" maxlength="1500" placeholder="Whenever the caller gives their name, the receptionist must ask them to spell it or read the spelling back to confirm it."></textarea>
+            <span class="muted small">Say what must happen (or must never happen) and when. Calls where that moment never comes up count as "not applicable".</span></label>
+          <label class="chk wide"><input type="checkbox" id="ckEdAll"> On for all assistants (new ones too). Leave off to choose assistants under <b>Assistants</b>.</label>
+          <label>Try on<select id="ckEdTryOn"></select></label>
+        </div>
+        <div class="ck-btns">
+          <button class="btn primary" type="button" id="ckEdSave">Save</button>
+          <button class="btn" type="button" id="ckEdTry">Try on recent calls</button>
+          <button class="btn" type="button" id="ckEdCancel">Cancel</button>
+          <span class="muted small" id="ckEdMsg"></span>
+        </div>
+        <div id="ckTry"></div>
       </div>
-      <div class="ck-btns">
-        <button class="btn primary" type="button" id="ckEdSave">Save</button>
-        <button class="btn" type="button" id="ckEdTry">Try on recent calls</button>
-        <button class="btn" type="button" id="ckEdCancel">Cancel</button>
-        <span class="muted small" id="ckEdMsg"></span>
-      </div>
-      <div id="ckTry"></div>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>Rule</th><th>Runs on</th><th>Last 7 days</th><th></th></tr></thead>
+        <tbody id="ckBody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
     </div>
-    <div class="card" style="margin-bottom:14px"><div class="table-wrap"><table class="ck-list">
-      <thead><tr><th>Check</th><th>Assistant</th><th>Last 7 days</th><th>On</th><th></th></tr></thead>
-      <tbody id="ckBody"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
-    </table></div></div>
-    <h3>Calls that failed a check <span class="muted small">last 30 days</span></h3>
-    <div class="card"><div class="table-wrap"><table class="ck-list">
-      <thead><tr><th>When</th><th>Assistant</th><th>What failed</th><th class="hide-sm">Alert</th></tr></thead>
-      <tbody id="ckFails"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
-    </table></div></div>
+
+    <div id="ckAssts" hidden>
+      <div class="filters">
+        <select id="ckAddSel" aria-label="Assistant to add"></select>
+        <button class="btn primary" type="button" id="ckAdd">+ Add assistant</button>
+        <button class="btn" type="button" id="ckAddAll">Add all</button>
+      </div>
+      <div class="muted small" style="margin:-6px 0 12px">Checks only run on assistants in this list. Open one to switch rules on or off for it and test it on its recent calls.</div>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>Assistant</th><th>Rules on</th><th>Last 7 days</th><th></th></tr></thead>
+        <tbody id="ckABody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
+    </div>
+
+    <div id="ckFailsBox" hidden>
+      <div class="card"><div class="table-wrap"><table class="ck-list">
+        <thead><tr><th>When</th><th>Assistant</th><th>What failed</th><th class="hide-sm">Alert</th></tr></thead>
+        <tbody id="ckFails"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+      </table></div></div>
+    </div>
   </section>
 
   <section id="tab-money" hidden>
@@ -650,98 +664,154 @@ $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b
 
 
 /* ---------------- call checks ---------------- */
-let ck = null, ckEditing = null;
-const ckAsstName = id => !id ? "All assistants" : (ck && (ck.assistants.find(a => a.id === id) || {}).name) || (ck && (ck.checks.find(c => c.assistantId === id) || {}).assistantName) || id;
+let ck = null, ckEditing = null, ckSub = "rules";
+try { ckSub = localStorage.getItem("vc_ck_sub") || "rules"; } catch (e) {}
 const ckVerdict = v => `<span class="pill ${v === "fail" ? "bad" : v === "pass" ? "good" : v === "error" ? "warn" : ""}">${v === "n/a" ? "not applicable" : v === "error" ? "couldn't run" : v}</span>`;
+const ckName = id => (ck && ((ck.monitored || []).find(a => a.id === id) || ck.assistants.find(a => a.id === id) || {}).name) || id || "—";
+// Library rules only (assistant_id null). On for an assistant: all-assistants, or switched on for it.
+const ckLib = () => ck.checks.filter(c => c.global);
+const ckOn = (c, a) => c.defaultOn || c.perAssistant[a] === true;
+const ckPost = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+const ckWhat = c => c.builtin === "tool_errors" ? "Built in: any tool the assistant calls returns an error, times out, never answers, or a transfer doesn't connect." : c.rule;
+
+function ckShowSub(name) {
+  ckSub = name; try { localStorage.setItem("vc_ck_sub", name); } catch (e) {}
+  document.querySelectorAll("#ckTabs button").forEach(b => b.classList.toggle("on", b.dataset.ck === name));
+  $("ckRules").hidden = name !== "rules"; $("ckAssts").hidden = name !== "assistants"; $("ckFailsBox").hidden = name !== "fails";
+}
+$("ckTabs").onclick = e => { const b = e.target.closest("button[data-ck]"); if (b) ckShowSub(b.dataset.ck); };
+
 async function loadChecks() {
   try {
     ck = await api(`/api/dashboard/admin/checks`);
     const miss = [];
-    if (!ck.ready.openai) miss.push("OPENAI_API_KEY (rule checks can't run)");
+    if (!ck.ready.openai) miss.push("OPENAI_API_KEY (rules can't be judged)");
     if (!ck.ready.email) miss.push("RESEND_API_KEY (no alert emails)");
     if (!ck.ready.sms) miss.push("ADMIN_SMS_FROM and Twilio (no alert texts)");
-    if (!ck.ready.vapi) miss.push("VAPI_API_KEY (assistant list, trying checks)");
+    if (!ck.ready.vapi) miss.push("VAPI_API_KEY (assistant names)");
+    if (!ck.monitored) miss.push("run migrations/2026-11-05-call-checks-library.sql in Supabase");
     $("ckReady").hidden = !miss.length;
-    $("ckReady").innerHTML = miss.length ? `Set on Render: ${miss.map(esc).join(" · ")}` : "";
+    $("ckReady").innerHTML = miss.length ? `Needs: ${miss.map(esc).join(" · ")}` : "";
     if (document.activeElement !== $("ckEmails")) $("ckEmails").value = ck.recipients.emails.join("\n");
     if (document.activeElement !== $("ckPhones")) $("ckPhones").value = ck.recipients.phones.join("\n");
-    const ids = [...new Set(ck.assistants.map(a => a.id).concat(ck.checks.filter(c => c.assistantId).map(c => c.assistantId)))];
-    const opts = ids.map(id => `<option value="${esc(id)}">${esc(ckAsstName(id))}</option>`).join("");
-    const cur = $("ckAsst").value;
-    $("ckAsst").innerHTML = `<option value="">Every check</option><option value="*">★ Checks for all assistants</option>` + opts;
-    $("ckAsst").value = ids.includes(cur) || cur === "*" ? cur : "";
-    const curE = $("ckEdAsst").value;
-    $("ckEdAsst").innerHTML = `<option value="*">★ All assistants (global)</option>` + opts; if (curE) $("ckEdAsst").value = curE;
-    const curT = $("ckEdTryOn").value;
-    $("ckEdTryOn").innerHTML = opts; if (curT) $("ckEdTryOn").value = curT;
-    renderChecks();
+    const mon = ck.monitored || [];
+    const tryOpts = (mon.length ? mon : ck.assistants).map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+    const curT = $("ckEdTryOn").value; $("ckEdTryOn").innerHTML = tryOpts; if (curT) $("ckEdTryOn").value = curT;
+    const notMon = ck.assistants.filter(a => !mon.some(m => m.id === a.id));
+    $("ckAddSel").innerHTML = notMon.length ? notMon.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("") : `<option value="">Every assistant is already listed</option>`;
+    $("ckAdd").disabled = !notMon.length; $("ckAddAll").disabled = !notMon.length;
+    ckShowSub(ckSub);
+    renderRules(); renderAssts(); renderFails();
   } catch (e) {
     if (e.message === "Signed out") return;
-    $("ckBody").innerHTML = `<tr><td colspan="5" class="empty err">${esc(e.message)}</td></tr>`;
-    $("ckFails").innerHTML = "";
+    $("ckBody").innerHTML = `<tr><td colspan="4" class="empty err">${esc(e.message)}</td></tr>`;
   }
 }
-function renderChecks() {
-  const sel = $("ckAsst").value, f = sel === "*" ? "" : sel;
-  // A global check is on for an assistant by its own setting, else the default.
-  const onFor = (c, a) => c.global ? (a in c.perAssistant ? c.perAssistant[a] : c.defaultOn) : c.assistantId === a;
-  const list = ck.checks.filter(c => sel === "*" ? c.global : !f || c.assistantId === f || c.global);
+
+function renderRules() {
+  const mon = ck.monitored || [];
+  const list = ckLib().sort((a, b) => (b.builtin ? 1 : 0) - (a.builtin ? 1 : 0));
   $("ckBody").innerHTML = list.length ? list.map(c => {
-    const w = c.week;
-    const nOn = c.global ? ck.assistants.filter(a => onFor(c, a.id)).length : 0;
-    const asstCell = !c.global ? esc(ckAsstName(c.assistantId))
-      : `<b>All assistants</b><div class="small muted">on for ${nOn} of ${ck.assistants.length}${c.defaultOn ? "" : " · new ones off"}</div>
-         ${f ? "" : `<button class="btn fx-btn" type="button" data-ckpa="${esc(c.id)}">Per assistant ▾</button>`}`;
-    const onBox = c.global && f
-      ? `<label class="chk" title="${c.enabled ? "" : "This check is switched off for everyone"}"><input type="checkbox" data-ckfor="${esc(c.id)}" ${onFor(c, f) ? "checked" : ""} ${c.enabled ? "" : "disabled"}> <span class="small">for this one</span></label>`
-      : `<label class="chk"><input type="checkbox" data-ckon="${esc(c.id)}" ${c.enabled ? "checked" : ""} aria-label="Run ${esc(c.name)} on every call"><span class="hide-wide">On</span></label>`;
-    const pa = c.global && !f ? `<tr class="detail" id="ckpa-${esc(c.id)}" hidden><td colspan="5"><div class="k2">Run "${esc(c.name)}" on</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px 16px">${ck.assistants.map(a => `<label class="chk"><input type="checkbox" data-ckfor="${esc(c.id)}" data-a="${esc(a.id)}" ${onFor(c, a.id) ? "checked" : ""}> ${esc(a.name)}</label>`).join("")}</div></td></tr>` : "";
+    const w = c.week, on = mon.filter(a => ckOn(c, a.id));
     return `<tr>
-      <td><b>${esc(c.name)}</b> <span class="pill">${c.kind === "rule" ? "rule" : "tool failures"}</span>
-        <div class="ck-rule">${c.kind === "rule" ? esc(c.rule) : c.tools.length ? "Tools: " + esc(c.tools.join(", ")) : "Every tool"}</div></td>
-      <td class="ck-meta">${asstCell}</td>
+      <td><b>${esc(c.name)}</b>${c.builtin ? ' <span class="pill">built in</span>' : ""}<div class="ck-rule">${esc(ckWhat(c))}</div></td>
+      <td class="ck-meta"><label class="chk"><input type="checkbox" data-ckall="${esc(c.id)}" ${c.defaultOn ? "checked" : ""}> All assistants</label>
+        <div class="small muted">${c.defaultOn ? `all ${mon.length} listed` : on.length ? esc(on.map(a => a.name).join(", ")) : "none yet: switch it on under Assistants"}</div></td>
       <td class="num ck-meta">${w.runs ? `${w.runs} call${w.runs === 1 ? "" : "s"}` : '<span class="muted">no calls yet</span>'}
         ${w.fail ? `<div><span class="pill bad">${w.fail} failed</span></div>` : w.runs ? `<div class="small good-t">no failures</div>` : ""}
         ${w.error ? `<div class="small warn-t">${w.error} couldn't run</div>` : ""}</td>
-      <td class="ck-meta">${onBox}</td>
-      <td style="white-space:nowrap"><button class="btn fx-btn" type="button" data-ckedit="${esc(c.id)}">Edit</button><button class="btn fx-btn" type="button" data-ckdel="${esc(c.id)}">Delete</button></td>
-    </tr>${pa}`;
-  }).join("") : `<tr><td colspan="5" class="empty">No checks${sel === "*" ? " for all assistants" : f ? " for this assistant" : ""} yet. Click <b>+ New check</b>.</td></tr>`;
+      <td style="white-space:nowrap">${c.builtin ? "" : `<button class="btn fx-btn" type="button" data-ckedit="${esc(c.id)}">Edit</button><button class="btn fx-btn" type="button" data-ckdel="${esc(c.id)}">Delete</button>`}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No rules yet. Click <b>+ New rule</b>.</td></tr>`;
   $("ckBody").querySelectorAll("[data-ckedit]").forEach(b => b.onclick = () => ckOpen(ck.checks.find(c => c.id === b.dataset.ckedit)));
-  $("ckBody").querySelectorAll("[data-ckon]").forEach(b => b.onchange = async () => {
-    const c = ck.checks.find(x => x.id === b.dataset.ckon);
+  $("ckBody").querySelectorAll("[data-ckall]").forEach(b => b.onchange = async () => {
+    const c = ck.checks.find(x => x.id === b.dataset.ckall);
     b.disabled = true;
-    try { await ckSave({ ...c, enabled: b.checked }); } catch (e) { b.checked = !b.checked; alert(e.message); }
-    b.disabled = false; loadChecks();
-  });
-  $("ckBody").querySelectorAll("[data-ckpa]").forEach(b => b.onclick = () => { const x = $("ckpa-" + b.dataset.ckpa); x.hidden = !x.hidden; });
-  $("ckBody").querySelectorAll("[data-ckfor]").forEach(b => b.onchange = async () => {
-    b.disabled = true;
-    try { await api(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckfor)}/assistant`, { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ assistantId: b.dataset.a || $("ckAsst").value, enabled: b.checked }) }); }
-    catch (e) { b.checked = !b.checked; alert(e.message); }
-    b.disabled = false;
-    const keep = [...document.querySelectorAll('#ckBody tr.detail[id^="ckpa-"]:not([hidden])')].map(x => x.id);
-    await loadChecks();
-    keep.forEach(id => { const x = $(id); if (x) x.hidden = false; });
+    try { await ckPost(`/api/dashboard/admin/checks`, { ...ckBody(c), defaultOn: b.checked }); } catch (e) { b.checked = !b.checked; alert(e.message); }
+    loadChecks();
   });
   $("ckBody").querySelectorAll("[data-ckdel]").forEach(b => b.onclick = async () => {
     if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to delete"; return; }
     b.disabled = true;
-    try { await api(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckdel)}/delete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }) }); }
-    catch (e) { alert(e.message); }
+    try { await ckPost(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckdel)}/delete`, { confirm: true }); } catch (e) { alert(e.message); }
     loadChecks();
   });
-  // One row per call, listing every check it failed.
+}
+const ckBody = c => ({ id: c.id, assistantId: "*", name: c.name, kind: c.kind, rule: c.rule, tools: c.tools, enabled: true, defaultOn: c.defaultOn });
+
+const ckOpenA = new Set();
+function renderAssts() {
+  const mon = ck.monitored || [];
+  const lib = ckLib();
+  $("ckABody").innerHTML = mon.length ? mon.map(a => {
+    const n = lib.filter(c => ckOn(c, a.id)).length;
+    return `<tr class="row" data-cka="${esc(a.id)}" style="cursor:pointer">
+      <td><b>${esc(a.name)}</b></td>
+      <td class="ck-meta">${n} of ${lib.length}</td>
+      <td class="num ck-meta">${a.week.calls ? `${a.week.calls} call${a.week.calls === 1 ? "" : "s"}` : '<span class="muted">no calls yet</span>'}
+        ${a.week.failed ? `<div><span class="pill bad">${a.week.failed} failed</span></div>` : a.week.calls ? `<div class="small good-t">no failures</div>` : ""}</td>
+      <td style="white-space:nowrap"><button class="btn fx-btn" type="button" data-ckrm="${esc(a.id)}">Remove</button></td>
+    </tr><tr class="detail" id="cka-${esc(a.id)}" ${ckOpenA.has(a.id) ? "" : "hidden"}><td colspan="4">
+      <div class="k2">Rules for ${esc(a.name)}</div>
+      ${lib.map(c => `<div class="check"><span><input type="checkbox" data-ckfor="${esc(c.id)}" data-a="${esc(a.id)}" ${ckOn(c, a.id) ? "checked" : ""} ${c.defaultOn ? "disabled" : ""} aria-label="${esc(c.name)} for ${esc(a.name)}"></span>
+        <div><b>${esc(c.name)}</b>${c.defaultOn ? ' <span class="pill">all assistants</span>' : ""}<div class="muted small">${esc(ckWhat(c))}</div></div></div>`).join("")}
+      <div class="muted small" style="margin:6px 0 10px">Rules marked "all assistants" run on every listed assistant; untick "All assistants" on the Rules tab to choose per assistant.</div>
+      <div class="ck-btns"><button class="btn" type="button" data-cktest="${esc(a.id)}">Run tests on recent calls</button><span class="muted small" data-cktestmsg="${esc(a.id)}"></span></div>
+      <div data-cktestout="${esc(a.id)}"></div>
+    </td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No assistants yet. Add one above.</td></tr>`;
+  $("ckABody").querySelectorAll("tr.row").forEach(r => r.onclick = e => {
+    if (e.target.closest("button,input")) return;
+    const id = r.dataset.cka, d = $("cka-" + id); d.hidden = !d.hidden;
+    if (d.hidden) ckOpenA.delete(id); else ckOpenA.add(id);
+  });
+  $("ckABody").querySelectorAll("[data-ckfor]").forEach(b => b.onchange = async () => {
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks/${encodeURIComponent(b.dataset.ckfor)}/assistant`, { assistantId: b.dataset.a, enabled: b.checked }); }
+    catch (e) { b.checked = !b.checked; alert(e.message); }
+    loadChecks();
+  });
+  $("ckABody").querySelectorAll("[data-ckrm]").forEach(b => b.onclick = async () => {
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to remove"; return; }
+    b.disabled = true;
+    try { await ckPost(`/api/dashboard/admin/checks/monitored`, { assistantId: b.dataset.ckrm, monitored: false }); } catch (e) { alert(e.message); }
+    loadChecks();
+  });
+  $("ckABody").querySelectorAll("[data-cktest]").forEach(b => b.onclick = () => ckTestAsst(b.dataset.cktest, b));
+}
+async function ckTestAsst(id, b) {
+  const msg = document.querySelector(`[data-cktestmsg="${CSS.escape(id)}"]`), out = document.querySelector(`[data-cktestout="${CSS.escape(id)}"]`);
+  b.disabled = true; msg.textContent = "Checking recent calls… (20–60 seconds)"; out.innerHTML = "";
+  try {
+    const d = await ckPost(`/api/dashboard/admin/checks/test-assistant`, { assistantId: id, limit: 8 });
+    if (!d.checks.length) { msg.textContent = "No rules are on for this assistant."; return; }
+    const fails = d.calls.filter(c => Object.values(c.verdicts).some(v => v.verdict === "fail")).length;
+    msg.textContent = d.calls.length ? `${d.calls.length} recent calls: ${fails} would have alerted. Nothing was saved or sent.` : "No recent calls for this assistant.";
+    out.innerHTML = d.calls.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th>${d.checks.map(c => `<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${
+      d.calls.map(c => `<tr><td class="num">${esc(fmtWhen(c.at))}</td><td class="small">${esc(c.caller || "web call")}${c.seconds != null ? `<div class="muted">${esc(fmtDur(c.seconds))}</div>` : ""}${c.source && c.source !== "vapi" ? `<div class="muted">read from ${esc(c.source)}</div>` : ""}</td>${
+        d.checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}</td>`; }).join("")}</tr>`).join("")
+    }</tbody></table></div>` : "";
+  } catch (e) { msg.textContent = e.message; }
+  finally { b.disabled = false; }
+}
+$("ckAdd").onclick = async () => { const id = $("ckAddSel").value; if (!id) return; try { await ckPost(`/api/dashboard/admin/checks/monitored`, { assistantId: id }); ckOpenA.add(id); } catch (e) { alert(e.message); } loadChecks(); };
+$("ckAddAll").onclick = async () => {
+  const b = $("ckAddAll");
+  if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again: add every assistant"; return; }
+  delete b.dataset.armed; b.textContent = "Add all";
+  try { await ckPost(`/api/dashboard/admin/checks/monitored`, { all: true }); } catch (e) { alert(e.message); }
+  loadChecks();
+};
+
+function renderFails() {
   const byCall = new Map();
-  for (const r of ck.recent.filter(r => !f || r.assistantId === f)) {
+  for (const r of ck.recent) {
     if (!byCall.has(r.callId)) byCall.set(r.callId, { ...r, items: [] });
     byCall.get(r.callId).items.push(r);
   }
   const fails = [...byCall.values()];
   $("ckFails").innerHTML = fails.length ? fails.map(r => `<tr class="row" data-ck-call="${esc(r.callId)}" style="cursor:pointer">
-      <td class="num ck-meta">${esc(fmtWhen(r.at))}</td><td class="ck-meta">${esc(ckAsstName(r.assistantId))}</td>
+      <td class="num ck-meta">${esc(fmtWhen(r.at))}</td><td class="ck-meta">${esc(ckName(r.assistantId))}</td>
       <td>${r.items.map(x => `<div class="ck-fl"><b>${esc(x.checkName || "—")}</b> ${x.verdict === "error" ? ckVerdict("error") : ""}<div class="small">${esc(x.reason || "")}</div>${x.evidence ? `<div class="ck-ev">${esc(x.evidence)}</div>` : ""}</div>`).join("")}</td>
       <td class="hide-sm small">${r.alert ? `${r.alert.email === "sent" ? "✉ sent" : "✉ " + esc(r.alert.email || "—")} · ${r.alert.sms === "sent" ? "📱 sent" : "📱 " + esc(r.alert.sms || "—")}${r.alert.error ? `<div class="err">${esc(r.alert.error)}</div>` : ""}` : '<span class="muted">no alert</span>'}</td>
     </tr><tr class="detail" hidden><td colspan="4"><div class="ckcall muted small">Loading call…</div></td></tr>`).join("")
@@ -750,6 +820,8 @@ function renderChecks() {
     const d = r.nextElementSibling; d.hidden = !d.hidden;
     if (!d.hidden && !d.dataset.loaded) { d.dataset.loaded = "1"; ckCall(r.dataset.ckCall, d.querySelector(".ckcall")); }
   });
+  const btn = document.querySelector('#ckTabs [data-ck="fails"]');
+  btn.textContent = fails.length ? `Failed calls (${fails.length})` : "Failed calls";
 }
 async function ckCall(id, box) {
   try {
@@ -767,52 +839,33 @@ async function ckCall(id, box) {
 }
 function ckOpen(c) {
   ckEditing = c ? c.id : null;
-  $("ckEdTitle").textContent = c ? `Edit: ${c.name}` : "New check";
-  $("ckEdAsst").value = c ? (c.global ? "*" : c.assistantId) : ($("ckAsst").value || $("ckEdAsst").value || "*");
-  $("ckEdDef").checked = c ? c.defaultOn : true;
-  if ($("ckAsst").value && $("ckAsst").value !== "*") $("ckEdTryOn").value = $("ckAsst").value;
-  if (!$("ckEdTryOn").value && $("ckEdTryOn").options.length) $("ckEdTryOn").selectedIndex = 0;
+  $("ckEdTitle").textContent = c ? `Edit: ${c.name}` : "New rule";
   $("ckEdName").value = c ? c.name : "";
-  $("ckEdKind").value = c ? c.kind : "rule";
   $("ckEdRule").value = c && c.rule || "";
-  $("ckEdTools").value = c ? c.tools.join(", ") : "";
-  $("ckEdOn").checked = c ? c.enabled : true;
+  $("ckEdAll").checked = c ? c.defaultOn : false;
   $("ckEdMsg").textContent = ""; $("ckTry").innerHTML = "";
-  ckKind();
   $("ckEd").hidden = false; $("ckEdName").focus();
 }
-function ckKind() {
-  const r = $("ckEdKind").value === "rule"; $("ckEdRuleL").hidden = !r; $("ckEdToolsL").hidden = r;
-  const g = $("ckEdAsst").value === "*"; $("ckEdDefL").hidden = !g; $("ckEdTryOnL").hidden = !g;
-}
 function ckForm() {
-  const a = $("ckEdAsst").value;
-  return { id: ckEditing || undefined, assistantId: a, assistantName: ckAsstName(a), name: $("ckEdName").value, kind: $("ckEdKind").value,
-    rule: $("ckEdRule").value, tools: $("ckEdTools").value, enabled: $("ckEdOn").checked,
-    defaultOn: $("ckEdDef").checked, tryAssistantId: a === "*" ? $("ckEdTryOn").value : undefined };
+  return { id: ckEditing || undefined, assistantId: "*", name: $("ckEdName").value, kind: "rule", rule: $("ckEdRule").value,
+    enabled: true, defaultOn: $("ckEdAll").checked, tryAssistantId: $("ckEdTryOn").value };
 }
-const ckSave = c => api(`/api/dashboard/admin/checks`, { method: "POST", headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(c.global ? { ...c, assistantId: "*" } : c) });
-$("ckEdKind").onchange = ckKind;
-$("ckEdAsst").onchange = ckKind;
 $("ckNew").onclick = () => ckOpen(null);
-$("ckNewG").onclick = () => { ckOpen(null); $("ckEdAsst").value = "*"; ckKind(); };
 $("ckEdCancel").onclick = () => { $("ckEd").hidden = true; };
-$("ckAsst").onchange = () => ck && renderChecks();
 $("ckRefresh").onclick = loadChecks;
 $("ckEdSave").onclick = async () => {
   const b = $("ckEdSave"); b.disabled = true; $("ckEdMsg").textContent = "Saving…";
-  try { await ckSave(ckForm()); $("ckEd").hidden = true; await loadChecks(); }
+  try { await ckPost(`/api/dashboard/admin/checks`, ckForm()); $("ckEd").hidden = true; await loadChecks(); }
   catch (e) { $("ckEdMsg").textContent = e.message; }
   b.disabled = false;
 };
 $("ckEdTry").onclick = async () => {
   const b = $("ckEdTry"); b.disabled = true;
-  $("ckEdMsg").textContent = "Checking the last calls… (this can take 20–40 seconds)"; $("ckTry").innerHTML = "";
+  $("ckEdMsg").textContent = "Checking the last calls… (20–40 seconds)"; $("ckTry").innerHTML = "";
   try {
-    const d = await api(`/api/dashboard/admin/checks/try`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ckForm(), name: ckForm().name || "Draft", limit: 8 }) });
+    const d = await ckPost(`/api/dashboard/admin/checks/try`, { ...ckForm(), name: ckForm().name || "Draft", limit: 8 });
     const n = d.counts;
-    $("ckEdMsg").textContent = d.results.length ? `${d.results.length} recent calls: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.` : "No ended calls in the last 13 days for this assistant.";
+    $("ckEdMsg").textContent = d.results.length ? `${d.results.length} recent calls: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.` : "No recent calls for this assistant.";
     $("ckTry").innerHTML = d.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
       d.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}${r.source && r.source !== "vapi" ? `<div class="muted">read from ${esc(r.source)}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
         <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>` : "";
