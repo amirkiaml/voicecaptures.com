@@ -338,12 +338,13 @@
     <div class="filters">
       <select id="ckAsst" aria-label="Assistant"><option value="">All assistants</option></select>
       <button class="btn primary" type="button" id="ckNew">+ New check</button>
+      <button class="btn" type="button" id="ckNewG">+ New check for all assistants</button>
       <button class="btn" type="button" id="ckRefresh">↻ Refresh</button>
     </div>
     <div class="card ck-ed" id="ckEd" hidden>
       <h3 style="margin:0 0 10px" id="ckEdTitle">New check</h3>
       <div class="form-grid">
-        <label>Assistant<select id="ckEdAsst"></select></label>
+        <label>Applies to<select id="ckEdAsst"></select></label>
         <label>Name<input id="ckEdName" maxlength="80" placeholder="e.g. Books when asked"></label>
         <label>Kind<select id="ckEdKind"><option value="rule">Rule (plain English, judged by AI)</option><option value="tool_errors">Tool failures (automatic)</option></select></label>
         <label class="chk"><input type="checkbox" id="ckEdOn" checked> Run on every call</label>
@@ -667,7 +668,8 @@ async function loadChecks() {
     const ids = [...new Set(ck.assistants.map(a => a.id).concat(ck.checks.filter(c => c.assistantId).map(c => c.assistantId)))];
     const opts = ids.map(id => `<option value="${esc(id)}">${esc(ckAsstName(id))}</option>`).join("");
     const cur = $("ckAsst").value;
-    $("ckAsst").innerHTML = `<option value="">All assistants</option>` + opts; $("ckAsst").value = ids.includes(cur) ? cur : "";
+    $("ckAsst").innerHTML = `<option value="">Every check</option><option value="*">★ Checks for all assistants</option>` + opts;
+    $("ckAsst").value = ids.includes(cur) || cur === "*" ? cur : "";
     const curE = $("ckEdAsst").value;
     $("ckEdAsst").innerHTML = `<option value="*">★ All assistants (global)</option>` + opts; if (curE) $("ckEdAsst").value = curE;
     const curT = $("ckEdTryOn").value;
@@ -680,10 +682,10 @@ async function loadChecks() {
   }
 }
 function renderChecks() {
-  const f = $("ckAsst").value;
+  const sel = $("ckAsst").value, f = sel === "*" ? "" : sel;
   // A global check is on for an assistant by its own setting, else the default.
   const onFor = (c, a) => c.global ? (a in c.perAssistant ? c.perAssistant[a] : c.defaultOn) : c.assistantId === a;
-  const list = ck.checks.filter(c => !f || c.assistantId === f || c.global);
+  const list = ck.checks.filter(c => sel === "*" ? c.global : !f || c.assistantId === f || c.global);
   $("ckBody").innerHTML = list.length ? list.map(c => {
     const w = c.week;
     const nOn = c.global ? ck.assistants.filter(a => onFor(c, a.id)).length : 0;
@@ -705,7 +707,7 @@ function renderChecks() {
       <td class="ck-meta">${onBox}</td>
       <td style="white-space:nowrap"><button class="btn fx-btn" type="button" data-ckedit="${esc(c.id)}">Edit</button><button class="btn fx-btn" type="button" data-ckdel="${esc(c.id)}">Delete</button></td>
     </tr>${pa}`;
-  }).join("") : `<tr><td colspan="5" class="empty">No checks${f ? " for this assistant" : ""} yet. Click <b>+ New check</b>.</td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">No checks${sel === "*" ? " for all assistants" : f ? " for this assistant" : ""} yet. Click <b>+ New check</b>.</td></tr>`;
   $("ckBody").querySelectorAll("[data-ckedit]").forEach(b => b.onclick = () => ckOpen(ck.checks.find(c => c.id === b.dataset.ckedit)));
   $("ckBody").querySelectorAll("[data-ckon]").forEach(b => b.onchange = async () => {
     const c = ck.checks.find(x => x.id === b.dataset.ckon);
@@ -766,9 +768,10 @@ async function ckCall(id, box) {
 function ckOpen(c) {
   ckEditing = c ? c.id : null;
   $("ckEdTitle").textContent = c ? `Edit: ${c.name}` : "New check";
-  $("ckEdAsst").value = c ? (c.global ? "*" : c.assistantId) : ($("ckAsst").value || $("ckEdAsst").value);
+  $("ckEdAsst").value = c ? (c.global ? "*" : c.assistantId) : ($("ckAsst").value || $("ckEdAsst").value || "*");
   $("ckEdDef").checked = c ? c.defaultOn : true;
-  if ($("ckAsst").value) $("ckEdTryOn").value = $("ckAsst").value;
+  if ($("ckAsst").value && $("ckAsst").value !== "*") $("ckEdTryOn").value = $("ckAsst").value;
+  if (!$("ckEdTryOn").value && $("ckEdTryOn").options.length) $("ckEdTryOn").selectedIndex = 0;
   $("ckEdName").value = c ? c.name : "";
   $("ckEdKind").value = c ? c.kind : "rule";
   $("ckEdRule").value = c && c.rule || "";
@@ -793,6 +796,7 @@ const ckSave = c => api(`/api/dashboard/admin/checks`, { method: "POST", headers
 $("ckEdKind").onchange = ckKind;
 $("ckEdAsst").onchange = ckKind;
 $("ckNew").onclick = () => ckOpen(null);
+$("ckNewG").onclick = () => { ckOpen(null); $("ckEdAsst").value = "*"; ckKind(); };
 $("ckEdCancel").onclick = () => { $("ckEd").hidden = true; };
 $("ckAsst").onchange = () => ck && renderChecks();
 $("ckRefresh").onclick = loadChecks;
@@ -810,7 +814,7 @@ $("ckEdTry").onclick = async () => {
     const n = d.counts;
     $("ckEdMsg").textContent = d.results.length ? `${d.results.length} recent calls: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.` : "No ended calls in the last 13 days for this assistant.";
     $("ckTry").innerHTML = d.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
-      d.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
+      d.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}${r.source && r.source !== "vapi" ? `<div class="muted">read from ${esc(r.source)}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
         <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>` : "";
   } catch (e) { $("ckEdMsg").textContent = e.message; }
   b.disabled = false;
