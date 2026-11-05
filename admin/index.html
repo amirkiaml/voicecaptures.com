@@ -181,6 +181,13 @@
   .hide-wide { display: none; }
   @media (max-width: 640px) { .hide-wide { display: inline; } }
   .ck-sub { margin-top: 4px; }
+  .ck-tools { margin-top: 4px; }
+  .ck-tools summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+  .ck-tlist { max-height: 220px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; margin-top: 4px; }
+  .ck-t { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .ck-t:last-child { border-bottom: 0; }
+  .ck-t.ok .ck-ti { color: var(--good); } .ck-t.bad .ck-ti { color: var(--bad); font-weight: 700; }
+  .ck-t .ck-ev { overflow-wrap: anywhere; }
   .ck-notes { margin-top: 4px; font-size: 12px; color: var(--muted); }
   .ck-notes summary { cursor: pointer; color: var(--accent); }
   .ck-fl + .ck-fl { margin-top: 8px; }
@@ -354,7 +361,7 @@
             <span class="muted small">Say what must happen (or must never happen) and when. Calls where that moment never comes up count as "not applicable".</span></label>
           <label class="chk wide"><input type="checkbox" id="ckEdAll"> On for all assistants (new ones too). Leave off to choose assistants under <b>Assistants</b>.</label>
           <label>Try on<select id="ckEdTryOn"></select></label>
-          <label>How far back<select id="ckEdDays"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select></label>
+          <label>How far back<select id="ckEdDays"><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select></label>
         </div>
         <div class="ck-btns">
           <button class="btn primary" type="button" id="ckEdSave">Save</button>
@@ -678,6 +685,18 @@ const ckPost = (path, body) => api(path, { method: "POST", headers: { "Content-T
 const ckWhat = c => c.builtin === "tool_errors" ? "Built in: any tool the assistant calls returns an error, times out, never answers, or a transfer doesn't connect."
   : c.builtin === "spelling" ? "Built in, no AI: when the caller spells a name out (R-I-Z-A, or \"R as in river…\"), the name sent to the tools must use exactly those letters." : c.rule;
 // The reviewer's own notes on a verdict, for working out why it decided what it did.
+// Tool checks: how many calls failed out of how many, and each call in a short scroll box.
+const ckPeriod = d => Number(d) === 1 ? "the last 24 hours" : `the last ${d} days`;
+const ckFmtT = t => t == null ? "" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+function ckTools(v) {
+  const list = v.tools || [], bad = list.filter(x => !x.ok).length;
+  if (!list.length) return `<div class="muted">${esc(v.reason || "No tools were used")}</div>`;
+  return `<div>${bad ? `<b class="bad-t">${bad} of ${list.length} failed</b>` : `<span class="muted">${list.length} tool call${list.length === 1 ? "" : "s"}, all worked</span>`}</div>
+    <details class="ck-tools"${bad ? " open" : ""}><summary>Each tool call</summary><div class="ck-tlist">${list.map(x => `<div class="ck-t ${x.ok ? "ok" : "bad"}">
+      <span class="ck-ti">${x.ok ? "✓" : "✗"}</span><div><b>${esc(x.tool)}</b> <span class="muted">${esc(ckFmtT(x.t))}</span>
+      ${x.ok ? "" : `<div class="bad-t">${esc(x.why || "")}</div>`}
+      ${x.args && x.args !== "{}" ? `<div class="ck-ev">→ ${esc(x.args)}</div>` : ""}${x.result ? `<div class="ck-ev">← ${esc(x.result)}</div>` : ""}</div></div>`).join("")}</div></details>`;
+}
 const ckNotes = v => v && v.thinking ? `<details class="ck-notes"><summary>Reviewer's notes${v.model ? ` · ${esc(v.model)}` : ""}</summary>${esc(v.thinking)}</details>` : "";
 
 function ckShowSub(name) {
@@ -762,7 +781,7 @@ function renderAssts() {
       ${lib.map(c => `<div class="check"><span><input type="checkbox" data-ckfor="${esc(c.id)}" data-a="${esc(a.id)}" ${ckOn(c, a.id) ? "checked" : ""} ${c.defaultOn ? "disabled" : ""} aria-label="${esc(c.name)} for ${esc(a.name)}"></span>
         <div><b>${esc(c.name)}</b>${c.defaultOn ? ' <span class="pill">all assistants</span>' : ""}<div class="muted small">${esc(ckWhat(c))}</div></div></div>`).join("")}
       <div class="muted small" style="margin:6px 0 10px">Rules marked "all assistants" run on every listed assistant; untick "All assistants" on the Rules tab to choose per assistant.</div>
-      <div class="ck-btns"><select data-ckdays="${esc(a.id)}" aria-label="How far back"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select><button class="btn" type="button" data-cktest="${esc(a.id)}">Run tests</button><span class="muted small" data-cktestmsg="${esc(a.id)}"></span></div>
+      <div class="ck-btns"><select data-ckdays="${esc(a.id)}" aria-label="How far back"><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select><button class="btn" type="button" data-cktest="${esc(a.id)}">Run tests</button><span class="muted small" data-cktestmsg="${esc(a.id)}"></span></div>
       <div data-cktestout="${esc(a.id)}"></div>
     </td></tr>`;
   }).join("") : `<tr><td colspan="4" class="empty">No assistants yet. Add one above.</td></tr>`;
@@ -789,7 +808,7 @@ function renderAssts() {
 // Test results per assistant, kept across re-renders; "older" pages append.
 const ckRuns = new Map();
 const ckRow = (c, checks) => `<tr><td class="num">${esc(fmtWhen(c.at))}</td><td class="small">${esc(c.caller || "web call")}${c.seconds != null ? `<div class="muted">${esc(fmtDur(c.seconds))}</div>` : ""}${c.source && c.source !== "vapi" ? `<div class="muted">read from ${esc(c.source)}</div>` : ""}</td>${
-  checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}${ckNotes(v)}</td>`; }).join("")}</tr>`;
+  checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.tools ? ckTools(v) : v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}${ckNotes(v)}</td>`; }).join("")}</tr>`;
 function ckRenderRun(id) {
   const st = ckRuns.get(id);
   const msg = document.querySelector(`[data-cktestmsg="${CSS.escape(id)}"]`), out = document.querySelector(`[data-cktestout="${CSS.escape(id)}"]`);
@@ -800,11 +819,13 @@ function ckRenderRun(id) {
   else if (!st.checks.length) msg.textContent = "No rules are on for this assistant.";
   else {
     const fails = st.calls.filter(c => Object.values(c.verdicts).some(v => v.verdict === "fail")).length;
-    msg.textContent = st.calls.length ? `${st.calls.length} call${st.calls.length === 1 ? "" : "s"} from the last ${st.days} days: ${fails} would have alerted. Nothing was saved or sent.` : `No calls in the last ${st.days} days.`;
+    msg.textContent = st.calls.length ? `${st.calls.length} call${st.calls.length === 1 ? "" : "s"} from ${ckPeriod(st.days)}: ${fails} would have alerted. Nothing was saved or sent.` : `No calls in ${ckPeriod(st.days)}.`;
   }
-  out.innerHTML = st.calls.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th>${st.checks.map(c => `<th>${esc(c.name)}</th>`).join("")}</tr></thead><tbody>${
+  out.innerHTML = st.calls.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th>${st.checks.map(c => {
+      const vs = st.calls.map(x => (x.verdicts[c.id] || {}).verdict), f = vs.filter(v => v === "fail").length, p = vs.filter(v => v === "pass").length;
+      return `<th>${esc(c.name)}<div class="small" style="font-weight:400">${f ? `<span class="bad-t">${f} failed</span> · ` : ""}<span class="good-t">${p} passed</span></div></th>`; }).join("")}</tr></thead><tbody>${
     st.calls.map(c => ckRow(c, st.checks)).join("")}</tbody></table></div>
-    ${st.more ? `<button class="btn more" type="button" data-ckolder="${esc(id)}" ${st.busy ? "disabled" : ""}>Test 10 older calls</button>` : st.calls.length ? `<div class="muted small" style="margin-top:8px">That's every call in the last ${st.days} days. Pick a longer period to go further back.</div>` : ""}` : "";
+    ${st.more ? `<button class="btn more" type="button" data-ckolder="${esc(id)}" ${st.busy ? "disabled" : ""}>Test 10 older calls</button>` : st.calls.length ? `<div class="muted small" style="margin-top:8px">That's every call in ${ckPeriod(st.days)}. Pick a longer period to go further back.</div>` : ""}` : "";
   const ob = out.querySelector("[data-ckolder]"); if (ob) ob.onclick = () => ckTestAsst(id, null, true);
 }
 async function ckTestAsst(id, b, older = false) {
@@ -890,12 +911,12 @@ function ckRenderTry() {
   if (!st) { $("ckTry").innerHTML = ""; return; }
   const n = st.results.reduce((a, r) => (a[r.verdict] = (a[r.verdict] || 0) + 1, a), {});
   $("ckEdMsg").textContent = st.busy ? (st.results.length ? "Checking older calls…" : "Checking calls… (20–40 seconds)") : st.error ? st.error
-    : st.results.length ? `${st.results.length} call${st.results.length === 1 ? "" : "s"} from the last ${st.days} days: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.`
-    : `No calls in the last ${st.days} days for this assistant.`;
+    : st.results.length ? `${st.results.length} call${st.results.length === 1 ? "" : "s"} from ${ckPeriod(st.days)}: ${n.fail || 0} would fail, ${n.pass || 0} pass, ${n["n/a"] || 0} not applicable${n.error ? `, ${n.error} couldn't run` : ""}. Nothing was saved or sent.`
+    : `No calls in ${ckPeriod(st.days)} for this assistant.`;
   $("ckTry").innerHTML = st.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
     st.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}${r.source && r.source !== "vapi" ? `<div class="muted">read from ${esc(r.source)}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
-      <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}${ckNotes(r)}</td></tr>`).join("")}</tbody></table></div>
-    ${st.more ? `<button class="btn more" type="button" id="ckTryOlder" ${st.busy ? "disabled" : ""}>Try 10 older calls</button>` : `<div class="muted small" style="margin-top:8px">That's every call in the last ${st.days} days.</div>`}` : "";
+      <td class="small">${r.tools ? ckTools(r) : `${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}`}${ckNotes(r)}</td></tr>`).join("")}</tbody></table></div>
+    ${st.more ? `<button class="btn more" type="button" id="ckTryOlder" ${st.busy ? "disabled" : ""}>Try 10 older calls</button>` : `<div class="muted small" style="margin-top:8px">That's every call in ${ckPeriod(st.days)}.</div>`}` : "";
   if ($("ckTryOlder")) $("ckTryOlder").onclick = () => ckRunTry(true);
 }
 async function ckRunTry(older = false) {
