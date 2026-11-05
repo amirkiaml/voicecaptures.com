@@ -181,6 +181,8 @@
   .hide-wide { display: none; }
   @media (max-width: 640px) { .hide-wide { display: inline; } }
   .ck-sub { margin-top: 4px; }
+  .ck-notes { margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .ck-notes summary { cursor: pointer; color: var(--accent); }
   .ck-fl + .ck-fl { margin-top: 8px; }
   @media (max-width: 760px) { .ck-rcpt, .ck-ed .form-grid { grid-template-columns: 1fr; } }
   /* Phone: checks and failures as stacked cards, no sideways scrolling. */
@@ -673,7 +675,10 @@ const ckName = id => (ck && ((ck.monitored || []).find(a => a.id === id) || ck.a
 const ckLib = () => ck.checks.filter(c => c.global);
 const ckOn = (c, a) => c.defaultOn || c.perAssistant[a] === true;
 const ckPost = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
-const ckWhat = c => c.builtin === "tool_errors" ? "Built in: any tool the assistant calls returns an error, times out, never answers, or a transfer doesn't connect." : c.rule;
+const ckWhat = c => c.builtin === "tool_errors" ? "Built in: any tool the assistant calls returns an error, times out, never answers, or a transfer doesn't connect."
+  : c.builtin === "spelling" ? "Built in, no AI: when the caller spells a name out (R-I-Z-A, or \"R as in river…\"), the name sent to the tools must use exactly those letters." : c.rule;
+// The reviewer's own notes on a verdict, for working out why it decided what it did.
+const ckNotes = v => v && v.thinking ? `<details class="ck-notes"><summary>Reviewer's notes${v.model ? ` · ${esc(v.model)}` : ""}</summary>${esc(v.thinking)}</details>` : "";
 
 function ckShowSub(name) {
   ckSub = name; try { localStorage.setItem("vc_ck_sub", name); } catch (e) {}
@@ -784,7 +789,7 @@ function renderAssts() {
 // Test results per assistant, kept across re-renders; "older" pages append.
 const ckRuns = new Map();
 const ckRow = (c, checks) => `<tr><td class="num">${esc(fmtWhen(c.at))}</td><td class="small">${esc(c.caller || "web call")}${c.seconds != null ? `<div class="muted">${esc(fmtDur(c.seconds))}</div>` : ""}${c.source && c.source !== "vapi" ? `<div class="muted">read from ${esc(c.source)}</div>` : ""}</td>${
-  checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}</td>`; }).join("")}</tr>`;
+  checks.map(k => { const v = c.verdicts[k.id] || {}; return `<td class="small">${ckVerdict(v.verdict)}${v.verdict === "fail" || v.verdict === "error" ? `<div>${esc(v.reason || "")}</div>${v.evidence ? `<div class="ck-ev">${esc(v.evidence)}</div>` : ""}` : `<div class="muted">${esc(v.reason || "")}</div>`}${ckNotes(v)}</td>`; }).join("")}</tr>`;
 function ckRenderRun(id) {
   const st = ckRuns.get(id);
   const msg = document.querySelector(`[data-cktestmsg="${CSS.escape(id)}"]`), out = document.querySelector(`[data-cktestout="${CSS.escape(id)}"]`);
@@ -889,7 +894,7 @@ function ckRenderTry() {
     : `No calls in the last ${st.days} days for this assistant.`;
   $("ckTry").innerHTML = st.results.length ? `<div class="table-wrap"><table class="sub-table"><thead><tr><th>When</th><th>Caller</th><th>Result</th><th>Why</th></tr></thead><tbody>${
     st.results.map(r => `<tr><td class="num">${esc(fmtWhen(r.at))}</td><td class="small">${esc(r.caller || "web call")}${r.seconds != null ? `<div class="muted">${esc(fmtDur(r.seconds))}</div>` : ""}${r.source && r.source !== "vapi" ? `<div class="muted">read from ${esc(r.source)}</div>` : ""}</td><td>${ckVerdict(r.verdict)}</td>
-      <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}</td></tr>`).join("")}</tbody></table></div>
+      <td class="small">${esc(r.reason || "")}${r.evidence ? `<div class="ck-ev">${esc(r.evidence)}</div>` : ""}${ckNotes(r)}</td></tr>`).join("")}</tbody></table></div>
     ${st.more ? `<button class="btn more" type="button" id="ckTryOlder" ${st.busy ? "disabled" : ""}>Try 10 older calls</button>` : `<div class="muted small" style="margin-top:8px">That's every call in the last ${st.days} days.</div>`}` : "";
   if ($("ckTryOlder")) $("ckTryOlder").onclick = () => ckRunTry(true);
 }
