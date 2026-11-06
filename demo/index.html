@@ -1504,6 +1504,27 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   .ported .pc-lines{height:340px}
 }
 
+/* Install the app: two platforms side by side, numbered steps in each. */
+.ported .inst-grid{display:grid; gap:var(--s6); grid-template-columns:1fr;
+  max-width:900px; margin:0 auto}
+@media(min-width:760px){ .ported .inst-grid{grid-template-columns:1fr 1fr} }
+.ported .inst{background:#fff; border:1px solid var(--line); border-radius:20px;
+  padding:var(--s8)}
+.ported .inst h3{display:flex; align-items:center; gap:var(--s3);
+  margin:0 0 var(--s4); font-size:19px}
+.ported .inst h3 svg{width:24px; height:24px; flex:0 0 auto; color:var(--blue)}
+.ported .inst ol{margin:0; padding:0; list-style:none; counter-reset:inst}
+.ported .inst li{counter-increment:inst; position:relative;
+  padding:0 0 var(--s4) var(--s8); font-size:15px; line-height:23px;
+  color:var(--ink-2)}
+.ported .inst li::before{content:counter(inst); position:absolute; left:0; top:1px;
+  width:26px; height:26px; border-radius:50%; background:var(--f-blue);
+  color:var(--blue); font-size:13px; font-weight:800;
+  display:grid; place-items:center}
+.ported .inst li:last-child{padding-bottom:0}
+.ported .inst b{color:var(--ink)}
+.ported .inst-note{max-width:900px; margin:var(--s8) auto 0}
+
 .ported *{min-width:0}
 .ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}
 .ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}
@@ -1770,6 +1791,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
           <li><a href="/playground/">Playground &mdash; call it live</a></li>
           <li><a href="tel:+16476921081">Call the demo line</a></li>
           <li><a href="/login">Client dashboard</a></li>
+          <li><a href="/install/">Install the app</a></li>
         </ul>
         <h4 class="f-h2">Legal</h4>
         <ul>
@@ -1897,6 +1919,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     ["Salons, spas and fitness", "/pricing/", "Bookings and rescheduling for salons, spas, studios and gyms.", "salon salons hair barber nails spa massage esthetics fitness gym studio yoga pilates personal trainer booking reschedule", IMG+"sec-salon.webp"],
     ["Professional services", "/pricing/", "Legal, real estate, accounting and consulting.", "legal lawyer law firm attorney paralegal real estate realtor broker accounting accountant bookkeeping consulting consultant agency office intake", IMG+"sec-pro.webp"],
     ["Any other business", "/pricing/", "If it takes calls, it fits. Tell us the trade and we will say so.", "other business industry sector vertical fit anything else", ""],
+    ["Install the app", "/install/", "Add your dashboard to your phone's home screen \u2014 iPhone and Android.", "install app home screen phone iphone android add shortcut pwa download mobile", IMG+"hero-phones-2.webp"],
     ["Playground", "/playground/", "Call the demo line and watch your booking land on the live calendar.", "playground try test live demo number call calendar booking see it in action sandbox", IMG+"winback.svg"],
     ["Personal line", "/pricing/", "A second number that screens your calls and texts you what matters.", "personal line private second number screen screening spam robocall telemarketer block cell mobile", IMG+"personal-2.webp"],
     ["Books into your calendar", "/", "It books the job live on the call, into the calendar you already use.", "calendar booking book appointment schedule scheduling availability slot google outlook calendly", ""],
