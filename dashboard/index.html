@@ -489,6 +489,7 @@
       <div class="acct-menu" id="acctMenu" hidden>
         <div class="em" id="acctEmail"></div>
         <button type="button" id="toPw">Change password</button>
+        <button type="button" id="billing" hidden>Manage billing</button>
         <button type="button" id="signOut">Log out</button>
       </div>
     </div>
@@ -1639,6 +1640,25 @@ async function signOut() { leaving = true; try { await SB.auth.signOut(); } catc
 $("acctBtn").onclick = e => { e.stopPropagation(); $("acctMenu").hidden = !$("acctMenu").hidden; };
 document.addEventListener("click", e => { if (!$("acct").contains(e.target)) $("acctMenu").hidden = true; });
 $("signOut").onclick = signOut;
+
+/* "Manage billing / cancel" — self-serve owners only, and only when the API
+ * has it switched on (it answers 404 otherwise and the item stays hidden). */
+async function checkBilling() {
+  try {
+    const r = await api("/api/dashboard/billing-portal");
+    $("billing").hidden = !(r.ok && (await r.json()).available === true);
+  } catch (e) { $("billing").hidden = true; }
+}
+$("billing").onclick = async () => {
+  const b = $("billing"); b.disabled = true; b.textContent = "Opening billing…";
+  try {
+    const r = await api("/api/dashboard/billing-portal", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && typeof d.url === "string" && d.url.startsWith("https://billing.stripe.com/")) { location.href = d.url; return; }
+    alert(d.error || "Billing is unavailable right now.");
+  } catch (e) { /* signed out: api() already went to log in */ }
+  b.disabled = false; b.textContent = "Manage billing";
+};
 $("toPw").onclick = () => { $("acctMenu").hidden = true; $("pw1").value = $("pw2").value = ""; $("pwMsg").textContent = "At least 8 characters."; $("pwPanel").hidden = false; $("pw1").focus(); };
 $("pwCancel").onclick = () => { $("pwPanel").hidden = true; };
 $("pwSave").onclick = async () => {
@@ -1654,7 +1674,7 @@ $("pwSave").onclick = async () => {
 $("bizSelect").onchange = e => {
   business = e.target.value;
   try { localStorage.setItem("vc_business", business); } catch (err) {}
-  shown = 25; load();
+  shown = 25; load(); checkBilling();
 };
 
 vcAuth.client().then(async ({ sb }) => {
@@ -1662,6 +1682,7 @@ vcAuth.client().then(async ({ sb }) => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return toLogin();
   renderAccount(session.user.email);
+  checkBilling();
   // Signed out in another tab, or the session expired: go to log in.
   sb.auth.onAuthStateChange((event) => { if (event === "SIGNED_OUT" && !leaving) toLogin(); });
   await load();
