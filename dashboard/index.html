@@ -1369,10 +1369,14 @@ function renderUsage(u) {
   const el = $("usageCard");
   if (!u) { el.hidden = true; return; }
   const fmtD = s => new Date(s + "T12:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" });
+  // Self-serve trials carry the exact end (the moment the line went live + the
+  // trial length): shown as a date and time in the business's timezone. Every
+  // other card keeps its date, exactly as before.
+  const ends = u.trial && u.trialEndsAt ? `Trial ends ${fmtWhen(u.trialEndsAt)}` : `${u.trial ? "Trial ends" : "Resets"} ${fmtD(u.resetDate)}`;
   if (!u.minutesAllowed) { // no plan set yet: minutes used only
     el.className = "card usage";
     el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))}</span>
-      <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
+      <span class="muted" style="font-size:13px">${esc(ends)}</span></div>
       <div class="muted" style="font-size:12px">${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}</div>`;
     el.hidden = false;
     return;
@@ -1380,7 +1384,7 @@ function renderUsage(u) {
   const pct = Math.max(0, u.percent || 0);
   el.className = "card usage" + (pct >= 100 ? " over" : pct >= 80 ? " warn" : "");
   el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))} of ${esc(u.minutesAllowed)}</span>
-      <span class="muted" style="font-size:13px">${u.trial ? "Trial ends" : "Resets"} ${esc(fmtD(u.resetDate))}</span></div>
+      <span class="muted" style="font-size:13px">${esc(ends)}</span></div>
     <div class="u-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.min(pct, 100)}" aria-label="Minutes used"><span style="width:${Math.min(pct, 100)}%"></span></div>
     ${pct >= 80 && last && last.service && last.service.active !== false ? buyButtons(last.service.links, ["topup"]) : ""}
     <div class="muted" style="font-size:12px">${usageNote(u, pct, fmtD)}</div>`;
