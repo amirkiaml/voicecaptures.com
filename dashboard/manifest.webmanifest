@@ -1,0 +1,18 @@
+{
+  "name": "VoiceCaptures Dashboard",
+  "short_name": "VoiceCaptures",
+  "description": "Every call your AI receptionist handled.",
+  "id": "/dashboard/",
+  "start_url": "/dashboard/?source=app",
+  "scope": "/dashboard/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f6fb",
+  "theme_color": "#f3f6fb",
+  "icons": [
+    { "src": "/dashboard/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/dashboard/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/dashboard/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/dashboard/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
