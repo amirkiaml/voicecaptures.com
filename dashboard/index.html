@@ -224,6 +224,17 @@
   .chip input { margin: 0; }
   .set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
   .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .cr-topics { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .cr-topics legend { padding: 0; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+  .cr-topics label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+  .cr-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  #crText { display: block; width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical; font: inherit; font-size: 14px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
+  .cr-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+  .cr-count { color: var(--muted); font-size: 13px; }
+  .cr-msg { margin: 10px 0 0; font-size: 14px; min-height: 1em; }
+  .cr-msg.ok { color: var(--good, #16a34a); }
+  .cr-msg.bad { color: var(--bad, #dc2626); }
   .btn-ghost { background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
   .tag-edit { cursor: pointer; display: inline-block; border-radius: 999px; }
   .tag-edit:hover { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -668,6 +679,27 @@
       </div>
       <button class="btn-ghost cb-toggle" type="button" id="cbDoneToggle" hidden></button>
     </div>
+  </div>
+
+  <!-- Self-serve Personal lines only: the API sends changeRequests: true. -->
+  <div class="card cr" id="crCard" hidden>
+    <p class="panel-title">Request a change</p>
+    <p class="panel-sub">Tell us what to change about how your receptionist answers, and we'll make the change for you.</p>
+    <form id="crForm" novalidate>
+      <fieldset class="cr-topics">
+        <legend>What is it about?</legend>
+        <label><input type="checkbox" name="crTopic" value="urgent"> Urgent categories</label>
+        <label><input type="checkbox" name="crTopic" value="name"> How I'm named</label>
+        <label><input type="checkbox" name="crTopic" value="other"> Other</label>
+      </fieldset>
+      <label class="cr-label" for="crText">What should change?</label>
+      <textarea id="crText" maxlength="1000" rows="4" placeholder="For example: treat calls about my mother as urgent."></textarea>
+      <div class="cr-foot">
+        <span class="cr-count" id="crCount">0 / 1000</span>
+        <button class="btn" type="submit" id="crSend">Send request</button>
+      </div>
+      <p class="cr-msg" id="crMsg" role="status" aria-live="polite"></p>
+    </form>
   </div>
   </div>
 
@@ -1475,7 +1507,33 @@ function renderAll(data) {
   $("tzNote").textContent = `times in ${tzLabel(TZ())}`;
   renderInsights(data);
   renderTopCallers(data.topCallers);
+  renderChangeRequest(data);
 }
+
+/* ---------- "Request a change" (self-serve Personal lines only) ---------- */
+let crFor = null;
+function renderChangeRequest(data) {
+  const show = data.changeRequests === true;
+  $("crCard").hidden = !show;
+  // A different business in the picker: start with an empty form.
+  if (crFor !== data.businessId) { crFor = data.businessId; $("crForm").reset(); $("crCount").textContent = "0 / 1000"; setCrMsg("", ""); }
+}
+function setCrMsg(text, kind) { const m = $("crMsg"); m.textContent = text; m.className = "cr-msg" + (kind ? " " + kind : ""); }
+$("crText").addEventListener("input", () => { $("crCount").textContent = `${$("crText").value.length} / 1000`; });
+$("crForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const text = $("crText").value.trim();
+  if (!text) { setCrMsg("Please describe the change.", "bad"); $("crText").focus(); return; }
+  const topics = [...document.querySelectorAll('input[name="crTopic"]:checked')].map(x => x.value);
+  const btn = $("crSend"); btn.disabled = true; btn.textContent = "Sending…"; setCrMsg("", "");
+  try {
+    const r = await api("/api/dashboard/change-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, topics }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.ok) { $("crForm").reset(); $("crCount").textContent = "0 / 1000"; setCrMsg(d.message || "Thanks, we've got your request.", "ok"); }
+    else setCrMsg(d.error || "Could not send your request. Please try again.", "bad");
+  } catch (err) { if (err.message !== "Signed out") setCrMsg("Could not send your request. Please try again.", "bad"); }
+  btn.disabled = false; btn.textContent = "Send request";
+});
 
 /* ---------- auth ---------- */
 let SB = null, business = null;
