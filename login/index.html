@@ -66,6 +66,8 @@
   .msg { min-height: 22px; margin-top: 14px; font-size: 14px; text-align: center; color: var(--muted); }
   .msg.err { color: var(--err); } .msg.ok { color: var(--ok); }
   .foot { text-align: center; margin-top: 28px; color: var(--muted); font-size: 15px; }
+  #firstTime { margin-top: 20px; font-size: 14px; }
+  #firstTime + .foot { margin-top: 12px; }
   .foot a { color: var(--text); font-weight: 700; }
   .back { display: block; text-align: center; margin-top: 18px; }
   [hidden] { display: none !important; }
@@ -125,6 +127,7 @@
           <button class="btn-main" id="loginBtn" type="submit">Log in</button>
           <div class="msg" id="loginMsg" role="status"></div>
         </form>
+        <p class="foot" id="firstTime">First time here? Open the invite email we sent you to set your password, or use Forgot password.</p>
         <p class="foot">Don't have an account? <a href="https://calendly.com/hello-voicecaptures">Book a demo</a></p>
       </section>
 
@@ -228,8 +231,11 @@
         sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
           if (r.error) {
             busy($("loginBtn"), false, "Log in");
-            var m = /invalid login/i.test(r.error.message) ? "Email or password is incorrect."
-              : /not confirmed/i.test(r.error.message) ? "Please accept your invite email first."
+            // An invited customer has no password until they open the invite, so
+            // "incorrect" is often "not set yet": point at the invite and Forgot password.
+            var INVITE = " Use the link in your invite email to set your password first, or use Forgot password.";
+            var m = /invalid login/i.test(r.error.message) ? "Email or password is incorrect." + INVITE
+              : /not confirmed/i.test(r.error.message) ? INVITE.trim()
               : r.error.message;
             return msg("loginMsg", m, "err");
           }
