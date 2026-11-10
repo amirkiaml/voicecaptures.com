@@ -226,6 +226,7 @@
   .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
   .cr-topics { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
   .cr-topics legend { padding: 0; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+  #crTopics { display: contents; }
   .cr-topics label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
   .cr-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
   #crText { display: block; width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical; font: inherit; font-size: 14px; padding: 10px 12px;
@@ -681,16 +682,14 @@
     </div>
   </div>
 
-  <!-- Self-serve Personal lines only: the API sends changeRequests: true. -->
+  <!-- Shown when the API sends changeRequests: true; changeRequestForm picks the checkboxes. -->
   <div class="card cr" id="crCard" hidden>
     <p class="panel-title">Request a change</p>
     <p class="panel-sub">Tell us what to change about how your receptionist answers, and we'll make the change for you.</p>
     <form id="crForm" novalidate>
       <fieldset class="cr-topics">
         <legend>What is it about?</legend>
-        <label><input type="checkbox" name="crTopic" value="urgent"> Urgent categories</label>
-        <label><input type="checkbox" name="crTopic" value="name"> How I'm named</label>
-        <label><input type="checkbox" name="crTopic" value="other"> Other</label>
+        <span id="crTopics"></span>
       </fieldset>
       <label class="cr-label" for="crText">What should change?</label>
       <textarea id="crText" maxlength="1000" rows="4" placeholder="For example: treat calls about my mother as urgent."></textarea>
@@ -1511,12 +1510,25 @@ function renderAll(data) {
 }
 
 /* ---------- "Request a change" (self-serve Personal lines only) ---------- */
+// The checkboxes per form (TorontoLeads change-requests.js FORMS). No form
+// named (an API from before business forms): the Personal one.
+const CR_FORMS = {
+  personal: [["urgent", "Urgent categories"], ["name", "How I'm named"], ["other", "Other"]],
+  business: [["hours", "Business hours"], ["services", "Services and service area"], ["emergency", "Emergency rules"],
+    ["greeting", "Greeting and business name"], ["calendar", "Calendar and booking"], ["other", "Other"]]
+};
 let crFor = null;
 function renderChangeRequest(data) {
   const show = data.changeRequests === true;
   $("crCard").hidden = !show;
-  // A different business in the picker: start with an empty form.
-  if (crFor !== data.businessId) { crFor = data.businessId; $("crForm").reset(); $("crCount").textContent = "0 / 1000"; setCrMsg("", ""); }
+  const form = CR_FORMS[data.changeRequestForm] ? data.changeRequestForm : "personal";
+  // A different business in the picker (or form): start with an empty form.
+  const key = `${data.businessId}|${form}`;
+  if (crFor !== key) {
+    crFor = key;
+    $("crTopics").innerHTML = CR_FORMS[form].map(([v, l]) => `<label><input type="checkbox" name="crTopic" value="${v}"> ${esc(l)}</label>`).join("");
+    $("crForm").reset(); $("crCount").textContent = "0 / 1000"; setCrMsg("", "");
+  }
 }
 function setCrMsg(text, kind) { const m = $("crMsg"); m.textContent = text; m.className = "cr-msg" + (kind ? " " + kind : ""); }
 $("crText").addEventListener("input", () => { $("crCount").textContent = `${$("crText").value.length} / 1000`; });
