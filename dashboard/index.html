@@ -1572,18 +1572,24 @@ $("rnCopy").addEventListener("click", async () => {
 });
 
 /* ---------- "Request a change" (self-serve Personal lines only) ---------- */
-// The checkboxes per form (TorontoLeads change-requests.js FORMS). No form
-// named (an API from before business forms): the Personal one.
-const CR_FORMS = {
-  personal: [["urgent", "Urgent categories"], ["name", "How I'm named"], ["other", "Other"]],
-  business: [["hours", "Business hours"], ["services", "Services and service area"], ["emergency", "Emergency rules"],
-    ["greeting", "Greeting and business name"], ["calendar", "Calendar and booking"], ["other", "Other"]]
-};
+// The checkboxes per form (TorontoLeads change-requests.js FORMS): only what
+// the line can be configured with (no Calendar on self-serve lines, no
+// Emergency rules on restaurant lines). No form named (an API from before
+// business forms): the Personal one. A form this page doesn't know: business.
+const CR_LABELS = { urgent: "Urgent categories", name: "How I'm named", hours: "Business hours", services: "Services and service area",
+  emergency: "Emergency rules", greeting: "Greeting and business name", calendar: "Calendar and booking", other: "Other" };
+const CR_FORMS = Object.fromEntries(Object.entries({
+  personal: ["urgent", "name", "other"],
+  business: ["hours", "services", "emergency", "greeting", "calendar", "other"],
+  business_selfserve: ["hours", "services", "emergency", "greeting", "other"],
+  restaurant: ["hours", "services", "greeting", "calendar", "other"],
+  restaurant_selfserve: ["hours", "services", "greeting", "other"]
+}).map(([k, v]) => [k, v.map(t => [t, CR_LABELS[t]])]));
 let crFor = null;
 function renderChangeRequest(data) {
   const show = data.changeRequests === true;
   $("crCard").hidden = !show;
-  const form = CR_FORMS[data.changeRequestForm] ? data.changeRequestForm : "personal";
+  const form = data.changeRequestForm == null ? "personal" : CR_FORMS[data.changeRequestForm] ? data.changeRequestForm : "business";
   // A different business in the picker (or form): start with an empty form.
   const key = `${data.businessId}|${form}`;
   if (crFor !== key) {
