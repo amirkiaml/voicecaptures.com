@@ -224,6 +224,16 @@
   .chip input { margin: 0; }
   .set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
   .btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .rn-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 12px; }
+  .rn-num { font-size: 24px; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+  .rn-copy { padding: 6px 12px; font-size: 14px; }
+  .rn-h { font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+  .rn-step { font-size: 14px; margin: 0 0 6px; }
+  .rn-codes { display: grid; grid-template-columns: max-content 1fr; gap: 4px 10px; margin: 0 0 10px; font-size: 14px; }
+  .rn-codes dt { color: var(--muted); }
+  .rn-codes dd { margin: 0; min-width: 0; }
+  .rn-codes code { font-family: ui-monospace, Menlo, monospace; font-size: 15px; background: var(--raise); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; }
+  .rn-note { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
   .cr-topics { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
   .cr-topics legend { padding: 0; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
   .cr-topics label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
@@ -596,6 +606,22 @@
   </div>
 
   <div class="card paused-card" id="pausedCard" hidden></div>
+  <!-- Self-serve lines: the API sends receptionistNumber. Not a customizable section: always shown. -->
+  <div class="card rn" id="rnCard" hidden>
+    <p class="panel-title">Your receptionist number</p>
+    <div class="rn-row">
+      <span class="rn-num" id="rnNum"></span>
+      <button class="btn-ghost rn-copy" type="button" id="rnCopy">Copy</button>
+    </div>
+    <p class="rn-h">If you answer on a mobile</p>
+    <p class="rn-step" id="rnLabel"></p>
+    <dl class="rn-codes">
+      <dt>turn on:</dt><dd><code id="rnOn"></code></dd>
+      <dt>turn off:</dt><dd><code id="rnOff"></code></dd>
+    </dl>
+    <p class="rn-note" id="rnCarriers"></p>
+    <p class="rn-note" id="rnLandline"></p>
+  </div>
   <div class="card usage" id="usageCard" hidden></div>
   <div class="muted" id="retentionNote" style="font-size:12px;margin:-4px 2px 12px" hidden></div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
@@ -1498,6 +1524,7 @@ function renderAll(data) {
   applySections();
   renderRetention(data.retention);
   renderService(data.service);
+  renderReceptionistNumber(data.receptionistNumber);
   renderUsage(data.usage);
   renderKpis(data.totals, data.previous || {});
   renderDaily(data.daily);
@@ -1509,6 +1536,41 @@ function renderAll(data) {
   renderTopCallers(data.topCallers);
   renderChangeRequest(data);
 }
+
+/* ---------- "Your receptionist number" (self-serve lines) ----------
+ * The forwarding wording is the ready email's, word for word (self-serve repo
+ * src/demo/forwarding.ts: the "unanswered" step, the carrier caveat and the
+ * landline line). The two repos can't share code: change both together. */
+const RN_STEP = "Forward calls you do not answer — the one to use (recommended)";
+const RN_CARRIERS = "Carriers differ. If a code does nothing, or your phone says the service is not provisioned, ring your carrier and ask them to turn on conditional call forwarding — that is the name they will know it by.";
+const RN_LANDLINE = "The codes above are for mobile phones. They will not work on a landline.";
+// +16475550005 → "+1 647 555 0005"; anything else as it came.
+const fmtNumber = n => { const m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(String(n || "")); return m ? `+1 ${m[1]} ${m[2]} ${m[3]}` : String(n || ""); };
+let rnValue = null;
+function renderReceptionistNumber(n) {
+  const ok = typeof n === "string" && /^\+\d{8,15}$/.test(n);
+  $("rnCard").hidden = !ok;
+  if (!ok) { rnValue = null; return; }
+  if (rnValue === n) return;
+  rnValue = n;
+  $("rnNum").textContent = fmtNumber(n);
+  $("rnLabel").textContent = RN_STEP;
+  $("rnOn").textContent = `**61*${n}#`;
+  $("rnOff").textContent = "##61#";
+  $("rnCarriers").textContent = RN_CARRIERS;
+  $("rnLandline").textContent = RN_LANDLINE;
+  $("rnCopy").textContent = "Copy";
+}
+$("rnCopy").addEventListener("click", async () => {
+  if (!rnValue) return;
+  let done = false;
+  try { await navigator.clipboard.writeText(rnValue); done = true; } catch (e) {
+    try { const t = document.createElement("textarea"); t.value = rnValue; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select(); done = document.execCommand("copy"); t.remove(); } catch (e2) {}
+  }
+  $("rnCopy").textContent = done ? "Copied" : "Copy failed";
+  setTimeout(() => { $("rnCopy").textContent = "Copy"; }, 2000);
+});
 
 /* ---------- "Request a change" (self-serve Personal lines only) ---------- */
 let crFor = null;
