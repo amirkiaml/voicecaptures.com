@@ -242,6 +242,9 @@
   .rn-opt .rn-step { font-weight: 600; }
   .rn-notes { color: var(--muted); font-size: 13px; margin: 10px 0 0; padding-left: 18px; }
   .rn-notes li { margin: 4px 0; }
+  .rn-land { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .rn-land .rn-step { font-size: 14px; margin: 0; }
+  .rn-stuck { font-size: 14px; margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
   .cr-topics { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
   .cr-topics legend { padding: 0; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
   #crTopics { display: contents; }
@@ -629,6 +632,11 @@
       <div id="rnOptions"></div>
       <ul class="rn-notes" id="rnCaveats"></ul>
       <p class="rn-note" id="rnLandline"></p>
+      <div class="rn-land">
+        <p class="rn-h">If you answer on a landline or office phone</p>
+        <p class="rn-step">Call your phone provider and ask for call forwarding (busy or no answer) to <b id="rnLandNum"></b>, or set it in your phone system's admin.</p>
+      </div>
+      <p class="rn-stuck">Stuck? <a id="rnHelp" href="mailto:hello@voicecaptures.com?subject=Help%20setting%20up%20call%20forwarding">Contact us</a> and we'll set it up with you.</p>
     </div>
   </div>
   <div class="card usage" id="usageCard" hidden></div>
@@ -1577,6 +1585,7 @@ function renderReceptionistNumber(n) {
     <dl class="rn-codes"><dt>turn on:</dt><dd><code>${esc(on + n + "#")}</code></dd><dt>turn off:</dt><dd><code>${esc(off)}</code></dd></dl></div>`).join("");
   $("rnCaveats").innerHTML = RN_CAVEATS.map(c => `<li>${esc(c)}</li>`).join("");
   $("rnLandline").textContent = RN_LANDLINE;
+  $("rnLandNum").textContent = fmtNumber(n);
   $("rnCopy").textContent = "Copy";
   setRnOpen(false);   // a different number (another business): start closed
 }
