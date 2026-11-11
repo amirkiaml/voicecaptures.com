@@ -1104,7 +1104,7 @@ const fmtMin = n => n == null ? "—" : n >= 100 ? Math.round(n).toLocaleString(
 const pctCls = p => p == null ? "" : p >= 100 ? "bad" : p >= 80 ? "warn" : "good";
 const PLAN_LABEL = { home_starter: "Home Starter", home_growth: "Home Growth", home_pro: "Home Pro", cafe_starter: "Café Starter",
   restaurant_growth: "Restaurant Growth", multi_location: "Multi-location", clinic_essentials: "Clinic Essentials", clinic_growth: "Clinic Growth",
-  clinic_pro: "Clinic Pro", custom: "Custom" };
+  clinic_pro: "Clinic Pro", custom: "Custom", personal: "Personal" };
 const STATUS_CLS = { trialing: "warn", active: "good", past_due: "bad", cancelled: "" };
 const PALETTE = ["#3b6fd8", "#1f9d55", "#d97706", "#a855f7", "#dc2626", "#0891b2", "#db2777", "#65a30d", "#7c3aed", "#ea580c", "#0d9488", "#64748b"];
 const needsMigration = e => e && e.status === 503;
