@@ -146,7 +146,7 @@
       <tr><td>HST ${R.taxPct}%${Q.tax && Q.tax.number ? ` (${esc(Q.tax.number)})` : ""}</td><td class="num">${money(R.dueAtStartTax)}</td></tr>` : ""}
       <tr class="total"><td>Total due at start (${R.taxPct ? "including HST" : what})</td><td class="num">${money(R.dueAtStartWithTax)} CAD</td></tr>`;
     const after = R.prepaid
-      ? `<p class="small muted">After the prepaid term, the plan renews monthly at ${money(R.monthlyNet)}${R.taxPct ? " plus HST" : ""} unless you choose another term. We email you the renewal rate during the final month.</p>`
+      ? `<p class="small muted">The ${R.months}-month term renews automatically for another ${R.months} months at our price at that time, unless you cancel. We email you the renewal date and amount at least 30 days before each renewal. Full refund if you ask within 14 days of the charge; after that we do not refund unused months and the service runs to the end of the term.</p>`
       : `<p class="small muted">Billed monthly at ${money(R.monthlyNet)}${R.taxPct ? ` plus HST (${money(R.monthlyNetWithTax)})` : ""}. Cancel any time before the next billing date.</p>`;
     const offer = R.inactiveCredits.length ? `<p class="small">${R.inactiveCredits.map(c => `${esc(c.label)}: ${money(-c.amount)} with a ${c.needsTermMonths}-month prepaid term.`).join(" ")}</p>` : "";
     return `<table><tr><th>Monthly</th><th class="num">CAD</th></tr>${rows.join("")}${termRows}${ot}${due}</table>${after}${offer}`;
