@@ -1986,7 +1986,7 @@ month, to the card you gave us, unless you have bought a prepaid term. Prices ar
 Canadian dollars and exclude tax. HST is added to your bill at the applicable rate
 and shown as a separate line on every invoice, with our HST number on it. Add-ons are billed with your plan. One-time setup
 and integration work is quoted in writing and billed separately. You can update
-your card or download invoices at any time from your billing portal.</p>
+your card or download invoices at any time from <strong>Manage billing</strong>.</p>
 
 <h2>Minutes</h2>
 <p>A minute is time our assistant spends on a live call, including transfers.
@@ -2013,9 +2013,9 @@ that charge and we refund it in full and pause your line. To ask, email
 <a href="mailto:{EMAIL}">{EMAIL}</a> within those 14 days.</li>
 <li><strong>After those 14 days we do not refund unused months.</strong> The service
 runs to the end of the term you paid for.</li>
-<li><strong>You can cancel at any time to stop the next renewal.</strong> Sign in and
-use <strong>Manage billing</strong>. Cancelling keeps your service on until the term
-ends.</li>
+<li><strong>You can cancel at any time to stop the next renewal.</strong> Sign in,
+click your email address at the top right, then <strong>Manage billing</strong>.
+Cancelling keeps your service on until the term ends.</li>
 <li><strong>A term renews automatically</strong> for another term of the same length,
 at our price at that time. We email you a reminder at least 30 days before each
 renewal, with the date and the amount.</li>
@@ -2035,15 +2035,15 @@ them.</p>
 through after about two weeks, your subscription is cancelled and the line stops
 answering.</p>
 
-<h2>Cancelling</h2>
-<p>Cancel anytime from <strong>Manage billing</strong> in your dashboard, or by
-emailing
-<a href="mailto:{EMAIL}">{EMAIL}</a>. After the trial, your service runs to the end
-of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. If you
-are on a prepaid term, cancelling takes effect at the end of that term and the
-refund rule under Prepaid terms applies instead. When
-you leave, turn off call forwarding on your phone so calls ring through to you
-again.</p>
+<h2>How to cancel</h2>
+<p>Sign in, click your email address at the top right, then
+<strong>Manage billing</strong>. You can also email
+<a href="mailto:{EMAIL}">{EMAIL}</a> and we will do it for you.</p>
+<p>After the trial, your service runs to the end of the month you&rsquo;ve paid for,
+and we don&rsquo;t refund partial months. If you are on a prepaid term, cancelling
+takes effect at the end of that term and the refund rule under Prepaid terms applies
+instead. When you leave, turn off call forwarding on your phone so calls ring through
+to you again.</p>
 
 <h2>Text messages</h2>
 <p>Our assistant sends texts that are part of handling a call: a summary to you; a
@@ -2700,7 +2700,8 @@ FAQ_GROUPS = [
          "Yes &mdash; that is exactly what the entry tier is for. Forward evenings, "
          "weekends and holidays, and leave daytime calls ringing through to you."),
         ("Can I cancel anytime?",
-         "Yes. Sign in and use Manage billing. On a monthly plan, including the "
+         "Yes. Sign in, click your email address at the top right, then Manage "
+         "billing. On a monthly plan, including the "
          "personal line, cancelling stops the next charge and your service runs to "
          "the end of the period you have paid for. On a prepaid term, cancelling "
          "stops the next renewal and your service runs to the end of the term. "
