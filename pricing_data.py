@@ -287,6 +287,55 @@ def load() -> dict:
     }
 
 
+# Which self-serve plan each tier sells, and how it is sold. The names are
+# production's own plan_names from the service's config/plans.json -- they are
+# what `?plan=` is validated against, so a typo here is a link that silently
+# drops the tier rather than one that errors.
+#
+# Launch scope (plans.json "_scope"): Home services, Other, Restaurants and
+# Personal are self-serve. Clinics keep real prices but stay book_a_call until
+# the lawyer review lands. Multi-location and Custom are quoted.
+#
+# TODO(owner): "Other" is named in the launch scope but has no other_* plans in
+# the catalog. Its prices are identical to Home services, so it is mapped onto
+# the home_* plans here. If Other should bill as its own product, the catalog
+# needs the names and this map needs changing with it.
+PLAN_SLUGS = {
+    ("home", "Starter"): "home_starter",
+    ("home", "Growth"): "home_growth",
+    ("home", "Pro"): "home_pro",
+    ("other", "Starter"): "home_starter",
+    ("other", "Growth"): "home_growth",
+    ("other", "Pro"): "home_pro",
+    ("food", "Caf\u00e9 Starter"): "cafe_starter",
+    ("food", "Restaurant Growth"): "restaurant_growth",
+}
+
+# Priced, but sold on a call. A trial button here would promise a signup that
+# does not exist.
+BOOK_A_CALL = {
+    ("clinic", "Essentials"), ("clinic", "Growth"), ("clinic", "Pro"),
+}
+
+PERSONAL_PLAN = "personal"
+
+# The trial, from the service's config/plans.json. Stripe gets
+# trial_period_days: 14, which charges at the END of day 14 -- day 15 on the
+# page. The two agree; do not "correct" 15 to 14 or the reverse.
+# reserve_days: a paused line's number is held this long, then released
+# (the service's PAUSE_RESERVE_DAYS, via transition.ts reserveNumber).
+TRIAL = {"days": 14, "minutes_business": 100, "minutes_personal": 30,
+         "billed_day": 15, "reserve_days": 7}
+
+
+def plan_for(key: str, tier_name: str):
+    """(plan_name, how_sold) for a tier. how_sold is 'trial', 'call' or 'quote'."""
+    if (key, tier_name) in BOOK_A_CALL:
+        return None, "call"
+    slug = PLAN_SLUGS.get((key, tier_name))
+    return (slug, "trial") if slug else (None, "quote")
+
+
 def check() -> None:
     """Fail the build rather than ship a half-written plan."""
     for key, label in VERTICALS:
@@ -310,6 +359,19 @@ def check() -> None:
                 sys.exit(f"pricing_data: {key!r} tier {t[0]!r} has no usable price")
             if len(t) not in (5, 7) or not t[0] or not t[2] or not t[4]:
                 sys.exit(f"pricing_data: malformed tier in {key!r}: {t[0]!r}")
+            # A tier whose CTA cannot be decided would render a dead button.
+            slug, how = plan_for(key, t[0])
+            if how == "trial" and not slug:
+                sys.exit(f"pricing_data: {t[0]!r} is self-serve with no plan name")
+            if how == "trial" and not priced:
+                sys.exit(f"pricing_data: {t[0]!r} sells a trial but has no price")
+
+    # A slug pointing at a tier that no longer exists is a dead CTA nobody sees
+    # until a visitor clicks it: plan_for() just falls through to "quote".
+    real = {(k, t[0]) for k, v in PLANS.items() for t in v["tiers"]}
+    stale = sorted(set(PLAN_SLUGS) - real) + sorted(BOOK_A_CALL - real)
+    if stale:
+        sys.exit(f"pricing_data: these map to tiers that no longer exist: {stale}")
 
 
 if __name__ == "__main__":

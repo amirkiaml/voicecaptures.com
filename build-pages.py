@@ -2368,7 +2368,7 @@ DEMO_SCRIPT = f"""
 
 # ---------------------------------------------------------------- pricing ----
 
-def _tier_card(t, rec):
+def _tier_card(t, rec, key):
     """One plan. Shape comes from index.html: [name, $price, minutes, calls,
     [features], "per location"?, {extras}?]."""
     extra = t[6] if len(t) > 6 else {}
@@ -2390,21 +2390,30 @@ def _tier_card(t, rec):
         price = (f'<p class="pr-price" data-m="{monthly}">{frm}'
                  f'<span class="pr-n">{t[1]}</span><em>/mo{unit}</em></p>')
         term = '<p class="pr-termnote" hidden></p>'
+    # What the button does depends on how the plan is sold, not on the tier's
+    # position. Clinics are priced but book_a_call until the lawyer review
+    # lands, and quoted tiers have no plan to start a trial against.
+    slug, how = pricing_data.plan_for(key, t[0])
+    if how == "trial":
+        cta = (f'<a class="btn {btn}" href="{DEMO}/?plan={slug}&amp;line=business">'
+               f'Start free trial</a>')
+    else:
+        cta = (f'<a class="btn {btn}" href="{CAL30}" target="_blank" '
+               f'rel="noopener">Book a call</a>')
     return (
         f'<div class="pr-card{cls}">'
         f'<div class="pr-top"><h3>{t[0]}</h3>{badge}</div>'
         f'{price}'
         f'<p class="pr-min">{t[2]}{calls}</p>{term}'
         f'<ul class="pr-feat">{feats}</ul>{note}'
-        f'<a class="btn {btn}" href="{CAL30}" '
-        f'target="_blank" rel="noopener">Book a 30-minute call</a></div>')
+        f'{cta}</div>')
 
 
 def _vertical(key, data, alt):
     d = data[key]
     sub = d["trades"] or ""
     note = f'<p class="fine pr-vnote">{d["priceNote"]}</p>' if d["priceNote"] else ""
-    cards = "".join(_tier_card(t, i == d["rec"]) for i, t in enumerate(d["tiers"]))
+    cards = "".join(_tier_card(t, i == d["rec"], key) for i, t in enumerate(d["tiers"]))
     acls = ' class="alt"' if alt else ""
     subp = f'<p class="pr-sub">{sub}</p>' if sub else ""
     sw = "".join(
@@ -2438,6 +2447,10 @@ def _prepaid_table(data):
 
 def _pricing_body():
     data = pricing_data.load()
+    # Trial terms come from pricing_data, which mirrors the service's
+    # config/plans.json. Retyping 14/100/30/15 into the copy is how the page
+    # and the thing that actually bills drift apart.
+    T = pricing_data.TRIAL
     verts = "".join(_vertical(k, data, i % 2 == 0)
                     for i, (k, _) in enumerate(pricing_data.VERTICALS)
                     if data[k]["tiers"])
@@ -2462,9 +2475,12 @@ def _pricing_body():
 
 <section class="pr-trial">
   <div class="wrap">
-    <p><b>14 days free at one location, up to 100 minutes.</b> On your real
-    business number, with full setup and real calls. Cancel before day 15 and you
-    pay nothing. Billed on day 15; we email you a reminder first.</p>
+    <p><b>{T['days']} days free at one location, up to {T['minutes_business']} minutes
+    on a business line and {T['minutes_personal']} on a personal one.</b> On your
+    real number, with full setup and real calls. <b>The trial starts when your
+    line is ready</b>, not when you sign up &mdash; setup time is ours, not
+    yours. Cancel before day {T['billed_day']} and you pay nothing. Billed on day
+    {T['billed_day']}; we email you a reminder first.</p>
   </div>
 </section>
 {verts}
@@ -2520,9 +2536,11 @@ def _pricing_body():
           <li>Takes a message and texts you the summary</li>
           <li>Your own number, no new line to give out</li>
         </ul>
-        <p class="pr-note">Not open yet. Join the waitlist and we will tell you
-        when it is. No card now, and the price may change before launch.</p>
-        <a class="btn btn-ghost" href="/#contact">Join the waitlist</a>
+        <p class="pr-note">{T['days']} days free, up to {T['minutes_personal']}
+        minutes of calls. If you don&rsquo;t carry on, the line pauses instead
+        of billing you: we hold your number for {T['reserve_days']} days, then
+        release it. Price may change while it is in beta.</p>
+        <a class="btn btn-primary" href="{DEMO}/?plan=personal&amp;line=personal">Start free trial</a>
       </div>
     </div>
   </div>
@@ -3011,6 +3029,62 @@ PLAYGROUND_SCRIPT = """
 """
 
 
+INSTALL_BODY = """<section class="pr-hero">
+  <div class="wrap">
+    <div class="pg-hero">
+      <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Install the app</p>
+      <h1>Put your calls on<br><span class="pay">your home screen.</span></h1>
+      <p class="lede" style="margin-left:auto;margin-right:auto">Add the
+      dashboard to your phone and it opens like an app &mdash; full screen, no
+      address bar, one tap from wherever you are. There is nothing to download
+      and no App Store account to set up.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="inst-grid">
+      <div class="inst">
+        <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.8c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.6 2.2 2.7 2.2 1.1 0 1.5-.7 2.8-.7s1.6.7 2.8.7c1.1 0 1.9-1 2.6-2.1.8-1.2 1.1-2.3 1.2-2.4-.1 0-2.3-.9-2.3-3.3zM14.3 5.3c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.5.6-1 1.6-.9 2.6 1 .1 2-.5 2.6-1.2z"/></svg>iPhone &amp; iPad</h3>
+        <ol>
+          <li>Open <b>voicecaptures.com/login</b> in <b>Safari</b>. This only works in Safari &mdash; other browsers on iPhone cannot add to the home screen.</li>
+          <li>Tap the <b>Share</b> button &mdash; the square with an arrow pointing up, at the bottom of the screen.</li>
+          <li>Scroll down the list and tap <b>Add to Home Screen</b>.</li>
+          <li>Tap <b>Add</b>. The icon appears on your home screen like any other app.</li>
+        </ol>
+      </div>
+      <div class="inst">
+        <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.5l-1.4 2.4a.4.4 0 01-.6.2.4.4 0 01-.1-.6l1.4-2.4A7.9 7.9 0 0012 7.8c-1.8 0-3.5.5-4.9 1.3l1.4 2.4a.4.4 0 01-.1.6.4.4 0 01-.6-.2L6.4 9.5A8.1 8.1 0 002.5 16h19a8.1 8.1 0 00-3.9-6.5zM7.3 13.9a.8.8 0 110-1.6.8.8 0 010 1.6zm9.4 0a.8.8 0 110-1.6.8.8 0 010 1.6z"/></svg>Android</h3>
+        <ol>
+          <li>Open <b>voicecaptures.com/login</b> in <b>Chrome</b>.</li>
+          <li>Tap the <b>three dots</b> at the top right.</li>
+          <li>Tap <b>Install app</b>, or <b>Add to Home screen</b> if you do not see it &mdash; the wording changes with the Chrome version.</li>
+          <li>Tap <b>Install</b> or <b>Add</b> to confirm.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="fine inst-note">This is your dashboard, saved to your home
+    screen &mdash; not an App Store download. It stays signed in, so you land on
+    your calls rather than a login box. Removing it is the same as deleting any
+    other icon, and it does not cancel anything.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap pg-hero">
+    <h2>Open it now</h2>
+    <p class="lede" style="margin-left:auto;margin-right:auto">Already a
+    customer? Open the dashboard and follow the steps above on your phone.</p>
+    <p class="btns" style="margin-top:var(--s8)">
+      <a class="btn btn-primary" href="/login">Open the dashboard</a>
+      <a class="btn btn-ghost" href="/playground/">Try the demo line</a>
+    </p>
+  </div>
+</section>
+"""
+
+
 PAGES = [
     ("faq", "Common questions | VoiceCaptures",
      "How an AI receptionist works, what setup takes, what happens to your "
@@ -3021,6 +3095,10 @@ PAGES = [
      "What an AI receptionist costs for home services, restaurants, clinics and "
      "any other business. Every plan, minutes, add-ons and prepaid terms, with "
      "no quote needed.", PRICING_BODY, PRICING_SCRIPT),
+
+    ("install", "Install the app | VoiceCaptures",
+     "Add your VoiceCaptures dashboard to your phone's home screen. Step-by-step "
+     "for iPhone and Android. Nothing to download.", INSTALL_BODY, ""),
 
     ("playground", "Playground \u2014 call the demo line | VoiceCaptures",
      "Call our live demo line, book yourself an appointment on the phone, and "

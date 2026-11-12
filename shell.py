@@ -237,6 +237,30 @@ TYPE_CSS = """
 }
 """
 
+INSTALL_CSS = """
+/* Install the app: two platforms side by side, numbered steps in each. */
+.ported .inst-grid{display:grid; gap:var(--s6); grid-template-columns:1fr;
+  max-width:900px; margin:0 auto}
+@media(min-width:760px){ .ported .inst-grid{grid-template-columns:1fr 1fr} }
+.ported .inst{background:#fff; border:1px solid var(--line); border-radius:20px;
+  padding:var(--s8)}
+.ported .inst h3{display:flex; align-items:center; gap:var(--s3);
+  margin:0 0 var(--s4); font-size:19px}
+.ported .inst h3 svg{width:24px; height:24px; flex:0 0 auto; color:var(--blue)}
+.ported .inst ol{margin:0; padding:0; list-style:none; counter-reset:inst}
+.ported .inst li{counter-increment:inst; position:relative;
+  padding:0 0 var(--s4) var(--s8); font-size:15px; line-height:23px;
+  color:var(--ink-2)}
+.ported .inst li::before{content:counter(inst); position:absolute; left:0; top:1px;
+  width:26px; height:26px; border-radius:50%; background:var(--f-blue);
+  color:var(--blue); font-size:13px; font-weight:800;
+  display:grid; place-items:center}
+.ported .inst li:last-child{padding-bottom:0}
+.ported .inst b{color:var(--ink)}
+.ported .inst-note{max-width:900px; margin:var(--s8) auto 0}
+"""
+
+
 PLAYGROUND_CSS = """
 /* Playground: the demo number, and the calendar it books into. */
 .ported .pg-hero{text-align:center; max-width:760px; margin:0 auto var(--s12)}
@@ -577,6 +601,7 @@ def build(old_css: str) -> str:
         + TYPE_CSS.replace("@@H1@@", p["h1_decl"]).replace("@@H2@@", p["h2_decl"])
         + PRICING_CSS
         + PLAYGROUND_CSS
+        + INSTALL_CSS
         + "\n.ported *{min-width:0}"
         + "\n.ported .btn-primary{background:var(--blue); border-color:var(--blue); color:#fff}"
         "\n.ported .btn-primary:hover{background:var(--blue-dk); border-color:var(--blue-dk)}"
