@@ -21,6 +21,19 @@ import shell
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "24 October 2026"
 TERMS_UPDATED = "11 November 2026"
+
+# Share cards. A page gets its own when the default card would misdescribe it;
+# everything else uses the default. The filenames are versioned because
+# LinkedIn, Facebook, Slack and iMessage each cache a preview by URL -- swapping
+# an image in place leaves every link already in the wild on the old one.
+OG_DEFAULT = ("og-image-2.png",
+              "VoiceCaptures \u2014 every call answered, every job booked, "
+              "details texted to you.")
+OG_BY_SLUG = {
+    "win-back": ("og-win-back.png",
+                 "VoiceCaptures \u2014 send us the customers you haven\u2019t seen "
+                 "in a year; we call them and book them back in."),
+}
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 # The legal owner's name is deliberately not published. Carriers and
@@ -3075,8 +3088,10 @@ def main():
     for slug, title, desc, body, script in PAGES:
         folder = ROOT / slug
         folder.mkdir(exist_ok=True)
+        og_img, og_alt = OG_BY_SLUG.get(slug, OG_DEFAULT)
         html = SHELL.format(
             title=title, desc=desc, slug=slug, body=body, script=script,
+            og_img=og_img, og_alt=og_alt,
             email=EMAIL, demo=DEMO_PAGE,
             cur_about=' aria-current="page"' if slug == "about" else "",
             cur_contact=' aria-current="page"' if slug == "contact" else "",

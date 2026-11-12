@@ -114,6 +114,43 @@ def check_vars() -> None:
                  "dropped):\n" + "\n".join(sorted(set(bad))))
 
 
+# Share-card guard. A page whose og:image 404s gets no preview at all on
+# LinkedIn, Facebook, Slack or iMessage, and nothing in the build says so --
+# the page is valid HTML either way, and the caches hold the miss for days.
+# Every referenced card must exist, be a PNG or JPEG, and be the 1200x630 the
+# og:image:width/height beside it claims.
+def check_cards() -> None:
+    import re as _re
+    want = {}
+    for f in sorted(ROOT.glob("*/index.html")) + [ROOT / "index.html"]:
+        if not f.exists():
+            continue
+        text = f.read_text(encoding="utf-8")
+        for m in _re.finditer(r'(?:og:image"|twitter:image")\s+content="'
+                              r'https://voicecaptures\.com/([^"]+)"', text):
+            want.setdefault(m.group(1), set()).add(f.name if f.parent == ROOT
+                                                   else f.parent.name + "/")
+    bad = []
+    for name, pages in sorted(want.items()):
+        p = ROOT / name
+        where = ", ".join(sorted(pages))
+        if not p.exists():
+            bad.append(f"  {name} is referenced by {where} but is not in the repo")
+            continue
+        try:
+            from PIL import Image
+            with Image.open(p) as im:
+                if im.size != (1200, 630):
+                    bad.append(f"  {name} is {im.size[0]}x{im.size[1]}, not 1200x630"
+                               f" (referenced by {where})")
+        except ImportError:
+            pass        # Pillow is optional; the existence check still ran.
+        except Exception as e:
+            bad.append(f"  {name} will not open as an image ({e})")
+    if bad:
+        sys.exit("share cards:\n" + "\n".join(bad))
+
+
 # Mojibake guard. index.html once reached production with every em dash stored
 # as "\u00e2\u20ac\u201d" — a UTF-8 em dash that some editor read as cp1252 and
 # saved back as UTF-8. It is invisible in most editors and shows up in the
@@ -154,6 +191,7 @@ def main():
     src = SRC.read_text(encoding="utf-8")
     check_encoding(raw, src)
     check_vars()
+    check_cards()
 
     for key, meta in PAGES.items():
         folder = ROOT / meta["slug"]
