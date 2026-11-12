@@ -533,13 +533,14 @@ HEAD = """<!DOCTYPE html>
 <meta property="og:url" content="https://voicecaptures.com/@@SLUG@@/">
 <meta property="og:title" content="@@TITLE@@">
 <meta property="og:description" content="@@DESC@@">
-<meta property="og:image" content="https://voicecaptures.com/og-image.png">
+<meta property="og:image" content="https://voicecaptures.com/@@OGIMG@@">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="@@OGALT@@">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="@@TITLE@@">
 <meta name="twitter:description" content="@@DESC@@">
-<meta name="twitter:image" content="https://voicecaptures.com/og-image.png">
+<meta name="twitter:image" content="https://voicecaptures.com/@@OGIMG@@">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
@@ -601,6 +602,8 @@ def build(old_css: str) -> str:
         ("@@SLUG@@", "{slug}"),
         ("@@BODY@@", "{body}"),
         ("@@SCRIPT@@", "{script}"),
+        ("@@OGIMG@@", "{og_img}"),
+        ("@@OGALT@@", "{og_alt}"),
     ):
         raw = raw.replace(token, field)
     return raw
