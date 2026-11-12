@@ -1481,6 +1481,8 @@ async function loadClient() {
           <label class="feat"><input type="checkbox" data-feat="sentiment" ${r.features.sentiment ? "checked" : ""}><span><b>Caller sentiment</b> <span class="muted small">paid add-on</span><br><span class="muted small">Mood per call + unhappy callers. Turning it on books the add-on in their revenue.${r.sentimentKey ? "" : ` <span class="bad-t">OPENAI_API_KEY not set on Render.</span>`}</span>
             ${r.features.sentiment ? `<br><button class="linkbtn" type="button" id="sentBackfill">Score the last 30 days</button>` : ""}</span></label>
           <label class="feat"><input type="checkbox" data-feat="callbacks" ${r.features.callbacks ? "checked" : ""}><span><b>Call back list</b><br><span class="muted small">A list at the top of their dashboard of everyone who needs a call back (Needs callback and Emergency), with Done and Reopen. On by default.</span></span></label>
+          <label class="feat"><input type="checkbox" data-feat="calendar" ${r.features.calendar ? "checked" : ""}><span><b>Calendar connection &amp; booking rules</b><br><span class="muted small">A "Calendar &amp; booking" card on their dashboard: they connect their own Google Calendar, pick which calendar to book into, and set appointment length, buffer, notice and how far ahead. Needs migrations/2026-11-02-calendar-connect.sql.</span>
+            <br><button class="linkbtn" type="button" id="calLinkBtn">Copy a calendar connect link to send them</button> <span class="muted small" id="calLinkMsg"></span></span></label>
           <label class="feat"><input type="checkbox" data-feat="call_delete" ${r.features.call_delete ? "checked" : ""}><span><b>Client can delete calls</b><br><span class="muted small">"Delete this call" on their dashboard, with a confirmation. Each deletion is logged below.</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="full_delete" ${r.features.full_delete ? "checked" : ""}><span><b>Full delete</b> <span class="muted small">clinics</span><br><span class="muted small">Deleting a call also removes the texts we sent about it, its report and events, and Twilio's call log and messages. Calls past their retention period are fully deleted too. Only a no-name stub (time, length) stays for billing.</span></span></label>
           <label class="feat"><input type="checkbox" data-feat="vapi_purge" ${r.features.vapi_purge ? "checked" : ""}><span><b>Remove calls from Vapi</b><br><span class="muted small">Delete each call (and its logs) at Vapi once our transcript and recording copy is saved. Vapi's delete may be soft. You lose Vapi's own logs for these calls.</span>
@@ -1548,6 +1550,14 @@ async function loadClient() {
         const why = Object.entries(x.reasons || {}).map(([k, n]) => `${n} ${k}`).join(", ");
         b.textContent = `Done: ${x.scored} scored${x.skipped ? `, ${x.skipped} skipped (${why || "no transcript"})` : ""}${x.failed ? `, ${x.failed} failed: ${x.firstError}` : ""}.`; b.disabled = false; }
       catch (err) { b.textContent = `Failed: ${err.message}`; b.disabled = false; }
+    };
+    if ($("calLinkBtn")) $("calLinkBtn").onclick = async e => {
+      e.preventDefault(); const m = $("calLinkMsg");
+      try {
+        const x = await api(`/api/dashboard/admin/calendar-link?business=${encodeURIComponent(CL.id)}`);
+        try { await navigator.clipboard.writeText(x.url); m.textContent = "Copied. They open it, sign in with Google, and it's connected."; }
+        catch { m.textContent = x.url; }
+      } catch (err) { m.textContent = err.message; }
     };
     box.querySelectorAll("[data-feat]").forEach(cb => cb.onchange = async () => {
       cb.disabled = true;

@@ -139,6 +139,30 @@
   .p-abandoned { background: var(--gray-soft); color: var(--muted); }
   .p-other { background: var(--accent-soft); color: var(--accent); }
   tr.spam-row td { opacity: .55; }
+  /* Calendar & booking */
+  .cal .cal-sec { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+  .cal-h { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .cal-note { border-radius: 10px; padding: 9px 12px; font-size: 14px; margin: 8px 0 4px; background: var(--good-soft); color: var(--good); }
+  .cal-note.bad { background: var(--bad-soft); color: var(--bad); }
+  .pv-logo { width: 20px; height: 20px; flex: none; }
+  .pv-btn { display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  .pv-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .pv-btn:disabled { cursor: default; opacity: .65; }
+  .cal-prov { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .cal-prov button { display: inline-flex; align-items: center; gap: 8px; }
+  .cal-prov .soon { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .cal-acct { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .cal-acct .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+  .cal-acct select, .cal-rules select { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); max-width: 100%; }
+  .cal-rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+  .cal-rules label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+  .cal-rules label span { font-weight: 400; font-size: 12px; color: var(--muted); }
+  .cal-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 12px; }
+  .cal-ev { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .cal-ev .t { color: var(--muted); }
+  .cal-ev a { color: var(--ink); text-decoration: none; }
+  .cal-dis { background: none; border: 0; color: var(--bad); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+  @media (max-width: 640px) { .cal-rules { grid-template-columns: minmax(0, 1fr); } .cal-ev { grid-template-columns: minmax(0, 1fr); gap: 0; } }
   /* Top callers */
   .tc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; margin-top: 6px; }
   .tc-h { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 6px 0 4px; }
@@ -744,6 +768,27 @@
   </div>
   </div>
 
+  <div class="card cal" id="calCard" data-section="calendar" hidden>
+    <p class="panel-title">Calendar &amp; booking</p>
+    <p class="panel-sub">Your receptionist checks this calendar for open times and books callers into it.</p>
+    <div class="cal-note" id="calNote" hidden></div>
+    <div id="calConn"></div>
+    <div class="cal-sec">
+      <div class="cal-h">Booking rules</div>
+      <div class="cal-rules">
+        <label>Appointment length <select id="crSlot"></select><span>How long each booking is.</span></label>
+        <label>Buffer between bookings <select id="crBuffer"></select><span>Kept free before and after each booking, e.g. for travel.</span></label>
+        <label>Earliest a caller can book <select id="crNotice"></select><span>How soon from now an appointment can start.</span></label>
+        <label>How far ahead <select id="crAhead"></select><span>The furthest date a caller can book.</span></label>
+      </div>
+      <div class="cal-actions"><span class="muted" id="crMsg"></span><button class="btn" type="button" id="crSave">Save rules</button></div>
+    </div>
+    <div class="cal-sec" id="calUpWrap" hidden>
+      <div class="cal-h">Coming up <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">· next 14 days</span></div>
+      <div id="calUp"></div>
+    </div>
+  </div>
+
   <footer>Powered by VoiceCaptures</footer>
   </div>
 </div>
@@ -752,7 +797,7 @@
 <script>
 let days = 7, shown = 25, allCalls = [], last = null, S = null;
 const DAY_NAMES = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const SECTION_NAMES = { callbacks: "Call back list", revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", callers: "Top callers", log: "Call log" };
+const SECTION_NAMES = { callbacks: "Call back list", revenue: "Revenue estimate", booking: "Bookings & booking rate", daily: "Calls per day", hours: "When people call", outcomes: "Call outcomes", week: "Busiest days", highlights: "Highlights", callers: "Top callers", log: "Call log", calendar: "Calendar & booking" };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
@@ -1403,6 +1448,7 @@ async function loadCallbacks() {
     cbData = { error: "Could not load the list" };
   }
   renderCallbacks();
+  if (calData) renderCalendar(); else $("calCard").hidden = true;
 }
 async function setCallback(btn) {
   const item = btn.closest(".cb-item"), msg = item.querySelector(".cb-msg");
@@ -1452,9 +1498,115 @@ function renderTopCallers(t) {
   $("tcTime").innerHTML = list(t && t.byTime, "seconds");
 }
 
+/* ---------- calendar & booking (feature "calendar") ---------- */
+const hasCalendar = () => !!(last && last.features && last.features.calendar);
+const G_LOGO = `<svg class="pv-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+const O_LOGO = `<svg class="pv-logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="8" width="30" height="32" rx="4" fill="#28A8EA"/><rect x="14" y="20" width="30" height="20" rx="3" fill="#0078D4"/><rect x="4" y="12" width="24" height="24" rx="4" fill="#0A64AD"/><circle cx="16" cy="24" r="6.5" fill="none" stroke="#fff" stroke-width="3"/></svg>`;
+const CR_LABELS = {
+  slotMin: v => v < 60 ? `${v} minutes` : v === 60 ? "1 hour" : v % 60 ? `${Math.floor(v / 60)}h ${v % 60}m` : `${v / 60} hours`,
+  bufferMin: v => !v ? "None" : v < 60 ? `${v} minutes` : v === 60 ? "1 hour" : v % 60 ? `${Math.floor(v / 60)}h ${v % 60}m` : `${v / 60} hours`,
+  noticeMin: v => !v ? "Any time" : v < 1440 ? `${v / 60} hour${v === 60 ? "" : "s"} from now` : `${v / 1440} day${v === 1440 ? "" : "s"} from now`,
+  maxAheadDays: v => v == null ? "No limit" : v === 7 ? "1 week" : v === 14 ? "2 weeks" : v % 30 === 0 ? `${v / 30} month${v === 30 ? "" : "s"}` : `${v} days`
+};
+let calData = null, calBiz = null, calNote = null;
+function calOptions(sel, key, cur) {
+  sel.innerHTML = calData.choices[key].map(v => `<option value="${v == null ? "" : v}" ${v === cur ? "selected" : ""}>${esc(CR_LABELS[key](v))}</option>`).join("");
+}
+function renderCalendar() {
+  const card = $("calCard");
+  card.hidden = !hasCalendar() || S.hiddenSections.includes("calendar");
+  if (card.hidden) return;
+  const note = $("calNote");
+  note.hidden = !calNote; if (calNote) { note.textContent = calNote.text; note.className = "cal-note" + (calNote.bad ? " bad" : ""); }
+  const conn = $("calConn");
+  if (!calData) { conn.innerHTML = `<div class="muted">Loading…</div>`; return; }
+  if (calData.error) {
+    conn.innerHTML = `<div class="muted">${esc(calData.needsMigration ? (last.isAdmin ? "Run migrations/2026-11-02-calendar-connect.sql in Supabase to turn this on." : "This is being set up. Check back shortly.") : calData.error)}</div>`;
+    return;
+  }
+  if (!calData.connected) {
+    conn.innerHTML = `<div class="cal-prov">
+      <button class="pv-btn" type="button" id="calGoogle">${G_LOGO}<span>Connect Google Calendar</span></button>
+      <button class="pv-btn" type="button" disabled title="Coming soon">${O_LOGO}<span>Outlook Calendar</span><span class="soon">COMING SOON</span></button>
+    </div>
+    <div class="muted" style="font-size:13px;margin-top:8px">You'll sign in with Google and allow VoiceCaptures to see your free/busy times and add bookings. You can disconnect any time.</div>`;
+    $("calGoogle").onclick = calConnect;
+  } else {
+    const opts = (calData.calendars || []).map(c => `<option value="${esc(c.id)}" ${c.id === calData.calendarId ? "selected" : ""}>${esc(c.primary ? `${c.name} (main)` : c.name)}</option>`).join("");
+    conn.innerHTML = `<div class="cal-acct">${G_LOGO}<b>Google Calendar</b><span class="dot"></span><span class="muted">connected</span><span class="muted">· ${esc(calData.accountEmail || "")}</span>
+        <span style="margin-left:auto"><button class="cal-dis" type="button" id="calDis">Disconnect</button></span></div>
+      ${calData.problem ? `<div class="cal-note bad">${esc(calData.problem)} <button class="btn-ghost" type="button" id="calRe" style="margin-left:6px;padding:3px 10px">Reconnect</button></div>` : ""}
+      ${opts ? `<div class="cal-acct"><span>Book into</span><select id="calPick">${opts}</select><span class="muted" id="calPickMsg"></span></div>` : ""}`;
+    if ($("calPick")) $("calPick").onchange = calPick;
+    if ($("calRe")) $("calRe").onclick = calConnect;
+    $("calDis").onclick = calDisconnect;
+  }
+  calOptions($("crSlot"), "slotMin", calData.rules.slotMin);
+  calOptions($("crBuffer"), "bufferMin", calData.rules.bufferMin);
+  calOptions($("crNotice"), "noticeMin", calData.rules.noticeMin);
+  calOptions($("crAhead"), "maxAheadDays", calData.rules.maxAheadDays);
+  const up = calData.upcoming || [];
+  $("calUpWrap").hidden = !calData.connected || !!calData.problem;
+  const when = e => e.allDay ? new Date(e.start + "T12:00:00Z").toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" }) + " · all day"
+    : new Date(e.start).toLocaleString("en-CA", { timeZone: TZ(), weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  $("calUp").innerHTML = up.length ? up.map(e => `<div class="cal-ev"><span class="t">${esc(when(e))}</span>${e.link
+      ? `<a href="${esc(e.link)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : `<span>${esc(e.title)}</span>`}</div>`).join("")
+    : `<div class="muted" style="font-size:14px">Nothing booked in the next 14 days.</div>`;
+}
+async function loadCalendar() {
+  if (!hasCalendar()) { $("calCard").hidden = true; return; }
+  if (calBiz !== business) { calData = null; calBiz = business; }
+  renderCalendar();
+  try {
+    const r = await api("/api/dashboard/calendar");
+    const d = await r.json();
+    calData = r.ok ? d : { error: d.error || "Could not load", needsMigration: !!d.needsMigration };
+  } catch (e) { if (e.message === "Signed out") return; calData = { error: "Could not load your calendar settings" }; }
+  renderCalendar();
+}
+async function calPost(path, body) {
+  const r = await api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || "Could not save");
+  return d;
+}
+async function calConnect() {
+  try { const d = await calPost("/api/dashboard/calendar/connect", { provider: "google" }); location.href = d.url; }
+  catch (e) { if (e.message !== "Signed out") { calNote = { text: e.message, bad: true }; renderCalendar(); } }
+}
+async function calPick() {
+  const sel = $("calPick"); sel.disabled = true; $("calPickMsg").textContent = "Saving…";
+  try { await calPost("/api/dashboard/calendar/settings", { calendarId: sel.value }); calData.calendarId = sel.value; $("calPickMsg").textContent = "Saved"; loadCalendar(); }
+  catch (e) { if (e.message !== "Signed out") $("calPickMsg").textContent = e.message; sel.disabled = false; }
+}
+async function calDisconnect() {
+  const b = $("calDis");
+  if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to disconnect (your receptionist stops booking)"; return; }
+  b.disabled = true; b.textContent = "Disconnecting…";
+  try { await calPost("/api/dashboard/calendar/disconnect", { confirm: true }); calNote = { text: "Calendar disconnected." }; loadCalendar(); }
+  catch (e) { if (e.message !== "Signed out") { calNote = { text: e.message, bad: true }; renderCalendar(); } }
+}
+$("crSave").onclick = async () => {
+  const num = v => v === "" ? null : Number(v);
+  const rules = { slotMin: num($("crSlot").value), bufferMin: num($("crBuffer").value), noticeMin: num($("crNotice").value), maxAheadDays: num($("crAhead").value) };
+  $("crSave").disabled = true; $("crMsg").textContent = "Saving…";
+  try { const d = await calPost("/api/dashboard/calendar/settings", { rules }); calData.rules = d.rules || rules; $("crMsg").textContent = "Saved. New calls follow these rules."; }
+  catch (e) { if (e.message !== "Signed out") $("crMsg").textContent = e.message; }
+  $("crSave").disabled = false;
+};
+// Back from Google's consent screen: ?calendar=connected|failed&reason=…
+(function () {
+  const q = new URLSearchParams(location.search), c = q.get("calendar");
+  if (!c) return;
+  calNote = c === "connected" ? { text: "Google Calendar connected. Your receptionist can now book into it." }
+    : { text: `Couldn't connect: ${q.get("reason") || "something went wrong"}. Try again.`, bad: true };
+  history.replaceState(null, "", location.pathname);
+  setTimeout(() => { const el = $("calCard"); if (el && !el.hidden) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 1200);
+})();
+
 function applySections() {
   document.querySelectorAll("[data-section]").forEach(el => {
-    if (el.id === "hero" || el.id === "cbCard") return; // these have their own visibility rules
+    if (el.id === "hero" || el.id === "cbCard" || el.id === "calCard") return; // these have their own visibility rules
     el.hidden = S.hiddenSections.includes(el.dataset.section);
   });
   document.querySelectorAll(".row2").forEach(row => {
@@ -1708,6 +1860,7 @@ async function load() {
     allCalls = data.calls;
     renderLog(allCalls);
     loadCallbacks();
+    loadCalendar();
   } catch (e) {
     if (e.message === "Signed out") return;
     $("app").hidden = false;
@@ -1728,7 +1881,7 @@ function openSettings() {
   $("sTz").innerHTML = tzs.map(z => `<option value="${esc(z)}" ${z === S.timezone ? "selected" : ""}>${esc(tzLabel(z))}</option>`).join("");
   $("sDays").innerHTML = DAY_NAMES.map((d, i) =>
     `<label class="chip"><input type="checkbox" value="${i}" ${S.openDays.includes(i) ? "checked" : ""}>${d}</label>`).join("");
-  $("sSections").innerHTML = Object.entries(SECTION_NAMES).filter(([k]) => k !== "callbacks" || hasCallbacks()).map(([k, v]) =>
+  $("sSections").innerHTML = Object.entries(SECTION_NAMES).filter(([k]) => (k !== "callbacks" || hasCallbacks()) && (k !== "calendar" || hasCalendar())).map(([k, v]) =>
     `<label class="chip"><input type="checkbox" value="${k}" ${S.hiddenSections.includes(k) ? "" : "checked"}>${v}</label>`).join("");
   statusDraft = (S.customStatuses || []).map(x => ({ ...x }));
   renderStatusDraft();
