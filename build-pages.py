@@ -20,7 +20,7 @@ import shell
 
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "24 October 2026"
-TERMS_UPDATED = "24 October 2026"
+TERMS_UPDATED = "11 November 2026"
 EMAIL = "hello@voicecaptures.com"
 ADDR = "Toronto, Ontario, Canada"
 # The legal owner's name is deliberately not published. Carriers and
@@ -168,7 +168,7 @@ html[data-theme="light"] .box{box-shadow:0 6px 20px rgba(13,23,41,.06)}
 .doc h2{font-size:21px;margin:40px 0 10px;padding-top:26px;border-top:1px solid var(--line)}
 .doc h3{font-size:15.5px;margin:22px 0 4px;scroll-margin-top:86px}
 .doc p{font-size:15.5px;margin-bottom:14px}
-.doc ul{margin:0 0 16px 20px}
+.doc ul,.doc ol{margin:0 0 16px 20px}
 .doc li{font-size:15.5px;margin-bottom:7px}
 .doc dt{font-weight:700;font-size:15.5px;margin-top:12px}
 .doc dd{font-size:15.5px;color:var(--muted);margin-left:0}
@@ -1986,7 +1986,7 @@ month, to the card you gave us, unless you have bought a prepaid term. Prices ar
 Canadian dollars and exclude tax. HST is added to your bill at the applicable rate
 and shown as a separate line on every invoice, with our HST number on it. Add-ons are billed with your plan. One-time setup
 and integration work is quoted in writing and billed separately. You can update
-your card or download invoices at any time from your billing portal.</p>
+your card or download invoices at any time from <strong>Manage billing</strong>.</p>
 
 <h2>Minutes</h2>
 <p>A minute is time our assistant spends on a live call, including transfers.
@@ -2001,44 +2001,48 @@ above are how we tell you before that happens.</p>
 
 <h2>Prepaid terms</h2>
 <p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
-rises with the term. The prices are on our pricing page. A prepaid term begins after
-your free trial ends, not instead of it.</p>
-<p><strong>Your rate is fixed for the term.</strong> If our prices change while your
-term is running, yours does not. The new price applies only when you renew, and we
-tell you before that happens.</p>
+rises with the term. The prices are on our pricing page. Here is how a prepaid term
+works, start to finish.</p>
+<ol>
+<li><strong>Your first 14 days are free.</strong> Nothing is charged during the
+trial.</li>
+<li><strong>On day 15 we charge the term once</strong> &mdash; 3, 6 or 12 months in a
+single payment.</li>
+<li><strong>You can get all of it back for 14 days.</strong> Ask within 14 days of
+that charge and we refund it in full and pause your line. To ask, email
+<a href="mailto:{EMAIL}">{EMAIL}</a> within those 14 days.</li>
+<li><strong>After those 14 days we do not refund unused months.</strong> The service
+runs to the end of the term you paid for.</li>
+<li><strong>You can cancel at any time to stop the next renewal.</strong> Sign in and
+use <strong>Manage billing</strong>. Cancelling keeps your service on until the term
+ends.</li>
+<li><strong>A term renews automatically</strong> for another term of the same length,
+at our price at that time. We email you a reminder 14 days before each renewal.</li>
+<li><strong>If we cannot provide the service</strong>, we refund the full months you
+have not used.</li>
+</ol>
 <p><strong>Minutes stay monthly.</strong> Your allowance is per month and unused
 minutes do not carry over. Prepaying does not pool them: twelve months of a 300-minute
 plan is 300 minutes each month, not 3,600 to spend at will.</p>
 <p><strong>Extra minutes are billed as described above</strong>, at $1.50 per minute,
 and are not taken out of your prepayment. As with any plan, we tell you before adding
 them.</p>
-<p><strong>When a term ends</strong>, your plan carries on month to month at our
-current monthly price. It does not renew automatically into another prepaid term, and
-we never charge you for a new term unless you ask for one. We email you the rate at
-least 30 days before your term ends &mdash; in practice, during its final month, so a
-3-month term hears from us in month 2, a 6-month term in month 5 and a 12-month term in
-month 11.</p>
-<p><strong>If you cancel part-way through a prepaid term</strong>, we refund what you
-paid less our standard monthly rate for each month you were live. Cancellation
-takes effect at the end of the month it is requested in, and that month counts as
-used, so you keep the service you have paid for. The discount applies
-only to a completed term, so leaving early means you simply paid the normal monthly
-price for the months you used. A refund is never less than zero: if the months used
-are worth more than you paid, nothing further is owed either way. Refunds go back to
-the original payment method within 10 business days.</p>
 
 <h2>Missed payments</h2>
 <p>If a payment fails, we retry it and email you. If it still hasn&rsquo;t gone
 through after about two weeks, your subscription is cancelled and the line stops
 answering.</p>
 
-<h2>Cancelling</h2>
-<p>Cancel anytime from your billing portal or by emailing
-<a href="mailto:{EMAIL}">{EMAIL}</a>. After the trial, your service runs to the end
-of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. If you
-are on a prepaid term, the refund rule under Prepaid terms applies instead. When
-you leave, turn off call forwarding on your phone so calls ring through to you
-again.</p>
+<h2>How to cancel</h2>
+<p>Sign in and use <strong>Manage billing</strong>. You can also email
+<a href="mailto:{EMAIL}">{EMAIL}</a> and we will do it for you.</p>
+<p><strong>On a monthly plan</strong>, including the personal line, cancelling stops
+the next charge. Your service runs to the end of the period you have paid for.</p>
+<p><strong>On a prepaid term</strong>, cancelling stops the next renewal and your
+service runs to the end of the term. The refund points under Prepaid terms above are
+the ones that apply.</p>
+<p>When you leave, turn off call forwarding on your phone so calls ring through to
+you again.</p>
 
 <h2>Text messages</h2>
 <p>Our assistant sends texts that are part of handling a call: a summary to you; a
@@ -2127,9 +2131,9 @@ indirect or consequential loss, including lost business, bookings or revenue.</p
 That applies whether you pay monthly or by prepaid term. If you don&rsquo;t agree,
 you can cancel before the change takes effect.</p>
 <p>A price change never applies to a prepaid term that is already running: your rate
-holds until that term ends. You hear the new rate at least 30 days before then, during
-the final month of your term, so you can renew, move to monthly or leave with the
-numbers in front of you.</p>
+holds until that term ends. Because a term renews automatically at the price then in
+force, we email you a reminder 14 days before each renewal, so you can let it run or
+cancel with the numbers in front of you.</p>
 
 <h2>Governing law</h2>
 <p>These terms are governed by the laws of Ontario and the federal laws of Canada
@@ -2542,10 +2546,12 @@ def _pricing_body():
         <tbody>{_prepaid_table(data)}</tbody>
       </table>
     </div>
+    <p class="fine pr-vnote">Prepaid terms renew automatically. Full refund within
+    14 days of the charge. Cancel anytime before renewal.</p>
     <p class="fine pr-vnote">Minutes stay monthly: twelve months of a 300-minute
     plan is 300 minutes each month, not 3,600 to spend at will. A prepaid term
-    starts after your free trial, and we email you the renewal rate during its
-    final month. Full terms are in our <a href="/terms/">Terms of Service</a>.</p>
+    starts after your free trial, and we email you a reminder 14 days before each
+    renewal. Full terms are in our <a href="/terms/">Terms of Service</a>.</p>
   </div>
 </section>
 
@@ -2692,8 +2698,19 @@ FAQ_GROUPS = [
          "Yes &mdash; that is exactly what the entry tier is for. Forward evenings, "
          "weekends and holidays, and leave daytime calls ringing through to you."),
         ("Can I cancel anytime?",
-         "Yes. It is month to month with no contract. Cancel and forwarding reverts "
-         "to your own phone the same day."),
+         "Yes. Sign in and use Manage billing. On a monthly plan, including the "
+         "personal line, cancelling stops the next charge and your service runs to "
+         "the end of the period you have paid for. On a prepaid term, cancelling "
+         "stops the next renewal and your service runs to the end of the term. "
+         "Forwarding reverts to your own phone when the service ends."),
+        ("Can I get a refund on a prepaid term?",
+         "Yes, in full, if you ask within 14 days of the day we charge it &mdash; email "
+         "hello@voicecaptures.com and we refund the payment and pause your line. "
+         "After those 14 days we do not refund unused months, and the service runs "
+         "to the end of the term. Prepaid terms renew automatically for the same "
+         "length at our price at that time, and we email you a reminder 14 days "
+         "before each renewal. The <a href=\"/terms/\">Terms of Service</a> set out "
+         "the detail."),
         ("What happens after the trial?",
          "Your plan starts on day 15. We email you a reminder before then. Cancel "
          "before day 15 and you pay nothing."),
