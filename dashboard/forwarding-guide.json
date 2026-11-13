@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "about": "THE ONE SOURCE of every customer-facing word about call forwarding. The dashboard renders it (dashboard/forwarding-guide.js); the line-ready and welcome emails are rendered by the self-serve repo, which must copy this file byte for byte and render forwarding-guide.txt's text from it (TODO(owner): self-serve repo). {number} is the customer's receptionist number: inside a code (on, off) it is the raw +1 number the phone dials; everywhere else it is shown as +1 647 555 0142. Change this file, then run node tests/forwarding-guide.test.js --write to refresh forwarding-guide.txt.",
+  "intro": "Send the calls you don't answer to your receptionist at {number}. Choose how you'd like to set it up:",
+  "modes": [
+    {
+      "id": "settings",
+      "label": "Phone settings"
+    },
+    {
+      "id": "code",
+      "label": "Dial a code"
+    }
+  ],
+  "settings": {
+    "devices": [
+      {
+        "id": "android",
+        "label": "Android (Samsung, Pixel)",
+        "verified": false,
+        "todo": "TODO(owner): verify these menu names on a real Samsung and a real Pixel before publishing.",
+        "steps": [
+          "Open the Phone app, tap the ⋮ menu, then Settings.",
+          "Find Call forwarding. On a Samsung it is under Supplementary services; on a Pixel it is under Calls or Calling accounts. Choose Voice call if asked.",
+          "Turn on three of them and set each to {number}: When unanswered, When busy, and When unreachable.",
+          "Leave Always forward off, or your phone will never ring.",
+          "If it lets you choose a ring time for When unanswered, pick 15 seconds."
+        ],
+        "note": "Menu names differ between models and carriers. If you can't find them, use Dial a code instead."
+      },
+      {
+        "id": "iphone",
+        "label": "iPhone",
+        "verified": false,
+        "todo": "TODO(owner): confirm on a real iPhone.",
+        "steps": [
+          "Don't use Settings > Phone > Call Forwarding for this. On iPhone it forwards every call, all the time, so your own phone would never ring.",
+          "Use Dial a code instead. It forwards only the calls you don't answer."
+        ],
+        "switchTo": "code",
+        "switchLabel": "Show me the code"
+      }
+    ]
+  },
+  "codes": {
+    "how": [
+      "Open the keypad in your Phone app on the mobile whose calls you want forwarded.",
+      "Type the code exactly as shown, then press Call.",
+      "Wait for the confirmation message on your screen."
+    ],
+    "options": [
+      {
+        "id": "unanswered",
+        "label": "Forward the calls you don't answer (recommended)",
+        "detail": "Your phone rings for 15 seconds. If you don't answer, your receptionist picks up before voicemail does.",
+        "on": "**61*{number}**15#",
+        "off": "##61#",
+        "recommended": true
+      },
+      {
+        "id": "conditional_all",
+        "label": "Forward when busy, unanswered or unreachable, all at once",
+        "detail": "One code for all three. It uses your carrier's own ring time instead of 15 seconds.",
+        "on": "**004*{number}#",
+        "off": "##004#",
+        "recommended": false
+      }
+    ],
+    "check": {
+      "code": "*#61#",
+      "text": "To check: dial *#61#. It should show {number} for unanswered calls."
+    },
+    "undo": "To turn it off: dial ##61#, or ##004# if you used that code."
+  },
+  "voicemail": {
+    "heading": "Turn off your carrier's voicemail",
+    "text": "If your carrier's voicemail answers first, the call never reaches your receptionist, even when your phone says forwarding is set.",
+    "carriers": [
+      {
+        "name": "Koodo",
+        "tested": true,
+        "finding": "Tested on an iPhone: the forwarding code showed \"Setting Registration Succeeded … When Unanswered\", but Koodo voicemail still answered first. Turning voicemail off fixed it.",
+        "steps": [],
+        "todo": "TODO(owner): record the exact steps to turn Koodo voicemail off."
+      }
+    ],
+    "noSteps": "Ask {carrier} to turn voicemail off on your line.",
+    "untestedCarriers": [
+      "Bell",
+      "Rogers",
+      "Telus",
+      "Fido",
+      "Freedom Mobile",
+      "Virgin Plus",
+      "Public Mobile"
+    ],
+    "others": "Other carriers (unverified): {carriers}. We haven't tested these yet. Ask your carrier to turn voicemail off on your line."
+  },
+  "test": {
+    "heading": "Test it",
+    "steps": [
+      "From another phone, call your own number.",
+      "Let it ring. Don't decline it on your phone.",
+      "After about 15 seconds your receptionist should answer."
+    ],
+    "unverified": "We can't see from here whether your forwarding is on, so this test is the way to check."
+  },
+  "faq": [
+    {
+      "q": "It still goes to voicemail",
+      "a": [
+        "Your carrier's voicemail is answering before the forward. Turn voicemail off, then test again.",
+        "A success message from the code doesn't mean voicemail is off. On Koodo, the code reported success and voicemail still answered. The code ##002# also reported success and didn't change voicemail."
+      ]
+    },
+    {
+      "q": "Do I have to turn voicemail off?",
+      "a": [
+        "Usually, yes. If voicemail picks up first, your receptionist never gets the call. With voicemail off, a call you don't answer goes to your receptionist, who takes the message instead."
+      ]
+    },
+    {
+      "q": "How do I test it?",
+      "a": [
+        "Call your own number from another phone and let it ring. Don't decline it: declining sends the call to voicemail or your carrier's busy handling, so it isn't a fair test.",
+        "After about 15 seconds your receptionist should answer."
+      ]
+    },
+    {
+      "q": "How do I turn it off?",
+      "a": [
+        "Dial ##61#, and ##004# if you used that code. If you used your phone's settings, switch those back off.",
+        "Turn your voicemail back on if you want it."
+      ]
+    },
+    {
+      "q": "Which carrier?",
+      "a": [
+        "These codes are standard, but each carrier handles them its own way. Some need call forwarding added to your plan before any code works, and some charge for forwarded minutes.",
+        "We've tested Koodo. We haven't tested the others yet. If something doesn't work, ask your carrier to turn on conditional call forwarding (the name they'll know it by), or contact us."
+      ]
+    },
+    {
+      "q": "Not on a mobile?",
+      "a": [
+        "The codes above are for mobile phones. They will not work on a landline.",
+        "A landline is forwarded by the company that provides the line, not from the handset. Ring them and ask for \"call forward on no answer\" to {number}. Most providers have their own dial code for it, so ask them for it.",
+        "An office phone system or internet line (RingCentral, Vonage, 8x8, Google Voice, or a PBX) is set in your provider's admin portal or app. Look for Call Forwarding, Call Handling or Answering Rules, and forward calls that are not answered to {number}, after the last phone in any ring group."
+      ]
+    }
+  ],
+  "stuck": "Stuck? Contact us at hello@voicecaptures.com and we'll set it up with you."
+}
