@@ -1,0 +1,62 @@
+Send the calls you don't answer to your receptionist at {number}. Choose how you'd like to set it up:
+
+OPTION 1: PHONE SETTINGS
+
+Android (Samsung, Pixel)
+1. Open the Phone app, tap the ⋮ menu, then Settings.
+2. Find Call forwarding. On a Samsung it is under Supplementary services; on a Pixel it is under Calls or Calling accounts. Choose Voice call if asked.
+3. Turn on three of them and set each to {number}: When unanswered, When busy, and When unreachable.
+4. Leave Always forward off, or your phone will never ring.
+5. If it lets you choose a ring time for When unanswered, pick 15 seconds.
+Menu names differ between models and carriers. If you can't find them, use Dial a code instead.
+
+iPhone
+1. Don't use Settings > Phone > Call Forwarding for this. On iPhone it forwards every call, all the time, so your own phone would never ring.
+2. Use Dial a code instead. It forwards only the calls you don't answer.
+
+OPTION 2: DIAL A CODE
+1. Open the keypad in your Phone app on the mobile whose calls you want forwarded.
+2. Type the code exactly as shown, then press Call.
+3. Wait for the confirmation message on your screen.
+
+Forward the calls you don't answer (recommended)
+Your phone rings for 15 seconds. If you don't answer, your receptionist picks up before voicemail does.
+Turn on:  **61*{code_number}**15#
+Turn off: ##61#
+
+Forward when busy, unanswered or unreachable, all at once
+One code for all three. It uses your carrier's own ring time instead of 15 seconds.
+Turn on:  **004*{code_number}#
+Turn off: ##004#
+
+To check: dial *#61#. It should show {number} for unanswered calls.
+
+If your carrier's voicemail still answers first, ask your carrier to turn voicemail off on your line.
+
+TEST IT
+1. From another phone, call your own number.
+2. Let it ring. Don't decline it: declining sends the call to voicemail, so it isn't a fair test.
+3. After about 15 seconds your receptionist should answer.
+We can't see from here whether your forwarding is on, so this test is the way to check.
+
+QUESTIONS
+
+It still goes to voicemail
+Your carrier's voicemail is answering before the forward. Ask your carrier to turn voicemail off on your line, then test again. A success message after dialing a code doesn't mean voicemail is off.
+
+Do I have to turn voicemail off?
+Usually, yes. If voicemail picks up first, your receptionist never gets the call. With voicemail off, your receptionist takes the message instead.
+
+How do I turn it off?
+Dial ##61#, or ##004# if you used that code. If you used your phone's settings, switch those back off. Turn your voicemail back on if you want it.
+
+Which carrier?
+The codes are standard, but some carriers need call forwarding added to your plan first, and some charge for forwarded minutes.
+Tested on Koodo with an iPhone; other carriers not tested yet.
+
+Not on a mobile?
+The codes above are for mobile phones. They will not work on a landline.
+A landline is forwarded by the company that provides the line, not from the handset. Ring them and ask for "call forward on no answer" to {number}. Most providers have their own dial code for it, so ask them for it.
+An office phone system or internet line (RingCentral, Vonage, 8x8, Google Voice, or a PBX) is set in your provider's admin portal or app. Look for Call Forwarding, Call Handling or Answering Rules, and forward calls that are not answered to {number}, after the last phone in any ring group.
+
+Stuck? Contact us at hello@voicecaptures.com and we'll set it up with you.

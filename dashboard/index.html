@@ -245,6 +245,34 @@
   .rn-land { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
   .rn-land .rn-step { font-size: 14px; margin: 0; }
   .rn-stuck { font-size: 14px; margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
+  /* the forwarding guide (forwarding-guide.js) */
+  .fg { font-size: 14px; }
+  .fg p { margin: 0 0 8px; }
+  .fg-intro { margin-bottom: 10px; }
+  .fg-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; margin: 0 0 12px; background: var(--raise); }
+  .fg-tab { border: 0; background: transparent; color: inherit; font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+  .fg-tab.on { background: var(--card, #fff); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .fg-devices { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 10px; }
+  .fg-device { border: 1px solid var(--line); background: transparent; color: inherit; font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 999px; cursor: pointer; }
+  .fg-device.on { border-color: currentColor; font-weight: 600; }
+  .fg-steps { margin: 0 0 8px; padding-left: 20px; }
+  .fg-steps li { margin: 4px 0; }
+  .fg-note { color: var(--muted); font-size: 13px; }
+  .fg-switch { padding: 6px 12px; font-size: 14px; }
+  .fg-code { border-top: 1px solid var(--line); padding: 10px 0 2px; }
+  .fg-code-label { font-weight: 600; }
+  .fg-codes { display: grid; grid-template-columns: max-content 1fr; gap: 4px 10px; margin: 0 0 8px; }
+  .fg-codes dt { color: var(--muted); }
+  .fg-codes dd { margin: 0; min-width: 0; }
+  .fg-codes code { font-family: ui-monospace, Menlo, monospace; font-size: 15px; background: var(--raise); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; user-select: all; }
+  .fg-check { color: var(--muted); font-size: 13px; }
+  .fg-section { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
+  .fg-h { font-weight: 600; }
+  .fg-copy { margin-left: 8px; border: 1px solid var(--line); background: transparent; color: inherit; font: inherit; font-size: 12px; padding: 2px 8px; border-radius: 6px; cursor: pointer; user-select: none; vertical-align: 1px; }
+  .fg-q { border-bottom: 1px solid var(--line); padding: 8px 0; }
+  .fg-q summary { cursor: pointer; font-weight: 600; }
+  .fg-q p { margin: 6px 0 0; }
+  .fg-stuck { margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
   .cr-topics { border: 0; padding: 0; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
   .cr-topics legend { padding: 0; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
   #crTopics { display: contents; }
@@ -519,6 +547,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
+<script src="/dashboard/forwarding-guide.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -627,16 +656,8 @@
     </div>
     <button class="btn-ghost rn-toggle" type="button" id="rnToggle" aria-expanded="false" aria-controls="rnHow">Call forwarding instructions</button>
     <div class="rn-how" id="rnHow" hidden>
-      <p class="rn-h">If you answer on a mobile</p>
-      <p class="rn-step">Dial one of these from the mobile you want forwarded:</p>
-      <div id="rnOptions"></div>
-      <ul class="rn-notes" id="rnCaveats"></ul>
-      <p class="rn-note" id="rnLandline"></p>
-      <div class="rn-land">
-        <p class="rn-h">If you answer on a landline or office phone</p>
-        <p class="rn-step">Call your phone provider and ask for call forwarding (busy or no answer) to <b id="rnLandNum"></b>, or set it in your phone system's admin.</p>
-      </div>
-      <p class="rn-stuck">Stuck? <a id="rnHelp" href="mailto:hello@voicecaptures.com?subject=Help%20setting%20up%20call%20forwarding">Contact us</a> and we'll set it up with you.</p>
+      <!-- Rendered from /dashboard/forwarding-guide.json (forwarding-guide.js): the one source of the forwarding wording. -->
+      <div id="fwdGuide" class="fg"></div>
     </div>
   </div>
   <div class="card usage" id="usageCard" hidden></div>
@@ -1553,23 +1574,25 @@ function renderAll(data) {
 }
 
 /* ---------- "Your receptionist number" (every customer with a line) ----------
- * The forwarding wording is the ready email's, word for word (self-serve repo
- * src/demo/forwarding.ts: forwardingSteps, FORWARDING_CAVEATS and the first
- * landline line). The two repos can't share code: change both together. */
-const RN_OPTIONS = [
-  ["Forward calls you do not answer — the one to use (recommended)", "**61*", "##61#"],
-  ["Forward every call, without ringing your phone first", "**21*", "##21#"],
-  ["Forward calls that arrive while you are on the phone", "**67*", "##67#"],
-  ["Forward calls when your phone is off or has no signal", "**62*", "##62#"]
-];
-const RN_CAVEATS = [
-  "Dial the code from the mobile whose calls you want forwarded, and wait for the confirmation message.",
-  "Carriers differ. If a code does nothing, or your phone says the service is not provisioned, ring your carrier and ask them to turn on conditional call forwarding — that is the name they will know it by.",
-  "Some carriers need call forwarding added to your plan before any code works, and some charge for forwarded minutes.",
-  "Voicemail may need to be switched off first. If voicemail answers before the forward happens, the call never reaches your receptionist.",
-  "To undo any of these, dial the matching cancel code above."
-];
-const RN_LANDLINE = "The codes above are for mobile phones. They will not work on a landline.";
+ * The forwarding guide is /dashboard/forwarding-guide.json, rendered by
+ * forwarding-guide.js: the one source of the wording. The self-serve repo's
+ * welcome and line-ready emails must render the same file (its text is
+ * forwarding-guide.txt). Change the JSON, never a copy of it. */
+let fwdGuide = null;
+const loadGuide = () => fwdGuide || (fwdGuide = fetch("/dashboard/forwarding-guide.json", { cache: "no-cache" })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .catch(e => { fwdGuide = null; throw e; }));
+async function renderGuide(n) {
+  const el = $("fwdGuide");
+  try { const g = await loadGuide(); if (rnValue === n) window.VCForwardingGuide.render(el, g, n, { ua: navigator.userAgent }); }
+  catch (e) {
+    el.textContent = "";
+    const p = document.createElement("p"); p.className = "fg-stuck";
+    p.append("The forwarding steps didn't load. Refresh the page, or ");
+    const a = document.createElement("a"); a.href = "mailto:hello@voicecaptures.com?subject=Help%20setting%20up%20call%20forwarding"; a.textContent = "contact us";
+    p.append(a, " and we'll set it up with you."); el.appendChild(p);
+  }
+}
 // +16475550005 → "+1 647 555 0005"; anything else as it came.
 const fmtNumber = n => { const m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(String(n || "")); return m ? `+1 ${m[1]} ${m[2]} ${m[3]}` : String(n || ""); };
 let rnValue = null;
@@ -1581,11 +1604,7 @@ function renderReceptionistNumber(n) {
   if (rnValue === n) return;
   rnValue = n;
   $("rnNum").textContent = fmtNumber(n);
-  $("rnOptions").innerHTML = RN_OPTIONS.map(([label, on, off]) => `<div class="rn-opt"><p class="rn-step">${esc(label)}</p>
-    <dl class="rn-codes"><dt>turn on:</dt><dd><code>${esc(on + n + "#")}</code></dd><dt>turn off:</dt><dd><code>${esc(off)}</code></dd></dl></div>`).join("");
-  $("rnCaveats").innerHTML = RN_CAVEATS.map(c => `<li>${esc(c)}</li>`).join("");
-  $("rnLandline").textContent = RN_LANDLINE;
-  $("rnLandNum").textContent = fmtNumber(n);
+  renderGuide(n);
   $("rnCopy").textContent = "Copy";
   setRnOpen(false);   // a different number (another business): start closed
 }
