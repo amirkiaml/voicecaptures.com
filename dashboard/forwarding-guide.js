@@ -6,6 +6,11 @@
  *     modes in turn, since an email can't toggle). forwarding-guide.txt is this
  *     with "{number}" left in, for the self-serve repo's email to match.
  *   VCForwardingGuide.deviceOf(ua)                       "iphone" | "android" | null
+ *   VCForwardingGuide.codeNumber(raw, format)            the number inside a code
+ *
+ * The number inside a code is written one way, set once in the JSON
+ * (codeNumberFormat: "e164" → +16475550142, "10digit" → 6475550142).
+ * TODO(owner): which one; see codeNumberFormatTodo in the JSON.
  *
  * Every string goes in with textContent: nothing from the JSON is parsed as
  * HTML. No network, no storage. Works in a browser (window.VCForwardingGuide)
@@ -15,6 +20,16 @@
   "use strict";
   // +16475550142 → "+1 647 555 0142" for sentences; codes keep the raw number.
   const pretty = n => { const m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(String(n || "")); return m ? `+1 ${m[1]} ${m[2]} ${m[3]}` : String(n || ""); };
+  const CODE_FORMATS = {
+    e164: d => `+1${d}`,
+    "10digit": d => d
+  };
+  function codeNumber(raw, format) {
+    const f = CODE_FORMATS[format];
+    if (!f) throw new Error(`forwarding guide: unknown codeNumberFormat ${format}`);
+    const m = /^\+?1?(\d{10})$/.exec(String(raw || "").replace(/[\s().-]/g, ""));
+    return m ? f(m[1]) : String(raw || "");
+  }
   const fill = (s, number, extra) => String(s).replace(/\{number\}/g, number).replace(/\{(\w+)\}/g, (m, k) => (extra && k in extra ? extra[k] : m));
 
   function deviceOf(ua) {
@@ -26,11 +41,26 @@
   // iPhone settings can only forward every call, so an iPhone starts on the code.
   const defaultMode = device => (device === "iphone" ? "code" : "settings");
 
+  // Copy: the code exactly as shown, nothing around it.
+  function copyText(doc, text) {
+    const nav = doc.defaultView && doc.defaultView.navigator;
+    if (nav && nav.clipboard && nav.clipboard.writeText) return nav.clipboard.writeText(text);
+    const t = doc.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+    doc.body.appendChild(t); t.select();
+    try { return doc.execCommand("copy") ? Promise.resolve() : Promise.reject(new Error("copy")); } finally { t.remove(); }
+  }
+
   function render(el, guide, raw, opts) {
-    const doc = el.ownerDocument, number = pretty(raw);
+    const doc = el.ownerDocument, number = pretty(raw), dial = codeNumber(raw, guide.codeNumberFormat);
     const h = (tag, cls, text) => { const n = doc.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
     const list = (tag, cls, items) => { const l = h(tag, cls); for (const t of items) l.appendChild(h("li", null, fill(t, number))); return l; };
     const device = deviceOf(opts && opts.ua);
+    const copyButton = code => {
+      const b = h("button", "fg-copy", "Copy"); b.type = "button"; b.dataset.copy = code; b.setAttribute("aria-label", `Copy ${code}`);
+      b.addEventListener("click", () => copyText(doc, code).then(() => { b.textContent = "Copied"; }, () => { b.textContent = "Select and copy"; })
+        .then(() => setTimeout(() => { b.textContent = "Copy"; }, 2000)));
+      return b;
+    };
     el.textContent = "";
     el.appendChild(h("p", "fg-intro", fill(guide.intro, number)));
 
@@ -74,28 +104,17 @@
       box.appendChild(h("p", "fg-code-label", o.label));
       box.appendChild(h("p", "fg-note", fill(o.detail, number)));
       const dl = h("dl", "fg-codes");
-      dl.appendChild(h("dt", null, "Turn on:")); const on = h("dd"); on.appendChild(h("code", null, fill(o.on, raw))); dl.appendChild(on);
-      dl.appendChild(h("dt", null, "Turn off:")); const off = h("dd"); off.appendChild(h("code", null, fill(o.off, raw))); dl.appendChild(off);
+      for (const [label, code] of [["Turn on:", fill(o.on, dial)], ["Turn off:", fill(o.off, dial)]]) {
+        dl.appendChild(h("dt", null, label));
+        const dd = h("dd"); dd.appendChild(h("code", null, code)); dd.appendChild(copyButton(code)); dl.appendChild(dd);
+      }
       box.appendChild(dl); cp.appendChild(box);
     }
     cp.appendChild(h("p", "fg-check", fill(guide.codes.check.text, number)));
-    cp.appendChild(h("p", "fg-check", fill(guide.codes.undo, number)));
     el.appendChild(cp);
 
-    // Both modes: voicemail, test, Q&A.
-    const vm = h("div", "fg-section fg-voicemail");
-    vm.appendChild(h("p", "fg-h", guide.voicemail.heading));
-    vm.appendChild(h("p", null, fill(guide.voicemail.text, number)));
-    const cl = h("ul", "fg-carriers");
-    for (const c of guide.voicemail.carriers) {
-      const li = h("li"); li.dataset.carrier = c.name;
-      li.appendChild(h("b", null, c.name + ": "));
-      li.appendChild(doc.createTextNode(carrierText(guide, c, number)));
-      cl.appendChild(li);
-    }
-    if (guide.voicemail.untestedCarriers.length) { const li = h("li", "fg-untested", fill(guide.voicemail.others, number, { carriers: guide.voicemail.untestedCarriers.join(", ") })); cl.appendChild(li); }
-    vm.appendChild(cl);
-    el.appendChild(vm);
+    // Both modes: the voicemail sentence, the test, then the Q&A.
+    el.appendChild(h("p", "fg-section fg-voicemail", fill(guide.voicemail.text, number)));
 
     const ts = h("div", "fg-section fg-test");
     ts.appendChild(h("p", "fg-h", guide.test.heading));
@@ -124,23 +143,18 @@
     return { mode: defaultMode(device), device: device || guide.settings.devices[0].id };
   }
 
-  // A tested carrier: what we found, then its steps (or "ask <carrier>").
-  const carrierText = (guide, c, number) => [c.finding, c.steps && c.steps.length ? c.steps.join(" ") : fill(guide.voicemail.noSteps, number, { carrier: c.name })].filter(Boolean).join(" ");
-
   // The email's text: both modes, in turn.
   function toText(guide, raw) {
-    const number = raw === "{number}" ? raw : pretty(raw);
+    const tpl = raw === "{number}", number = tpl ? raw : pretty(raw), dial = tpl ? "{code_number}" : codeNumber(raw, guide.codeNumberFormat);
     const out = [], f = s => fill(s, number);
     const numbered = items => items.map((s, i) => `${i + 1}. ${f(s)}`);
     out.push(f(guide.intro), "");
     out.push(`OPTION 1: ${guide.modes.find(m => m.id === "settings").label.toUpperCase()}`);
     for (const d of guide.settings.devices) { out.push("", d.label, ...numbered(d.steps)); if (d.note) out.push(f(d.note)); }
     out.push("", `OPTION 2: ${guide.modes.find(m => m.id === "code").label.toUpperCase()}`, ...numbered(guide.codes.how));
-    for (const o of guide.codes.options) out.push("", o.label, f(o.detail), `Turn on:  ${fill(o.on, raw)}`, `Turn off: ${fill(o.off, raw)}`);
-    out.push("", f(guide.codes.check.text), f(guide.codes.undo));
-    out.push("", guide.voicemail.heading.toUpperCase(), f(guide.voicemail.text));
-    for (const c of guide.voicemail.carriers) out.push(`- ${c.name}: ${carrierText(guide, c, number)}`);
-    if (guide.voicemail.untestedCarriers.length) out.push(`- ${fill(guide.voicemail.others, number, { carriers: guide.voicemail.untestedCarriers.join(", ") })}`);
+    for (const o of guide.codes.options) out.push("", o.label, f(o.detail), `Turn on:  ${fill(o.on, dial)}`, `Turn off: ${fill(o.off, dial)}`);
+    out.push("", f(guide.codes.check.text));
+    out.push("", f(guide.voicemail.text));
     out.push("", guide.test.heading.toUpperCase(), ...numbered(guide.test.steps), f(guide.test.unverified));
     out.push("", "QUESTIONS");
     for (const q of guide.faq) out.push("", q.q, ...q.a.map(f));
@@ -148,7 +162,7 @@
     return out.join("\n") + "\n";
   }
 
-  const api = { render, toText, deviceOf, defaultMode, pretty };
+  const api = { render, toText, deviceOf, defaultMode, pretty, codeNumber };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.VCForwardingGuide = api;
 })(typeof window !== "undefined" ? window : globalThis);

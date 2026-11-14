@@ -1,6 +1,8 @@
 {
   "version": 1,
-  "about": "THE ONE SOURCE of every customer-facing word about call forwarding. The dashboard renders it (dashboard/forwarding-guide.js); the line-ready and welcome emails are rendered by the self-serve repo, which must copy this file byte for byte and render forwarding-guide.txt's text from it (TODO(owner): self-serve repo). {number} is the customer's receptionist number: inside a code (on, off) it is the raw +1 number the phone dials; everywhere else it is shown as +1 647 555 0142. Change this file, then run node tests/forwarding-guide.test.js --write to refresh forwarding-guide.txt.",
+  "about": "THE ONE SOURCE of every customer-facing word about call forwarding. The dashboard renders it (dashboard/forwarding-guide.js); the line-ready and welcome emails are rendered by the self-serve repo, which must copy this file byte for byte and render forwarding-guide.txt's text from it (TODO(owner): self-serve repo). {number} in a sentence is the receptionist number shown as +1 647 555 0142. Inside a code (on, off) it is the number the phone dials, written as codeNumberFormat says (forwarding-guide.txt shows it as {code_number}). Change this file, then run node tests/forwarding-guide.test.js --write to refresh forwarding-guide.txt.",
+  "codeNumberFormat": "e164",
+  "codeNumberFormatTodo": "TODO(owner): which number the codes carry. \"e164\" dials **61*+13653895994**15#; \"10digit\" dials **61*3653895994**15#. Not tested on a real phone either way; e164 is what shipped first.",
   "intro": "Send the calls you don't answer to your receptionist at {number}. Choose how you'd like to set it up:",
   "modes": [
     {
@@ -69,38 +71,16 @@
     "check": {
       "code": "*#61#",
       "text": "To check: dial *#61#. It should show {number} for unanswered calls."
-    },
-    "undo": "To turn it off: dial ##61#, or ##004# if you used that code."
+    }
   },
   "voicemail": {
-    "heading": "Turn off your carrier's voicemail",
-    "text": "If your carrier's voicemail answers first, the call never reaches your receptionist, even when your phone says forwarding is set.",
-    "carriers": [
-      {
-        "name": "Koodo",
-        "tested": true,
-        "finding": "Tested on an iPhone: the forwarding code showed \"Setting Registration Succeeded … When Unanswered\", but Koodo voicemail still answered first. Turning voicemail off fixed it.",
-        "steps": [],
-        "todo": "TODO(owner): record the exact steps to turn Koodo voicemail off."
-      }
-    ],
-    "noSteps": "Ask {carrier} to turn voicemail off on your line.",
-    "untestedCarriers": [
-      "Bell",
-      "Rogers",
-      "Telus",
-      "Fido",
-      "Freedom Mobile",
-      "Virgin Plus",
-      "Public Mobile"
-    ],
-    "others": "Other carriers (unverified): {carriers}. We haven't tested these yet. Ask your carrier to turn voicemail off on your line."
+    "text": "If your carrier's voicemail still answers first, ask your carrier to turn voicemail off on your line."
   },
   "test": {
     "heading": "Test it",
     "steps": [
       "From another phone, call your own number.",
-      "Let it ring. Don't decline it on your phone.",
+      "Let it ring. Don't decline it: declining sends the call to voicemail, so it isn't a fair test.",
       "After about 15 seconds your receptionist should answer."
     ],
     "unverified": "We can't see from here whether your forwarding is on, so this test is the way to check."
@@ -109,35 +89,26 @@
     {
       "q": "It still goes to voicemail",
       "a": [
-        "Your carrier's voicemail is answering before the forward. Turn voicemail off, then test again.",
-        "A success message from the code doesn't mean voicemail is off. On Koodo, the code reported success and voicemail still answered. The code ##002# also reported success and didn't change voicemail."
+        "Your carrier's voicemail is answering before the forward. Ask your carrier to turn voicemail off on your line, then test again. A success message after dialing a code doesn't mean voicemail is off."
       ]
     },
     {
       "q": "Do I have to turn voicemail off?",
       "a": [
-        "Usually, yes. If voicemail picks up first, your receptionist never gets the call. With voicemail off, a call you don't answer goes to your receptionist, who takes the message instead."
-      ]
-    },
-    {
-      "q": "How do I test it?",
-      "a": [
-        "Call your own number from another phone and let it ring. Don't decline it: declining sends the call to voicemail or your carrier's busy handling, so it isn't a fair test.",
-        "After about 15 seconds your receptionist should answer."
+        "Usually, yes. If voicemail picks up first, your receptionist never gets the call. With voicemail off, your receptionist takes the message instead."
       ]
     },
     {
       "q": "How do I turn it off?",
       "a": [
-        "Dial ##61#, and ##004# if you used that code. If you used your phone's settings, switch those back off.",
-        "Turn your voicemail back on if you want it."
+        "Dial ##61#, or ##004# if you used that code. If you used your phone's settings, switch those back off. Turn your voicemail back on if you want it."
       ]
     },
     {
       "q": "Which carrier?",
       "a": [
-        "These codes are standard, but each carrier handles them its own way. Some need call forwarding added to your plan before any code works, and some charge for forwarded minutes.",
-        "We've tested Koodo. We haven't tested the others yet. If something doesn't work, ask your carrier to turn on conditional call forwarding (the name they'll know it by), or contact us."
+        "The codes are standard, but some carriers need call forwarding added to your plan first, and some charge for forwarded minutes.",
+        "Tested on Koodo with an iPhone; other carriers not tested yet."
       ]
     },
     {
