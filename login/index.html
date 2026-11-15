@@ -131,10 +131,10 @@
         <p class="foot">Don't have an account? <a href="https://calendly.com/hello-voicecaptures">Book a demo</a></p>
       </section>
 
-      <!-- Forgot password -->
+      <!-- Forgot password; also shown, retitled, when an invite or reset link was already used -->
       <section id="vForgot" hidden>
-        <h1>Reset your password</h1>
-        <p class="lede">Enter your email and we'll send you a link to choose a new password.</p>
+        <h1 id="fTitle">Reset your password</h1>
+        <p class="lede" id="fLede">Enter your email and we'll send you a link to choose a new password.</p>
         <form id="forgotForm" novalidate>
           <div class="field">
             <label for="fEmail">Email</label>
@@ -194,6 +194,24 @@
 
   var link = vcAuth.linkType;
   var setMode = link.type === "invite" || link.type === "recovery";
+  // An invite or reset link that was already opened (often by the email app's
+  // safety scan, before the person clicked) or has run out: not an error to
+  // show in red, just a reason to send a fresh link. Read before supabase-js
+  // clears the hash.
+  var spent = (function () {
+    var h = new URLSearchParams(location.hash.replace(/^#/, "")), q = new URLSearchParams(location.search);
+    var code = h.get("error_code") || q.get("error_code") || "";
+    return code === "otp_expired" || (!!link.error && /expired|invalid/i.test(link.error));
+  })();
+  var sendLabel = "Send reset link";
+  function showSpent() {
+    $("fTitle").textContent = "Get a new link";
+    $("fLede").textContent = "That link has already been opened, which is normal: some email apps open links to check them, and each link works only once. Enter your email and we'll send you a new link to set your password.";
+    sendLabel = "Send me a new link";
+    $("forgotBtn").textContent = sendLabel;
+    msg("forgotMsg", "");
+    show("vForgot");
+  }
 
   vcAuth.client().then(function (ctx) {
     var sb = ctx.sb;
@@ -206,7 +224,9 @@
     return sb.auth.getSession().then(function (res) {
       var session = res.data && res.data.session;
 
-      if (link.error) {
+      if (spent && !session) {
+        showSpent();
+      } else if (link.error) {
         show("vLogin");
         msg("loginMsg", /expired|invalid/i.test(link.error)
           ? "That link has expired or was already used. Log in, or use “Forgot password?” to get a new one."
@@ -247,7 +267,12 @@
         sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + next() } });
       };
 
-      $("toForgot").onclick = function () { $("fEmail").value = $("email").value; msg("forgotMsg", ""); show("vForgot"); };
+      $("toForgot").onclick = function () {
+        $("fTitle").textContent = "Reset your password";
+        $("fLede").textContent = "Enter your email and we'll send you a link to choose a new password.";
+        sendLabel = "Send reset link"; $("forgotBtn").textContent = sendLabel;
+        $("fEmail").value = $("email").value; msg("forgotMsg", ""); show("vForgot");
+      };
       $("backToLogin").onclick = function () { show("vLogin"); };
 
       $("forgotForm").onsubmit = function (e) {
@@ -256,7 +281,7 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg("forgotMsg", "Enter a valid email.", "err");
         busy($("forgotBtn"), true, "Sending…");
         sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/login/" }).then(function (r) {
-          busy($("forgotBtn"), false, "Send reset link");
+          busy($("forgotBtn"), false, sendLabel);
           if (r.error && /rate|seconds/i.test(r.error.message)) return msg("forgotMsg", "Please wait a minute before asking again.", "err");
           // Same message either way, so this form can't be used to test which emails have accounts.
           msg("forgotMsg", "If " + email + " has an account, a reset link is on its way.", "ok");
