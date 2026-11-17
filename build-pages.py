@@ -2931,6 +2931,194 @@ def _triggers():
     return out
 
 
+# ------------------------------------------------------------- waitlist ----
+# The international waitlist. Off until the endpoint exists: with the flag off
+# the block is the sentence and nothing else, so we never show a form that
+# posts into the void.
+WAITLIST = {
+    "enabled": False,          # flip when the self-serve /waitlist route ships
+    "endpoint": "https://demo.voicecaptures.com/waitlist",
+    "hosted": "https://demo.voicecaptures.com/waitlist",
+    "consent_version": "waitlist-2026-11-17",
+    # Exact, and unticked by default. Changing a character means a new version
+    # string: the record of what someone agreed to has to match what they saw.
+    "consent_text": ("Email me when VoiceCaptures launches in my country. "
+                     "I can unsubscribe at any time."),
+    # CASL: the sender has to be identifiable at the point of consent, which
+    # means a mailing address valid for at least 60 days, not just an email.
+    "sender": ("VoiceCaptures, PMB 111, 2160 Highway 7, Unit 6, "
+               "Concord ON L4K 1W6, hello@voicecaptures.com"),
+    "heading": "Not in Canada?",
+    "copy_on": ("VoiceCaptures is live in Canada. We&rsquo;re rolling out to more "
+                "countries soon. Join the waitlist and we&rsquo;ll email you the "
+                "moment it opens in yours."),
+    "copy_off": ("VoiceCaptures is live in Canada. We&rsquo;re rolling out to "
+                 "more countries soon."),
+}
+WAITLIST_CONSENT_VERSION = WAITLIST["consent_version"]
+
+
+def _countries():
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "pricing", "countries.json"), encoding="utf-8") as fh:
+        return json.load(fh)["countries"]
+
+
+def _waitlist_block():
+    """The "Not in Canada?" block.
+
+    With WAITLIST["enabled"] off this is one sentence and no form: the
+    endpoint does not exist yet, and a form that silently fails is worse than
+    no form. With it on, the form posts JSON to the self-serve route and
+    degrades to a link to the hosted page when JavaScript is off.
+    """
+    w = WAITLIST
+    if not w["enabled"]:
+        return (f'\n<section id="waitlist" class="wl-off">\n  <div class="wrap">\n'
+                f'    <h2>{w["heading"]}</h2>\n'
+                f'    <p class="wl-copy">{w["copy_off"]}</p>\n'
+                f'  </div>\n</section>\n')
+
+    opts = "".join(f'<option value="{c["code"]}">{c["name"]}</option>'
+                   for c in _countries())
+    return f"""
+<section id="waitlist">
+  <div class="wrap">
+    <h2>{w["heading"]}</h2>
+    <p class="wl-copy">{w["copy_on"]}</p>
+
+    <noscript>
+      <p><a class="btn btn-primary" href="{w["hosted"]}">Join the waitlist</a></p>
+    </noscript>
+
+    <form class="wl-form" id="wl-form" method="post" action="{w["hosted"]}"
+      data-endpoint="{w["endpoint"]}"
+      data-consent-version="{w["consent_version"]}" hidden>
+      <div class="wl-row">
+        <label for="wl-email">Email <span aria-hidden="true">*</span></label>
+        <input type="email" id="wl-email" name="email" required
+          autocomplete="email" inputmode="email">
+      </div>
+      <div class="wl-row">
+        <label for="wl-country">Country <span aria-hidden="true">*</span></label>
+        <select id="wl-country" name="country" required>
+          <option value="">Choose your country</option>{opts}
+        </select>
+      </div>
+      <div class="wl-row">
+        <label for="wl-type">Business type <span class="wl-opt">optional</span></label>
+        <input type="text" id="wl-type" name="business_type" maxlength="80"
+          autocomplete="organization-title">
+      </div>
+      <div class="wl-row">
+        <label for="wl-site">Website <span class="wl-opt">optional</span></label>
+        <input type="url" id="wl-site" name="website" maxlength="200"
+          autocomplete="url" placeholder="https://">
+      </div>
+
+      <!-- Honeypot. Hidden from people, tempting to a bot that fills every
+           field it finds. A filled one is dropped without ever being sent. -->
+      <div class="wl-hp" aria-hidden="true">
+        <label for="wl-company">Company</label>
+        <input type="text" id="wl-company" name="company" tabindex="-1"
+          autocomplete="off">
+      </div>
+
+      <label class="wl-consent">
+        <input type="checkbox" id="wl-consent" name="consent" required>
+        <span>{w["consent_text"]}</span>
+      </label>
+      <p class="wl-sender">{w["sender"]}</p>
+
+      <button type="submit" class="btn btn-primary" id="wl-send">Join the waitlist</button>
+      <p class="wl-state" id="wl-state" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+"""
+
+
+WAITLIST_SCRIPT = """
+<script>
+// The waitlist form. No third-party anything: one fetch to our own endpoint.
+(function(){
+  var f = document.getElementById("wl-form");
+  if (!f) return;
+  // The form ships hidden and is shown here, so a visitor without JavaScript
+  // sees the <noscript> link instead of a form that cannot submit. The form
+  // still carries a real action, so it degrades rather than breaking.
+  f.hidden = false;
+  // With script running, this form does its own checking, so the messages are
+  // ours and read the same in every browser. The `required` attributes stay on
+  // the fields for the no-JS path, where the browser is the only validator.
+  f.noValidate = true;
+  var state = document.getElementById("wl-state");
+  var send = document.getElementById("wl-send");
+  var ENDPOINT = f.getAttribute("data-endpoint");
+
+  function say(kind, msg){
+    state.className = "wl-state wl-" + kind;
+    state.textContent = msg;
+  }
+
+  f.addEventListener("submit", function(e){
+    e.preventDefault();
+    // A filled honeypot is a bot. Behave exactly as if it worked, and send
+    // nothing: telling it that it was caught only teaches it.
+    if (f.company.value){ say("ok", "Thanks \\u2014 you're on the list."); return; }
+
+    var email = f.email.value.trim();
+    var country = f.country.value;
+    if (!email || email.indexOf("@") < 1 || email.indexOf(".") < 0){
+      say("err", "Please enter an email address we can reach you at."); return;
+    }
+    if (!country){ say("err", "Please choose your country."); return; }
+    if (!f.consent.checked){
+      say("err", "Please tick the box so we know we may email you."); return;
+    }
+
+    var body = { email: email, country: country, consent: true,
+                 source: "website", consent_version:
+                   f.getAttribute("data-consent-version") };
+    if (f.business_type.value.trim()) body.business_type = f.business_type.value.trim();
+    if (f.website.value.trim()) body.website = f.website.value.trim();
+    var utm = window.location.search.match(/utm_[a-z]+=[^&]*/g);
+    if (utm) body.utm = utm.join("&");
+
+    send.disabled = true;
+    say("busy", "Sending\\u2026");
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function(r){
+      if (r.status === 429){
+        say("err", "That is a lot of tries. Give it a minute and try again.");
+        return null;
+      }
+      if (r.status === 400){
+        say("err", "Something in that was not right. Check the email and country and try again.");
+        return null;
+      }
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).then(function(d){
+      if (!d) return;
+      if (d.ok){
+        f.reset();
+        say("ok", "Thanks \\u2014 you're on the list. We'll email you when VoiceCaptures opens in your country.");
+      } else {
+        say("err", "We could not save that. Please try again.");
+      }
+    }).catch(function(){
+      say("err", "We could not reach us just now. Try again in a minute, or email hello@voicecaptures.com.");
+    }).then(function(){ send.disabled = false; });
+  });
+})();
+</script>
+"""
+
+
 def _winback_section():
     """Win-back, rendered from pricing/winback.json and nothing else.
 
@@ -3002,6 +3190,7 @@ def _pricing_body():
     <ul class="pr-strip">{strip_html}</ul>
   </div>
 </section>
+{_waitlist_block()}
 
 {_winback_section()}
 <section id="p-minutes">
@@ -3557,7 +3746,7 @@ PAGES = [
      f"{pricing_data.PLANS['business_pro']['name']} "
      f"{pricing_data.money(pricing_data.PLANS['business_pro']['monthly'])}/mo, "
      f"Enterprise quoted. Minutes, add-ons and annual, with no quote needed.",
-     PRICING_BODY, PRICING_SCRIPT),
+     PRICING_BODY, PRICING_SCRIPT + (WAITLIST_SCRIPT if WAITLIST["enabled"] else "")),
 
     ("playground", "Playground \u2014 call the demo line | VoiceCaptures",
      "Call our live demo line, book yourself an appointment on the phone, and "
