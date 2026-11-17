@@ -1376,6 +1376,10 @@ CAREERS_SCRIPT = f"""
 
 # -------------------------------------------------------------- win-back ----
 
+# Note to ourselves, deliberately not an HTML comment: the win-back page
+# has no proof or case-study block. Nothing goes there until there is a
+# real campaign with real numbers and the client's permission to quote
+# them.
 WINBACK_BODY = f"""
 
 <section class="wb-hero">
@@ -1789,9 +1793,6 @@ WINBACK_BODY = f"""
     </div>
   </div>
 </section>
-
-<!-- PLACEHOLDER: proof / case study. Nothing goes here until there is a real
-     campaign with real numbers and the client's permission to quote them. -->
 
 <section>
   <div class="wrap center">

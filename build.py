@@ -152,6 +152,57 @@ def check_cards() -> None:
         sys.exit("share cards:\n" + "\n".join(bad))
 
 
+# Review notes must never reach a published page. A phrase like "pending
+# lawyer review" in a heading, a meta tag, an alt attribute or even an HTML
+# comment is visible to anyone who looks, and on the terms and privacy pages it
+# undermines the document it sits in. The build fails rather than publish one.
+#
+# Whole words only: "Depending on your plan" is not "pending". Attribute NAMES
+# are not content, so a form's placeholder="..." is fine while the word
+# "placeholder" in the text is not. Bracketed fill-ins like [mailing address]
+# are caught separately: a placeholder nobody replaced is the thing this guard
+# exists for.
+import re as _re
+
+BANNED = ["lawyer", "legal review", "draft", "pending", "TODO", "TBD",
+          "placeholder", "to be confirmed", "coming shortly", "under review"]
+BANNED_PAGES = ["terms", "privacy", "pricing", "caller-texts", "waitlist",
+                "win-back", "faq", "home", "demo", "about", "careers",
+                "contact", "playground", "install"]
+
+
+def _visible_text(html: str) -> str:
+    """What a reader or a crawler sees: tags out, attribute values that are
+    read aloud (alt, aria-label, title, content) kept in."""
+    spoken = " ".join(m.group(1) for m in _re.finditer(
+        r'(?:alt|aria-label|title|content)="([^"]*)"', html))
+    body = _re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", html, flags=_re.S)
+    body = _re.sub(r"<[^>]+>", " ", body)
+    return body + " " + spoken
+
+
+def check_words() -> None:
+    bad = []
+    for f in sorted(ROOT.glob("*/index.html")) + [ROOT / "index.html"]:
+        page = f.parent.name if f.parent != ROOT else "home"
+        if page not in BANNED_PAGES:
+            continue
+        html = f.read_text(encoding="utf-8")
+        text = _visible_text(html)
+        for word in BANNED:
+            if _re.search(r"\b" + _re.escape(word) + r"\b", text, _re.I):
+                bad.append(f"  {page}: the word {word!r} is on the published page")
+        for m in _re.finditer(r"<!--(.*?)-->", html, _re.S):
+            for word in BANNED:
+                if _re.search(r"\b" + _re.escape(word) + r"\b", m.group(1), _re.I):
+                    bad.append(f"  {page}: {word!r} in an HTML comment "
+                               f"(comments ship with the page)")
+        for m in _re.finditer(r"\[[a-z][a-z ]{3,40}\]", text):
+            bad.append(f"  {page}: unfilled placeholder {m.group(0)!r}")
+    if bad:
+        sys.exit("review notes on a public page:\n" + "\n".join(sorted(set(bad))))
+
+
 # Mojibake guard. index.html once reached production with every em dash stored
 # as "\u00e2\u20ac\u201d" — a UTF-8 em dash that some editor read as cp1252 and
 # saved back as UTF-8. It is invisible in most editors and shows up in the
@@ -193,6 +244,7 @@ def main():
     check_encoding(raw, src)
     check_vars()
     check_cards()
+    check_words()
 
     for key, meta in PAGES.items():
         folder = ROOT / meta["slug"]
