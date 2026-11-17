@@ -2944,10 +2944,10 @@ WAITLIST = {
     # string: the record of what someone agreed to has to match what they saw.
     "consent_text": ("Email me when VoiceCaptures launches in my country. "
                      "I can unsubscribe at any time."),
-    # CASL: the sender has to be identifiable at the point of consent.
-    # TODO(owner): the mailing address. "[mailing address]" is a placeholder and
-    # must be replaced before this is published, flag on or off.
-    "sender": "VoiceCaptures, [mailing address], hello@voicecaptures.com",
+    # CASL: the sender has to be identifiable at the point of consent, which
+    # means a mailing address valid for at least 60 days, not just an email.
+    "sender": ("VoiceCaptures, PMB 111, 2160 Highway 7, Unit 6, "
+               "Concord ON L4K 1W6, hello@voicecaptures.com"),
     "heading": "Not in Canada?",
     "copy_on": ("VoiceCaptures is live in Canada. We&rsquo;re rolling out to more "
                 "countries soon. Join the waitlist and we&rsquo;ll email you the "
