@@ -114,6 +114,19 @@ section{padding:var(--s24) 0}
 .btn-dark:hover{background:#0D1729}
 .btn-sm{font-size:15px; padding:13px 22px; min-height:46px; white-space:nowrap}
 .beta{font-style:normal; font-weight:700; font-size:.78em; opacity:.72; margin-left:3px}
+/* The beta tag. A corner pill rather than a parenthetical, so it never changes
+   the button's width or pushes its label off centre: it is positioned out of
+   flow, and the ring is the page background so it reads as a tag sitting on
+   the edge. The button keeps the full wording in its aria-label, so screen
+   readers still hear "beta"; the tag itself is decorative. */
+.btn{position:relative}
+.beta-tag{position:absolute; top:-8px; right:-6px; z-index:1;
+  padding:2px 6px; border-radius:var(--r-pill);
+  background:var(--ink); color:#fff;
+  font-size:10px; font-weight:800; line-height:1.1; letter-spacing:.06em;
+  text-transform:uppercase; white-space:nowrap; pointer-events:none;
+  box-shadow:0 0 0 2px var(--bg)}
+.btn-ghost .beta-tag{background:var(--blue)}
 
 /* ---- nav ---- */
 header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line)}
@@ -1263,9 +1276,14 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   margin-top:var(--s8); align-items:start}
 @media(min-width:760px){ .ported .pr-grid-4{grid-template-columns:repeat(2,1fr)} }
 @media(min-width:1080px){ .ported .pr-grid-4{grid-template-columns:repeat(4,1fr)} }
+/* Four cards in the 1120px rail leave each one about 250px wide, which wraps
+   nearly every feature onto two lines and is what actually made these cards
+   tall. The plan grid alone gets a wider rail; the rest of the page keeps the
+   site's measure. */
+@media(min-width:1240px){ .ported .pr-plans .wrap{max-width:1280px} }
 
 .ported .pr-card{position:relative; display:flex; flex-direction:column;
-  height:100%; padding:var(--s8) var(--s6); border:1px solid var(--line);
+  height:100%; padding:var(--s6); border:1px solid var(--line);
   border-radius:var(--r-card); background:var(--bg)}
 .ported .pr-card.pr-pop{border-color:var(--blue); background:#F5F8FF}
 .ported .pr-card.pr-dark{background:var(--ink); border-color:var(--ink)}
@@ -1276,7 +1294,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pr-card.pr-dark .pr-min,
 .ported .pr-card.pr-dark .pr-feat li{color:#C7D2E4}
 .ported .pr-card.pr-dark .pr-annual{color:#8FB4FF}
-.ported .pr-card.pr-dark .pr-feat li::before{color:#8FB4FF}
+.ported .pr-card.pr-dark .pr-feat .pr-ico{color:#8FB4FF}
 
 .ported .pr-badge{position:absolute; top:calc(var(--s6) * -1); left:50%;
   transform:translateX(-50%); white-space:nowrap;
@@ -1285,35 +1303,72 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   letter-spacing:.06em; text-transform:uppercase}
 
 .ported .pr-top{display:block; margin-bottom:0}
-.ported .pr-top h3{margin:0; font-size:23px}
-.ported .pr-tag{margin:var(--s1) 0 0; font-size:15px; color:var(--muted)}
-.ported .pr-price{margin:var(--s6) 0 0; font-size:46px; font-weight:800;
-  line-height:1.05; letter-spacing:-.02em; color:var(--ink)}
+.ported .pr-top h3{margin:0; font-size:21px}
+.ported .pr-tag{margin:var(--s1) 0 0; font-size:13.5px; line-height:1.3;
+  color:var(--muted)}
+.ported .pr-price{margin:var(--s4) 0 0; font-size:40px; font-weight:800;
+  line-height:1.02; letter-spacing:-.02em; color:var(--ink)}
 .ported .pr-price .pr-per{font-size:18px; font-weight:700; color:var(--muted)}
-.ported .pr-price.pr-quoted{font-size:34px}
-.ported .pr-min{margin:var(--s3) 0 0; font-size:15px; color:var(--ink-2)}
-.ported .pr-annual{margin:var(--s1) 0 0; font-size:14px; font-weight:700;
+.ported .pr-price.pr-quoted{font-size:30px}
+.ported .pr-min{margin:var(--s2) 0 0; font-size:14px; color:var(--ink-2)}
+.ported .pr-annual{margin:var(--s1) 0 0; font-size:13px; font-weight:700;
   color:var(--blue)}
 
-.ported .pr-feats{margin-top:var(--s6); padding-top:var(--s6);
+.ported .pr-feats{margin-top:var(--s4); padding-top:var(--s4);
   border-top:1px solid var(--line); flex:1}
 .ported .pr-card.pr-dark .pr-feats{border-top-color:rgba(255,255,255,.18)}
-.ported .pr-feat-head{margin:0 0 var(--s4); font-size:15px; font-weight:800;
-  color:var(--ink)}
+.ported .pr-feat-head{margin:0 0 var(--s2); font-size:13px; font-weight:800;
+  line-height:1.3; color:var(--ink)}
 .ported .pr-feat{list-style:none; margin:0; padding:0}
-.ported .pr-feat li{position:relative; margin:0 0 var(--s3); padding-left:26px;
-  font-size:15px; line-height:1.45; color:var(--ink-2)}
-/* The ported layer already draws a tick here out of two rotated borders.
-   Setting only `content` on top of it left the glyph sitting inside half a
-   drawn box, so this resets that geometry before drawing the character. */
-.ported .pr-feat li::before{content:"\2713"; position:absolute; left:0; top:0;
-  width:auto; height:auto; border:0; transform:none; background:none;
-  font-weight:800; color:var(--blue)}
+.ported .pr-feat li{display:flex; gap:var(--s2); align-items:flex-start;
+  margin:0 0 6px; padding-left:0; font-size:14px;
+  line-height:1.3; color:var(--ink-2)}
+/* A fixed icon box, so swapping a tick for a sparkle moves nothing. */
+.ported .pr-feat .pr-ico{flex:none; width:16px; height:16px;
+  margin-top:2px; color:var(--blue)}
 
 
-.ported .pr-extra{margin:var(--s6) 0 var(--s4); padding:var(--s3) var(--s4);
-  border-radius:var(--r-sm); background:var(--bg-soft); font-size:14px;
-  color:var(--ink-2)}
+/* Sparkles mark the features worth noticing. Decorative only: the markup is
+   aria-hidden, and the twinkle is staggered by --i so three on one card do not
+   pulse in unison. transform-box keeps the scale centred on the glyph. */
+.ported .pr-feat .pr-spark{color:#7C3AED; transform-origin:50% 50%;
+  animation:pr-twinkle 3.2s ease-in-out infinite;
+  animation-delay:calc(var(--i) * .45s)}
+.ported .pr-card.pr-dark .pr-feat .pr-spark{color:#C4B5FD}
+@keyframes pr-twinkle{
+  0%,100%{opacity:.55; transform:scale(.85) rotate(0deg)}
+  50%{opacity:1; transform:scale(1.15) rotate(12deg)}
+}
+@media (prefers-reduced-motion: reduce){
+  .ported .pr-feat .pr-spark{animation:none; opacity:1; transform:none}
+}
+
+/* The "see all features" disclosure. Closed on wide screens, where the extra
+   height is the problem; opened by CSS below 1024px, where it is not. Two
+   mechanisms because browsers hide closed details content differently, and a
+   browser that honours neither still shows a working summary. */
+.ported .pr-more{margin-top:var(--s2)}
+.ported .pr-more summary{display:flex; align-items:center; gap:var(--s2);
+  width:max-content; cursor:pointer; font-size:13px; font-weight:800;
+  color:var(--blue); list-style:none}
+.ported .pr-more summary::-webkit-details-marker{display:none}
+.ported .pr-more summary:focus-visible{outline:3px solid var(--blue);
+  outline-offset:3px; border-radius:var(--r-sm)}
+.ported .pr-more-n{padding:0 var(--s2); border-radius:var(--r-pill);
+  background:var(--bg-soft); color:var(--ink-2); font-size:11px}
+.ported .pr-card.pr-dark .pr-more summary{color:#8FB4FF}
+.ported .pr-card.pr-dark .pr-more-n{background:rgba(255,255,255,.14); color:#C7D2E4}
+.ported .pr-feat-rest{margin-top:var(--s2)}
+@media(max-width:1023px){
+  .ported .pr-more summary{display:none}
+  .ported .pr-more::details-content{content-visibility:visible}
+  .ported .pr-more:not([open]) > .pr-feat-rest{display:block}
+  .ported .pr-feat-rest{margin-top:0}
+}
+
+.ported .pr-extra{margin:var(--s4) 0 var(--s3); padding:var(--s2) var(--s3);
+  border-radius:var(--r-sm); background:var(--bg-soft); font-size:13px;
+  line-height:1.35; color:var(--ink-2)}
 .ported .pr-card .pr-cta-btn{width:100%; margin-top:auto; text-align:center}
 .ported .pr-card.pr-dark .pr-cta-btn{background:#fff; color:var(--ink);
   border-color:#fff}
@@ -1323,26 +1378,69 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   padding:var(--s6) 0 0; border-top:1px solid var(--line)}
 .ported .pr-strip li{margin:0; font-size:14px; color:var(--ink-2)}
 
-/* ---- minutes, add-ons and setup --------------------------------------- */
-.ported .pr-three{display:grid; grid-template-columns:1fr; gap:var(--s8);
-  margin-top:var(--s8)}
-@media(min-width:900px){ .ported .pr-three{grid-template-columns:repeat(3,1fr)} }
-.ported .pr-col h3{margin:0 0 var(--s4); font-size:20px}
-.ported .pr-col p{font-size:15px}
-.ported .pr-table{width:100%; border-collapse:collapse; margin:var(--s4) 0;
-  background:var(--bg); border-radius:var(--r-sm); overflow:hidden;
-  font-size:14px}
-.ported .pr-table th, .ported .pr-table td{padding:var(--s3) var(--s4);
-  text-align:left; border-bottom:1px solid var(--line)}
-.ported .pr-table thead th{font-size:13px; color:var(--muted);
-  text-transform:none}
+/* ---- minutes, add-ons and setup: three boxed cards --------------------- */
+/* The section used to be three bare columns of prose in a tinted band. The
+   words are unchanged; they now sit in cards that match the plan grid, so the
+   page reads as one system and a price can be found by scanning. */
+.ported #p-minutes{padding-top:var(--s12); padding-bottom:var(--s12)}
+.ported .pr-three{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  margin-top:var(--s8); align-items:stretch}
+@media(min-width:1024px){ .ported .pr-three{grid-template-columns:repeat(3,1fr)} }
+
+.ported .mcard{display:flex; flex-direction:column; height:100%;
+  padding:var(--s6); background:var(--bg); border:1px solid var(--line);
+  border-radius:var(--r-card)}
+.ported .mcard-head{display:flex; align-items:center; gap:var(--s2);
+  margin-bottom:var(--s4)}
+.ported .mcard-head h3{margin:0; font-size:18px}
+.ported .mi{flex:none; width:16px; height:16px; color:var(--blue)}
+.ported .mcard-lede{margin:0 0 var(--s3); font-size:14px; color:var(--ink-2)}
+
+.ported .pr-table{width:100%; border-collapse:collapse; margin:0 0 var(--s4);
+  background:var(--bg); font-size:13.5px}
+.ported .pr-table th, .ported .pr-table td{padding:var(--s2) var(--s2);
+  text-align:left; border-bottom:1px solid var(--line); white-space:nowrap}
+.ported .pr-table thead th{font-size:12px; font-weight:700; color:var(--muted)}
 .ported .pr-table tbody th{font-weight:700; color:var(--ink)}
 .ported .pr-table tr:last-child th,
 .ported .pr-table tr:last-child td{border-bottom:0}
-.ported .pr-addons{list-style:none; margin:0; padding:0}
-.ported .pr-addons li{margin:0 0 var(--s4); font-size:15px; color:var(--ink)}
-.ported .pr-addons li span{display:block; font-size:13px; color:var(--muted)}
-.ported .pr-note{font-size:14px; color:var(--muted)}
+.ported .pr-table td:last-child, .ported .pr-table th:last-child{text-align:right}
+
+.ported .mcard-callout{margin:0 0 var(--s4); padding:var(--s3) var(--s4);
+  border-left:3px solid var(--blue); border-radius:var(--r-sm);
+  background:#F5F8FF; font-size:13.5px; line-height:1.4; color:var(--ink-2)}
+.ported .mcard-callout b{color:var(--ink)}
+
+.ported .mcard-notes{list-style:none; margin:0; padding:0}
+.ported .mcard-notes li{position:relative; margin:0 0 var(--s2);
+  padding-left:var(--s3); font-size:12.5px; line-height:1.45; color:var(--muted)}
+.ported .mcard-notes li::before{content:"2"; position:absolute; left:0;
+  color:var(--faint)}
+.ported .mcard-notes b{color:var(--ink-2)}
+
+.ported .pr-addons{list-style:none; margin:0; padding:0; flex:1}
+.ported .pr-addons li{display:flex; gap:var(--s3); align-items:flex-start;
+  justify-content:space-between; margin:0; padding:var(--s3) 0;
+  border-bottom:1px solid var(--line)}
+.ported .pr-addons li:last-child{border-bottom:0}
+.ported .ad-t{display:block; font-size:14px; color:var(--ink)}
+.ported .ad-t b{display:block; font-weight:700; line-height:1.3}
+.ported .ad-n{display:block; margin-top:2px; font-size:12.5px; color:var(--muted)}
+.ported .ad-p{flex:none; align-self:flex-start; white-space:nowrap;
+  padding:var(--s1) var(--s3); border-radius:var(--r-pill);
+  background:var(--bg-soft); font-size:13px; font-weight:800; color:var(--ink)}
+.ported .ad-p-wide{white-space:normal; text-align:right; line-height:1.3}
+
+.ported .mcard-facts{list-style:none; margin:0 0 var(--s4); padding:0}
+.ported .mcard-facts li{display:flex; gap:var(--s2); align-items:flex-start;
+  margin:0 0 var(--s3); font-size:13.5px; line-height:1.4; color:var(--ink-2)}
+.ported .mcard-facts .mi{margin-top:2px}
+.ported .mcard-facts b{color:var(--ink)}
+
+.ported .mcard-foot{margin:auto 0 0; padding-top:var(--s3);
+  border-top:1px solid var(--line); font-size:12.5px; line-height:1.45;
+  color:var(--muted)}
+.ported .mcard-foot b{color:var(--ink-2)}
 
 /* ---- the move-up path -------------------------------------------------- */
 .ported .pth-wrap{margin-top:var(--s8); padding:var(--s8) var(--s6);
@@ -1532,7 +1630,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
       </a>
       <a class="login" href="/login">Log in</a>
-      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview" aria-label="Build your assistant (beta)"><span class="cta-l">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></span><span class="cta-s">Build assistant<span class="beta-tag" aria-hidden="true">Beta</span></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
       </button>
@@ -1543,13 +1641,13 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     <div class="mega-in">
       <div class="mega-grid">
         <a href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
-        <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
+        <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your assistant</b><em>Hear it answer as your own business</em></span></a>
         <a href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
         <a href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
         <a href="/#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Talk to us</b><em>One form, and we come back within a day</em></span></a>
       </div>
       <a class="mega-feat" href="/demo/?src=nav">
-        <b>Build your demo assistant</b>
+        <b>Build your assistant</b>
         <em>Tell it about your business and talk to it in your browser. About 30 seconds, no call.</em>
         <img src="/img/hero-phones-2.webp" width="1600" height="900" loading="lazy" alt="">
       </a>
@@ -1616,7 +1714,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <div class="mnav-g1">
         <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a" href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
-      <a class="mnav-a" href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
+      <a class="mnav-a" href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your assistant</b><em>Hear it answer as your own business</em></span></a>
       <a class="mnav-a" href="/pricing/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Plans &amp; pricing</b><em>Every plan on one page, no quote needed</em></span></a>
       <a class="mnav-a" href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
         <a class="mnav-a" href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
@@ -1638,7 +1736,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <div class="mnav-foot">
         <a class="mnav-act" href="/login"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-9 9a9 9 0 0118 0z"/></svg></i>Log in</a>
         <a class="mnav-act" href="tel:+13656039234"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i>Sales</a>
-        <a class="btn btn-primary" href="/demo/?src=nav">Build demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-primary" href="/demo/?src=nav" aria-label="Build your assistant (beta)">Build assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
       </div>
     </div>
   </div>
@@ -1959,7 +2057,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <a class="brand" href="/" aria-label="VoiceCaptures home"><img src="/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
         <p>An AI receptionist that answers on your existing number, books into your
         calendar and texts you the details.</p>
-        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-primary btn-sm" href="/demo/?src=preview" aria-label="Build your assistant (beta)">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
         <dl class="fmeta">
           <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &middot; demo line</dd>
           <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
@@ -2110,7 +2208,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     ["Extra minutes", "/pricing/", "Packages bought from your dashboard: 20 minutes for $20, 50 for $75, 100 for $110. No per-minute overage.", "overage extra minutes package packages bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
     ["Annual plans", "/pricing/", "Pay for the year and get 2 months free, with your rate locked for the term.", "annual yearly upfront discount commitment term contract length save prepaid", ""],
     ["Free trial", "/demo/", "14 days free, up to 60 minutes, card on file. Personal Line is 7 days.", "free trial try test pilot risk no card 14 days evaluate", ""],
-    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
+    ["Build your assistant", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
     ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "winback win back reactivation outbound lapsed dormant past customers campaign list database revive dead leads", IMG+"winback.webp"],
     ["Win-back pricing", "/win-back/#pay", "One-time campaign, always-on, or a build you own.", "winback cost price per customer campaign always on one time own build", ""],
     ["What win-back is worth", "/win-back/#calc", "Run the numbers on your own list size and job value.", "calculator roi worth return math revenue estimate list size job value payback", ""],

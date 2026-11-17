@@ -377,9 +377,14 @@ PRICING_CSS = """
   margin-top:var(--s8); align-items:start}
 @media(min-width:760px){ .ported .pr-grid-4{grid-template-columns:repeat(2,1fr)} }
 @media(min-width:1080px){ .ported .pr-grid-4{grid-template-columns:repeat(4,1fr)} }
+/* Four cards in the 1120px rail leave each one about 250px wide, which wraps
+   nearly every feature onto two lines and is what actually made these cards
+   tall. The plan grid alone gets a wider rail; the rest of the page keeps the
+   site's measure. */
+@media(min-width:1240px){ .ported .pr-plans .wrap{max-width:1280px} }
 
 .ported .pr-card{position:relative; display:flex; flex-direction:column;
-  height:100%; padding:var(--s8) var(--s6); border:1px solid var(--line);
+  height:100%; padding:var(--s6); border:1px solid var(--line);
   border-radius:var(--r-card); background:var(--bg)}
 .ported .pr-card.pr-pop{border-color:var(--blue); background:#F5F8FF}
 .ported .pr-card.pr-dark{background:var(--ink); border-color:var(--ink)}
@@ -390,7 +395,7 @@ PRICING_CSS = """
 .ported .pr-card.pr-dark .pr-min,
 .ported .pr-card.pr-dark .pr-feat li{color:#C7D2E4}
 .ported .pr-card.pr-dark .pr-annual{color:#8FB4FF}
-.ported .pr-card.pr-dark .pr-feat li::before{color:#8FB4FF}
+.ported .pr-card.pr-dark .pr-feat .pr-ico{color:#8FB4FF}
 
 .ported .pr-badge{position:absolute; top:calc(var(--s6) * -1); left:50%;
   transform:translateX(-50%); white-space:nowrap;
@@ -399,35 +404,72 @@ PRICING_CSS = """
   letter-spacing:.06em; text-transform:uppercase}
 
 .ported .pr-top{display:block; margin-bottom:0}
-.ported .pr-top h3{margin:0; font-size:23px}
-.ported .pr-tag{margin:var(--s1) 0 0; font-size:15px; color:var(--muted)}
-.ported .pr-price{margin:var(--s6) 0 0; font-size:46px; font-weight:800;
-  line-height:1.05; letter-spacing:-.02em; color:var(--ink)}
+.ported .pr-top h3{margin:0; font-size:21px}
+.ported .pr-tag{margin:var(--s1) 0 0; font-size:13.5px; line-height:1.3;
+  color:var(--muted)}
+.ported .pr-price{margin:var(--s4) 0 0; font-size:40px; font-weight:800;
+  line-height:1.02; letter-spacing:-.02em; color:var(--ink)}
 .ported .pr-price .pr-per{font-size:18px; font-weight:700; color:var(--muted)}
-.ported .pr-price.pr-quoted{font-size:34px}
-.ported .pr-min{margin:var(--s3) 0 0; font-size:15px; color:var(--ink-2)}
-.ported .pr-annual{margin:var(--s1) 0 0; font-size:14px; font-weight:700;
+.ported .pr-price.pr-quoted{font-size:30px}
+.ported .pr-min{margin:var(--s2) 0 0; font-size:14px; color:var(--ink-2)}
+.ported .pr-annual{margin:var(--s1) 0 0; font-size:13px; font-weight:700;
   color:var(--blue)}
 
-.ported .pr-feats{margin-top:var(--s6); padding-top:var(--s6);
+.ported .pr-feats{margin-top:var(--s4); padding-top:var(--s4);
   border-top:1px solid var(--line); flex:1}
 .ported .pr-card.pr-dark .pr-feats{border-top-color:rgba(255,255,255,.18)}
-.ported .pr-feat-head{margin:0 0 var(--s4); font-size:15px; font-weight:800;
-  color:var(--ink)}
+.ported .pr-feat-head{margin:0 0 var(--s2); font-size:13px; font-weight:800;
+  line-height:1.3; color:var(--ink)}
 .ported .pr-feat{list-style:none; margin:0; padding:0}
-.ported .pr-feat li{position:relative; margin:0 0 var(--s3); padding-left:26px;
-  font-size:15px; line-height:1.45; color:var(--ink-2)}
-/* The ported layer already draws a tick here out of two rotated borders.
-   Setting only `content` on top of it left the glyph sitting inside half a
-   drawn box, so this resets that geometry before drawing the character. */
-.ported .pr-feat li::before{content:"\\2713"; position:absolute; left:0; top:0;
-  width:auto; height:auto; border:0; transform:none; background:none;
-  font-weight:800; color:var(--blue)}
+.ported .pr-feat li{display:flex; gap:var(--s2); align-items:flex-start;
+  margin:0 0 6px; padding-left:0; font-size:14px;
+  line-height:1.3; color:var(--ink-2)}
+/* A fixed icon box, so swapping a tick for a sparkle moves nothing. */
+.ported .pr-feat .pr-ico{flex:none; width:16px; height:16px;
+  margin-top:2px; color:var(--blue)}
 
 
-.ported .pr-extra{margin:var(--s6) 0 var(--s4); padding:var(--s3) var(--s4);
-  border-radius:var(--r-sm); background:var(--bg-soft); font-size:14px;
-  color:var(--ink-2)}
+/* Sparkles mark the features worth noticing. Decorative only: the markup is
+   aria-hidden, and the twinkle is staggered by --i so three on one card do not
+   pulse in unison. transform-box keeps the scale centred on the glyph. */
+.ported .pr-feat .pr-spark{color:#7C3AED; transform-origin:50% 50%;
+  animation:pr-twinkle 3.2s ease-in-out infinite;
+  animation-delay:calc(var(--i) * .45s)}
+.ported .pr-card.pr-dark .pr-feat .pr-spark{color:#C4B5FD}
+@keyframes pr-twinkle{
+  0%,100%{opacity:.55; transform:scale(.85) rotate(0deg)}
+  50%{opacity:1; transform:scale(1.15) rotate(12deg)}
+}
+@media (prefers-reduced-motion: reduce){
+  .ported .pr-feat .pr-spark{animation:none; opacity:1; transform:none}
+}
+
+/* The "see all features" disclosure. Closed on wide screens, where the extra
+   height is the problem; opened by CSS below 1024px, where it is not. Two
+   mechanisms because browsers hide closed details content differently, and a
+   browser that honours neither still shows a working summary. */
+.ported .pr-more{margin-top:var(--s2)}
+.ported .pr-more summary{display:flex; align-items:center; gap:var(--s2);
+  width:max-content; cursor:pointer; font-size:13px; font-weight:800;
+  color:var(--blue); list-style:none}
+.ported .pr-more summary::-webkit-details-marker{display:none}
+.ported .pr-more summary:focus-visible{outline:3px solid var(--blue);
+  outline-offset:3px; border-radius:var(--r-sm)}
+.ported .pr-more-n{padding:0 var(--s2); border-radius:var(--r-pill);
+  background:var(--bg-soft); color:var(--ink-2); font-size:11px}
+.ported .pr-card.pr-dark .pr-more summary{color:#8FB4FF}
+.ported .pr-card.pr-dark .pr-more-n{background:rgba(255,255,255,.14); color:#C7D2E4}
+.ported .pr-feat-rest{margin-top:var(--s2)}
+@media(max-width:1023px){
+  .ported .pr-more summary{display:none}
+  .ported .pr-more::details-content{content-visibility:visible}
+  .ported .pr-more:not([open]) > .pr-feat-rest{display:block}
+  .ported .pr-feat-rest{margin-top:0}
+}
+
+.ported .pr-extra{margin:var(--s4) 0 var(--s3); padding:var(--s2) var(--s3);
+  border-radius:var(--r-sm); background:var(--bg-soft); font-size:13px;
+  line-height:1.35; color:var(--ink-2)}
 .ported .pr-card .pr-cta-btn{width:100%; margin-top:auto; text-align:center}
 .ported .pr-card.pr-dark .pr-cta-btn{background:#fff; color:var(--ink);
   border-color:#fff}
@@ -437,26 +479,69 @@ PRICING_CSS = """
   padding:var(--s6) 0 0; border-top:1px solid var(--line)}
 .ported .pr-strip li{margin:0; font-size:14px; color:var(--ink-2)}
 
-/* ---- minutes, add-ons and setup --------------------------------------- */
-.ported .pr-three{display:grid; grid-template-columns:1fr; gap:var(--s8);
-  margin-top:var(--s8)}
-@media(min-width:900px){ .ported .pr-three{grid-template-columns:repeat(3,1fr)} }
-.ported .pr-col h3{margin:0 0 var(--s4); font-size:20px}
-.ported .pr-col p{font-size:15px}
-.ported .pr-table{width:100%; border-collapse:collapse; margin:var(--s4) 0;
-  background:var(--bg); border-radius:var(--r-sm); overflow:hidden;
-  font-size:14px}
-.ported .pr-table th, .ported .pr-table td{padding:var(--s3) var(--s4);
-  text-align:left; border-bottom:1px solid var(--line)}
-.ported .pr-table thead th{font-size:13px; color:var(--muted);
-  text-transform:none}
+/* ---- minutes, add-ons and setup: three boxed cards --------------------- */
+/* The section used to be three bare columns of prose in a tinted band. The
+   words are unchanged; they now sit in cards that match the plan grid, so the
+   page reads as one system and a price can be found by scanning. */
+.ported #p-minutes{padding-top:var(--s12); padding-bottom:var(--s12)}
+.ported .pr-three{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  margin-top:var(--s8); align-items:stretch}
+@media(min-width:1024px){ .ported .pr-three{grid-template-columns:repeat(3,1fr)} }
+
+.ported .mcard{display:flex; flex-direction:column; height:100%;
+  padding:var(--s6); background:var(--bg); border:1px solid var(--line);
+  border-radius:var(--r-card)}
+.ported .mcard-head{display:flex; align-items:center; gap:var(--s2);
+  margin-bottom:var(--s4)}
+.ported .mcard-head h3{margin:0; font-size:18px}
+.ported .mi{flex:none; width:16px; height:16px; color:var(--blue)}
+.ported .mcard-lede{margin:0 0 var(--s3); font-size:14px; color:var(--ink-2)}
+
+.ported .pr-table{width:100%; border-collapse:collapse; margin:0 0 var(--s4);
+  background:var(--bg); font-size:13.5px}
+.ported .pr-table th, .ported .pr-table td{padding:var(--s2) var(--s2);
+  text-align:left; border-bottom:1px solid var(--line); white-space:nowrap}
+.ported .pr-table thead th{font-size:12px; font-weight:700; color:var(--muted)}
 .ported .pr-table tbody th{font-weight:700; color:var(--ink)}
 .ported .pr-table tr:last-child th,
 .ported .pr-table tr:last-child td{border-bottom:0}
-.ported .pr-addons{list-style:none; margin:0; padding:0}
-.ported .pr-addons li{margin:0 0 var(--s4); font-size:15px; color:var(--ink)}
-.ported .pr-addons li span{display:block; font-size:13px; color:var(--muted)}
-.ported .pr-note{font-size:14px; color:var(--muted)}
+.ported .pr-table td:last-child, .ported .pr-table th:last-child{text-align:right}
+
+.ported .mcard-callout{margin:0 0 var(--s4); padding:var(--s3) var(--s4);
+  border-left:3px solid var(--blue); border-radius:var(--r-sm);
+  background:#F5F8FF; font-size:13.5px; line-height:1.4; color:var(--ink-2)}
+.ported .mcard-callout b{color:var(--ink)}
+
+.ported .mcard-notes{list-style:none; margin:0; padding:0}
+.ported .mcard-notes li{position:relative; margin:0 0 var(--s2);
+  padding-left:var(--s3); font-size:12.5px; line-height:1.45; color:var(--muted)}
+.ported .mcard-notes li::before{content:"\2022"; position:absolute; left:0;
+  color:var(--faint)}
+.ported .mcard-notes b{color:var(--ink-2)}
+
+.ported .pr-addons{list-style:none; margin:0; padding:0; flex:1}
+.ported .pr-addons li{display:flex; gap:var(--s3); align-items:flex-start;
+  justify-content:space-between; margin:0; padding:var(--s3) 0;
+  border-bottom:1px solid var(--line)}
+.ported .pr-addons li:last-child{border-bottom:0}
+.ported .ad-t{display:block; font-size:14px; color:var(--ink)}
+.ported .ad-t b{display:block; font-weight:700; line-height:1.3}
+.ported .ad-n{display:block; margin-top:2px; font-size:12.5px; color:var(--muted)}
+.ported .ad-p{flex:none; align-self:flex-start; white-space:nowrap;
+  padding:var(--s1) var(--s3); border-radius:var(--r-pill);
+  background:var(--bg-soft); font-size:13px; font-weight:800; color:var(--ink)}
+.ported .ad-p-wide{white-space:normal; text-align:right; line-height:1.3}
+
+.ported .mcard-facts{list-style:none; margin:0 0 var(--s4); padding:0}
+.ported .mcard-facts li{display:flex; gap:var(--s2); align-items:flex-start;
+  margin:0 0 var(--s3); font-size:13.5px; line-height:1.4; color:var(--ink-2)}
+.ported .mcard-facts .mi{margin-top:2px}
+.ported .mcard-facts b{color:var(--ink)}
+
+.ported .mcard-foot{margin:auto 0 0; padding-top:var(--s3);
+  border-top:1px solid var(--line); font-size:12.5px; line-height:1.45;
+  color:var(--muted)}
+.ported .mcard-foot b{color:var(--ink-2)}
 
 /* ---- the move-up path -------------------------------------------------- */
 .ported .pth-wrap{margin-top:var(--s8); padding:var(--s8) var(--s6);
