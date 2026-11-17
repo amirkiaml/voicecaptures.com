@@ -2697,16 +2697,23 @@ def _check_sparkles() -> None:
                          f"drifted from the catalog")
 
 
+# A plan that cannot be bought on the site sends you to the same booking link
+# as Enterprise. Never to a waitlist: on this site the waitlist means one
+# thing, the list for countries we have not opened in yet, and a plan card
+# offering to put a Canadian customer on it would say something untrue. The
+# word does not belong anywhere on these cards.
+CTA_OFF_LABEL = {"book_a_call": "Book a Call"}
+CTA_OFF_DEFAULT = "Talk to us"
+
+
 def _plan_cta(p):
-    """Get Started, the waitlist, or a call. checkout_enabled decides."""
+    """Get Started, or a call. checkout_enabled decides."""
     key = p["key"]
     primary = "btn-primary" if p.get("badge") else "btn-ghost"
     if p["cta"] == "book_a_call" or not p["checkout_enabled"]:
-        label = "Book a Call" if p["cta"] == "book_a_call" else "Join the waitlist"
-        if p["cta"] == "book_a_call":
-            return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
-                    f'target="_blank" rel="noopener">{label}</a>')
-        return f'<a class="btn {primary} pr-cta-btn" href="/#contact">{label}</a>'
+        label = CTA_OFF_LABEL.get(p["cta"], CTA_OFF_DEFAULT)
+        return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
+                f'target="_blank" rel="noopener">{label}</a>')
     # data-plan lets the billing switch rewrite ?billing= without a reload.
     return (f'<a class="btn {primary} pr-cta-btn" data-plan="{key}" '
             f'href="{DEMO}/?plan={key}&amp;billing=month">Get Started</a>')

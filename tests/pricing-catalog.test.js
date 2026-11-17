@@ -225,6 +225,53 @@ for (const key of ORDER) {
   ok(!new RegExp(`plan=${key}\\b`).test(pricing),
      `${key} has checkout_enabled=false, so nothing links to its checkout`);
 }
+
+/* ------------------------------------------------------- the plan grid --
+ * The four cards, read on their own. The rest of the page has a waitlist
+ * section of its own, so these checks are scoped to the grid by walking its
+ * divs rather than by searching the whole document. */
+function planGrid(html) {
+  const start = html.indexOf('<div class="pr-grid pr-grid-4">');
+  assert.ok(start > -1, "the plan grid is on the page");
+  let depth = 0;
+  for (const m of html.slice(start).matchAll(/<div\b|<\/div>/g)) {
+    depth += m[0] === "</div>" ? -1 : 1;
+    if (depth === 0) return html.slice(start, start + m.index + m[0].length);
+  }
+  throw new Error("the plan grid's divs do not balance");
+}
+const grid = planGrid(pricing);
+eq((grid.match(/class="pr-card/g) || []).length, ORDER.length, "four plan cards in the grid");
+
+/* The waitlist on this site means one thing: the list for countries we have
+   not opened in yet. A plan card offering a Canadian customer a place on it
+   would say something untrue, so the word is not allowed on these cards --
+   whatever a plan's checkout_enabled happens to be. */
+ok(!/waitlist/i.test(grid), "the word \"waitlist\" appears nowhere on the plan cards");
+/* ...while the international block it belongs to is still there. */
+ok(/waitlist/i.test(pricing.slice(pricing.indexOf(grid) + grid.length)),
+   "the international waitlist section is untouched below the grid");
+
+/* A plan that cannot be bought here sends you to the booking link, the same
+   one Enterprise uses -- not to a contact anchor and not to a waitlist. */
+const CAL = "https://calendly.com/hello-voicecaptures/30min";
+const ctas = [...grid.matchAll(/<a class="btn[^"]*pr-cta-btn"[^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g)]
+  .map(m => ({ href: m[1].replace(/&amp;/g, "&"), label: m[2] }));
+eq(ctas.length, ORDER.length, `${ctas.length} plan buttons, one per card`);
+ORDER.forEach((key, i) => {
+  const c = ctas[i];
+  if (plans[key].checkout_enabled) {
+    eq(c.label, "Get Started", `${key}: buyable, so the button says Get Started`);
+    ok(c.href.includes(`plan=${key}`), `${key}: Get Started carries its own plan key`);
+  } else {
+    eq(c.href, CAL, `${key}: not buyable, so the button opens the booking link`);
+    ok(["Talk to us", "Book a Call"].includes(c.label),
+       `${key}: button says "${c.label}"`);
+  }
+});
+eq(ctas.map(c => c.label),
+   ["Get Started", "Get Started", "Talk to us", "Book a Call"],
+   "the four buttons, in order");
 for (const old of Object.keys(aliases)) {
   if (plans[old]) continue;
   ok(!new RegExp(`plan=${old}\\b`).test(pricing), `no page link still uses the old key ${old}`);
