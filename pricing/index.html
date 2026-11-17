@@ -1323,6 +1323,13 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .pr-feat li{display:flex; gap:var(--s2); align-items:flex-start;
   margin:0 0 6px; padding-left:0; font-size:14px;
   line-height:1.3; color:var(--ink-2)}
+/* The ported layer draws a tick of its own here, out of two rotated borders.
+   Markers are inline SVG now, one element per item, so that pseudo-element
+   must not render at all: left alone it paints a second tick underneath every
+   feature, and a tick underneath every sparkle. content:none removes the box
+   entirely rather than just emptying it. */
+.ported .pr-feat li::before{content:none}
+.ported .pr-feat li::marker{content:""}
 /* A fixed icon box, so swapping a tick for a sparkle moves nothing. */
 .ported .pr-feat .pr-ico{flex:none; width:16px; height:16px;
   margin-top:2px; color:var(--blue)}
@@ -2392,23 +2399,78 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
                  source: "website", consent_version:
                    f.getAttribute("data-consent-version") };
     if (f.business_type.value.trim()) body.business_type = f.business_type.value.trim();
-    if (f.website.value.trim()) body.website = f.website.value.trim();
+    // A bare domain is what people actually type. Normalise it rather than
+    // refuse it, and if it still does not look like a host, leave it out: the
+    // website is optional and must never be the reason a signup fails.
+    var site = normalizeSite(f.website.value);
+    if (site) body.website = site;
     var utm = window.location.search.match(/utm_[a-z]+=[^&]*/g);
     if (utm) body.utm = utm.join("&");
 
     send.disabled = true;
     say("busy", "Sending\u2026");
+    post(body, true);
+  });
+
+  function normalizeSite(raw){
+    var v = (raw || "").trim();
+    if (!v) return "";
+    if (/^https?:\/\//i.test(v)) return v;
+    // host, optionally with a path: example.com, sub.example.co.uk/pricing
+    if (/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+(\/\S*)?$/i.test(v)){
+      return "https://" + v;
+    }
+    return "";            // not a host: drop it rather than fail the signup
+  }
+
+  // What the server said went wrong, when it says. Falls back to null so the
+  // caller can decide, rather than guessing at the email and country.
+  function fieldFault(data){
+    if (!data) return null;
+    var f = (data.field || data.param || "") + "";
+    var m = ((data.error || data.message || "") + "").toLowerCase();
+    if (f === "email" || /\bemail\b/.test(m)) return "email";
+    if (f === "country" || /\bcountry\b/.test(m)) return "country";
+    if (f === "website" || /\b(website|url)\b/.test(m)) return "website";
+    if (f === "consent" || /\bconsent\b/.test(m)) return "consent";
+    return null;
+  }
+
+  function post(payload, mayRetry){
     fetch(ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify(payload)
     }).then(function(r){
       if (r.status === 429){
         say("err", "That is a lot of tries. Give it a minute and try again.");
         return null;
       }
       if (r.status === 400){
-        say("err", "Something in that was not right. Check the email and country and try again.");
+        return r.json().catch(function(){ return {}; }).then(function(d){
+          var fault = fieldFault(d);
+          if (fault === "email"){
+            say("err", "That email address was not accepted. Check it and try again.");
+            return null;
+          }
+          if (fault === "country"){
+            say("err", "That country was not accepted. Choose it from the list and try again.");
+            return null;
+          }
+          // The website is optional, so a server that dislikes it must not cost
+          // us the signup: drop it and send the rest, once.
+          if (mayRetry && payload.website){
+            var again = {};
+            for (var k in payload) if (k !== "website") again[k] = payload[k];
+            post(again, false);
+            return null;
+          }
+          say("err", "We could not save that just now. Please try again, or email hello@voicecaptures.com.");
+          return null;
+        });
+      }
+      if (r.status >= 500){
+        say("err", "Something went wrong at our end. Try again in a minute, or email hello@voicecaptures.com.");
         return null;
       }
       if (!r.ok) throw new Error("http " + r.status);
@@ -2422,9 +2484,9 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         say("err", "We could not save that. Please try again.");
       }
     }).catch(function(){
-      say("err", "We could not reach us just now. Try again in a minute, or email hello@voicecaptures.com.");
+      say("err", "We could not reach the server. Check your connection and try again, or email hello@voicecaptures.com.");
     }).then(function(){ send.disabled = false; });
-  });
+  }
 })();
 </script>
 
