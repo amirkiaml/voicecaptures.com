@@ -112,6 +112,19 @@ section{padding:var(--s24) 0}
 .btn-dark:hover{background:#0D1729}
 .btn-sm{font-size:15px; padding:13px 22px; min-height:46px; white-space:nowrap}
 .beta{font-style:normal; font-weight:700; font-size:.78em; opacity:.72; margin-left:3px}
+/* The beta tag. A corner pill rather than a parenthetical, so it never changes
+   the button's width or pushes its label off centre: it is positioned out of
+   flow, and the ring is the page background so it reads as a tag sitting on
+   the edge. The button keeps the full wording in its aria-label, so screen
+   readers still hear "beta"; the tag itself is decorative. */
+.btn{position:relative}
+.beta-tag{position:absolute; top:-8px; right:-6px; z-index:1;
+  padding:2px 6px; border-radius:var(--r-pill);
+  background:var(--ink); color:#fff;
+  font-size:10px; font-weight:800; line-height:1.1; letter-spacing:.06em;
+  text-transform:uppercase; white-space:nowrap; pointer-events:none;
+  box-shadow:0 0 0 2px var(--bg)}
+.btn-ghost .beta-tag{background:var(--blue)}
 
 /* ---- nav ---- */
 header{position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line)}
@@ -692,7 +705,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <span class="sales-w">Sales:</span>&nbsp;(365)&nbsp;603-9234
       </a>
       <a class="login" href="/login">Log in</a>
-      <a class="btn btn-primary btn-sm" href="/demo/?src=preview"><span class="cta-l">Build your demo<em class="beta">(beta)</em></span><span class="cta-s">Build demo<em class="beta">(beta)</em></span></a>
+      <a class="btn btn-primary btn-sm" href="/demo/?src=preview" aria-label="Build your assistant (beta)"><span class="cta-l">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></span><span class="cta-s">Build assistant<span class="beta-tag" aria-hidden="true">Beta</span></span></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
         <span></span><span></span><span></span>
       </button>
@@ -703,13 +716,13 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     <div class="mega-in">
       <div class="mega-grid">
         <a href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
-        <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
+        <a href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your assistant</b><em>Hear it answer as your own business</em></span></a>
         <a href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
         <a href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
         <a href="/#contact"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7z"/></svg></i><span><b>Talk to us</b><em>One form, and we come back within a day</em></span></a>
       </div>
       <a class="mega-feat" href="/demo/?src=nav">
-        <b>Build your demo assistant</b>
+        <b>Build your assistant</b>
         <em>Tell it about your business and talk to it in your browser. About 30 seconds, no call.</em>
         <img src="/img/hero-phones-2.webp" width="1600" height="900" loading="lazy" alt="">
       </a>
@@ -776,7 +789,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <div class="mnav-g1">
         <p class="mnav-h">AI receptionist</p>
       <a class="mnav-a" href="/#how"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><span><b>How it answers</b><em>One evening on the line, call by call</em></span></a>
-      <a class="mnav-a" href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your demo</b><em>Hear it answer as your own business</em></span></a>
+      <a class="mnav-a" href="/demo/?src=nav"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3.5 3.5 0 003.5-3.5v-6a3.5 3.5 0 10-7 0v6A3.5 3.5 0 0012 15zm6-3.5a6 6 0 01-5 5.92V21h-2v-3.58a6 6 0 01-5-5.92h2a4 4 0 008 0z"/></svg></i><span><b>Build your assistant</b><em>Hear it answer as your own business</em></span></a>
       <a class="mnav-a" href="/pricing/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></i><span><b>Plans &amp; pricing</b><em>Every plan on one page, no quote needed</em></span></a>
       <a class="mnav-a" href="/faq/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2zm.6-5.2c-.5.4-.6.6-.6 1.2h-2c0-1.3.4-2 1.3-2.6.6-.5.7-.7.7-1.1 0-.6-.4-1-1-1s-1 .4-1 1H9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1-.4 1.7-1.4 2.5z"/></svg></i><span><b>Common questions</b><em>Setup, numbers, data and cancelling</em></span></a>
         <a class="mnav-a" href="/playground/"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2h10V2h2v2h3v18H2V4h3V2zM4 9v11h16V9zm3 2h4v4H7z"/></svg></i><span><b>Playground</b><em>Call the live demo line and watch it book you in</em></span></a>
@@ -798,7 +811,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <div class="mnav-foot">
         <a class="mnav-act" href="/login"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-9 9a9 9 0 0118 0z"/></svg></i>Log in</a>
         <a class="mnav-act" href="tel:+13656039234"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i>Sales</a>
-        <a class="btn btn-primary" href="/demo/?src=nav">Build demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-primary" href="/demo/?src=nav" aria-label="Build your assistant (beta)">Build assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
       </div>
     </div>
   </div>
@@ -832,7 +845,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       </button>
 
       <div class="hero-cta">
-        <a class="btn btn-primary" href="/demo/?src=preview">Build your demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-primary" href="/demo/?src=preview" aria-label="Build your assistant (beta)">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
         <a class="btn btn-ghost" href="tel:+16476921081">Hear the demo line</a>
       </div>
       <p class="fine hero-fine">Setup takes about 10 minutes, and we do it for you. 14 days
@@ -1029,7 +1042,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <h2 style="color:#fff">Hear it answer <span class="pay">as your business.</span></h2>
       <p>Tell it about your business and talk to it, right in your browser. About
       30 seconds to set up, no call and no signup.</p>
-      <a class="btn btn-primary" href="/demo/?src=preview">Build your demo<em class="beta">(beta)</em></a>
+      <a class="btn btn-primary" href="/demo/?src=preview" aria-label="Build your assistant (beta)">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
     </div>
   </div>
 </section>
@@ -1061,7 +1074,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
       <p>Thirty minutes, no slide deck. We will tell you on the call if your call
       volume does not justify it.</p>
       <a class="btn btn-dark" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a 30-minute call</a>
-      <a class="btn btn-ghost" href="/demo/?src=preview">Build your demo instead<em class="beta">(beta)</em></a>
+      <a class="btn btn-ghost" href="/demo/?src=preview" aria-label="Build your assistant (beta)">Build your assistant instead<span class="beta-tag" aria-hidden="true">Beta</span></a>
       <hr>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Hear it answer&nbsp;<span class="adot" aria-hidden="true"></span></b><span><a href="tel:+16476921081">(647)&nbsp;692-1081</a><br>Our live demo line, answering right now</span></div></div>
       <div class="arow"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.6a1 1 0 01-.25 1z"/></svg></i><div><b>Talk to sales</b><span><a href="tel:+13656039234">(365)&nbsp;603-9234</a></span></div></div>
@@ -1081,7 +1094,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <a class="brand" href="/" aria-label="VoiceCaptures home"><img src="/img/logo-mark.png" width="512" height="512" alt=""><span>VoiceCaptures</span></a>
         <p>An AI receptionist that answers on your existing number, books into your
         calendar and texts you the details.</p>
-        <a class="btn btn-primary btn-sm" href="/demo/?src=preview">Build your demo<em class="beta">(beta)</em></a>
+        <a class="btn btn-primary btn-sm" href="/demo/?src=preview" aria-label="Build your assistant (beta)">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
         <dl class="fmeta">
           <dd><a href="tel:+16476921081">(647)&nbsp;692-1081</a> &middot; demo line</dd>
           <dd><a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a></dd>
@@ -1339,7 +1352,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
     ["Extra minutes", "/pricing/", "Packages bought from your dashboard: 20 minutes for $20, 50 for $75, 100 for $110. No per-minute overage.", "overage extra minutes package packages bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
     ["Annual plans", "/pricing/", "Pay for the year and get 2 months free, with your rate locked for the term.", "annual yearly upfront discount commitment term contract length save prepaid", ""],
     ["Free trial", "/demo/", "14 days free, up to 60 minutes, card on file. Personal Line is 7 days.", "free trial try test pilot risk no card 14 days evaluate", ""],
-    ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
+    ["Build your assistant", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
     ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "winback win back reactivation outbound lapsed dormant past customers campaign list database revive dead leads", IMG+"winback.webp"],
     ["Win-back pricing", "/win-back/#pay", "One-time campaign, always-on, or a build you own.", "winback cost price per customer campaign always on one time own build", ""],
     ["What win-back is worth", "/win-back/#calc", "Run the numbers on your own list size and job value.", "calculator roi worth return math revenue estimate list size job value payback", ""],

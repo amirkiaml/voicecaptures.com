@@ -563,7 +563,7 @@ header .btn.nav-cta.demo-cta{animation:demoring 2.8s ease-out infinite}
    pushed the pill 93px past the right edge; the mark carries the brand
    instead, and .brand keeps aria-label="VoiceCaptures home" so a screen
    reader still gets the full name. Below 380 that is still not enough, so
-   the bar tightens and the label drops to "Build demo". */
+   the bar tightens and the label drops to "Build assistant". */
 @media (max-width:480px){
   header .bar .brand span{display:none}
 }
@@ -2321,7 +2321,7 @@ DEMO_BODY = f"""
     assistant it builds &mdash; in your browser, on this page, about thirty
     seconds from now. No call, no signup, no card.</p>
     <p class="demo-cta-row">
-      <a class="btn btn-primary demo-go" id="demo-go" href="{DEMO}">Build your demo assistant</a>
+      <a class="btn btn-primary demo-go" id="demo-go" href="{DEMO}">Build your assistant</a>
       <a class="btn btn-ghost" href="tel:+16476921081">Call the live line instead</a>
     </p>
     <p class="fine demo-call">The line on <a href="tel:+16476921081">(647)&nbsp;692-1081</a>
@@ -2412,6 +2412,52 @@ DEMO_SCRIPT = f"""
 # price that is not in the catalog cannot reach the page, and the price test
 # asserts it.
 
+# Which features carry a sparkle instead of a tick. Presentation only, so it
+# lives here and not in the catalog: the catalog is a byte-identical copy
+# shared with the other repos and carries no styling. Keyed by plan and the
+# exact feature label; _check_sparkles() fails the build if one stops matching,
+# so a reworded feature cannot silently lose its sparkle.
+SPARKLE = {
+    "business_lite": [
+        "Custom-tailored to your business: services, hours, FAQs, area",
+        "Live booking into your calendar (Google now; Outlook and Apple coming soon)",
+        "Confirmation texts to your callers",
+    ],
+    "business_pro": [
+        "Up to 3 calendars",
+        "Appointment reminders (text + email)",
+        "Review-request texts after a job or visit",
+    ],
+    "enterprise": [
+        "Multi-location and multi-team setup",
+        "Custom integrations: CRM, EMR, POS, field service",
+    ],
+    "personal": [],
+}
+
+TICK_SVG = ('<svg class="pr-ico" viewBox="0 0 16 16" aria-hidden="true" '
+            'focusable="false"><path d="M6.2 11.4 3 8.2l1.1-1.1 2.1 2.1 5.7-5.7 '
+            '1.1 1.1z" fill="currentColor"/></svg>')
+
+def _sparkle_svg(i: int) -> str:
+    """A four-point sparkle. Decorative, so it is hidden from assistive tech;
+    --i staggers the twinkle so the three on a card do not pulse in unison."""
+    return (f'<svg class="pr-ico pr-spark" style="--i:{i}" viewBox="0 0 16 16" '
+            f'aria-hidden="true" focusable="false"><path d="M8 0.8 9.5 6.5 '
+            f'15.2 8 9.5 9.5 8 15.2 6.5 9.5 0.8 8 6.5 6.5z" '
+            f'fill="currentColor"/></svg>')
+
+
+def _check_sparkles() -> None:
+    for key, labels in SPARKLE.items():
+        have = [f["label"] for f in pricing_data.PLANS[key]["features"]]
+        for label in labels:
+            if have.count(label) != 1:
+                sys.exit(f"sparkle: {key!r} has {have.count(label)} features "
+                         f"labelled {label!r}; the list in build-pages.py has "
+                         f"drifted from the catalog")
+
+
 def _plan_cta(p):
     """Get Started, the waitlist, or a call. checkout_enabled decides."""
     key = p["key"]
@@ -2425,6 +2471,43 @@ def _plan_cta(p):
     # data-plan lets the billing switch rewrite ?billing= without a reload.
     return (f'<a class="btn {primary} pr-cta-btn" data-plan="{key}" '
             f'href="{DEMO}/?plan={key}&amp;billing=month">Get Started</a>')
+
+
+# Past six features the cards outgrow the fold on a wide screen, where four
+# narrow columns wrap every other line. The rest go behind a disclosure:
+# nothing is removed, it stays in the DOM for search and for assistive tech, it
+# opens without JavaScript, and the CSS opens it for narrow screens where the
+# height does not matter. A browser that ignores that CSS still shows the
+# summary, which works on its own.
+FEATURES_SHOWN = 6
+
+
+def _plan_features(p) -> str:
+    """The feature list. Icons are inline rather than a ::before, so a sparkle
+    and a tick sit on the same baseline and reserve the same box: swapping one
+    for the other shifts nothing.
+
+    No status tag is rendered. The catalog still carries a status for every
+    feature and the tests still check it, but it is internal tracking: Amir
+    decided on 17 November that the page should not caveat itself.
+    """
+    marked, n, rows = SPARKLE.get(p["key"], []), 0, []
+    for f in p["features"]:
+        if f["label"] in marked:
+            icon, cls = _sparkle_svg(n), ' class="pr-star"'
+            n += 1
+        else:
+            icon, cls = TICK_SVG, ""
+        rows.append(f'<li{cls}>{icon}<span>{f["label"]}</span></li>')
+
+    if len(rows) <= FEATURES_SHOWN:
+        return f'<ul class="pr-feat">{"".join(rows)}</ul>'
+    rest = len(rows) - FEATURES_SHOWN
+    return (f'<ul class="pr-feat">{"".join(rows[:FEATURES_SHOWN])}</ul>'
+            f'<details class="pr-more"><summary>See all features'
+            f'<span class="pr-more-n">+{rest}</span></summary>'
+            f'<ul class="pr-feat pr-feat-rest">{"".join(rows[FEATURES_SHOWN:])}'
+            f'</ul></details>')
 
 
 def _plan_card(p):
@@ -2452,10 +2535,7 @@ def _plan_card(p):
     inherit = pricing_data.PLANS[p["inherits"]]["name"] if p.get("inherits") else None
     head = (f'<p class="pr-feat-head">Everything in {inherit}, plus:</p>'
             if inherit else '<p class="pr-feat-head">Includes:</p>')
-    # No status tag is rendered. The catalog still carries a status for every
-    # feature and the tests still check it, but it is internal tracking now:
-    # Amir decided on 17 November that the page should not caveat itself.
-    feats = "".join(f'<li>{f["label"]}</li>' for f in p["features"])
+    feats = _plan_features(p)
 
     pkg = pricing_data.package_for(p["key"])
     if pkg:
@@ -2472,8 +2552,26 @@ def _plan_card(p):
     return (f'<div class="{cls}">{badge}'
             f'<div class="pr-top"><h3>{p["name"]}</h3>'
             f'<p class="pr-tag">{p["tagline"]}</p></div>'
-            f'{price}<div class="pr-feats">{head}<ul class="pr-feat">{feats}</ul></div>'
+            f'{price}<div class="pr-feats">{head}{feats}</div>'
             f'{extra}{_plan_cta(p)}</div>')
+
+
+# Small decorative icons for the minutes/add-ons/setup cards. Inline so there
+# is no extra request and no third-party sprite; aria-hidden because each one
+# sits beside a heading that already says what it is.
+_MICONS = {
+    "minutes":  "M8 1a7 7 0 100 14A7 7 0 008 1zm.75 3.5v3.69l2.53 1.5-.75 1.26L7.25 9V4.5z",
+    "addons":   "M8 1.5 14 5v6l-6 3.5L2 11V5zm0 1.7L3.5 5.9v4.2L8 12.8l4.5-2.7V5.9z",
+    "setup":    "M6.8 1.5h2.4l.3 1.7 1.3.75 1.6-.6 1.2 2.1-1.3 1.1v1.5l1.3 1.1-1.2 2.1-1.6-.6-1.3.75-.3 1.7H6.8l-.3-1.7-1.3-.75-1.6.6-1.2-2.1 1.3-1.1V6.55l-1.3-1.1 1.2-2.1 1.6.6 1.3-.75zM8 6a2 2 0 100 4 2 2 0 000-4z",
+    "tick":     "M6.2 11.4 3 8.2l1.1-1.1 2.1 2.1 5.7-5.7 1.1 1.1z",
+    "clock":    "M8 1a7 7 0 100 14A7 7 0 008 1zm.75 3.5v3.69l2.53 1.5-.75 1.26L7.25 9V4.5z",
+    "calendar": "M5 1v1.5h6V1h1.5v1.5H14V15H2V2.5h1.5V1zm7.5 5h-9v7.5h9zm-7 1.5h2V10h-2z",
+}
+
+
+def _mi(name: str) -> str:
+    return (f'<svg class="mi" viewBox="0 0 16 16" aria-hidden="true" '
+            f'focusable="false"><path d="{_MICONS[name]}" fill="currentColor"/></svg>')
 
 
 def _packages_table():
@@ -2503,15 +2601,21 @@ def _annual_table():
 
 
 def _addons_list():
+    """One row per add-on: name and its one-line note on the left, the price as
+    a pill on the right. Same words as before, laid out so a price can be found
+    by scanning down the right edge rather than reading every line."""
     cat = pricing_data.CATALOG
     out = ""
     for a in cat["addons"]:
-        out += (f'<li><b>{a["label"]} &mdash; {pricing_data.money(a["price"])}'
-                f'/{a["per"]}</b><span>{a["note"]}</span></li>')
+        out += (f'<li><span class="ad-t"><b>{a["label"]}</b>'
+                f'<span class="ad-n">{a["note"]}</span></span>'
+                f'<span class="ad-p">{pricing_data.money(a["price"])}'
+                f'/{a["per"]}</span></li>')
     i = cat["integration"]
-    out += (f'<li><b>{i["label"]} &mdash; from {pricing_data.money(i["one_time_from"])} '
-            f'one-time + {pricing_data.money(i["monthly"])}/mo</b>'
-            f'<span>{i["note"]}</span></li>')
+    out += (f'<li><span class="ad-t"><b>{i["label"]}</b>'
+            f'<span class="ad-n">{i["note"]}</span></span>'
+            f'<span class="ad-p ad-p-wide">from {pricing_data.money(i["one_time_from"])} '
+            f'one-time<br>+ {pricing_data.money(i["monthly"])}/mo</span></li>')
     return out
 
 
@@ -2625,6 +2729,7 @@ def _winback_section():
 
 def _pricing_body():
     pricing_data.check()
+    _check_sparkles()
     cat = pricing_data.CATALOG
     r = cat["rules"]
     a = cat["alerts"]
@@ -2672,47 +2777,55 @@ def _pricing_body():
   <div class="wrap">
     <h2>Minutes, add-ons and setup</h2>
     <div class="pr-three">
-      <div class="pr-col">
-        <h3>If you need more minutes</h3>
-        <p>{r["packages_from_dashboard"]}</p>
-        <table class="pr-table">
-          <thead><tr><th>Plan</th><th>Package</th><th>Works out to</th></tr></thead>
+
+      <div class="mcard">
+        <div class="mcard-head">{_mi("minutes")}<h3>If you need more minutes</h3></div>
+        <p class="mcard-lede">{r["packages_from_dashboard"]}</p>
+        <table class="pr-table pr-table-pkg">
+          <thead><tr><th>Plan</th><th>Package</th><th>Per min</th></tr></thead>
           <tbody>{_packages_table()}</tbody>
         </table>
-        <p>We text <b>and email</b> you at {a["warn_pct"]}% of your minutes, and
-        again at {a["stop_pct"]}%.</p>
-        <p><b>{r["business_never_stops"].split(".")[0]}.</b>
+        <p class="mcard-callout"><b>{r["business_never_stops"].split(".")[0]}.</b>
         {r["business_never_stops"].split(". ", 1)[1]}</p>
-        <p><b>{personal["name"]}:</b>
-        {r["personal_out_of_minutes"].split(": ", 1)[1]}</p>
-        <p>{r["no_carry_over"]} {r["not_billable"]}</p>
-        <p class="pr-note">Buying packages most months? A bigger plan is cheaper
-        &mdash; we will tell you when that is true for you.</p>
+        <ul class="mcard-notes">
+          <li>We text <b>and email</b> you at {a["warn_pct"]}% of your minutes, and
+          again at {a["stop_pct"]}%.</li>
+          <li><b>{personal["name"]}:</b>
+          {r["personal_out_of_minutes"].split(": ", 1)[1]}</li>
+          <li>{r["no_carry_over"]}</li>
+          <li>{r["not_billable"]}</li>
+          <li>Buying packages most months? A bigger plan is cheaper &mdash; we
+          will tell you when that is true for you.</li>
+        </ul>
       </div>
 
-      <div class="pr-col">
-        <h3>Add-ons</h3>
+      <div class="mcard">
+        <div class="mcard-head">{_mi("addons")}<h3>Add-ons</h3></div>
         <ul class="pr-addons">{_addons_list()}</ul>
-        <p class="pr-note">{personal["name"]} keeps {personal["retention_days"]}
+        <p class="mcard-foot">{personal["name"]} keeps {personal["retention_days"]}
         days of history, recordings and transcripts &mdash; longer history comes
         with Business. For clinics we recommend staying at
         {personal["retention_days"]} days.</p>
       </div>
 
-      <div class="pr-col">
-        <h3>Setup, trial and annual</h3>
-        <p><b>Setup is included.</b> {r["setup"].split(". ", 1)[1]}</p>
-        <p><b>Free trial, card on file:</b> {personal["name"]}
-        {personal["trial"]["days"]} days / {personal["trial"]["minutes_cap"]} min
-        &middot; Business {lite["trial"]["days"]} days /
-        {lite["trial"]["minutes_cap"]} min.</p>
-        <table class="pr-table">
+      <div class="mcard">
+        <div class="mcard-head">{_mi("setup")}<h3>Setup, trial and annual</h3></div>
+        <ul class="mcard-facts">
+          <li>{_mi("tick")}<span><b>Setup is included.</b>
+          {r["setup"].split(". ", 1)[1]}</span></li>
+          <li>{_mi("clock")}<span><b>Free trial, card on file:</b>
+          {personal["name"]} {personal["trial"]["days"]} days /
+          {personal["trial"]["minutes_cap"]} min &middot; Business
+          {lite["trial"]["days"]} days / {lite["trial"]["minutes_cap"]} min.</span></li>
+          <li>{_mi("calendar")}<span>{cat["annual"]["terms"]}</span></li>
+        </ul>
+        <table class="pr-table pr-table-mini">
           <thead><tr><th>Plan</th><th>Annual</th><th>Per month</th></tr></thead>
           <tbody>{_annual_table()}</tbody>
         </table>
-        <p>{cat["annual"]["terms"]}</p>
-        <p>{r["minute_definition"].replace("A minute", "<b>A minute</b>", 1)}</p>
+        <p class="mcard-foot">{r["minute_definition"].replace("A minute", "<b>A minute</b>", 1)}</p>
       </div>
+
     </div>
   </div>
 </section>
@@ -2745,7 +2858,7 @@ def _pricing_body():
     <div class="pr-cta">
       <a class="btn btn-primary" data-plan="{lite["key"]}"
         href="{DEMO}/?plan={lite["key"]}&amp;billing=month">Get Started</a>
-      <a class="btn btn-ghost" href="/demo/?src=pricing">Build your demo</a>
+      <a class="btn btn-ghost" href="/demo/?src=pricing">Build your assistant</a>
       <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a Call</a>
     </div>
   </div>
@@ -2900,7 +3013,7 @@ FAQ_BODY = """<main class="wrap faq-page">
     <p>The fastest answer is to hear it. Build a demo on your own business, or
     call the live line and ask it something awkward.</p>
     <p class="faq-cta">
-      <a class="btn btn-primary" href="/demo/?src=faq">Build your demo</a>
+      <a class="btn btn-primary" href="/demo/?src=faq">Build your assistant</a>
       <a class="btn btn-ghost" href="tel:+16476921081">Call the demo line</a>
     </p>
   </aside>
@@ -3043,7 +3156,7 @@ PLAYGROUND_BODY = f"""<section class="pr-hero">
     assistant from your own website in about 30 seconds, or talk to us about
     putting it on your real line.</p>
     <p class="btns" style="margin-top:var(--s8)">
-      <a class="btn btn-primary" href="/demo/?src=playground">Build your demo<em class="beta">(beta)</em></a>
+      <a class="btn btn-primary" href="/demo/?src=playground">Build your assistant<span class="beta-tag" aria-hidden="true">Beta</span></a>
       <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
     </p>
   </div>
@@ -3214,10 +3327,10 @@ def main():
             cur_pricing=' aria-current="page"' if slug == "pricing" else "",
             cal=CAL30 if slug == "about" else CAL,
             cta="" if slug in ("win-back", "demo") else
-                ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO_PAGE + '?src=nav">'
+                ('<a class="btn btn-primary nav-cta demo-cta" href="' + DEMO_PAGE + '?src=nav" aria-label="Build your assistant (beta)">'
                  '<span class="spark" aria-hidden="true"></span>'
-                 '<span class="demo-cta-t"><span><span class="dc-full">Build your demo assistant</span>'
-                 '<span class="dc-min">Build <span class="dc-y">your </span>demo</span> <em>(beta)</em></span>'
+                 '<span class="demo-cta-t"><span><span class="dc-full">Build your assistant</span>'
+                 '<span class="dc-min">Build <span class="dc-y">your </span>assistant</span> <span class="beta-tag" aria-hidden="true">Beta</span></span>'
                  '<small>in seconds</small></span></a>'),
             cur_winback=' aria-current="page"' if slug == "win-back" else "",
             cur_careers=' aria-current="page"' if slug == "careers" else "",
