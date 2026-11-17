@@ -544,6 +544,20 @@
     .ins .v { font-size: 20px; }
     footer { margin-top: 18px; }
   }
+  /* Pricing v2 settings (only when /api/dashboard/v2/settings says v2: true) */
+  .v2 .v2-sec { border-top: 1px solid var(--line); padding: 12px 0 4px; }
+  .v2 .v2-sec:first-of-type { border-top: 0; }
+  .v2 .v2-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 600; margin: 0 0 6px; }
+  .v2 .v2-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--gray-soft); color: var(--muted); }
+  .v2 .v2-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+  .v2 .v2-row input[type=text], .v2 .v2-row input[type=tel], .v2 .v2-row input[type=email], .v2 .v2-row select { min-width: 0; max-width: 100%; }
+  .v2 label.v2-row.chk-inline { display: flex; flex-wrap: nowrap; align-items: flex-start; }
+  .v2 label.v2-row.chk-inline input { margin-top: 3px; flex: none; }
+  .v2 .v2-locked { opacity: .75; }
+  .v2 .v2-msg { font-size: 13px; color: var(--muted); min-height: 1em; }
+  .v2-modal { border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); max-width: 520px; width: calc(100% - 32px); padding: 18px; }
+  .v2-modal::backdrop { background: rgba(0,0,0,.45); }
+  .v2-modal .v2-text { font-size: 14px; line-height: 1.5; color: var(--ink2); max-height: 50vh; overflow: auto; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="/vc-auth.js"></script>
@@ -661,6 +675,21 @@
     </div>
   </div>
   <div class="card usage" id="usageCard" hidden></div>
+  <!-- Pricing v2: plan, integrations and features. Hidden for legacy customers ({ v2: false }) and when the server's FEATURE_V2_SETTINGS is off (404). -->
+  <div class="card v2" id="v2Card" hidden>
+    <p class="panel-title" id="v2Title">Your plan</p>
+    <p class="panel-sub" id="v2Sub"></p>
+    <div id="v2Body"></div>
+  </div>
+  <dialog class="v2-modal" id="v2Modal" aria-labelledby="v2ModalH">
+    <h3 id="v2ModalH" style="margin:0 0 8px"></h3>
+    <div class="v2-text" id="v2ModalText"></div>
+    <label class="chk-inline" style="display:block;margin:12px 0"><input type="checkbox" id="v2ModalOk"> I have read this and agree.</label>
+    <div class="set-actions">
+      <button type="button" class="btn-ghost" id="v2ModalNo">Cancel</button>
+      <button type="button" class="btn" id="v2ModalYes" disabled>Switch on</button>
+    </div>
+  </dialog>
   <div class="muted" id="retentionNote" style="font-size:12px;margin:-4px 2px 12px" hidden></div>
   <div class="card hero" id="hero" data-section="revenue" hidden></div>
   <div class="grid" id="kpis"></div>
@@ -1669,6 +1698,140 @@ let SB = null, business = null;
 try { business = localStorage.getItem("vc_business"); } catch (e) {}
 const toLogin = () => location.replace("/login/?next=/dashboard/");
 
+/* ---------- Pricing v2 settings ----------
+ * Everything here comes from GET /api/dashboard/v2/settings. A legacy customer
+ * gets { v2: false } and the card stays hidden; the server refuses every change
+ * for them anyway. Feature status: live / rolling_out (shown, "Rolling out"),
+ * coming_soon, addon, none (locked card with an upgrade prompt). */
+const V2_STATUS = { rolling_out: "Rolling out", coming_soon: "Coming soon", addon: "Add-on", none: "Upgrade" };
+const V2_LOCKED = { caller_sms: "Confirmation texts to callers", transfer: "Live transfer to a person", calendar_google: "Google Calendar booking",
+  reminders: "Appointment reminders", review_requests: "Review requests", report: "Monthly report", sentiment: "Caller mood", history_90: "90 days of call history",
+  priority_support: "Priority support", custom_routing: "Custom routing", textback: "Missed-call text-back", coverage_mode: "Coverage mode" };
+let v2 = null;
+const v2Usable = f => f && (f.status === "live" || f.status === "rolling_out");
+const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge">${esc(V2_STATUS[f.status] || f.status)}</span>` : "";
+const v2Soon = f => f && f.running === false ? ` <span class="v2-badge">Rolling out</span>` : "";
+async function v2Post(path, body) {
+  const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  let d = {}; try { d = await r.json(); } catch {}
+  return { ok: r.ok, status: r.status, ...d };
+}
+// Resolves true only when the owner ticks the box and presses Switch on.
+function v2Consent(title, text) {
+  const dlg = $("v2Modal"), ok = $("v2ModalOk"), yes = $("v2ModalYes");
+  $("v2ModalH").textContent = title; $("v2ModalText").textContent = text;
+  ok.checked = false; yes.disabled = true; ok.onchange = () => { yes.disabled = !ok.checked; };
+  return new Promise(done => {
+    const close = v => { dlg.close(); done(v); };
+    yes.onclick = () => close(ok.checked); $("v2ModalNo").onclick = () => close(false);
+    dlg.oncancel = e => { e.preventDefault(); close(false); };
+    if (dlg.showModal) dlg.showModal(); else done(window.confirm(text));
+  });
+}
+// keepEdits: re-render from the server but keep what the owner has typed in other, unsaved fields.
+async function loadV2(keepEdits = false) {
+  const card = $("v2Card");
+  const typed = keepEdits ? [...card.querySelectorAll("input[type=tel], input[type=email], select")].map(el => el.value) : null;
+  try {
+    const r = await api("/api/dashboard/v2/settings");
+    if (!r.ok) { card.hidden = true; return; }
+    const d = await r.json();
+    if (!d || d.v2 !== true) { card.hidden = true; return; }
+    v2 = d; renderV2(); card.hidden = false;
+    if (typed) { const now = [...card.querySelectorAll("input[type=tel], input[type=email], select")]; if (now.length === typed.length) now.forEach((el, i) => { el.value = typed[i]; }); }
+  } catch { card.hidden = true; }
+}
+function renderV2() {
+  const d = v2, f = d.features, p = d.plan;
+  $("v2Title").textContent = `Your plan: ${p.label}`;
+  $("v2Sub").textContent = `${p.minutes} minutes a month` + (p.package ? ` · extra ${p.package.minutes} minutes for $${p.package.price_cad}` : "");
+  const sec = [];
+  // Integrations
+  const g = f.calendar_google;
+  sec.push(`<div class="v2-sec"><p class="v2-h">Calendar ${v2Badge(g)}</p>
+    ${v2Usable(g) ? `<div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
+      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>`
+      : `<div class="v2-row v2-locked">Your receptionist can book into Google Calendar on Business Lite and Pro.</div>`}
+    <div class="v2-row v2-locked">Outlook ${v2Badge(f.calendar_outlook)} · Apple ${v2Badge(f.calendar_apple)}</div>
+    <div class="v2-msg" id="v2CalMsg"></div></div>`);
+  // Caller texts
+  const cs = f.caller_sms;
+  sec.push(`<div class="v2-sec"><p class="v2-h">Texts to callers ${v2Badge(cs)}${v2Soon(cs)}</p>
+    ${!v2Usable(cs) ? `<div class="v2-row v2-locked">Callers who leave a message can get a confirmation text. Available on Business Lite and Pro.</div>`
+      : cs.trialBlocked ? `<div class="v2-row">Caller texts start with your paid plan.</div>`
+      : `<label class="v2-row chk-inline"><input type="checkbox" id="v2Sms" ${cs.enabled ? "checked" : ""} ${cs.running ? "" : "disabled"}> Send a confirmation text to callers who ask for one (they can reply STOP)</label>`}
+    <div class="v2-msg" id="v2SmsMsg"></div></div>`);
+  // Live transfer
+  const t = f.transfer;
+  sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer ${v2Badge(t)}${v2Soon(t)}</p>
+    ${!v2Usable(t) ? `<div class="v2-row v2-locked">Put urgent callers through to a person. Available on Business Lite and Pro.</div>`
+      : `<div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}" ${t.running ? "" : "disabled"}></label>
+        <label>Ring for <select id="v2TrRing" ${t.running ? "" : "disabled"}>${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
+        <div class="v2-row muted" style="font-size:13px">Use a different phone from the one that forwards to your receptionist, or the call would loop. If nobody answers, the caller leaves a message.</div>
+        <div class="v2-row"><button type="button" class="btn" id="v2TrSave" ${t.running ? "" : "disabled"}>${t.enabled ? "Save" : "Switch on"}</button>
+        ${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : ""}</div>`}
+    <div class="v2-msg" id="v2TrMsg"></div></div>`);
+  // Email recipients
+  const er = f.email_recipients, max = (er && er.max) || 1;
+  sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email${v2Soon(er)}</p>
+    <div class="v2-row">${Array.from({ length: max }, (_, i) => `<input type="email" class="v2Em" placeholder="name@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Email ${i + 1}">`).join("")}
+    <button type="button" class="btn" id="v2EmSave">Save</button></div>
+    ${max < 3 ? `<div class="v2-row muted" style="font-size:13px">Up to 3 addresses on Business Lite and Pro.</div>` : ""}
+    <div class="v2-msg" id="v2EmMsg"></div></div>`);
+  // Settings-only features
+  const cm = f.coverage_mode;
+  const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]];
+  sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
+    ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>${v2Soon(cm)}</div>` : ""}
+    ${toggles.map(([k, l]) => v2Usable(f[k]) ? `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}${v2Soon(f[k])}</label>` : "").join("")}
+    <div class="v2-msg" id="v2MoreMsg"></div></div>`);
+  // Locked features: what an upgrade or add-on unlocks
+  const locked = Object.entries(f).filter(([k, x]) => V2_LOCKED[k] && x && (x.status === "none" || x.status === "addon" || x.status === "coming_soon"));
+  if (locked.length) sec.push(`<div class="v2-sec"><p class="v2-h">Not on your plan</p>
+    ${locked.map(([k, x]) => `<div class="v2-row v2-locked">${esc(V2_LOCKED[k])} ${v2Badge(x)}</div>`).join("")}
+    <div class="v2-row muted" style="font-size:13px">To change plans, use Manage billing or ask us.</div></div>`);
+  $("v2Body").innerHTML = sec.join("");
+  wireV2();
+}
+function wireV2() {
+  const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
+  // A toggle changes what the card shows, so it reloads (keeping unsaved typing); a plain save just says Saved.
+  const after = async (id, r, okText, reload = true) => { msg(id, r.ok ? okText : (r.error || "Could not save.")); if (r.ok && reload) { await loadV2(true); msg(id, okText); } };
+  const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
+  on("v2CalOn", async () => {
+    msg("v2CalMsg", "Opening Google…");
+    const r = await api("/api/dashboard/calendar/connect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider: "google" }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.url) location.href = d.url; else msg("v2CalMsg", d.error || "Could not start the connection.");
+  });
+  on("v2CalOff", async () => {
+    if (!window.confirm("Disconnect Google Calendar? Your receptionist will stop booking into it.")) return;
+    const r = await api("/api/dashboard/calendar/disconnect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: true }) });
+    const d = await r.json().catch(() => ({}));
+    await after("v2CalMsg", { ok: r.ok, ...d }, "Disconnected.");
+  });
+  const sms = $("v2Sms");
+  if (sms) sms.onchange = async () => {
+    const want = sms.checked; sms.checked = !want;
+    if (want && !(await v2Consent("Texts to your callers", v2.consent.caller_sms))) return;
+    msg("v2SmsMsg", "Saving…");
+    await after("v2SmsMsg", await v2Post("caller-sms", want ? { enabled: true, accept: true, consent_version: v2.consent.version } : { enabled: false }), want ? "On." : "Off.");
+  };
+  on("v2TrSave", async () => {
+    if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
+    msg("v2TrMsg", "Saving…");
+    await after("v2TrMsg", await v2Post("transfer", { enabled: true, destination: $("v2TrNum").value, ring_seconds: Number($("v2TrRing").value), accept: true, consent_version: v2.consent.version }), "Saved.");
+  });
+  on("v2TrOff", async () => { msg("v2TrMsg", "Saving…"); await after("v2TrMsg", await v2Post("transfer", { enabled: false }), "Off."); });
+  on("v2EmSave", async () => {
+    const emails = [...document.querySelectorAll(".v2Em")].map(i => i.value.trim()).filter(Boolean);
+    msg("v2EmMsg", "Saving…"); await after("v2EmMsg", await v2Post("email-recipients", { emails }), "Saved.", false);
+  });
+  const cov = $("v2Cov");
+  if (cov) cov.onchange = async () => { msg("v2MoreMsg", "Saving…"); await after("v2MoreMsg", await v2Post("feature", { key: "coverage_mode", value: cov.value }), "Saved.", false); };
+  document.querySelectorAll(".v2Tg").forEach(el => { el.onchange = async () => { msg("v2MoreMsg", "Saving…"); const r = await v2Post("feature", { key: el.dataset.k, value: el.checked }); if (!r.ok) el.checked = !el.checked; await after("v2MoreMsg", r, "Saved.", false); }; });
+}
+
 async function api(path, opts = {}) {
   const { data: { session } } = await SB.auth.getSession(); // refreshes the token when needed
   if (!session) { toLogin(); throw new Error("Signed out"); }
@@ -1727,6 +1890,7 @@ async function load() {
     allCalls = data.calls;
     renderLog(allCalls);
     loadCallbacks();
+    loadV2();
   } catch (e) {
     if (e.message === "Signed out") return;
     $("app").hidden = false;
