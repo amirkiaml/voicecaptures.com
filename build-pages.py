@@ -3101,8 +3101,15 @@ WAITLIST_SCRIPT = """
     // website is optional and must never be the reason a signup fails.
     var site = normalizeSite(f.website.value);
     if (site) body.website = site;
-    var utm = window.location.search.match(/utm_[a-z]+=[^&]*/g);
-    if (utm) body.utm = utm.join("&");
+    /* Campaign attribution, from attr.js: the first-touch parameters for this
+       visit, already bounded in length and character set, under the same keys
+       the links carry. Absent when nothing brought them in, and absent when
+       JavaScript storage is unavailable -- never an empty object, which the
+       server would have to tell apart from a real one. No field here
+       identifies the visitor; the email on this form is theirs alone and does
+       not travel with it. */
+    var attr = window.vcAttr && window.vcAttr.get();
+    if (attr) body.utm = attr;
 
     send.disabled = true;
     say("busy", "Sending\\u2026");
