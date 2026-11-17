@@ -1421,7 +1421,12 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 .ported .mcard-notes{list-style:none; margin:0; padding:0}
 .ported .mcard-notes li{position:relative; margin:0 0 var(--s2);
   padding-left:var(--s3); font-size:12.5px; line-height:1.45; color:var(--muted)}
-.ported .mcard-notes li::before{content:"2"; position:absolute; left:0;
+/* The bullet needs BOTH backslashes in the Python source. With one,
+   Python reads it as an octal escape and emits a C1 control character
+   followed by a stray digit, which renders as a tofu box. The .trg rule
+   further down has always had it right; this one did not. check_control_chars()
+   in build.py now fails the build on either mistake. */
+.ported .mcard-notes li::before{content:"\2022"; position:absolute; left:0;
   color:var(--faint)}
 .ported .mcard-notes b{color:var(--ink-2)}
 

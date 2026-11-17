@@ -203,6 +203,25 @@ def check_words() -> None:
         sys.exit("review notes on a public page:\n" + "\n".join(sorted(set(bad))))
 
 
+# Control characters in a built page. The bullet on the minutes notes was
+# written as content:"\2022" in a Python string, where \202 is an octal escape
+# and the rule rendered U+0082 followed by "2": a tofu box with a stray digit.
+# Nothing valid puts a C0 or C1 control character in our HTML or CSS, so the
+# build refuses one rather than shipping a glyph nobody can read.
+def check_control_chars() -> None:
+    bad = []
+    for f in sorted(ROOT.glob("*/index.html")) + [ROOT / "index.html"]:
+        text = f.read_text(encoding="utf-8")
+        for i, ch in enumerate(text):
+            o = ord(ch)
+            if (o < 0x20 and ch not in "\t\n\r") or 0x80 <= o <= 0x9F:
+                where = text[max(0, i - 45):i + 25].replace("\n", " ")
+                bad.append(f"  {f.parent.name or 'home'}: U+{o:04X} in ...{where}...")
+                break
+    if bad:
+        sys.exit("control characters in a built page:\n" + "\n".join(bad))
+
+
 # Mojibake guard. index.html once reached production with every em dash stored
 # as "\u00e2\u20ac\u201d" — a UTF-8 em dash that some editor read as cp1252 and
 # saved back as UTF-8. It is invisible in most editors and shows up in the
@@ -245,6 +264,7 @@ def main():
     check_vars()
     check_cards()
     check_words()
+    check_control_chars()
 
     for key, meta in PAGES.items():
         folder = ROOT / meta["slug"]
