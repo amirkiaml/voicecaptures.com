@@ -555,6 +555,14 @@
   .v2 label.v2-row.chk-inline input { margin-top: 3px; flex: none; }
   .v2 .v2-locked { opacity: .75; }
   .v2 .v2-msg { font-size: 13px; color: var(--muted); min-height: 1em; }
+  .v2 .v2-meter { height: 10px; border-radius: 99px; background: var(--gray-soft); overflow: hidden; margin: 6px 0; }
+  .v2 .v2-meter i { display: block; height: 100%; background: var(--accent, #2563eb); }
+  .v2 .v2-meter.over i { background: var(--bad); }
+  .v2 .v2-banner { border: 1px solid var(--bad); border-radius: 10px; padding: 10px 12px; margin: 0 0 10px; }
+  .v2 .v2-prompt { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+  .v2 .v2-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .v2 .v2-plan { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  .v2 .v2-plan.cur { border-color: var(--accent, #2563eb); }
   .v2-modal { border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); max-width: 520px; width: calc(100% - 32px); padding: 18px; }
   .v2-modal::backdrop { background: rgba(0,0,0,.45); }
   .v2-modal .v2-text { font-size: 14px; line-height: 1.5; color: var(--ink2); max-height: 50vh; overflow: auto; }
@@ -676,6 +684,10 @@
   </div>
   <div class="card usage" id="usageCard" hidden></div>
   <!-- Pricing v2: plan, integrations and features. Hidden for legacy customers ({ v2: false }) and when the server's FEATURE_V2_SETTINGS is off (404). -->
+  <!-- Pricing v2 usage, packages, plan, add-ons (GET /api/dashboard/v2/billing + /plans). Hidden for legacy and when PRICING_V2_BILLING is off. -->
+  <div class="card v2" id="v2Bill" hidden>
+    <div id="v2BillBody"></div>
+  </div>
   <div class="card v2" id="v2Card" hidden>
     <p class="panel-title" id="v2Title">Your plan</p>
     <p class="panel-sub" id="v2Sub"></p>
@@ -1698,6 +1710,120 @@ let SB = null, business = null;
 try { business = localStorage.getItem("vc_business"); } catch (e) {}
 const toLogin = () => location.replace("/login/?next=/dashboard/");
 
+/* ---------- Pricing v2 usage, packages, plan, add-ons ----------
+ * From GET /api/dashboard/v2/billing and /api/dashboard/v2/plans (both 404
+ * when the server's PRICING_V2_BILLING is off, 403 legacy: card hidden).
+ * Every number comes from the API (the catalog on the server). */
+let v2b = null, v2p = null, v2Interval = null;
+const v2Money = n => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
+async function loadV2Bill() {
+  const card = $("v2Bill");
+  try {
+    const [rb, rp] = await Promise.all([api("/api/dashboard/v2/billing"), api("/api/dashboard/v2/plans")]);
+    if (!rb.ok) { card.hidden = true; return; }
+    v2b = await rb.json(); v2p = rp.ok ? await rp.json() : null;
+    if (!v2Interval) v2Interval = v2b.plan.billing;
+    renderV2Bill(); card.hidden = false;
+  } catch { card.hidden = true; }
+}
+function renderV2Bill() {
+  const b = v2b, p = v2p, pk = b.plan.package, per = b.period, sec = [];
+  const pct = per.allowance ? Math.min(100, Math.round(per.used / per.allowance * 100)) : 0;
+  const daysLeft = d => Math.max(0, Math.ceil((Date.parse(d) - Date.now()) / 864e5));
+  if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
+    ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
+  if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
+    <div class="v2-row">${daysLeft(b.trial.end)} days and ${Math.max(0, Math.round(b.trial.cap - per.used))} of ${b.trial.cap} minutes left. Your plan starts on ${esc(String(b.trial.end).slice(0, 10))}.</div>
+    <div class="v2-row"><button type="button" class="btn-ghost" id="v2Start">Start my plan now</button></div><div class="v2-msg" id="v2StartMsg"></div></div>`);
+  sec.push(`<div class="v2-sec"><p class="v2-h">Minutes this period</p>
+    <div class="v2-meter${per.used >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${Math.round(per.used)}"><i style="width:${pct}%"></i></div>
+    <div class="v2-row"><span><b>${Math.round(per.used)}</b> of ${per.allowance} minutes used · resets ${esc(String(per.end).slice(0, 10))}</span></div>
+    ${per.packages.length ? `<div class="v2-row muted" style="font-size:13px">Extra this period: ${per.packages.map(x => `${x.minutes} min`).join(", ")}</div>` : ""}
+    <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
+    ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
+    <div class="v2-msg" id="v2BuyMsg"></div></div>`);
+  if (b.autoPackage.available && pk) sec.push(`<div class="v2-sec"><p class="v2-h">Automatic extra minutes${b.autoPackage.running ? "" : ` <span class="v2-badge">Rolling out</span>`}</p>
+    <label class="v2-row chk-inline"><input type="checkbox" id="v2Auto" ${b.autoPackage.enabled ? "checked" : ""} ${b.autoPackage.running ? "" : "disabled"}> When I run out, add ${pk.minutes} minutes for ${v2Money(pk.price_cad)} + tax to my card (at most ${b.autoPackage.max} a period)</label>
+    <div class="v2-msg" id="v2AutoMsg"></div></div>`);
+  if (p && p.prompts && p.prompts.length) sec.push(p.prompts.map(x => `<div class="v2-prompt"><p class="v2-h">${esc(x.title)}</p><div>${esc(x.body)}</div>
+    <div class="v2-row">${x.kind === "pro_to_enterprise" ? `<a class="btn" href="/contact/">Book a call</a>` : `<button type="button" class="btn" data-up="${esc(p.compare.next && p.compare.next.plan || "")}">See ${esc(p.compare.next ? p.compare.next.label : "plans")}</button>`}
+    <button type="button" class="btn-ghost" data-dismiss="${esc(x.kind)}">Not now</button></div></div>`).join(""));
+  if (p) {
+    const st = p.compare.stay, nx = p.compare.next;
+    sec.push(`<div class="v2-sec" id="v2Plans"><p class="v2-h">Your plan</p>
+      ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(String(b.pendingPlan.at || "").slice(0, 10))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
+      <div class="v2-row muted" style="font-size:13px">At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes${st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : ""}.${nx && !nx.quoted ? ` ${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.` : nx ? ` ${esc(nx.label)}: priced on a call.` : ""}</div>
+      <div class="v2-row" role="radiogroup" aria-label="Billing"><label class="chk-inline"><input type="radio" name="v2Iv" value="month" ${v2Interval === "month" ? "checked" : ""}> Monthly</label>
+        <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
+      <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
+        <b>${esc(x.label)}</b><div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div><div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
+        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row"><span class="v2-badge">Rolling out</span></div>`}</div>`; }).join("")}</div>
+      <div class="v2-msg" id="v2PlanMsg"></div></div>`);
+    const addons = Object.entries(p.addons).filter(([, a]) => a.status !== "quoted");
+    if (addons.length) sec.push(`<div class="v2-sec"><p class="v2-h">Add-ons${p.addonsRunning ? "" : ` <span class="v2-badge">Rolling out</span>`}</p>
+      ${addons.map(([k, a]) => `<div class="v2-row">${esc(a.label)} · ${v2Money(a.price_cad)}/month
+        ${a.status === "included" ? `<span class="v2-badge">Included</span>` : a.status === "none" ? `<span class="v2-badge">Upgrade</span>`
+          : `<button type="button" class="btn-ghost" data-addon="${esc(k)}" data-on="${a.active ? "0" : "1"}" ${p.addonsRunning ? "" : "disabled"}>${a.active ? "Remove" : "Add"}</button>`}</div>`).join("")}
+      <div class="v2-msg" id="v2AddonMsg"></div></div>`);
+  }
+  sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
+    <div class="v2-row"><button type="button" class="btn-ghost" id="v2Rcpt">Show receipts</button></div><div id="v2RcptList"></div></div>`);
+  $("v2BillBody").innerHTML = sec.join("");
+  wireV2Bill();
+}
+const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k;
+function wireV2Bill() {
+  const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
+  const post = async (path, body) => { const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }); let d = {}; try { d = await r.json(); } catch {} return { ok: r.ok, ...d }; };
+  document.querySelectorAll("#v2Bill [data-buy]").forEach(el => el.onclick = async () => {
+    msg("v2BuyMsg", "Opening checkout…");
+    const r = await post("package/checkout");
+    if (r.ok && r.url) location.href = r.url; else msg("v2BuyMsg", r.error || "Couldn't start the purchase.");
+  });
+  const st = $("v2Start");
+  if (st) st.onclick = async () => {
+    if (!window.confirm(`Start your ${v2b.plan.label} plan now? Your card is charged today.`)) return;
+    const r = await post("start-plan"); msg("v2StartMsg", r.ok ? "Done. Your plan has started." : r.error || "Couldn't start it."); if (r.ok) setTimeout(loadV2Bill, 1500);
+  };
+  const au = $("v2Auto");
+  if (au) au.onchange = async () => {
+    const want = au.checked; au.checked = !want;
+    if (want && !(await v2Consent("Automatic extra minutes", v2b.consent.auto_package))) return;
+    msg("v2AutoMsg", "Saving…");
+    const r = await post("auto-package", want ? { enabled: true, accept: true, consent_version: v2b.consent.version } : { enabled: false });
+    if (r.ok) { au.checked = want; v2b.autoPackage.enabled = want; } msg("v2AutoMsg", r.ok ? (want ? "On." : "Off.") : r.error || "Couldn't save.");
+  };
+  document.querySelectorAll("#v2Bill [data-dismiss]").forEach(el => el.onclick = async () => { await post("prompts/dismiss", { kind: el.dataset.dismiss }); loadV2Bill(); });
+  document.querySelectorAll("#v2Bill [data-up]").forEach(el => el.onclick = () => { const t = $("v2Plans"); if (t) t.scrollIntoView({ behavior: "smooth" }); });
+  document.querySelectorAll("#v2Bill input[name=v2Iv]").forEach(el => el.onchange = () => { v2Interval = el.value; renderV2Bill(); });
+  document.querySelectorAll("#v2Bill [data-plan]").forEach(el => el.onclick = async () => {
+    const x = v2p.plans.find(q => q.key === el.dataset.plan), cur = v2p.plans.find(q => q.current);
+    const price = v2Interval === "year" ? `${v2Money(x.year)} a year` : `${v2Money(x.month)} a month`;
+    const up = x.month > cur.month || (x.key === cur.key && v2Interval === "year");
+    if (!window.confirm(up ? `Move to ${x.label} (${price}) now? You're charged the difference for the rest of this period today.` : `Move to ${x.label} (${price}) at the end of this period? You keep ${cur.label} until then.`)) return;
+    msg("v2PlanMsg", "Saving…");
+    const r = await post("plan", { plan_key: x.key, billing: v2Interval });
+    msg("v2PlanMsg", r.ok ? (r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${String(r.at || "").slice(0, 10)}.`) : r.error || "Couldn't change the plan.");
+    if (r.ok) { loadV2Bill(); loadV2(); }
+  });
+  document.querySelectorAll("#v2Bill [data-keep]").forEach(el => el.onclick = async () => {
+    const cur = v2p.plans.find(q => q.current);
+    const r = await post("plan", { plan_key: cur.key, billing: v2p.billing }); msg("v2PlanMsg", r.ok ? "Kept your plan." : r.error || "Couldn't save."); if (r.ok) loadV2Bill();
+  });
+  document.querySelectorAll("#v2Bill [data-addon]").forEach(el => el.onclick = async () => {
+    const on = el.dataset.on === "1", a = v2p.addons[el.dataset.addon];
+    if (!window.confirm(on ? `Add ${a.label} for ${v2Money(a.price_cad)} a month? You're charged for the rest of this period today.` : `Remove ${a.label}?`)) return;
+    msg("v2AddonMsg", "Saving…");
+    const r = await post("addon", { key: el.dataset.addon, enabled: on });
+    msg("v2AddonMsg", r.ok ? "Saved." : r.error || "Couldn't save."); if (r.ok) loadV2Bill();
+  });
+  const rc = $("v2Rcpt");
+  if (rc) rc.onclick = async () => {
+    const r = await api("/api/dashboard/v2/invoices"); const d = await r.json().catch(() => ({ invoices: [] }));
+    $("v2RcptList").innerHTML = (d.invoices || []).length ? d.invoices.map(i => `<div class="v2-row">${esc(i.date || "")} · ${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("") : `<div class="v2-row muted">No receipts yet.</div>`;
+  };
+}
+
 /* ---------- Pricing v2 settings ----------
  * Everything here comes from GET /api/dashboard/v2/settings. A legacy customer
  * gets { v2: false } and the card stays hidden; the server refuses every change
@@ -1789,7 +1915,7 @@ function renderV2() {
   const locked = Object.entries(f).filter(([k, x]) => V2_LOCKED[k] && x && (x.status === "none" || x.status === "addon" || x.status === "coming_soon"));
   if (locked.length) sec.push(`<div class="v2-sec"><p class="v2-h">Not on your plan</p>
     ${locked.map(([k, x]) => `<div class="v2-row v2-locked">${esc(V2_LOCKED[k])} ${v2Badge(x)}</div>`).join("")}
-    <div class="v2-row muted" style="font-size:13px">To change plans, use Manage billing or ask us.</div></div>`);
+    <div class="v2-row muted" style="font-size:13px">See "Your plan" above to move up.</div></div>`);
   $("v2Body").innerHTML = sec.join("");
   wireV2();
 }
@@ -1891,6 +2017,7 @@ async function load() {
     renderLog(allCalls);
     loadCallbacks();
     loadV2();
+    loadV2Bill();
   } catch (e) {
     if (e.message === "Signed out") return;
     $("app").hidden = false;
