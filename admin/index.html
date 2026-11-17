@@ -1374,6 +1374,7 @@ async function loadSettings() {
         f.items.length ? f.items.map(x => `<tr><td>${esc(String(x.month).slice(0, 7))}</td><td>${esc(x.item)}</td><td class="num">${bothM(x.both)} <span class="muted small">(entered ${esc(x.currency)})</span></td><td class="small">${esc(x.note || "")}</td>
           <td><button class="linkbtn" data-delfc="${x.id}">remove</button></td></tr>`).join("") : `<tr><td colspan="5" class="muted">None entered.</td></tr>`}</tbody></table>
       <h3 style="margin-top:16px">Costs <span class="muted small">(every cost in one place; alert only: nothing here changes a model, prompt or line)</span></h3>
+      <div id="readyBox" class="small muted">Loading…</div>
       <div id="costsBox" class="small muted">Loading…</div>
       <h3 style="margin-top:16px">Retention cleanup</h3>
       <div class="small">Mode: <b>${d.cleanupMode === "delete" ? "deleting expired transcripts and recordings daily" : "dry run (counts only) — set RETENTION_CLEANUP=on on Render to delete"}</b>.
@@ -1402,6 +1403,7 @@ async function loadSettings() {
         <td>${p.checkout_enabled ? `<span class="good-t">open</span>` : `<span class="muted">closed</span>`}</td></tr>`).join("")}</tbody></table>
         <div class="muted" style="margin-top:4px">Add-ons: ${Object.values(c.addons).map(a => esc(`${a.label} $${a.price_cad}/mo`)).join(" · ")}. Old plans map for display: ${Object.entries(cd.legacyMap).map(([o, n]) => esc(`${PLAN_LABEL[o] || o} → ${c.plans[n].label}`)).join(", ")}.</div>`;
     }).catch(e => { $("catalogBox").innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Not deployed yet (TorontoLeads pricing v2 PR 1).</span>` : `<span class="err">${esc(e.message)}</span>`; });
+    loadReadiness();
     loadCosts();
     // Stripe products
     const spRow = p => `<tr>
@@ -1449,6 +1451,35 @@ async function loadSettings() {
   } catch (e) { el.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
 }
 
+/* ---------- Launch readiness (admin-costs.js: /admin/billing/costs/readiness) ----------
+ * Every plan's catalog feature that is rolling_out or coming_soon, with a
+ * manual fallback, target date and owner note. A feature leaves the list
+ * when catalog.json marks it live. Banner: a plan open for checkout with any
+ * listed feature that has no manual fallback. */
+const FEATURE_LABEL = k => String(k).replace(/_/g, " ").replace(/^\w/, c => c.toUpperCase());
+async function loadReadiness() {
+  const box = $("readyBox"); if (!box) return;
+  try { renderReadiness(await api(`${B}/costs/readiness`)); }
+  catch (e) { box.innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Launch readiness: not deployed yet (TorontoLeads pricing v2 PR 6).</span>` : needsMigration(e) ? `<span class="warn-t">${esc(e.message)}</span>` : `<span class="err">${esc(e.message)}</span>`; }
+}
+function renderReadiness(d) {
+  const box = $("readyBox");
+  box.innerHTML = `${d.warning ? `<div class="err" role="alert" id="readyWarn" style="margin-bottom:6px">⚠ ${esc(d.warning.text)} Write what you'll do by hand for each one below.</div>` : ""}
+    <div class="k2">Launch readiness <span class="muted small" style="text-transform:none;letter-spacing:0">— features promised on a plan but not live yet (from pricing/catalog.json; a feature leaves this list when it's marked live)</span></div>
+    ${d.items.length ? `<table class="sub-table" id="readyTable"><thead><tr><th>Plan</th><th>Feature</th><th>Status</th><th>Manual fallback</th><th>Target date</th><th>Owner note</th><th></th></tr></thead><tbody>${d.items.map((i, n) => `<tr data-rd="${n}" data-plan="${esc(i.plan_key)}" data-feature="${esc(i.feature)}">
+      <td>${esc(i.plan)}${i.checkout_enabled ? "" : ` <span class="muted">(checkout closed)</span>`}</td><td>${esc(FEATURE_LABEL(i.feature))}</td><td>${esc(i.status.replace("_", " "))}</td>
+      <td><input class="inline-in ${i.missingFallback ? "bad-t" : ""}" data-f="manual_fallback" style="width:260px" placeholder="${i.missingFallback ? "Needed: what you'll do by hand" : "What you'll do by hand"}" value="${esc(i.manual_fallback || "")}"></td>
+      <td><input class="inline-in" type="date" data-f="target_date" value="${esc(i.target_date || "")}"></td>
+      <td><input class="inline-in" data-f="owner_note" style="width:180px" value="${esc(i.owner_note || "")}"></td>
+      <td><button class="linkbtn" data-rdsave="${n}">save</button></td></tr>`).join("")}</tbody></table>` : `<div class="good-t">Every promised feature is live.</div>`}
+    <div id="readyMsg" class="small"></div>`;
+  box.querySelectorAll("[data-rdsave]").forEach(b => b.onclick = async () => {
+    const tr = b.closest("tr"), v = f => tr.querySelector(`[data-f=${f}]`).value;
+    try { renderReadiness(await api(`${B}/costs/readiness`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan_key: tr.dataset.plan, feature: tr.dataset.feature,
+        manual_fallback: v("manual_fallback"), target_date: v("target_date") || null, owner_note: v("owner_note") }) })); $("readyMsg").innerHTML = `<span class="good-t">Saved.</span>`; }
+    catch (e) { $("readyMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  });
+}
 /* ---------- Costs (admin-costs.js: GET /admin/billing/costs) ----------
  * Not yet tracked, vendor limits, cost per minute per plan with thresholds,
  * flags (clients over threshold, prompts over the token caps, tool retry
