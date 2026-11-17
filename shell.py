@@ -349,6 +349,15 @@ PLAYGROUND_CSS = """
 
 
 PRICING_CSS = """
+/* The ported stylesheet has a .pay rule that is a CARD -- display:flex, a
+   tinted background, a border and 24px of padding -- for a pricing block that
+   shares the name. The headings here use .pay for the serif italic half of the
+   title, and were getting both: the right typeface inside a grey box. The
+   typography is kept, the card is undone. Affects /demo/, /terms/ and
+   /privacy/, which are the three headings built this way. */
+.ported h1 .pay, .ported h2 .pay{display:inline; width:auto; padding:0;
+  border:0; border-radius:0; background:none; box-shadow:none}
+
 /* ---- pricing: one grid, in the main page's system --------------------- */
 /* Selectors are compounded with `.ported` on purpose. The ported stylesheet
    carries descendant rules (`.ported p`, `.ported ul li`) that outrank a bare
