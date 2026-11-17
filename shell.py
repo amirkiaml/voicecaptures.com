@@ -424,12 +424,6 @@ PRICING_CSS = """
   width:auto; height:auto; border:0; transform:none; background:none;
   font-weight:800; color:var(--blue)}
 
-.ported .pr-chip{display:inline-block; margin-left:var(--s2);
-  padding:1px var(--s2); border-radius:var(--r-pill); font-size:11px;
-  font-weight:800; letter-spacing:.03em; white-space:nowrap;
-  background:#EDE9FE; color:#5B21B6}
-.ported .pr-chip-soon{background:var(--bg-soft); color:var(--muted)}
-.ported .pr-card.pr-dark .pr-chip{background:rgba(255,255,255,.14); color:#DDD6FE}
 
 .ported .pr-extra{margin:var(--s6) 0 var(--s4); padding:var(--s3) var(--s4);
   border-radius:var(--r-sm); background:var(--bg-soft); font-size:14px;
