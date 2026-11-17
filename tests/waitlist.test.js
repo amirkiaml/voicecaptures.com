@@ -100,8 +100,16 @@ try {
     await p.route("https://demo.voicecaptures.com/waitlist", async (route, req) => {
       sent.push(JSON.parse(req.postData() || "{}"));
       const mode = await p.evaluate(() => window.__mode || 200);
+      const named = await p.evaluate(() => window.__body || null);
       if (mode === 429) return route.fulfill({ status: 429, body: "" });
-      if (mode === 400) return route.fulfill({ status: 400, body: "" });
+      if (mode === 500) return route.fulfill({ status: 500, body: "" });
+      if (mode === 400) return route.fulfill({ status: 400,
+        contentType: "application/json", body: JSON.stringify(named || {}) });
+      // Rejects anything carrying a website, accepts the retry without one.
+      if (mode === "400-once" && JSON.parse(req.postData() || "{}").website) {
+        return route.fulfill({ status: 400, contentType: "application/json",
+                               body: JSON.stringify({ error: "invalid url" }) });
+      }
       route.fulfill({ status: 200, contentType: "application/json",
                       body: JSON.stringify({ ok: true }) });
     });
@@ -170,10 +178,82 @@ try {
     await p.evaluate(() => { window.__mode = 400; });
     await fill("someone@example.com", "GB", true);
     await p.locator("#wl-send").click();
-    await p.waitForFunction(() => /not right/i.test(
+    await p.waitForFunction(() => /could not save/i.test(
       document.getElementById("wl-state").textContent));
-    ok(/not right/i.test(await state.textContent()), "400 asks them to check the fields");
+    const generic = await state.textContent();
+    ok(/could not save/i.test(generic), "an unexplained 400 says it could not save");
+    /* "email hello@voicecaptures.com" is an invitation to contact us, not a
+       complaint about their address: the bug was blaming the fields. */
+    ok(!/email address/i.test(generic) && !/check the email/i.test(generic)
+       && !/country/i.test(generic),
+       "and does not blame the email or the country for it");
     ok(await p.locator("#wl-send").isEnabled(), "the button is usable again after an error");
+
+    /* A 400 that names a field gets that field's message, not a guess. */
+    for (const [payload, want, what] of [
+      [{ field: "email", error: "invalid email" }, /email address was not accepted/i, "email"],
+      [{ field: "country", error: "unknown country" }, /country was not accepted/i, "country"],
+    ]) {
+      await p.evaluate(d => { window.__mode = 400; window.__body = d; }, payload);
+      await fill("someone@example.com", "GB", true);
+      await p.locator("#wl-send").click();
+      await p.waitForFunction(w => new RegExp(w, "i").test(
+        document.getElementById("wl-state").textContent), want.source);
+      ok(want.test(await state.textContent()), `a 400 naming ${what} says so`);
+    }
+    await p.evaluate(() => { window.__body = null; });
+
+    console.log("\n  The website field never costs a signup");
+    /* The bug: a bare domain was posted as typed, the server rejected it, and
+       the form blamed the email and country. A bare domain is what people
+       type, so it is normalised; and if the server still dislikes it, the
+       field is optional, so it is dropped and the rest is sent once. */
+    await p.evaluate(() => { window.__mode = 200; });
+    sent.length = 0;
+    await fill("someone@example.com", "AT", true);
+    await p.fill("#wl-type", "Plumber");
+    await p.fill("#wl-site", "amirkiaml.github.io");
+    await p.locator("#wl-send").click();
+    await p.waitForFunction(() => /on the list/i.test(
+      document.getElementById("wl-state").textContent));
+    eq(sent.length, 1, "a bare domain submits, in one request");
+    eq(sent[0].website, "https://amirkiaml.github.io",
+       "the bare domain is normalised to https:// before posting");
+    eq(sent[0].country, "AT", "the reported case: Austria");
+    eq(sent[0].business_type, "Plumber", "with the business type");
+
+    sent.length = 0;
+    await p.evaluate(() => { window.__mode = "400-once"; });
+    await fill("someone@example.com", "AT", true);
+    await p.fill("#wl-site", "amirkiaml.github.io");
+    await p.locator("#wl-send").click();
+    await p.waitForFunction(() => /on the list/i.test(
+      document.getElementById("wl-state").textContent));
+    eq(sent.length, 2, "a server that rejects the website gets one retry");
+    ok("website" in sent[0], "the first attempt carried the website");
+    ok(!("website" in sent[1]), "the retry drops it");
+    eq(sent[1].email, "someone@example.com", "and keeps everything else");
+
+    sent.length = 0;
+    await p.evaluate(() => { window.__mode = 200; });
+    await fill("someone@example.com", "AT", true);
+    await p.fill("#wl-site", "not a website");
+    await p.locator("#wl-send").click();
+    await p.waitForFunction(() => /on the list/i.test(
+      document.getElementById("wl-state").textContent));
+    eq(sent.length, 1, "an unparseable website still submits");
+    ok(!("website" in sent[0]), "it is left out rather than blocking the signup");
+
+    console.log("\n  Server and network faults say so");
+    await p.evaluate(() => { window.__mode = 500; });
+    await fill("someone@example.com", "AT", true);
+    await p.locator("#wl-send").click();
+    await p.waitForFunction(() => /our end/i.test(
+      document.getElementById("wl-state").textContent));
+    const five = await state.textContent();
+    ok(/our end/i.test(five), "a 500 blames our end");
+    ok(!/email address/i.test(five) && !/country/i.test(five),
+       "not the email or country");
 
     console.log("\n  No personal data leaves the page by any other route");
     const urls = [];

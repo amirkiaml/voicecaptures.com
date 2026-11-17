@@ -424,6 +424,13 @@ PRICING_CSS = """
 .ported .pr-feat li{display:flex; gap:var(--s2); align-items:flex-start;
   margin:0 0 6px; padding-left:0; font-size:14px;
   line-height:1.3; color:var(--ink-2)}
+/* The ported layer draws a tick of its own here, out of two rotated borders.
+   Markers are inline SVG now, one element per item, so that pseudo-element
+   must not render at all: left alone it paints a second tick underneath every
+   feature, and a tick underneath every sparkle. content:none removes the box
+   entirely rather than just emptying it. */
+.ported .pr-feat li::before{content:none}
+.ported .pr-feat li::marker{content:""}
 /* A fixed icon box, so swapping a tick for a sparkle moves nothing. */
 .ported .pr-feat .pr-ico{flex:none; width:16px; height:16px;
   margin-top:2px; color:var(--blue)}

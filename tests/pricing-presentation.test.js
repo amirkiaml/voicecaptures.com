@@ -74,6 +74,41 @@ const SPARKLES = {
   ok(icons.inAcc.every(t => t.length > 0),
      "the feature text is still the accessible name of the row");
 
+  console.log("\n  One marker per item");
+  /* The ported stylesheet draws a tick of its own with a ::before. When the
+     markers became inline SVG that rule was left in place and every feature
+     rendered two ticks, and every sparkle a sparkle plus a tick. */
+  const markers = await p.evaluate(() => {
+    const rows = [];
+    document.querySelectorAll(".pr-card").forEach(c => {
+      const plan = c.querySelector("h3").textContent;
+      c.querySelectorAll(".pr-feat li").forEach((li, i) => rows.push({
+        plan, i,
+        icons: li.querySelectorAll(".pr-ico").length,
+        sparks: li.querySelectorAll(".pr-spark").length,
+        before: getComputedStyle(li, "::before").content,
+        after: getComputedStyle(li, "::after").content,
+      }));
+    });
+    return rows;
+  });
+  ok(markers.length > 20, `${markers.length} feature rows checked across all four cards`);
+  ok(markers.every(r => r.icons === 1),
+     "every row has exactly one marker element");
+  ok(markers.every(r => r.before === "none" || r.before === "normal"),
+     "no ::before marker renders on any row");
+  ok(markers.every(r => r.after === "none" || r.after === "normal"),
+     "no ::after marker renders on any row");
+  ok(markers.every(r => r.sparks === 0 || r.sparks === 1),
+     "a sparkled row carries the sparkle and nothing else");
+  const dark = markers.filter(r => r.plan === "Enterprise");
+  ok(dark.length > 0 && dark.every(r => r.icons === 1),
+     `the dark Enterprise card too (${dark.length} rows)`);
+
+  const sheet = pricing.slice(pricing.indexOf("<style"), pricing.indexOf("</style>"));
+  ok(!/\.pr-feat li::before\{(?![^}]*content:none)[^}]*border/.test(sheet.replace(/\s+/g, "")),
+     "no drawn-tick ::before rule is left in the stylesheet");
+
   console.log("\n  Twinkle");
   const anim = await p.evaluate(() => {
     const s = getComputedStyle(document.querySelector(".pr-spark"));
