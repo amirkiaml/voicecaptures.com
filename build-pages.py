@@ -2018,8 +2018,33 @@ only what it needs to do its part.</p>
 <p><strong>If you turn on the caller-sentiment add-on</strong>, the transcript of
 each call is sent to OpenAI to be scored. With the add-on off, no transcript is
 sent for scoring. For clinics we recommend leaving it off.</p>
-<p>VoiceCaptures is sold to businesses in Canada and the service is built around
-Canadian numbers, carriers and law.</p>
+<p>VoiceCaptures is live in Canada. We are rolling out to more countries, and
+the service is built around Canadian numbers, carriers and law.</p>
+
+<h2>The international waitlist</h2>
+<p>If the service is not yet available where you are, you can ask us to tell you
+when it opens.</p>
+<p><strong>What we collect:</strong> your email address and your country, which are
+required, and your business type and website if you choose to give them. We also
+record that you ticked the consent box, when you ticked it, and which version of
+the wording you were shown.</p>
+<p><strong>What we do with it.</strong> We use it for one thing: to email you when
+VoiceCaptures opens in your country. That is a single notice per country. We do not
+sell it, we do not add you to a marketing list, and we do not promise a date.</p>
+<p><strong>Unsubscribing.</strong> Every email we send from the waitlist has an
+unsubscribe link. Unsubscribing deletes your entry rather than merely flagging it,
+and you can also ask us to delete it at any time by emailing
+<a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p><strong>How long we keep it: 12 months</strong> from the day you consented, and
+then it is deleted automatically. Sooner, if you unsubscribe or ask us to delete
+it.</p>
+<p>Waitlist entries are held with the same providers listed above, which means
+outside Canada.</p>
+<!-- TODO(owner): lawyer review of the consent wording shown to visitors outside
+     Canada. CASL governs the Canadian side; other countries have their own
+     regimes (GDPR consent and the ePrivacy rules in the EU and UK, CAN-SPAM in
+     the US, the Privacy Act and Spam Act in Australia) and the single tick-box
+     has to be defensible under the ones we actually collect from. -->
 
 <h2>If there is a security incident</h2>
 <p>If we find that information we hold about you or your callers may have been
