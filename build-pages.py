@@ -2936,7 +2936,7 @@ def _triggers():
 # the block is the sentence and nothing else, so we never show a form that
 # posts into the void.
 WAITLIST = {
-    "enabled": False,          # flip when the self-serve /waitlist route ships
+    "enabled": True,           # the self-serve /waitlist route is live (Nov 17)
     "endpoint": "https://demo.voicecaptures.com/waitlist",
     "hosted": "https://demo.voicecaptures.com/waitlist",
     "consent_version": "waitlist-2026-11-17",
