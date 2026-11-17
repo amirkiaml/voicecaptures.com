@@ -18,6 +18,24 @@ import pricing_data
 
 import shell
 
+def _package_phrases() -> str:
+    """"20 minutes for $20 on Personal Line, 50 for $75 on Business Lite ..."
+    built from the catalog so the FAQ cannot drift from the pricing page."""
+    parts = []
+    for key in pricing_data.ORDER:
+        pkg = pricing_data.package_for(key)
+        if not pkg:
+            continue
+        parts.append(f"{pkg['minutes']} minutes for "
+                     f"{pricing_data.money(pkg['price'])} on "
+                     f"{pricing_data.PLANS[key]['name']}")
+    return ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
+# The plain-language billing rules, read from the catalog so the terms page
+# and the pricing page cannot state different ones.
+TERMS_RULES = pricing_data.CATALOG["rules"]
+
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "24 October 2026"
 TERMS_UPDATED = "11 November 2026"
@@ -2006,11 +2024,12 @@ your card or download invoices at any time from your billing portal.</p>
 Unused minutes don&rsquo;t carry over. We text you when you reach 80% of your
 monthly minutes, and again at 100%. Your line keeps answering either way &mdash;
 we never cut it off for going over.</p>
-<p><strong>Extra minutes.</strong> You can top up from your dashboard at any
-time: 50 minutes for $65, or 100 minutes for $120. A top-up applies to the
-billing period you buy it in and does not carry over. Minutes you use past your
-plan without a top-up are billed at $1.50 each on your next invoice. The texts
-above are how we tell you before that happens.</p>
+<p><strong>Extra minutes.</strong> Extra minutes come in packages, bought from
+your dashboard: {_package_phrases()}. A package applies to the billing period you
+buy it in and does not carry over. There is no per-minute overage.
+{TERMS_RULES["business_never_stops"]}
+{TERMS_RULES["personal_out_of_minutes"]} The texts above are how we tell you
+before that happens.</p>
 
 <h2>Prepaid terms</h2>
 <p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
@@ -2386,286 +2405,325 @@ DEMO_SCRIPT = f"""
 """
 
 # ---------------------------------------------------------------- pricing ----
+# Every figure below is read from pricing/catalog.json through pricing_data.
+# Nothing here writes a price, a minute count or a trial term of its own: a
+# price that is not in the catalog cannot reach the page, and the price test
+# asserts it.
 
-def _tier_card(t, rec):
-    """One plan. Shape comes from index.html: [name, $price, minutes, calls,
-    [features], "per location"?, {extras}?]."""
-    extra = t[6] if len(t) > 6 else {}
-    unit = (" " + t[5]) if len(t) > 5 and isinstance(t[5], str) else ""
-    frm = "From " if extra.get("from") else ""
-    feats = "".join(f"<li>{f}</li>" for f in t[4])
-    note = f'<p class="pr-note">{extra["note"]}</p>' if extra.get("note") else ""
-    cls = " is-rec" if rec else ""
-    badge = '<span class="pop">Recommended</span>' if rec else ""
-    calls = (" &middot; " + t[3]) if t[3] else ""
-    btn = "btn-primary" if rec else "btn-ghost"
-    if extra.get("quote"):
-        # No number, by decision: enterprise is settled on a call and a "from"
-        # price would be exactly the range we promise not to quote.
-        price = '<p class="pr-price pr-quoted">Quoted on a call</p>'
-        term = ""
+def _tag(key):
+    """The small 'Rolling out' / 'Coming soon' chip beside a feature."""
+    label = pricing_data.tag_for(key)
+    if not label:
+        return ""
+    cls = "pr-chip pr-chip-soon" if label == "Coming soon" else "pr-chip"
+    return f' <span class="{cls}">{label}</span>'
+
+
+def _plan_cta(p):
+    """Get Started, the waitlist, or a call. checkout_enabled decides."""
+    key = p["key"]
+    primary = "btn-primary" if p.get("badge") else "btn-ghost"
+    if p["cta"] == "book_a_call" or not p["checkout_enabled"]:
+        label = "Book a Call" if p["cta"] == "book_a_call" else "Join the waitlist"
+        if p["cta"] == "book_a_call":
+            return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
+                    f'target="_blank" rel="noopener">{label}</a>')
+        return f'<a class="btn {primary} pr-cta-btn" href="/#contact">{label}</a>'
+    # data-plan lets the billing switch rewrite ?billing= without a reload.
+    return (f'<a class="btn {primary} pr-cta-btn" data-plan="{key}" '
+            f'href="{DEMO}/?plan={key}&amp;billing=month">Get Started</a>')
+
+
+def _plan_card(p):
+    cat = pricing_data.CATALOG
+    quoted = p["monthly"] is None
+    badge = (f'<span class="pr-badge">{p["badge"]}</span>' if p.get("badge") else "")
+
+    if quoted:
+        price = ('<p class="pr-price pr-quoted">Custom pricing</p>'
+                 f'<p class="pr-min">{p["quote_line"]}</p>'
+                 '<p class="pr-annual">Quoted on a call</p>')
     else:
-        monthly = int(str(t[1]).replace("$", "").replace(",", ""))
-        price = (f'<p class="pr-price" data-m="{monthly}">{frm}'
-                 f'<span class="pr-n">{t[1]}</span><em>/mo{unit}</em></p>')
-        term = '<p class="pr-termnote" hidden></p>'
-    return (
-        f'<div class="pr-card{cls}">'
-        f'<div class="pr-top"><h3>{t[0]}</h3>{badge}</div>'
-        f'{price}'
-        f'<p class="pr-min">{t[2]}{calls}</p>{term}'
-        f'<ul class="pr-feat">{feats}</ul>{note}'
-        f'<a class="btn {btn}" href="{CAL30}" '
-        f'target="_blank" rel="noopener">Book a 30-minute call</a></div>')
+        # Both figures ship in the HTML. Monthly shows by default, so the page
+        # is right with JavaScript switched off, and the annual numbers are in
+        # the document for the price test to check.
+        price = (
+            f'<p class="pr-price" data-month="{pricing_data.money(p["monthly"])}"'
+            f' data-year="{pricing_data.money(p["annual"])}">'
+            f'<span class="pr-n">{pricing_data.money(p["monthly"])}</span>'
+            f'<span class="pr-per">/mo</span></p>'
+            f'<p class="pr-min">{p["minutes"]} minutes &middot; about {p["calls"]} calls</p>'
+            f'<p class="pr-annual">or {pricing_data.money(p["annual"])}/yr '
+            f'&mdash; {cat["annual"]["label"]}</p>')
+
+    inherit = pricing_data.PLANS[p["inherits"]]["name"] if p.get("inherits") else None
+    head = (f'<p class="pr-feat-head">Everything in {inherit}, plus:</p>'
+            if inherit else '<p class="pr-feat-head">Includes:</p>')
+    feats = "".join(f'<li>{f["label"]}{_tag(f.get("key"))}</li>' for f in p["features"])
+
+    pkg = pricing_data.package_for(p["key"])
+    if pkg:
+        rate = pricing_data.per_minute(pkg)
+        extra = (f'<p class="pr-extra"><b>Extra minutes:</b> {pkg["minutes"]}-min '
+                 f'package, {pricing_data.money(pkg["price"])} '
+                 f'(${rate:.2f}/min)</p>')
+    else:
+        extra = ""
+
+    cls = "pr-card pr-pop" if p.get("badge") else "pr-card"
+    if quoted:
+        cls = "pr-card pr-dark"
+    return (f'<div class="{cls}">{badge}'
+            f'<div class="pr-top"><h3>{p["name"]}</h3>'
+            f'<p class="pr-tag">{p["tagline"]}</p></div>'
+            f'{price}<div class="pr-feats">{head}<ul class="pr-feat">{feats}</ul></div>'
+            f'{extra}{_plan_cta(p)}</div>')
 
 
-def _vertical(key, data, alt):
-    d = data[key]
-    sub = d["trades"] or ""
-    note = f'<p class="fine pr-vnote">{d["priceNote"]}</p>' if d["priceNote"] else ""
-    cards = "".join(_tier_card(t, i == d["rec"]) for i, t in enumerate(d["tiers"]))
-    acls = ' class="alt"' if alt else ""
-    subp = f'<p class="pr-sub">{sub}</p>' if sub else ""
-    sw = "".join(
-        f'<button type="button" data-term="{m}" aria-pressed="{"true" if m=="1" else "false"}">'
-        f'{lbl}<em>{sub2}</em></button>'
-        for m, lbl, sub2, _ in pricing_data.TERMS)
-    switch = (f'<div class="pr-terms" role="group" aria-label="Billing term for '
-              f'{d["label"]}">{sw}</div>')
-    return (f'<section id="p-{key}"{acls}>'
-            f'<div class="wrap"><h2>{d["label"]}</h2>{subp}{switch}'
-            f'<div class="pr-grid">{cards}</div>{note}</div></section>')
-
-
-def _prepaid_table(data):
-    """Every distinct monthly price, at each term, using the same arithmetic as
-    the homepage switch: 5%, 10%, and 12 months for the price of 10."""
-    prices = sorted({int(str(t[1]).replace("$", "").replace(",", ""))
-                     for d in data.values() for t in d["tiers"] if t[1]})
-    terms = [(3, 0.05), (6, 0.10), (12, 1 - 10 / 12)]
+def _packages_table():
     rows = ""
-    for p in prices:
-        cells = ""
-        for months, off in terms:
-            total = round(p * months * (1 - off))
-            per = round(total / months)
-            cells += (f'<td><b>${total:,}</b><span>${per:,}/mo'
-                      f' &middot; save ${round(p * months) - total:,}</span></td>')
-        rows += f"<tr><th>${p:,}/mo</th>{cells}</tr>"
+    for key in pricing_data.ORDER:
+        pkg = pricing_data.package_for(key)
+        if not pkg:
+            continue
+        p = pricing_data.PLANS[key]
+        rate = pricing_data.per_minute(pkg)
+        rows += (f'<tr><th>{p["name"]}</th>'
+                 f'<td>{pkg["minutes"]} min for {pricing_data.money(pkg["price"])}</td>'
+                 f'<td>${rate:.2f}/min</td></tr>')
     return rows
 
 
+def _annual_table():
+    rows = ""
+    for key in pricing_data.ORDER:
+        p = pricing_data.PLANS[key]
+        if not p["annual"]:
+            continue
+        rows += (f'<tr><th>{p["name"]}</th>'
+                 f'<td>{pricing_data.money(p["annual"])}</td>'
+                 f'<td>{pricing_data.per_month(p["annual"])}</td></tr>')
+    return rows
+
+
+def _addons_list():
+    cat = pricing_data.CATALOG
+    out = ""
+    for a in cat["addons"]:
+        out += (f'<li><b>{a["label"]} &mdash; {pricing_data.money(a["price"])}'
+                f'/{a["per"]}</b><span>{a["note"]}</span></li>')
+    i = cat["integration"]
+    out += (f'<li><b>{i["label"]} &mdash; from {pricing_data.money(i["one_time_from"])} '
+            f'one-time + {pricing_data.money(i["monthly"])}/mo</b>'
+            f'<span>{i["note"]}</span></li>')
+    return out
+
+
+def _path_diagram():
+    """Page 4's path, as cards and connector pills rather than a picture of a
+    PDF: it has to reflow to one column on a phone and stay readable."""
+    m = pricing_data.move_up()
+    steps = []
+    for key in pricing_data.ORDER:
+        p = pricing_data.PLANS[key]
+        if p["monthly"]:
+            line = (f'{pricing_data.money(p["monthly"])}/mo &middot; '
+                    f'{p["minutes"]} min')
+        else:
+            line = "Custom pricing"
+        steps.append((key, p["name"], line))
+    blurbs = {
+        "personal": "Screens, takes messages",
+        "business_lite": "Answers, books, transfers",
+        "business_pro": "Reminders, reviews, routing",
+        "enterprise": "Locations, integrations",
+    }
+    links = {
+        "business_lite": f'+{pricing_data.money(m["lite_step"])}/mo',
+        "business_pro": f'+{pricing_data.money(m["pro_step"])}/mo',
+        "enterprise": "quoted",
+    }
+    out = ""
+    for key, name, line in steps:
+        if key in links:
+            out += f'<div class="pth-link" aria-hidden="true">{links[key]}</div>'
+        cls = "pth-card pth-dark" if key == "enterprise" else "pth-card"
+        out += (f'<div class="{cls}"><h4>{name}</h4>'
+                f'<p class="pth-price">{line}</p>'
+                f'<p class="pth-blurb">{blurbs[key]}</p></div>')
+    return out
+
+
+def _triggers():
+    """The three 'time to move up' cards. Every number is computed from the
+    catalog, so a price change cannot leave a stale comparison behind."""
+    m = pricing_data.move_up()
+    pm, l1, l2 = m["personal_match"], m["lite_one"], m["lite_two"]
+    lite = pricing_data.PLANS["business_lite"]
+    pro = pricing_data.PLANS["business_pro"]
+    pkg_p = pricing_data.package_for("personal")
+
+    cards = [
+        ("Time for Business Lite if&hellip;", [
+            "Callers ask about your services, prices or service area &mdash; and "
+            "you want them answered, not just a message taken",
+            "You want callers to book themselves into your calendar",
+            "You want callers to get a confirmation text, or urgent calls put "
+            "straight through to you",
+            f"You&rsquo;re buying a {pkg_p['minutes']}-minute package most months "
+            f"&mdash; at about {pm['minutes']} minutes, {lite['name']} costs the "
+            f"same ({pricing_data.money(pm['cost'])}) and does far more",
+        ]),
+        ("Time for Business Pro if&hellip;", [
+            f"You&rsquo;re regularly past {l1['minutes']} minutes a month &mdash; "
+            f"{pro['name']} gives you {pro['minutes']} for "
+            f"{pricing_data.money(pro['monthly'])}, where {lite['name']} plus "
+            f"packages is {pricing_data.money(l2['cost'])} for {l2['minutes']}",
+            f"You want to book into more than one calendar &mdash; "
+            f"{pro['name']} takes up to {pro['calendars']}",
+            "You want appointment reminders and review requests sent for you",
+            "You want calls routed by service, team or urgency, and sentiment on "
+            "every call",
+        ]),
+        ("Talk to us about Enterprise if&hellip;", [
+            "You&rsquo;re opening a second location or team",
+            f"You&rsquo;re past {pro['minutes'] + lite['minutes'] + 50} minutes most months",
+            "You want it connected to your practice software, CRM, field-service "
+            "or POS system",
+            "You need guaranteed response times or one dedicated contact",
+        ]),
+    ]
+    out = ""
+    for title, items in cards:
+        lis = "".join(f"<li>{t}</li>" for t in items)
+        out += f'<div class="trg"><h4>{title}</h4><ul>{lis}</ul></div>'
+    return out
+
+
 def _pricing_body():
-    data = pricing_data.load()
-    verts = "".join(_vertical(k, data, i % 2 == 0)
-                    for i, (k, _) in enumerate(pricing_data.VERTICALS)
-                    if data[k]["tiers"])
+    pricing_data.check()
+    cat = pricing_data.CATALOG
+    r = cat["rules"]
+    a = cat["alerts"]
+    cards = "".join(_plan_card(pricing_data.PLANS[k]) for k in pricing_data.ORDER)
+    personal = pricing_data.PLANS["personal"]
+    lite = pricing_data.PLANS["business_lite"]
+
+    strip = [
+        ("<b>Extra minutes</b> come in packages", "clock"),
+        (r["no_contracts"], "ban"),
+        (cat["tax_note"], "pin"),
+        (r["existing_number"], "head"),
+        (r["clinics"], "shield"),
+    ]
+    strip_html = "".join(f'<li>{text}</li>' for text, _ in strip)
+
     return f"""
 <section class="pr-hero">
   <div class="wrap">
-    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Pricing</p>
-    <h1>Every plan, <span class="pay">on one page.</span></h1>
-    <p class="lede">What each industry pays, what a plan includes, and what the
-    extras cost. No quote needed to see a price.</p>
-    <p class="fine">All prices in CAD, plus HST. Month to month, cancel anytime.
-    Every plan covers one location and answers 24/7 &mdash; after-hours, overflow
-    or all day.</p>
-    <div class="pr-jump">
-      <a href="#p-home">Home services</a><a href="#p-food">Restaurants</a>
-      <a href="#p-clinic">Clinics</a><a href="#p-other">Other</a>
-      <a href="#p-personal">Personal</a><a href="#p-term">Prepaid</a>
-      <a href="#p-multi">Multi-location</a><a href="#p-extra">Extras</a><a href="#p-wb">Win-back</a>
+    <h1>AI Receptionist for Any Business</h1>
+    <p class="lede">Answer calls, capture leads, book appointments, and never
+    miss an opportunity.</p>
+
+    <div class="pr-switch" role="radiogroup" aria-label="Billing period">
+      <button type="button" class="pr-sw is-on" role="radio" aria-checked="true"
+        data-billing="month"><b>Monthly</b><span>pay as you go</span></button>
+      <button type="button" class="pr-sw" role="radio" aria-checked="false"
+        data-billing="year"><b>Annual</b><span>{cat["annual"]["label"]}</span></button>
     </div>
+
+    <p class="pr-banner"><b>Every plan includes the dashboard:</b> call
+    recordings, transcripts, caller details, call log and usage.</p>
   </div>
 </section>
 
-<section class="pr-trial">
+<section class="pr-plans">
   <div class="wrap">
-    <p><b>14 days free at one location, up to 100 minutes.</b> On your real
-    business number, with full setup and real calls. Cancel before day 15 and you
-    pay nothing. Billed on day 15; we email you a reminder first.</p>
-  </div>
-</section>
-{verts}
-<section id="p-multi" class="alt">
-  <div class="wrap">
-    <h2>More than one location, or something we have to build</h2>
-    <p class="sub">Two paths out of the plans above. Both are quoted on a call,
-    and both come back as one number &mdash; not a range.</p>
-    <div class="pr-grid pr-grid-2">
-      <div class="pr-card">
-        <div class="pr-top"><h3>Multi-location</h3></div>
-        <p class="pr-price pr-quoted">Quoted on a call</p>
-        <p class="pr-min">Priced per location, once we know how many and how busy</p>
-        <ul class="pr-feat">
-          <li>Everything in Pro, at every location</li>
-          <li>One account and one bill, however many lines</li>
-          <li>Per-location greetings, hours and calendars</li>
-          <li>Setup for all of them &mdash; $249 one-time</li>
-        </ul>
-        <p class="pr-note">One number, not a range. The free trial covers one
-        location; the rest go live on the paid plan.</p>
-        <a class="btn btn-primary" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
-      </div>
-      <div class="pr-card">
-        <div class="pr-top"><h3>Custom build</h3></div>
-        <p class="pr-price">From $500</p>
-        <p class="pr-min">The minimum integrations and service fee. The rest is
-        quoted on the call, on your software and your call flow.</p>
-        <ul class="pr-feat">
-          <li>Practice management, field service, a POS or a CRM, written into the call</li>
-          <li>Call flows that do not fit a plan &mdash; triage rules, multi-step transfers</li>
-          <li>A build you own outright, if you would rather not rent it</li>
-        </ul>
-        <p class="pr-note">We scope it on the call and send one price for
-        everything, before any work starts.</p>
-        <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
-      </div>
-    </div>
+    <div class="pr-grid pr-grid-4">{cards}</div>
+    <ul class="pr-strip">{strip_html}</ul>
   </div>
 </section>
 
-<section id="p-personal" class="alt">
-  <div class="wrap">
-    <h2>Personal line</h2>
-    <p class="pr-sub">A screening line for your own phone, not a business</p>
-    <div class="pr-grid pr-grid-1">
-      <div class="pr-card">
-        <div class="pr-top"><h3>Personal</h3><span class="pop">Beta</span></div>
-        <p class="pr-price">$9<em>/mo</em></p>
-        <p class="pr-min">Introductory price during the beta</p>
-        <ul class="pr-feat">
-          <li>Screens unknown numbers and spam</li>
-          <li>Takes a message and texts you the summary</li>
-          <li>Your own number, no new line to give out</li>
-        </ul>
-        <p class="pr-note">Not open yet. Join the waitlist and we will tell you
-        when it is. No card now, and the price may change before launch.</p>
-        <a class="btn btn-ghost" href="/#contact">Join the waitlist</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="p-term">
-  <div class="wrap">
-    <h2>Pay for 3, 6 or 12 months up front</h2>
-    <p class="pr-sub">The discount rises with the term, and your rate is locked
-    for it &mdash; if our prices go up while your term runs, yours does not.</p>
-    <p class="pr-swipe">Swipe the table sideways for the 6- and 12-month prices. &rarr;</p>
-    <div class="pr-scroll">
-      <table class="pr-tbl">
-        <thead><tr><th>Monthly</th><th>3 months<span>save 5%</span></th>
-        <th>6 months<span>save 10%</span></th>
-        <th>12 months<span>2 months free</span></th></tr></thead>
-        <tbody>{_prepaid_table(data)}</tbody>
-      </table>
-    </div>
-    <p class="fine pr-vnote">Prepaid terms renew automatically. Cancel anytime
-    before renewal.</p>
-    <p class="fine pr-vnote">Minutes stay monthly: twelve months of a 300-minute
-    plan is 300 minutes each month, not 3,600 to spend at will. A prepaid term
-    starts after your free trial, and we email you the renewal date and amount at
-    least 30 days before each renewal. Full terms are in our
-    <a href="/terms/">Terms of Service</a>.</p>
-  </div>
-</section>
-
-<section id="p-extra" class="alt">
+<section id="p-minutes" class="alt">
   <div class="wrap">
     <h2>Minutes, add-ons and setup</h2>
-    <div class="pr-cols">
+    <div class="pr-three">
       <div class="pr-col">
         <h3>If you need more minutes</h3>
-        <ul>
-          <li>We text you at 80% of your minutes, and again at 100%.</li>
-          <li><b>Your line never stops answering.</b> We do not cut you off for
-          going over.</li>
-          <li>Top up from your dashboard: <b>50 minutes for $65</b> ($1.30 each)
-          or <b>100 for $120</b> ($1.20 each).</li>
-          <li>Minutes used past your plan without a top-up are <b>$1.50 each</b>,
-          on your next invoice.</li>
-          <li>Top-ups apply to the month you buy them in. Unused minutes do not
-          carry over.</li>
-        </ul>
-        <p class="fine">Consistently over? A larger plan is cheaper than topping
-        up every month &mdash; we will tell you when that is true for you.</p>
+        <p>{r["packages_from_dashboard"]}</p>
+        <table class="pr-table">
+          <thead><tr><th>Plan</th><th>Package</th><th>Works out to</th></tr></thead>
+          <tbody>{_packages_table()}</tbody>
+        </table>
+        <p>We text <b>and email</b> you at {a["warn_pct"]}% of your minutes, and
+        again at {a["stop_pct"]}%.</p>
+        <p><b>{r["business_never_stops"].split(".")[0]}.</b>
+        {r["business_never_stops"].split(". ", 1)[1]}</p>
+        <p><b>{personal["name"]}:</b>
+        {r["personal_out_of_minutes"].split(": ", 1)[1]}</p>
+        <p>{r["no_carry_over"]} {r["not_billable"]}</p>
+        <p class="pr-note">Buying packages most months? A bigger plan is cheaper
+        &mdash; we will tell you when that is true for you.</p>
       </div>
+
       <div class="pr-col">
         <h3>Add-ons</h3>
-        <ul>
-          <li>Extra line or calendar &mdash; <b>$29/mo</b></li>
-          <li>90-day call history &mdash; <b>$19/mo</b></li>
-          <li>1-year call history &mdash; <b>$49/mo</b></li>
-          <li>Practice-software, field-service, POS or CRM integration &mdash;
-          <b>from $500</b> one-time <b>+ $39/mo</b>, quoted</li>
-        </ul>
-        <p class="fine">Every plan keeps call history, recordings and transcripts
-        for 14 days. For clinics we recommend staying at 14 days &mdash; on a
-        patient-facing line, keeping less is the safer setting, not a worse one.</p>
+        <ul class="pr-addons">{_addons_list()}</ul>
+        <p class="pr-note">{personal["name"]} keeps {personal["retention_days"]}
+        days of history, recordings and transcripts &mdash; longer history comes
+        with Business. For clinics we recommend staying at
+        {personal["retention_days"]} days.</p>
       </div>
+
       <div class="pr-col">
-        <h3>Setup</h3>
-        <ul>
-          <li><b>Setup is included.</b> We configure the assistant for your
-          business, on your existing number. It takes about 10 minutes of your
-          time.</li>
-          <li>Multi-location or custom call flows &mdash; <b>$249</b> one-time.</li>
-        </ul>
-        <h3>What a minute means</h3>
-        <ul>
-          <li>Time our assistant spends on a live call, including transfers.</li>
-          <li>Calls the assistant marks as spam are not billed.</li>
-        </ul>
+        <h3>Setup, trial and annual</h3>
+        <p><b>Setup is included.</b> {r["setup"].split(". ", 1)[1]}</p>
+        <p><b>Free trial, card on file:</b> {personal["name"]}
+        {personal["trial"]["days"]} days / {personal["trial"]["minutes_cap"]} min
+        &middot; Business {lite["trial"]["days"]} days /
+        {lite["trial"]["minutes_cap"]} min.</p>
+        <table class="pr-table">
+          <thead><tr><th>Plan</th><th>Annual</th><th>Per month</th></tr></thead>
+          <tbody>{_annual_table()}</tbody>
+        </table>
+        <p>{cat["annual"]["terms"]}</p>
+        <p>{r["minute_definition"].replace("A minute", "<b>A minute</b>", 1)}</p>
       </div>
     </div>
   </div>
 </section>
 
-<section id="p-wb">
+<section id="p-moveup">
   <div class="wrap">
-    <h2>Win-back campaigns</h2>
-    <p class="pr-sub">Outbound calls to your own past customers &mdash; priced
-    separately from the receptionist, and you can buy either on its own</p>
-    <div class="pr-cols">
-      <div class="pr-col">
-        <h3>One-time campaign</h3>
-        <p class="pr-price">$2.50<em> per customer on your list</em></p>
-        <p>A single push through a list you give us &mdash; seasonal maintenance,
-        annual recalls, lapsed customers.</p>
-      </div>
-      <div class="pr-col">
-        <h3>Always-on</h3>
-        <p class="pr-price">$2.50<em> per customer, + $99/mo</em></p>
-        <p>Each customer called automatically when they come due, rather than in
-        one batch.</p>
-      </div>
-      <div class="pr-col">
-        <h3>Build and own it</h3>
-        <p class="pr-price pr-price-q">Priced on a call</p>
-        <p>We build the system and hand it over, running on phone and AI accounts
-        you own. You pay the providers directly, at cost.</p>
-      </div>
+    <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Growing with VoiceCaptures</p>
+    <h2>When is it time to move up?</h2>
+    <p class="sub">Start with the plan that fits today. If any of these start
+    sounding like you, the next plan will pay for itself &mdash; and your
+    dashboard will tell you when it does.</p>
+
+    <div class="pth-wrap">
+      <p class="pth-intro"><b>Your path</b><span>Every plan keeps everything
+      from the one before. Move up or down any month &mdash; no contracts.</span></p>
+      <div class="pth">{_path_diagram()}</div>
+      <div class="trg-grid">{_triggers()}</div>
+      <p class="pth-end"><b>You don&rsquo;t have to work it out.</b> When a bigger
+      plan would cost you less than buying minute packages, we will show you the
+      comparison in your dashboard and by email.</p>
     </div>
-    <p class="fine pr-vnote"><b>The first 20% of your list is a free pilot</b>
-    (at least 25 names, at most 100), so you see your real booking rate before
-    you pay anything. We call your own past customers only &mdash; never cold
-    lists or purchased leads. <a href="/win-back/">How win-back works</a>.</p>
   </div>
 </section>
 
 <section class="alt">
   <div class="wrap pr-end">
-    <h2>Start with the 14-day trial</h2>
+    <h2>Start with the free trial</h2>
     <p class="lede">Or build a demo assistant for your business first and hear it
     answer, in about 30 seconds, without talking to anyone.</p>
     <div class="pr-cta">
-      <a class="btn btn-primary" href="/#contact">Start free trial</a>
+      <a class="btn btn-primary" data-plan="{lite["key"]}"
+        href="{DEMO}/?plan={lite["key"]}&amp;billing=month">Get Started</a>
       <a class="btn btn-ghost" href="/demo/?src=pricing">Build your demo</a>
-      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a 30-minute call</a>
+      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a Call</a>
     </div>
-    <p class="fine">Questions about a price? <a href="/#contact">Tell us what you
-    need</a> and we will come back within a day.</p>
   </div>
 </section>
 """
@@ -2711,28 +2769,44 @@ FAQ_GROUPS = [
          "Yes. Your calls forward to us when you do not pick up, or after hours. "
          "Nothing changes for your customers, your listings or your signage."),
         ("Can I use it for after-hours only?",
-         "Yes &mdash; that is exactly what the entry tier is for. Forward evenings, "
-         "weekends and holidays, and leave daytime calls ringing through to you."),
+         "Yes. Forward evenings, weekends and holidays, and leave daytime calls "
+         "ringing through to you. You set that with your forwarding, not your "
+         "plan &mdash; 24/7, after-hours and overflow all work the same way."),
         ("Can I cancel anytime?",
          "Yes. It is month to month with no contract. Cancel and forwarding reverts "
          "to your own phone the same day."),
         ("What happens after the trial?",
-         "Your plan starts on day 15. We email you a reminder before then. Cancel "
-         "before day 15 and you pay nothing."),
+         f"The trial is "
+         f"{pricing_data.PLANS['personal']['trial']['days']} days on "
+         f"{pricing_data.PLANS['personal']['name']} and "
+         f"{pricing_data.PLANS['business_lite']['trial']['days']} days on "
+         f"Business, with a card on file. Your plan starts the day after it "
+         f"ends, and we email you a reminder before then. Cancel before it "
+         f"ends and you pay nothing."),
     ]),
     ("Plans and minutes", [
         ("What counts as a minute?",
          "Time the assistant spends on a live call, including transfers."),
         ("What if I go over?",
-         "We text you at 80% of your minutes, and again at 100% &mdash; the line never "
-         "stops answering. You can top up from your dashboard: 50 minutes for $65, or "
-         "100 for $120. Minutes used past your plan without a top-up are $1.50 each, "
-         "on your next invoice. There are no surprise charges."),
+         f"We text and email you at "
+         f"{pricing_data.CATALOG['alerts']['warn_pct']}% of your minutes, and "
+         f"again at {pricing_data.CATALOG['alerts']['stop_pct']}%. Extra minutes "
+         f"come in packages, bought from your dashboard: "
+         f"{_package_phrases()}. "
+         f"{pricing_data.CATALOG['rules']['business_never_stops']} "
+         f"{pricing_data.CATALOG['rules']['personal_out_of_minutes']} "
+         f"There is no per-minute overage and no surprise charge."),
         ("I have more than one location. How does pricing work?",
-         "Each plan covers one location. For two or more, book a 30-minute call and "
-         "we will quote one price for all of them, on one account and one bill."),
+         "Each plan covers one location. For two or more that is Enterprise: book "
+         "a call and we will quote one price for all of them, on one account and "
+         "one bill."),
         ("Is live booking included?",
-         "Yes, at every plan. Booking on the call is never gated behind an upgrade."),
+         f"It comes with Business Lite and up, and it is rolling out now: Google "
+         f"Calendar first, with Outlook and Apple coming soon. "
+         f"{pricing_data.PLANS['business_lite']['name']} books into "
+         f"{pricing_data.PLANS['business_lite']['calendars']} calendar, "
+         f"{pricing_data.PLANS['business_pro']['name']} up to "
+         f"{pricing_data.PLANS['business_pro']['calendars']}."),
     ]),
     ("Data and privacy", [
         ("Where is my call data stored?",
@@ -2743,9 +2817,16 @@ FAQ_GROUPS = [
          "30 days to clear its backups. Our <a href=\"/privacy/\">Privacy Policy</a> sets "
          "out the detail."),
         ("What do you keep, and for how long?",
-         "Call history, recordings and transcripts are kept for 14 days on every plan. "
-         "Longer history is an add-on. For clinics we recommend staying at 14 days &mdash; "
-         "on a patient-facing line, keeping less is the safer setting, not a worse one."),
+         f"Call history, recordings and transcripts are kept for "
+         f"{pricing_data.PLANS['personal']['retention_days']} days on "
+         f"{pricing_data.PLANS['personal']['name']} and "
+         f"{pricing_data.PLANS['business_lite']['name']}, and "
+         f"{pricing_data.PLANS['business_pro']['retention_days']} days on "
+         f"{pricing_data.PLANS['business_pro']['name']}. Longer history is an "
+         f"add-on. For clinics we recommend staying at "
+         f"{pricing_data.PLANS['personal']['retention_days']} days &mdash; on a "
+         f"patient-facing line, keeping less is the safer setting, not a worse "
+         f"one."),
         ("How do you handle patient information?",
          "Our assistant collects only contact details and the general reason for the "
          "call. Recording is off by default for clinics, and transcripts are deleted "
@@ -2805,42 +2886,47 @@ FAQ_BODY = """<main class="wrap faq-page">
 
 PRICING_SCRIPT = """
 <script>
-// Prepaid terms. The rates come from pricing_data.TERMS at build time, so the
-// switch cannot drift from the savings table further down the page.
+// The monthly/annual switch. Both figures are already in the HTML (data-month
+// and data-year on each price), so this only chooses which one shows: with
+// JavaScript off the page still renders correct monthly pricing, and the
+// annual numbers are in the document either way.
 (function(){
-  var OFF = {"1": 0.0, "3": 0.05, "6": 0.1, "12": 0.166667};
-  function money(n){ return "$" + n.toLocaleString("en-US"); }
-  function apply(section, months){
-    var off = OFF[months] || 0;
-    section.querySelectorAll(".pr-card").forEach(function(card){
-      var el = card.querySelector(".pr-price[data-m]");
-      if (!el) return;                       // quote-only card: nothing to reprice
-      var m = parseInt(el.getAttribute("data-m"), 10);
+  var sw = document.querySelectorAll(".pr-sw");
+  if (!sw.length) return;
+
+  function apply(billing){
+    document.querySelectorAll(".pr-price[data-month]").forEach(function(el){
       var n = el.querySelector(".pr-n");
-      var note = card.querySelector(".pr-termnote");
-      var per = Math.round(m * (1 - off));
-      n.textContent = money(per);
-      if (months === 1 || !off){
-        if (note) note.hidden = true;
-        return;
-      }
-      var total = Math.round(m * months * (1 - off));
-      var save = Math.round(m * months) - total;
-      if (note){
-        note.textContent = money(total) + " billed up front \u00b7 save " + money(save);
-        note.hidden = false;
-      }
+      var per = el.querySelector(".pr-per");
+      if (!n) return;
+      n.textContent = el.getAttribute(billing === "year" ? "data-year" : "data-month");
+      if (per) per.textContent = billing === "year" ? "/yr" : "/mo";
+    });
+    // Carry the choice into the signup link, so the plan the visitor priced is
+    // the plan the app opens on.
+    document.querySelectorAll("a[data-plan]").forEach(function(a){
+      a.setAttribute("href", a.getAttribute("href")
+        .replace(/([?&]billing=)[a-z]+/, "$1" + billing));
+    });
+    sw.forEach(function(b){
+      var on = b.getAttribute("data-billing") === billing;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
     });
   }
-  document.querySelectorAll(".pr-terms").forEach(function(sw){
-    var section = sw.closest("section");
-    sw.addEventListener("click", function(e){
-      var b = e.target.closest("button[data-term]");
-      if (!b) return;
-      sw.querySelectorAll("button[data-term]").forEach(function(x){
-        x.setAttribute("aria-pressed", x === b ? "true" : "false");
-      });
-      apply(section, parseInt(b.getAttribute("data-term"), 10) || 1);
+
+  sw.forEach(function(b, i){
+    b.addEventListener("click", function(){ apply(b.getAttribute("data-billing")); });
+    // A radiogroup is expected to move between options with the arrow keys;
+    // Tab alone would leave the second option unreachable for some users.
+    b.addEventListener("keydown", function(e){
+      var keys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
+      if (keys.indexOf(e.key) === -1) return;
+      e.preventDefault();
+      var next = sw[(i + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1)
+                     + sw.length) % sw.length];
+      next.focus();
+      apply(next.getAttribute("data-billing"));
     });
   });
 })();
@@ -3040,9 +3126,15 @@ PAGES = [
      FAQ_BODY, ""),
 
     ("pricing", "Pricing | VoiceCaptures",
-     "What an AI receptionist costs for home services, restaurants, clinics and "
-     "any other business. Every plan, minutes, add-ons and prepaid terms, with "
-     "no quote needed.", PRICING_BODY, PRICING_SCRIPT),
+     f"AI receptionist pricing for any business. "
+     f"{pricing_data.PLANS['personal']['name']} "
+     f"{pricing_data.money(pricing_data.PLANS['personal']['monthly'])}/mo, "
+     f"{pricing_data.PLANS['business_lite']['name']} "
+     f"{pricing_data.money(pricing_data.PLANS['business_lite']['monthly'])}/mo, "
+     f"{pricing_data.PLANS['business_pro']['name']} "
+     f"{pricing_data.money(pricing_data.PLANS['business_pro']['monthly'])}/mo, "
+     f"Enterprise quoted. Minutes, add-ons and annual, with no quote needed.",
+     PRICING_BODY, PRICING_SCRIPT),
 
     ("playground", "Playground \u2014 call the demo line | VoiceCaptures",
      "Call our live demo line, book yourself an appointment on the phone, and "
