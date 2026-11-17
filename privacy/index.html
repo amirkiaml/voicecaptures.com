@@ -1386,6 +1386,37 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   color:var(--ink-2)}
 .ported .pth-end b{color:var(--ink)}
 
+/* ---- international waitlist ------------------------------------------- */
+.ported #waitlist{padding-top:var(--s12); padding-bottom:var(--s12)}
+.ported #waitlist .wrap{max-width:640px}
+.ported #waitlist h2{margin:0 0 var(--s3); font-size:24px}
+.ported .wl-copy{margin:0 0 var(--s6); font-size:16px; color:var(--ink-2)}
+.ported .wl-off .wl-copy{margin-bottom:0}
+.ported .wl-form{display:grid; gap:var(--s4)}
+.ported .wl-row{display:grid; gap:var(--s2)}
+.ported .wl-row label{font-size:14px; font-weight:700; color:var(--ink)}
+.ported .wl-opt{font-weight:600; color:var(--muted)}
+.ported .wl-row input, .ported .wl-row select{width:100%; font:inherit;
+  font-size:16px; padding:var(--s3) var(--s4); color:var(--ink);
+  background:var(--bg); border:1px solid var(--line);
+  border-radius:var(--r-sm)}
+.ported .wl-row input:focus-visible, .ported .wl-row select:focus-visible,
+.ported .wl-consent input:focus-visible{outline:3px solid var(--blue);
+  outline-offset:2px}
+/* The honeypot is hidden from people without display:none, which some bots
+   skip, and is kept out of the tab order and the accessibility tree. */
+.ported .wl-hp{position:absolute; left:-9999px; width:1px; height:1px;
+  overflow:hidden}
+.ported .wl-consent{display:flex; gap:var(--s3); align-items:flex-start;
+  font-size:15px; color:var(--ink-2)}
+.ported .wl-consent input{margin-top:3px; width:18px; height:18px; flex:none}
+.ported .wl-sender{margin:0; font-size:13px; color:var(--muted)}
+.ported .wl-state{margin:0; font-size:15px; min-height:1.4em}
+.ported .wl-state.wl-ok{color:#166534; font-weight:700}
+.ported .wl-state.wl-err{color:#B42318; font-weight:700}
+.ported .wl-state.wl-busy{color:var(--muted)}
+.ported .f-wl{margin-top:var(--s4); font-size:14px}
+
 .ported .pr-end{text-align:center}
 .ported .pr-cta{display:flex; flex-wrap:wrap; justify-content:center;
   gap:var(--s3); margin-top:var(--s6)}
@@ -1820,6 +1851,7 @@ Toronto, Ontario, Canada<br>
         <h4 class="f-h2">Legal</h4>
         <ul>
           <li><a href="/privacy/">Privacy Policy</a></li>
+          <li><a href="/pricing/#waitlist">Not in Canada?</a></li>
           <li><a href="/terms/">Terms of Service</a></li>
         </ul>
       </div>

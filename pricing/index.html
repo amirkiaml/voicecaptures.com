@@ -1386,6 +1386,37 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   color:var(--ink-2)}
 .ported .pth-end b{color:var(--ink)}
 
+/* ---- international waitlist ------------------------------------------- */
+.ported #waitlist{padding-top:var(--s12); padding-bottom:var(--s12)}
+.ported #waitlist .wrap{max-width:640px}
+.ported #waitlist h2{margin:0 0 var(--s3); font-size:24px}
+.ported .wl-copy{margin:0 0 var(--s6); font-size:16px; color:var(--ink-2)}
+.ported .wl-off .wl-copy{margin-bottom:0}
+.ported .wl-form{display:grid; gap:var(--s4)}
+.ported .wl-row{display:grid; gap:var(--s2)}
+.ported .wl-row label{font-size:14px; font-weight:700; color:var(--ink)}
+.ported .wl-opt{font-weight:600; color:var(--muted)}
+.ported .wl-row input, .ported .wl-row select{width:100%; font:inherit;
+  font-size:16px; padding:var(--s3) var(--s4); color:var(--ink);
+  background:var(--bg); border:1px solid var(--line);
+  border-radius:var(--r-sm)}
+.ported .wl-row input:focus-visible, .ported .wl-row select:focus-visible,
+.ported .wl-consent input:focus-visible{outline:3px solid var(--blue);
+  outline-offset:2px}
+/* The honeypot is hidden from people without display:none, which some bots
+   skip, and is kept out of the tab order and the accessibility tree. */
+.ported .wl-hp{position:absolute; left:-9999px; width:1px; height:1px;
+  overflow:hidden}
+.ported .wl-consent{display:flex; gap:var(--s3); align-items:flex-start;
+  font-size:15px; color:var(--ink-2)}
+.ported .wl-consent input{margin-top:3px; width:18px; height:18px; flex:none}
+.ported .wl-sender{margin:0; font-size:13px; color:var(--muted)}
+.ported .wl-state{margin:0; font-size:15px; min-height:1.4em}
+.ported .wl-state.wl-ok{color:#166534; font-weight:700}
+.ported .wl-state.wl-err{color:#B42318; font-weight:700}
+.ported .wl-state.wl-busy{color:var(--muted)}
+.ported .f-wl{margin-top:var(--s4); font-size:14px}
+
 .ported .pr-end{text-align:center}
 .ported .pr-cta{display:flex; flex-wrap:wrap; justify-content:center;
   gap:var(--s3); margin-top:var(--s6)}
@@ -1667,9 +1698,17 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 <section class="pr-plans">
   <div class="wrap">
     <div class="pr-grid pr-grid-4"><div class="pr-card"><div class="pr-top"><h3>Personal Line</h3><p class="pr-tag">An AI call assistant for you.</p></div><p class="pr-price" data-month="$19" data-year="$190"><span class="pr-n">$19</span><span class="pr-per">/mo</span></p><p class="pr-min">30 minutes &middot; about 35 calls</p><p class="pr-annual">or $190/yr &mdash; 2 months free</p><div class="pr-feats"><p class="pr-feat-head">Includes:</p><ul class="pr-feat"><li>Answers on your existing number</li><li>Screens unknown callers, spam and robocalls</li><li>Takes messages and key details</li><li>Text + email summary with the caller's number</li><li>14-day call history</li></ul></div><p class="pr-extra"><b>Extra minutes:</b> 20-min package, $20 ($1.00/min)</p><a class="btn btn-ghost pr-cta-btn" data-plan="personal" href="https://demo.voicecaptures.com/?plan=personal&amp;billing=month">Get Started</a></div><div class="pr-card pr-pop"><span class="pr-badge">Most popular</span><div class="pr-top"><h3>Business Lite</h3><p class="pr-tag">A real AI receptionist for your business.</p></div><p class="pr-price" data-month="$99" data-year="$990"><span class="pr-n">$99</span><span class="pr-per">/mo</span></p><p class="pr-min">100 minutes &middot; about 60 calls</p><p class="pr-annual">or $990/yr &mdash; 2 months free</p><div class="pr-feats"><p class="pr-feat-head">Everything in Personal Line, plus:</p><ul class="pr-feat"><li>Custom-tailored to your business: services, hours, FAQs, area</li><li>Live booking into your calendar (Google now; Outlook and Apple coming soon)</li><li>Confirmation texts to your callers</li><li>Live transfer and urgent-call routing</li><li>Missed-call text-back</li><li>24/7, after-hours or overflow</li><li>Email summaries to up to 3 people</li></ul></div><p class="pr-extra"><b>Extra minutes:</b> 50-min package, $75 ($1.50/min)</p><a class="btn btn-primary pr-cta-btn" data-plan="business_lite" href="https://demo.voicecaptures.com/?plan=business_lite&amp;billing=month">Get Started</a></div><div class="pr-card"><div class="pr-top"><h3>Business Pro</h3><p class="pr-tag">More capacity and automation as you grow.</p></div><p class="pr-price" data-month="$199" data-year="$1,990"><span class="pr-n">$199</span><span class="pr-per">/mo</span></p><p class="pr-min">250 minutes &middot; about 150 calls</p><p class="pr-annual">or $1,990/yr &mdash; 2 months free</p><div class="pr-feats"><p class="pr-feat-head">Everything in Business Lite, plus:</p><ul class="pr-feat"><li>Up to 3 calendars</li><li>Appointment reminders (text + email)</li><li>Review-request texts after a job or visit</li><li>Custom call handling and routing</li><li>Sentiment analysis on every call</li><li>90-day call history</li><li>Monthly report</li><li>Priority same-day support</li></ul></div><p class="pr-extra"><b>Extra minutes:</b> 100-min package, $110 ($1.10/min)</p><a class="btn btn-ghost pr-cta-btn" data-plan="business_pro" href="https://demo.voicecaptures.com/?plan=business_pro&amp;billing=month">Get Started</a></div><div class="pr-card pr-dark"><div class="pr-top"><h3>Enterprise</h3><p class="pr-tag">Multiple locations, high volume or custom systems.</p></div><p class="pr-price pr-quoted">Custom pricing</p><p class="pr-min">Minutes sized to your call volume</p><p class="pr-annual">Quoted on a call</p><div class="pr-feats"><p class="pr-feat-head">Everything in Business Pro, plus:</p><ul class="pr-feat"><li>Multi-location and multi-team setup</li><li>Custom integrations: CRM, EMR, POS, field service</li><li>Custom call flows and triage rules</li><li>High volumes and SLAs</li><li>Dedicated account support</li></ul></div><a class="btn btn-ghost pr-cta-btn" href="https://calendly.com/hello-voicecaptures/30min" target="_blank" rel="noopener">Book a Call</a></div></div>
-    <ul class="pr-strip"><li><b>Extra minutes</b> come in packages</li><li>No contracts, cancel anytime.</li><li>All prices in CAD, plus HST/GST as applicable.</li><li>Works with your existing number.</li><li>Clinics: privacy-first setup included.</li></ul>
+    <ul class="pr-strip"><li><b>Extra minutes</b> come in packages</li><li>No contracts, cancel anytime.</li><li>All prices in CAD, plus applicable taxes.</li><li>Works with your existing number.</li><li>Clinics: privacy-first setup included.</li></ul>
   </div>
 </section>
+
+<section id="waitlist" class="wl-off">
+  <div class="wrap">
+    <h2>Not in Canada?</h2>
+    <p class="wl-copy">VoiceCaptures is live in Canada. We&rsquo;re rolling out to more countries soon.</p>
+  </div>
+</section>
+
 
 
 <section id="p-wb" class="alt">
@@ -1812,6 +1851,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
         <h4 class="f-h2">Legal</h4>
         <ul>
           <li><a href="/privacy/">Privacy Policy</a></li>
+          <li><a href="/pricing/#waitlist">Not in Canada?</a></li>
           <li><a href="/terms/">Terms of Service</a></li>
         </ul>
       </div>
