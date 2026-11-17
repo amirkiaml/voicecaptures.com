@@ -36,9 +36,16 @@ def _package_phrases() -> str:
 
 def _trial_phrases() -> str:
     """"7 days and 15 minutes on Personal Line, 14 days and 60 minutes on
-    Business" -- the terms page states the trial the catalog sells."""
+    Business" -- the terms page states the trial the catalog sells.
+
+    Enterprise is stated separately, and last, because its trial carries a
+    condition the others do not ("one location"). It used to have no minutes
+    cap at all; TorontoLeads #126 gave it 60, which is why it is now excluded
+    from the loop by key rather than by having no cap to print."""
     seen, parts = set(), []
     for key in pricing_data.ORDER:
+        if key == "enterprise":
+            continue
         p = pricing_data.PLANS[key]
         t = p.get("trial") or {}
         if not t.get("minutes_cap"):
@@ -50,7 +57,8 @@ def _trial_phrases() -> str:
         seen.add(shape)
         parts.append(f"{t['days']} days and {t['minutes_cap']} minutes on {name}")
     ent = pricing_data.PLANS["enterprise"]["trial"]
-    parts.append(f"{ent['days']} days on Enterprise, at {ent['note']}")
+    cap = f" and {ent['minutes_cap']} minutes" if ent.get("minutes_cap") else ""
+    parts.append(f"{ent['days']} days{cap} on Enterprise, at {ent['note']}")
     return ", ".join(parts[:-1]) + " and " + parts[-1]
 
 
@@ -2689,16 +2697,23 @@ def _check_sparkles() -> None:
                          f"drifted from the catalog")
 
 
+# A plan that cannot be bought on the site sends you to the same booking link
+# as Enterprise. Never to a waitlist: on this site the waitlist means one
+# thing, the list for countries we have not opened in yet, and a plan card
+# offering to put a Canadian customer on it would say something untrue. The
+# word does not belong anywhere on these cards.
+CTA_OFF_LABEL = {"book_a_call": "Book a Call"}
+CTA_OFF_DEFAULT = "Talk to us"
+
+
 def _plan_cta(p):
-    """Get Started, the waitlist, or a call. checkout_enabled decides."""
+    """Get Started, or a call. checkout_enabled decides."""
     key = p["key"]
     primary = "btn-primary" if p.get("badge") else "btn-ghost"
     if p["cta"] == "book_a_call" or not p["checkout_enabled"]:
-        label = "Book a Call" if p["cta"] == "book_a_call" else "Join the waitlist"
-        if p["cta"] == "book_a_call":
-            return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
-                    f'target="_blank" rel="noopener">{label}</a>')
-        return f'<a class="btn {primary} pr-cta-btn" href="/#contact">{label}</a>'
+        label = CTA_OFF_LABEL.get(p["cta"], CTA_OFF_DEFAULT)
+        return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
+                f'target="_blank" rel="noopener">{label}</a>')
     # data-plan lets the billing switch rewrite ?billing= without a reload.
     return (f'<a class="btn {primary} pr-cta-btn" data-plan="{key}" '
             f'href="{DEMO}/?plan={key}&amp;billing=month">Get Started</a>')
