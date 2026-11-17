@@ -1,423 +1,340 @@
 {
-  "schema_version": 1,
-  "updated": "2026-11-17",
-  "note": "Canonical pricing catalog. The dashboard repo (TorontoLeads) owns this file; the website and self-serve repos hold a byte-identical copy at this same path. No price, minute count or trial term is hardcoded anywhere else. Edit it there, copy it here, run the drift test.",
+  "schema": 1,
+  "about": "THE ONE SOURCE of every price, minute count and trial term (pricing v2). TorontoLeads owns this file; the website and self-serve repos keep a byte-identical copy at pricing/catalog.json with a test that fails on drift. Never served by any endpoint publicly. Amounts are CAD before HST/GST (Stripe Tax adds it).",
   "currency": "CAD",
-  "tax_note": "All prices in CAD, plus applicable taxes.",
-  "plans": [
-    {
-      "key": "personal",
-      "name": "Personal Line",
-      "tagline": "An AI call assistant for you.",
-      "audience": "personal",
-      "monthly": 19,
-      "annual": 190,
-      "minutes": 30,
-      "calls": 35,
-      "retention_days": 14,
-      "calendars": 0,
-      "email_recipients": 1,
+  "plans": {
+    "personal": {
+      "label": "Personal Line",
       "checkout_enabled": true,
-      "badge": null,
-      "cta": "get_started",
-      "package": "pkg_personal_20",
-      "trial": {
-        "days": 7,
-        "minutes_cap": 15
+      "price_cad": {
+        "month": 19,
+        "year": 190
       },
       "lookup_keys": {
         "month": "plan_personal_month",
         "year": "plan_personal_year"
       },
-      "inherits": null,
-      "features": [
-        {
-          "label": "Answers on your existing number",
-          "key": "answers_existing_number"
-        },
-        {
-          "label": "Screens unknown callers, spam and robocalls",
-          "key": "spam_screening"
-        },
-        {
-          "label": "Takes messages and key details",
-          "key": "messages_summary"
-        },
-        {
-          "label": "Text + email summary with the caller's number",
-          "key": null
-        },
-        {
-          "label": "14-day call history",
-          "key": null
-        }
-      ]
-    },
-    {
-      "key": "business_lite",
-      "name": "Business Lite",
-      "tagline": "A real AI receptionist for your business.",
-      "audience": "business",
-      "monthly": 99,
-      "annual": 990,
-      "minutes": 100,
-      "calls": 60,
-      "retention_days": 14,
-      "calendars": 1,
-      "email_recipients": 3,
-      "checkout_enabled": true,
-      "badge": "Most popular",
-      "cta": "get_started",
-      "package": "pkg_lite_50",
+      "minutes": 30,
+      "calls_estimate": 35,
       "trial": {
-        "days": 14,
-        "minutes_cap": 60
+        "days": 7,
+        "minutes_cap": 15
+      },
+      "package": {
+        "minutes": 20,
+        "price_cad": 20,
+        "lookup_key": "pkg_personal_20"
+      },
+      "retention_days": 14,
+      "calendars_max": 0,
+      "email_recipients_max": 1,
+      "entitlements": {
+        "answers_existing_number": "live",
+        "spam_screening": "live",
+        "messages_summary": "live",
+        "dashboard": "live",
+        "tailored_to_business": "none",
+        "calendar_google": "none",
+        "calendar_outlook": "none",
+        "calendar_apple": "none",
+        "caller_confirmation_texts": "none",
+        "live_transfer": "none",
+        "missed_call_textback": "none",
+        "coverage_modes": "none",
+        "email_recipients": "none",
+        "reminders": "none",
+        "review_requests": "none",
+        "custom_routing": "none",
+        "sentiment": "none",
+        "history_90": "none",
+        "history_365": "none",
+        "monthly_report": "none",
+        "priority_support": "none",
+        "multi_location": "none",
+        "integrations": "none",
+        "sla": "none"
+      }
+    },
+    "business_lite": {
+      "label": "Business Lite",
+      "checkout_enabled": true,
+      "price_cad": {
+        "month": 99,
+        "year": 990
       },
       "lookup_keys": {
         "month": "plan_lite_month",
         "year": "plan_lite_year"
       },
-      "inherits": "personal",
-      "features": [
-        {
-          "label": "Custom-tailored to your business: services, hours, FAQs, area",
-          "key": "tailored_to_business"
-        },
-        {
-          "label": "Live booking into your calendar (Google now; Outlook and Apple coming soon)",
-          "key": "calendar_google"
-        },
-        {
-          "label": "Confirmation texts to your callers",
-          "key": "caller_confirmation_texts"
-        },
-        {
-          "label": "Live transfer and urgent-call routing",
-          "key": "live_transfer"
-        },
-        {
-          "label": "Missed-call text-back",
-          "key": "missed_call_textback"
-        },
-        {
-          "label": "24/7, after-hours or overflow",
-          "key": "coverage_modes"
-        },
-        {
-          "label": "Email summaries to up to 3 people",
-          "key": "email_recipients"
-        }
-      ]
-    },
-    {
-      "key": "business_pro",
-      "name": "Business Pro",
-      "tagline": "More capacity and automation as you grow.",
-      "audience": "business",
-      "monthly": 199,
-      "annual": 1990,
-      "minutes": 250,
-      "calls": 150,
-      "retention_days": 90,
-      "calendars": 3,
-      "email_recipients": 3,
-      "checkout_enabled": true,
-      "badge": null,
-      "cta": "get_started",
-      "package": "pkg_pro_100",
+      "minutes": 100,
+      "calls_estimate": 60,
       "trial": {
         "days": 14,
         "minutes_cap": 60
+      },
+      "package": {
+        "minutes": 50,
+        "price_cad": 75,
+        "lookup_key": "pkg_lite_50"
+      },
+      "retention_days": 14,
+      "calendars_max": 1,
+      "email_recipients_max": 3,
+      "entitlements": {
+        "answers_existing_number": "live",
+        "spam_screening": "live",
+        "messages_summary": "live",
+        "dashboard": "live",
+        "tailored_to_business": "live",
+        "calendar_google": "rolling_out",
+        "calendar_outlook": "coming_soon",
+        "calendar_apple": "coming_soon",
+        "caller_confirmation_texts": "rolling_out",
+        "live_transfer": "rolling_out",
+        "missed_call_textback": "rolling_out",
+        "coverage_modes": "rolling_out",
+        "email_recipients": "rolling_out",
+        "reminders": "none",
+        "review_requests": "none",
+        "custom_routing": "none",
+        "sentiment": "addon",
+        "history_90": "addon",
+        "history_365": "addon",
+        "monthly_report": "none",
+        "priority_support": "none",
+        "multi_location": "none",
+        "integrations": "none",
+        "sla": "none"
+      }
+    },
+    "business_pro": {
+      "label": "Business Pro",
+      "checkout_enabled": false,
+      "price_cad": {
+        "month": 199,
+        "year": 1990
       },
       "lookup_keys": {
         "month": "plan_pro_month",
         "year": "plan_pro_year"
       },
-      "inherits": "business_lite",
-      "features": [
-        {
-          "label": "Up to 3 calendars",
-          "key": "calendar_google"
-        },
-        {
-          "label": "Appointment reminders (text + email)",
-          "key": "reminders"
-        },
-        {
-          "label": "Review-request texts after a job or visit",
-          "key": "review_requests"
-        },
-        {
-          "label": "Custom call handling and routing",
-          "key": "custom_routing"
-        },
-        {
-          "label": "Sentiment analysis on every call",
-          "key": "sentiment"
-        },
-        {
-          "label": "90-day call history",
-          "key": "history_90"
-        },
-        {
-          "label": "Monthly report",
-          "key": "monthly_report"
-        },
-        {
-          "label": "Priority same-day support",
-          "key": "priority_support"
-        }
-      ]
+      "minutes": 250,
+      "calls_estimate": 150,
+      "trial": {
+        "days": 14,
+        "minutes_cap": 60
+      },
+      "package": {
+        "minutes": 100,
+        "price_cad": 110,
+        "lookup_key": "pkg_pro_100"
+      },
+      "retention_days": 90,
+      "calendars_max": 3,
+      "email_recipients_max": 3,
+      "entitlements": {
+        "answers_existing_number": "live",
+        "spam_screening": "live",
+        "messages_summary": "live",
+        "dashboard": "live",
+        "tailored_to_business": "live",
+        "calendar_google": "rolling_out",
+        "calendar_outlook": "coming_soon",
+        "calendar_apple": "coming_soon",
+        "caller_confirmation_texts": "rolling_out",
+        "live_transfer": "rolling_out",
+        "missed_call_textback": "rolling_out",
+        "coverage_modes": "rolling_out",
+        "email_recipients": "rolling_out",
+        "reminders": "rolling_out",
+        "review_requests": "rolling_out",
+        "custom_routing": "rolling_out",
+        "sentiment": "live",
+        "history_90": "live",
+        "history_365": "addon",
+        "monthly_report": "rolling_out",
+        "priority_support": "live",
+        "multi_location": "none",
+        "integrations": "none",
+        "sla": "none"
+      }
     },
-    {
-      "key": "enterprise",
-      "name": "Enterprise",
-      "tagline": "Multiple locations, high volume or custom systems.",
-      "audience": "business",
-      "monthly": null,
-      "annual": null,
-      "minutes": null,
-      "calls": null,
-      "retention_days": null,
-      "calendars": null,
-      "email_recipients": null,
+    "enterprise": {
+      "label": "Enterprise",
       "checkout_enabled": false,
-      "badge": null,
-      "cta": "book_a_call",
-      "package": null,
+      "price_cad": "quoted",
+      "lookup_keys": null,
+      "minutes": "contract",
+      "calls_estimate": null,
       "trial": {
         "days": 21,
-        "minutes_cap": null,
+        "minutes_cap": 60,
         "note": "one location"
       },
-      "lookup_keys": {},
-      "inherits": "business_pro",
-      "quote_line": "Minutes sized to your call volume",
-      "features": [
-        {
-          "label": "Multi-location and multi-team setup",
-          "key": "multi_location"
-        },
-        {
-          "label": "Custom integrations: CRM, EMR, POS, field service",
-          "key": "integrations"
-        },
-        {
-          "label": "Custom call flows and triage rules",
-          "key": "custom_routing"
-        },
-        {
-          "label": "High volumes and SLAs",
-          "key": "sla"
-        },
-        {
-          "label": "Dedicated account support",
-          "key": "priority_support"
-        }
-      ]
-    }
-  ],
-  "packages": {
-    "pkg_personal_20": {
-      "plan": "personal",
-      "minutes": 20,
-      "price": 20
-    },
-    "pkg_lite_50": {
-      "plan": "business_lite",
-      "minutes": 50,
-      "price": 75
-    },
-    "pkg_pro_100": {
-      "plan": "business_pro",
-      "minutes": 100,
-      "price": 110
+      "package": "quoted",
+      "retention_days": "contract",
+      "calendars_max": "contract",
+      "email_recipients_max": "contract",
+      "entitlements": {
+        "answers_existing_number": "live",
+        "spam_screening": "live",
+        "messages_summary": "live",
+        "dashboard": "live",
+        "tailored_to_business": "live",
+        "calendar_google": "rolling_out",
+        "calendar_outlook": "coming_soon",
+        "calendar_apple": "coming_soon",
+        "caller_confirmation_texts": "rolling_out",
+        "live_transfer": "rolling_out",
+        "missed_call_textback": "rolling_out",
+        "coverage_modes": "rolling_out",
+        "email_recipients": "rolling_out",
+        "reminders": "rolling_out",
+        "review_requests": "rolling_out",
+        "custom_routing": "rolling_out",
+        "sentiment": "live",
+        "history_90": "live",
+        "history_365": "quoted",
+        "monthly_report": "rolling_out",
+        "priority_support": "live",
+        "multi_location": "quoted",
+        "integrations": "quoted",
+        "sla": "quoted"
+      }
     }
   },
-  "addons": [
-    {
-      "lookup_key": "addon_calendar",
+  "addons": {
+    "addon_calendar": {
       "label": "Extra calendar or line",
-      "price": 29,
-      "per": "mo",
-      "note": "Business Lite includes 1 calendar · Pro includes up to 3"
+      "price_cad": 29,
+      "interval": "month",
+      "plans": {
+        "personal": "none",
+        "business_lite": "addon",
+        "business_pro": "addon",
+        "enterprise": "quoted"
+      }
     },
-    {
-      "lookup_key": "addon_history_90",
+    "addon_history_90": {
       "label": "90-day call history",
-      "price": 19,
-      "per": "mo",
-      "note": "Business Lite · included in Pro"
+      "price_cad": 19,
+      "interval": "month",
+      "plans": {
+        "personal": "none",
+        "business_lite": "addon",
+        "business_pro": "included",
+        "enterprise": "included"
+      }
     },
-    {
-      "lookup_key": "addon_history_365",
+    "addon_history_365": {
       "label": "1-year call history",
-      "price": 49,
-      "per": "mo",
-      "note": "Business Lite and Pro"
+      "price_cad": 49,
+      "interval": "month",
+      "plans": {
+        "personal": "none",
+        "business_lite": "addon",
+        "business_pro": "addon",
+        "enterprise": "quoted"
+      }
     },
-    {
-      "lookup_key": "addon_sentiment",
+    "addon_sentiment": {
       "label": "Caller sentiment",
-      "price": 9,
-      "per": "mo",
-      "note": "Business Lite · included in Pro"
+      "price_cad": 9,
+      "interval": "month",
+      "plans": {
+        "personal": "none",
+        "business_lite": "addon",
+        "business_pro": "included",
+        "enterprise": "included"
+      }
     }
-  ],
+  },
   "integration": {
-    "label": "Practice-software, field-service, POS or CRM integration",
-    "one_time_from": 500,
-    "monthly": 39,
-    "note": "Enterprise, quoted on a call"
+    "label": "Integration (practice software, field service, POS, CRM)",
+    "setup_from_cad": 500,
+    "monthly_cad": 39,
+    "plans": [
+      "enterprise"
+    ],
+    "quoted": true
   },
-  "entitlements": {
-    "answers_existing_number": {
-      "label": "Answers on your existing number",
-      "status": "live"
-    },
-    "spam_screening": {
-      "label": "Spam and robocall screening",
-      "status": "live"
-    },
-    "messages_summary": {
-      "label": "Messages and summaries",
-      "status": "live"
-    },
-    "dashboard": {
-      "label": "Dashboard",
-      "status": "live"
-    },
-    "tailored_to_business": {
-      "label": "Tailored to your business",
-      "status": "live"
-    },
-    "sentiment": {
-      "label": "Caller sentiment",
-      "status": "live"
-    },
-    "history_90": {
-      "label": "90-day history",
-      "status": "live"
-    },
-    "priority_support": {
-      "label": "Priority support",
-      "status": "live"
-    },
-    "calendar_google": {
-      "label": "Google Calendar booking",
-      "status": "rolling_out"
-    },
-    "caller_confirmation_texts": {
-      "label": "Caller confirmation texts",
-      "status": "rolling_out"
-    },
-    "live_transfer": {
-      "label": "Live transfer",
-      "status": "rolling_out"
-    },
-    "missed_call_textback": {
-      "label": "Missed-call text-back",
-      "status": "rolling_out"
-    },
-    "coverage_modes": {
-      "label": "Coverage modes",
-      "status": "rolling_out"
-    },
-    "email_recipients": {
-      "label": "Email recipients",
-      "status": "rolling_out"
-    },
-    "reminders": {
-      "label": "Appointment reminders",
-      "status": "rolling_out"
-    },
-    "review_requests": {
-      "label": "Review requests",
-      "status": "rolling_out"
-    },
-    "custom_routing": {
-      "label": "Custom routing",
-      "status": "rolling_out"
-    },
-    "monthly_report": {
-      "label": "Monthly report",
-      "status": "rolling_out"
-    },
-    "calendar_outlook": {
-      "label": "Outlook Calendar booking",
-      "status": "coming_soon"
-    },
-    "calendar_apple": {
-      "label": "Apple Calendar booking",
-      "status": "coming_soon"
-    },
-    "multi_location": {
-      "label": "Multi-location",
-      "status": "quoted"
-    },
-    "integrations": {
-      "label": "Custom integrations",
-      "status": "quoted"
-    },
-    "sla": {
-      "label": "SLAs",
-      "status": "quoted"
-    }
-  },
-  "status_tags": {
-    "rolling_out": "Rolling out",
-    "coming_soon": "Coming soon"
-  },
-  "annual": {
-    "months_free": 2,
-    "label": "2 months free",
-    "terms": "Annual is 2 months free, with your rate locked for the term. Cancel early and unused months come back as account credit."
-  },
-  "alerts": {
-    "warn_pct": 80,
-    "stop_pct": 100
-  },
-  "rules": {
-    "minute_definition": "A minute is time our assistant spends on a live call, including transfers.",
-    "not_billable": "Spam calls and calls under 10 seconds are never billed.",
-    "no_carry_over": "Packages apply to the month you buy them in. Unused minutes do not carry over.",
-    "auto_package_cap": 2,
-    "business_never_stops": "Business plans never stop answering. If you run out, we add your plan's package automatically and let you know.",
-    "personal_out_of_minutes": "Personal Line: without a package, callers past your minutes hear a short message that you can't take the call right now.",
-    "setup": "Setup is included. We configure the assistant on your existing number. About 10 minutes of your time.",
-    "clinics": "Clinics: privacy-first setup included.",
-    "no_contracts": "No contracts, cancel anytime.",
-    "existing_number": "Works with your existing number.",
-    "packages_from_dashboard": "Extra minutes come in packages, bought from your dashboard."
-  },
-  "promos": {
+  "trial_types": {
     "standard": {
-      "note": "Per plan trial above."
+      "label": "Standard trial (per plan)",
+      "source": "plans.<key>.trial"
     },
     "referral_affiliate": {
-      "days": 21,
-      "minutes_cap": 60
+      "label": "Referral / affiliate",
+      "max_days": 21,
+      "minutes_cap": 60,
+      "via": "affiliate code"
     },
     "personal_tester": {
+      "label": "Personal tester",
+      "plan": "personal",
       "free_months": 3,
       "monthly_minutes": 30
     },
     "invite_45": {
-      "legacy": true,
-      "days": 45
+      "label": "45-day invite (legacy)",
+      "days": 45,
+      "legacy": true
     }
   },
-  "plan_key_aliases": {
+  "entitlement_statuses": [
+    "live",
+    "rolling_out",
+    "coming_soon",
+    "addon",
+    "none",
+    "quoted"
+  ],
+  "entitlement_keys": [
+    "answers_existing_number",
+    "spam_screening",
+    "messages_summary",
+    "dashboard",
+    "tailored_to_business",
+    "calendar_google",
+    "calendar_outlook",
+    "calendar_apple",
+    "caller_confirmation_texts",
+    "live_transfer",
+    "missed_call_textback",
+    "coverage_modes",
+    "email_recipients",
+    "reminders",
+    "review_requests",
+    "custom_routing",
+    "sentiment",
+    "history_90",
+    "history_365",
+    "monthly_report",
+    "priority_support",
+    "multi_location",
+    "integrations",
+    "sla"
+  ],
+  "legacy_map": {
+    "personal": "personal",
     "home_starter": "business_lite",
     "cafe_starter": "business_lite",
     "home_growth": "business_pro",
     "restaurant_growth": "business_pro",
-    "growth": "business_pro",
     "home_pro": "business_pro",
-    "starter": "business_lite",
-    "pro": "business_pro",
-    "personal": "personal",
-    "clinic": "enterprise",
-    "multi": "enterprise"
+    "clinic_essentials": "business_pro",
+    "clinic_growth": "business_pro",
+    "clinic_pro": "business_pro",
+    "custom": "enterprise",
+    "multi_location": "enterprise"
+  },
+  "rules": {
+    "billable_min_seconds": 10,
+    "spam_billable": false,
+    "packages_carry_over": false,
+    "auto_package_max_per_month": 2,
+    "trial_grace_pct": 10,
+    "annual_multiplier": 10,
+    "annual_early_cancel": "account_credit"
   }
 }

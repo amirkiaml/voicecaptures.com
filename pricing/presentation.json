@@ -1,0 +1,145 @@
+{
+  "about": "How the public pages SPEAK about the catalog. pricing/catalog.json is owned by TorontoLeads and copied here byte for byte; it holds every price, minute count and trial term. This file holds only the wording wrapped around them -- plan names, taglines, the feature lines on each card, section notes and the plain-language rules. Deliberately no prices, minute counts or trial terms: pricing_data.check() fails the build if a figure appears here, so a number can still only be changed in one place.",
+  "tax_note": "All prices in CAD, plus applicable taxes.",
+
+  "plans": {
+    "personal": {
+      "name": "Personal Line",
+      "tagline": "An AI call assistant for you.",
+      "audience": "personal",
+      "badge": null,
+      "cta": "get_started",
+      "inherits": null,
+      "features": [
+        { "label": "Answers on your existing number", "key": "answers_existing_number" },
+        { "label": "Screens unknown callers, spam and robocalls", "key": "spam_screening" },
+        { "label": "Takes messages and key details", "key": "messages_summary" },
+        { "label": "Text + email summary with the caller's number", "key": null },
+        { "label": "14-day call history", "key": null }
+      ]
+    },
+    "business_lite": {
+      "name": "Business Lite",
+      "tagline": "A real AI receptionist for your business.",
+      "audience": "business",
+      "badge": "Most popular",
+      "cta": "get_started",
+      "inherits": "personal",
+      "features": [
+        { "label": "Custom-tailored to your business: services, hours, FAQs, area", "key": "tailored_to_business" },
+        { "label": "Live booking into your calendar (Google now; Outlook and Apple coming soon)", "key": "calendar_google" },
+        { "label": "Confirmation texts to your callers", "key": "caller_confirmation_texts" },
+        { "label": "Live transfer and urgent-call routing", "key": "live_transfer" },
+        { "label": "Missed-call text-back", "key": "missed_call_textback" },
+        { "label": "24/7, after-hours or overflow", "key": "coverage_modes" },
+        { "label": "Email summaries to up to 3 people", "key": "email_recipients" }
+      ]
+    },
+    "business_pro": {
+      "name": "Business Pro",
+      "tagline": "More capacity and automation as you grow.",
+      "audience": "business",
+      "badge": null,
+      "cta": "get_started",
+      "inherits": "business_lite",
+      "features": [
+        { "label": "Up to 3 calendars", "key": "calendar_google" },
+        { "label": "Appointment reminders (text + email)", "key": "reminders" },
+        { "label": "Review-request texts after a job or visit", "key": "review_requests" },
+        { "label": "Custom call handling and routing", "key": "custom_routing" },
+        { "label": "Sentiment analysis on every call", "key": "sentiment" },
+        { "label": "90-day call history", "key": "history_90" },
+        { "label": "Monthly report", "key": "monthly_report" },
+        { "label": "Priority same-day support", "key": "priority_support" }
+      ]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "tagline": "Multiple locations, high volume or custom systems.",
+      "audience": "business",
+      "badge": null,
+      "cta": "book_a_call",
+      "inherits": "business_pro",
+      "quote_line": "Minutes sized to your call volume",
+      "features": [
+        { "label": "Multi-location and multi-team setup", "key": "multi_location" },
+        { "label": "Custom integrations: CRM, EMR, POS, field service", "key": "integrations" },
+        { "label": "Custom call flows and triage rules", "key": "custom_routing" },
+        { "label": "High volumes and SLAs", "key": "sla" },
+        { "label": "Dedicated account support", "key": "priority_support" }
+      ]
+    }
+  },
+
+  "entitlement_labels": {
+    "answers_existing_number": "Answers on your existing number",
+    "spam_screening": "Spam and robocall screening",
+    "messages_summary": "Messages and summaries",
+    "dashboard": "Dashboard",
+    "tailored_to_business": "Tailored to your business",
+    "calendar_google": "Google Calendar booking",
+    "calendar_outlook": "Outlook Calendar booking",
+    "calendar_apple": "Apple Calendar booking",
+    "caller_confirmation_texts": "Caller confirmation texts",
+    "live_transfer": "Live transfer",
+    "missed_call_textback": "Missed-call text-back",
+    "coverage_modes": "Coverage modes",
+    "email_recipients": "Email recipients",
+    "reminders": "Appointment reminders",
+    "review_requests": "Review requests",
+    "custom_routing": "Custom routing",
+    "sentiment": "Caller sentiment",
+    "history_90": "90-day history",
+    "history_365": "1-year history",
+    "monthly_report": "Monthly report",
+    "priority_support": "Priority support",
+    "multi_location": "Multi-location",
+    "integrations": "Custom integrations",
+    "sla": "SLAs"
+  },
+
+  "addon_notes": {
+    "addon_calendar": "Business Lite includes 1 calendar · Pro includes up to 3",
+    "addon_history_90": "Business Lite · included in Pro",
+    "addon_history_365": "Business Lite and Pro",
+    "addon_sentiment": "Business Lite · included in Pro"
+  },
+
+  "integration": {
+    "label": "Practice-software, field-service, POS or CRM integration",
+    "note": "Enterprise, quoted on a call"
+  },
+
+  "annual": {
+    "label": "2 months free",
+    "terms": "Annual is 2 months free, with your rate locked for the term. Cancel early and unused months come back as account credit."
+  },
+
+  "alerts": {
+    "warn_pct": 80,
+    "stop_pct": 100,
+    "about": "TODO(owner): the usage-alert thresholds are the one product figure with no home in the canonical catalog. They are the dashboard's to own; they live here until TorontoLeads adds them, and pricing_data.check() exempts this block from the no-figures rule by name."
+  },
+
+  "rules": {
+    "minute_definition": "A minute is time our assistant spends on a live call, including transfers.",
+    "not_billable": "Spam calls and calls under {billable_min_seconds} seconds are never billed.",
+    "no_carry_over": "Packages apply to the month you buy them in. Unused minutes do not carry over.",
+    "business_never_stops": "Business plans never stop answering. If you run out, we add your plan's package automatically and let you know.",
+    "personal_out_of_minutes": "Personal Line: without a package, callers past your minutes hear a short message that you can't take the call right now.",
+    "setup": "Setup is included. We configure the assistant on your existing number. About 10 minutes of your time.",
+    "clinics": "Clinics: privacy-first setup included.",
+    "no_contracts": "No contracts, cancel anytime.",
+    "existing_number": "Works with your existing number.",
+    "packages_from_dashboard": "Extra minutes come in packages, bought from your dashboard."
+  },
+
+  "extra_plan_aliases": {
+    "about": "Short ?plan= values that have been linked to from live pages and emails but are not in the canonical legacy_map. Kept so old links keep resolving. TODO(owner): fold these into legacy_map in TorontoLeads and delete this block.",
+    "starter": "business_lite",
+    "growth": "business_pro",
+    "pro": "business_pro",
+    "clinic": "enterprise",
+    "multi": "enterprise"
+  }
+}

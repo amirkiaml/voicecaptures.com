@@ -3,68 +3,130 @@
  * Covers: catalog drift, no price on any page outside the catalog, the
  * Get Started links, the mobile layout, and the billing switch's keyboard
  * and contrast behaviour.
+ *
+ * The catalog is TorontoLeads' file, copied here byte for byte. Since #126 it
+ * is keyed by plan, prices sit under price_cad.{month,year}, each package
+ * hangs off its plan, and entitlement status is PER PLAN rather than one
+ * global status per entitlement. pricing/presentation.json holds this site's
+ * wording around those figures and no figures of its own.
  * Needs Playwright with a Chromium (preinstalled here; or npm i --no-save playwright). */
 const fs = require("fs"), path = require("path"), assert = require("assert");
 const { chromium } = require("playwright");
 let pass = 0;
-const ok = (c, m) => { assert.ok(c, m); pass++; console.log("  ✓", m); };
-const eq = (a, b, m) => { assert.deepStrictEqual(a, b, m); pass++; console.log("  ✓", m); };
+const ok = (c, m) => { assert.ok(c, m); pass++; console.log("  \u2713", m); };
+const eq = (a, b, m) => { assert.deepStrictEqual(a, b, m); pass++; console.log("  \u2713", m); };
 
 const root = path.join(__dirname, "..");
 const cat = JSON.parse(fs.readFileSync(path.join(root, "pricing/catalog.json"), "utf8"));
-const plans = Object.fromEntries(cat.plans.map(p => [p.key, p]));
+const pres = JSON.parse(fs.readFileSync(path.join(root, "pricing/presentation.json"), "utf8"));
+const plans = cat.plans;
 const page = f => fs.readFileSync(path.join(root, f), "utf8");
+const ORDER = ["personal", "business_lite", "business_pro", "enterprise"];
 
 /* ---------------------------------------------------------------- drift --
  * The dashboard repo owns the catalog; this repo holds a copy. These are the
  * values the public page was built against, written out so a copy that has
  * drifted fails here instead of quietly repricing the site. */
 const CONTRACT = {
-  personal:      { monthly: 19,  annual: 190,  minutes: 30,  trial: { days: 7,  minutes_cap: 15 }, package: "pkg_personal_20" },
-  business_lite: { monthly: 99,  annual: 990,  minutes: 100, trial: { days: 14, minutes_cap: 60 }, package: "pkg_lite_50" },
-  business_pro:  { monthly: 199, annual: 1990, minutes: 250, trial: { days: 14, minutes_cap: 60 }, package: "pkg_pro_100" },
+  personal:      { month: 19,  year: 190,  minutes: 30,  trial: { days: 7,  minutes_cap: 15 }, pkg: ["pkg_personal_20", 20, 20] },
+  business_lite: { month: 99,  year: 990,  minutes: 100, trial: { days: 14, minutes_cap: 60 }, pkg: ["pkg_lite_50", 50, 75] },
+  business_pro:  { month: 199, year: 1990, minutes: 250, trial: { days: 14, minutes_cap: 60 }, pkg: ["pkg_pro_100", 100, 110] },
 };
-const PACKAGES = { pkg_personal_20: [20, 20], pkg_lite_50: [50, 75], pkg_pro_100: [100, 110] };
 
 console.log("Catalog");
-eq(cat.schema_version, 1, "schema_version is 1");
-eq(cat.plans.map(p => p.key),
-   ["personal", "business_lite", "business_pro", "enterprise"], "plan keys and order");
+eq(cat.schema, 1, "schema is 1");
+eq(Object.keys(plans), ORDER, "plan keys and order");
 for (const [key, want] of Object.entries(CONTRACT)) {
   const p = plans[key];
-  eq([p.monthly, p.annual, p.minutes], [want.monthly, want.annual, want.minutes],
-     `${key}: ${want.monthly}/mo, ${want.annual}/yr, ${want.minutes} min`);
+  eq([p.price_cad.month, p.price_cad.year, p.minutes], [want.month, want.year, want.minutes],
+     `${key}: ${want.month}/mo, ${want.year}/yr, ${want.minutes} min`);
   eq(p.trial.days, want.trial.days, `${key}: ${want.trial.days}-day trial`);
   eq(p.trial.minutes_cap, want.trial.minutes_cap, `${key}: ${want.trial.minutes_cap}-minute trial cap`);
-  eq(p.package, want.package, `${key}: package ${want.package}`);
-  eq(p.annual, p.monthly * 10, `${key}: annual is 10x monthly (${cat.annual.label})`);
+  const [lk, minutes, price] = want.pkg;
+  eq([p.package.lookup_key, p.package.minutes, p.package.price_cad], [lk, minutes, price],
+     `${key}: package ${lk}, ${minutes} min for $${price}`);
+  eq(p.price_cad.year, p.price_cad.month * cat.rules.annual_multiplier,
+     `${key}: annual is ${cat.rules.annual_multiplier}x monthly (${pres.annual.label})`);
 }
-for (const [k, [minutes, price]] of Object.entries(PACKAGES)) {
-  eq([cat.packages[k].minutes, cat.packages[k].price], [minutes, price], `${k}: ${minutes} min for $${price}`);
+eq(plans.enterprise.price_cad, "quoted", "enterprise carries no price");
+eq(plans.enterprise.minutes, "contract", "enterprise minutes are sized on a call");
+/* #126 gave Enterprise a trial cap. It had none before, and the terms page
+   says it out loud, so it is pinned here rather than left to drift back. */
+eq(plans.enterprise.trial, { days: 21, minutes_cap: 60, note: "one location" },
+   "enterprise trial: 21 days, 60 minutes, one location");
+eq(Object.fromEntries(ORDER.map(k => [k, plans[k].checkout_enabled])),
+   { personal: true, business_lite: true, business_pro: false, enterprise: false },
+   "checkout_enabled: Personal and Lite only (Pro until Amir flips it in TorontoLeads)");
+
+/* ------------------------------------------------------- entitlements ----
+ * One list of keys, and every plan must rule on every one of them. A key added
+ * in the dashboard and left unanswered by a plan would otherwise read as
+ * absent rather than as an oversight. */
+console.log("\nEntitlements");
+const keys = cat.entitlement_keys;
+eq(keys.length, 24, `${keys.length} entitlement keys`);
+eq(new Set(keys).size, keys.length, "no duplicate entitlement key");
+ok(keys.includes("history_365"), "history_365 is in the key list (new in #126)");
+const statuses = new Set(cat.entitlement_statuses);
+for (const key of ORDER) {
+  const ents = plans[key].entitlements;
+  eq(Object.keys(ents).sort(), [...keys].sort(), `${key}: rules on all ${keys.length} keys`);
+  const bad = Object.entries(ents).filter(([, s]) => !statuses.has(s));
+  eq(bad, [], `${key}: every status is one of ${[...statuses].join(", ")}`);
 }
-eq(plans.enterprise.monthly, null, "enterprise carries no price");
-eq(plans.enterprise.checkout_enabled, false, "enterprise is never checkout_enabled");
-ok(Object.values(cat.plan_key_aliases).every(v => plans[v]),
-   "every old ?plan= alias resolves to a current plan");
-/* Statuses are internal tracking. Every feature that points at an entitlement
-   must still have one, so the dashboard can flip it as features ship... */
-let withStatus = 0;
-for (const p of cat.plans) {
-  for (const f of p.features) {
+/* The same entitlement can mean different things on different plans now --
+ * this is the shape change #126 made, so it is asserted rather than assumed. */
+eq([plans.business_lite.entitlements.sentiment, plans.business_pro.entitlements.sentiment],
+   ["addon", "live"], "status is per plan: sentiment is an add-on on Lite, live on Pro");
+eq(ORDER.map(k => plans[k].entitlements.history_365),
+   ["none", "addon", "addon", "quoted"], "history_365 across the four plans");
+
+/* presentation.json is this site's wording. It must label every key and
+ * invent none, and every feature line must point at a real entitlement. */
+console.log("\nPresentation");
+eq(Object.keys(pres.plans), ORDER, "presentation covers the same plans, in order");
+eq(keys.filter(k => !(k in pres.entitlement_labels)), [], "every entitlement has a label");
+eq(Object.keys(pres.entitlement_labels).filter(k => !keys.includes(k)), [],
+   "no label for an entitlement the catalog does not have");
+let features = 0;
+for (const key of ORDER) {
+  for (const f of pres.plans[key].features) {
     if (!f.key) continue;
-    const e = cat.entitlements[f.key];
-    ok(!!e, `${p.key}: "${f.label.slice(0, 34)}..." points at a known entitlement`);
-    ok(!!e.status, `${f.key}: has a status (${e.status})`);
-    withStatus++;
+    ok(keys.includes(f.key), `${key}: "${f.label.slice(0, 34)}..." points at a known entitlement`);
+    features++;
   }
 }
-ok(withStatus > 10, `${withStatus} features carry a status`);
-for (const [key, e] of Object.entries(cat.entitlements)) {
-  ok(["live", "rolling_out", "coming_soon", "addon", "none", "quoted"].includes(e.status),
-     `${key}: status "${e.status}" is one of the allowed values`);
+ok(features > 10, `${features} feature lines point at an entitlement`);
+eq(Object.keys(cat.addons).filter(k => !(k in pres.addon_notes)), [],
+   "every add-on has a note");
+/* Old ?plan= values: the canonical legacy_map plus the short forms this site
+ * has linked to and the dashboard does not carry. */
+const aliases = { ...cat.legacy_map };
+for (const [k, v] of Object.entries(pres.extra_plan_aliases)) if (k !== "about") aliases[k] = v;
+eq(Object.entries(aliases).filter(([, v]) => !plans[v]), [],
+   `all ${Object.keys(aliases).length} old ?plan= aliases resolve to a current plan`);
+/* presentation.json holds wording, not figures. If a price or a minute count
+ * is ever written into it there are two sources of truth again. alerts is the
+ * one exemption, and it carries a TODO(owner) saying why. */
+const owned = new Set();
+for (const k of ORDER) {
+  const p = plans[k];
+  if (p.price_cad !== "quoted") { owned.add(p.price_cad.month); owned.add(p.price_cad.year); }
+  if (typeof p.minutes === "number") owned.add(p.minutes);
+  if (p.package && p.package !== "quoted") { owned.add(p.package.minutes); owned.add(p.package.price_cad); }
 }
+for (const a of Object.values(cat.addons)) owned.add(a.price_cad);
+owned.add(cat.integration.setup_from_cad); owned.add(cat.integration.monthly_cad);
+const strays = [];
+(function walk(node, where) {
+  if (Array.isArray(node)) node.forEach((v, i) => walk(v, `${where}[${i}]`));
+  else if (node && typeof node === "object")
+    for (const [k, v] of Object.entries(node)) { if (where === "" && k === "alerts") continue; walk(v, `${where}.${k}`); }
+  else if (typeof node === "number" && owned.has(node)) strays.push(`${where} = ${node}`);
+})(pres, "");
+eq(strays, [], "presentation.json holds no figure the catalog owns");
 
-/* ...and none of them renders. Amir decided on 17 November that the page does
+/* ...and no status renders. Amir decided on 17 November that the page does
    not caveat itself, so no status tag appears anywhere, for any status. */
 console.log("\nNo status tags render");
 const builtPages = ["index.html", "pricing/index.html", "faq/index.html"];
@@ -88,16 +150,21 @@ ok(page("pricing/index.html").includes("Google now; Outlook and Apple coming soo
  * it (per-minute rates, per-month annual, and the move-up comparisons). */
 const allowed = new Set();
 const add = n => allowed.add(Number(n).toFixed(2));
-for (const p of cat.plans) { if (p.monthly) { add(p.monthly); add(p.annual); add(p.annual / 12); } }
-for (const k of Object.values(cat.packages)) { add(k.price); add(k.price / k.minutes); }
-for (const a of cat.addons) add(a.price);
-add(cat.integration.one_time_from); add(cat.integration.monthly);
-// Move-up comparisons: a plan plus N packages, and the step between plans.
-add(plans.business_lite.monthly - plans.personal.monthly);
-add(plans.business_pro.monthly - plans.business_lite.monthly);
-for (const [key, n] of [["personal", 4], ["business_lite", 1], ["business_lite", 2]]) {
-  add(plans[key].monthly + cat.packages[plans[key].package].price * n);
+for (const k of ORDER) {
+  const p = plans[k];
+  if (p.price_cad === "quoted") continue;
+  add(p.price_cad.month); add(p.price_cad.year); add(p.price_cad.year / 12);
+  if (p.package && p.package !== "quoted") { add(p.package.price_cad); add(p.package.price_cad / p.package.minutes); }
 }
+for (const a of Object.values(cat.addons)) add(a.price_cad);
+add(cat.integration.setup_from_cad); add(cat.integration.monthly_cad);
+// Move-up comparisons: a plan plus N packages, and the step between plans.
+add(plans.business_lite.price_cad.month - plans.personal.price_cad.month);
+add(plans.business_pro.price_cad.month - plans.business_lite.price_cad.month);
+for (const [key, n] of [["personal", 4], ["business_lite", 1], ["business_lite", 2]]) {
+  add(plans[key].price_cad.month + plans[key].package.price_cad * n);
+}
+
 /* Figures that are deliberately not plan pricing. Each one is listed with why,
  * so a new unexplained number on a page fails this test rather than sliding in. */
 const NOT_PLAN_PRICING = {
@@ -139,7 +206,9 @@ console.log("\nGet Started links");
 const pricing = page("pricing/index.html");
 const links = [...pricing.matchAll(/href="(https:\/\/demo\.voicecaptures\.com\/\?plan=[^"]+)"/g)]
   .map(m => m[1].replace(/&amp;/g, "&"));
-ok(links.length >= 3, `${links.length} checkout links on the pricing page`);
+/* Two since #126 turned Business Pro's checkout off: Personal and Business
+   Lite. Pro and Enterprise must not link to checkout at all. */
+ok(links.length >= 2, `${links.length} checkout links on the pricing page`);
 for (const href of links) {
   const u = new URL(href);
   const key = u.searchParams.get("plan");
@@ -149,7 +218,14 @@ for (const href of links) {
      `link plan=${key} carries billing=${u.searchParams.get("billing")}`);
 }
 ok(!/plan=enterprise/.test(pricing), "enterprise never links to checkout");
-for (const old of Object.keys(cat.plan_key_aliases)) {
+/* The flip side of checkout_enabled: a plan the catalog says cannot be bought
+   must not carry a buy button anywhere on the page. */
+for (const key of ORDER) {
+  if (plans[key].checkout_enabled) continue;
+  ok(!new RegExp(`plan=${key}\\b`).test(pricing),
+     `${key} has checkout_enabled=false, so nothing links to its checkout`);
+}
+for (const old of Object.keys(aliases)) {
   if (plans[old]) continue;
   ok(!new RegExp(`plan=${old}\\b`).test(pricing), `no page link still uses the old key ${old}`);
 }

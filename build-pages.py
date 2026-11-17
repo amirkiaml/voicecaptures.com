@@ -36,9 +36,16 @@ def _package_phrases() -> str:
 
 def _trial_phrases() -> str:
     """"7 days and 15 minutes on Personal Line, 14 days and 60 minutes on
-    Business" -- the terms page states the trial the catalog sells."""
+    Business" -- the terms page states the trial the catalog sells.
+
+    Enterprise is stated separately, and last, because its trial carries a
+    condition the others do not ("one location"). It used to have no minutes
+    cap at all; TorontoLeads #126 gave it 60, which is why it is now excluded
+    from the loop by key rather than by having no cap to print."""
     seen, parts = set(), []
     for key in pricing_data.ORDER:
+        if key == "enterprise":
+            continue
         p = pricing_data.PLANS[key]
         t = p.get("trial") or {}
         if not t.get("minutes_cap"):
@@ -50,7 +57,8 @@ def _trial_phrases() -> str:
         seen.add(shape)
         parts.append(f"{t['days']} days and {t['minutes_cap']} minutes on {name}")
     ent = pricing_data.PLANS["enterprise"]["trial"]
-    parts.append(f"{ent['days']} days on Enterprise, at {ent['note']}")
+    cap = f" and {ent['minutes_cap']} minutes" if ent.get("minutes_cap") else ""
+    parts.append(f"{ent['days']} days{cap} on Enterprise, at {ent['note']}")
     return ", ".join(parts[:-1]) + " and " + parts[-1]
 
 

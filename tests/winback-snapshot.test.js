@@ -65,7 +65,8 @@ for (const m of flat.matchAll(/\$([0-9][0-9,.]*)/g)) {
    Business Lite happens to be $99/mo too. The check above is the real one —
    every dollar figure in this section must come from winback.json, whatever
    the catalog happens to charge. */
-ok(cat.plans.length > 0, "catalog read (the per-figure check above is the guard)");
+/* plans is keyed by plan since TorontoLeads #126, not a list. */
+ok(Object.keys(cat.plans).length > 0, "catalog read (the per-figure check above is the guard)");
 for (const word of ["2 months free", "HST", "free trial", "minutes a month"]) {
   ok(!flat.includes(word), `no "${word}" wording in the win-back section`);
 }
