@@ -2412,15 +2412,6 @@ DEMO_SCRIPT = f"""
 # price that is not in the catalog cannot reach the page, and the price test
 # asserts it.
 
-def _tag(key):
-    """The small 'Rolling out' / 'Coming soon' chip beside a feature."""
-    label = pricing_data.tag_for(key)
-    if not label:
-        return ""
-    cls = "pr-chip pr-chip-soon" if label == "Coming soon" else "pr-chip"
-    return f' <span class="{cls}">{label}</span>'
-
-
 def _plan_cta(p):
     """Get Started, the waitlist, or a call. checkout_enabled decides."""
     key = p["key"]
@@ -2461,7 +2452,10 @@ def _plan_card(p):
     inherit = pricing_data.PLANS[p["inherits"]]["name"] if p.get("inherits") else None
     head = (f'<p class="pr-feat-head">Everything in {inherit}, plus:</p>'
             if inherit else '<p class="pr-feat-head">Includes:</p>')
-    feats = "".join(f'<li>{f["label"]}{_tag(f.get("key"))}</li>' for f in p["features"])
+    # No status tag is rendered. The catalog still carries a status for every
+    # feature and the tests still check it, but it is internal tracking now:
+    # Amir decided on 17 November that the page should not caveat itself.
+    feats = "".join(f'<li>{f["label"]}</li>' for f in p["features"])
 
     pkg = pricing_data.package_for(p["key"])
     if pkg:
