@@ -46,11 +46,42 @@ eq(plans.enterprise.monthly, null, "enterprise carries no price");
 eq(plans.enterprise.checkout_enabled, false, "enterprise is never checkout_enabled");
 ok(Object.values(cat.plan_key_aliases).every(v => plans[v]),
    "every old ?plan= alias resolves to a current plan");
+/* Statuses are internal tracking. Every feature that points at an entitlement
+   must still have one, so the dashboard can flip it as features ship... */
+let withStatus = 0;
 for (const p of cat.plans) {
   for (const f of p.features) {
-    if (f.key) ok(!!cat.entitlements[f.key], `${p.key}: feature "${f.label.slice(0, 32)}..." has a known entitlement`);
+    if (!f.key) continue;
+    const e = cat.entitlements[f.key];
+    ok(!!e, `${p.key}: "${f.label.slice(0, 34)}..." points at a known entitlement`);
+    ok(!!e.status, `${f.key}: has a status (${e.status})`);
+    withStatus++;
   }
 }
+ok(withStatus > 10, `${withStatus} features carry a status`);
+for (const [key, e] of Object.entries(cat.entitlements)) {
+  ok(["live", "rolling_out", "coming_soon", "addon", "none", "quoted"].includes(e.status),
+     `${key}: status "${e.status}" is one of the allowed values`);
+}
+
+/* ...and none of them renders. Amir decided on 17 November that the page does
+   not caveat itself, so no status tag appears anywhere, for any status. */
+console.log("\nNo status tags render");
+const builtPages = ["index.html", "pricing/index.html", "faq/index.html"];
+for (const f of builtPages) {
+  const html = page(f);
+  ok(!/class="[^"]*pr-chip/.test(html), `${f}: no status chip markup`);
+  ok(!html.includes(">Rolling out<"), `${f}: no "Rolling out" tag`);
+}
+/* "Coming soon" is checked on the pricing page only. The home page has its own
+   badge component that predates the catalog and says it about the integrations
+   card, which is still true and is not a catalog status tag. */
+ok(!page("pricing/index.html").includes(">Coming soon<"),
+   "pricing: no \"Coming soon\" tag");
+/* The one place a status is still spoken aloud is the calendar label, which is
+   written into the feature text on purpose and stays as it is. */
+ok(page("pricing/index.html").includes("Google now; Outlook and Apple coming soon"),
+   "the calendar wording is kept as written");
 
 /* --------------------------------------------------------------- prices --
  * Every dollar figure the catalog permits, including the ones computed from
@@ -198,7 +229,6 @@ for (const old of Object.keys(cat.plan_key_aliases)) {
       "selected pill": read(".pr-sw.is-on b"),
       "dark card body": read(".pr-dark .pr-feat li"),
       "feature text": read(".pr-card .pr-feat li"),
-      "rolling-out chip": read(".pr-chip"),
     };
   });
   for (const [what, [fg, bg]] of Object.entries(pairs)) {
