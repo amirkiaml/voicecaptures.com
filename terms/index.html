@@ -1235,167 +1235,160 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
   .ported .btns .btn + .btn{margin-top:var(--s3)}
 }
 
-/* ---- pricing cards, in the main page's system ------------------------- */
+/* ---- pricing: one grid, in the main page's system --------------------- */
+/* Selectors are compounded with `.ported` on purpose. The ported stylesheet
+   carries descendant rules (`.ported p`, `.ported ul li`) that outrank a bare
+   single class, so a plain `.pr-card p` here would silently lose. */
+.ported .pr-hero{text-align:center; padding-top:var(--s12)}
+.ported .pr-hero .lede{max-width:46rem; margin-inline:auto}
+
+.ported .pr-switch{display:flex; width:max-content; gap:var(--s1);
+  margin:var(--s8) auto 0; padding:var(--s1); background:var(--bg-soft);
+  border-radius:var(--r-pill)}
+.ported .pr-sw{display:block; border:0; cursor:pointer; font:inherit;
+  padding:var(--s3) var(--s6); border-radius:var(--r-pill);
+  background:transparent; color:var(--ink-2); text-align:center}
+.ported .pr-sw b{display:block; font-size:16px; font-weight:700; color:var(--ink)}
+.ported .pr-sw span{display:block; font-size:13px; color:var(--muted)}
+.ported .pr-sw.is-on{background:var(--blue)}
+.ported .pr-sw.is-on b, .ported .pr-sw.is-on span{color:#fff}
+.ported .pr-sw:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+
+.ported .pr-banner{display:block; width:max-content; max-width:100%;
+  margin-inline:auto; margin-top:var(--s8);
+  padding:var(--s3) var(--s6); border-radius:var(--r-pill);
+  background:var(--bg-soft); color:var(--ink-2); font-size:15px}
+
 .ported .pr-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
-  margin-top:var(--s8)}
-@media(min-width:860px){ .ported .pr-grid{grid-template-columns:repeat(3,1fr)} }
-/* A single card is a single card. `.pr-grid-1` alone loses to `.ported
-   .pr-grid` above, so the lone personal-line card was being dealt the first
-   of three columns and sat hard against the left edge. */
-@media(min-width:860px){
-  .ported .pr-grid-1{grid-template-columns:minmax(0,380px); justify-content:center}
-}
+  margin-top:var(--s8); align-items:start}
+@media(min-width:760px){ .ported .pr-grid-4{grid-template-columns:repeat(2,1fr)} }
+@media(min-width:1080px){ .ported .pr-grid-4{grid-template-columns:repeat(4,1fr)} }
 
-/* Prepaid term switch, one per sector. */
-.ported .pr-terms{display:flex; flex-wrap:wrap; gap:var(--s2);
-  justify-content:center; margin:0 auto var(--s8); max-width:720px}
-.ported .pr-terms button{font:inherit; cursor:pointer; text-align:center;
-  padding:9px 16px; min-height:46px; border-radius:var(--r-pill);
-  border:1px solid var(--line); background:#fff; color:var(--ink-2);
-  font-size:14px; font-weight:700; line-height:1.15}
-.ported .pr-terms button em{display:block; font-style:normal; font-size:11.5px;
-  font-weight:600; color:var(--muted)}
-.ported .pr-terms button:hover{border-color:var(--blue)}
-.ported .pr-terms button[aria-pressed="true"]{background:var(--blue);
-  border-color:var(--blue); color:#fff}
-.ported .pr-terms button[aria-pressed="true"] em{color:rgba(255,255,255,.82)}
-.ported .pr-termnote{margin:var(--s1) 0 0; font-size:12.5px; font-weight:600;
+.ported .pr-card{position:relative; display:flex; flex-direction:column;
+  height:100%; padding:var(--s8) var(--s6); border:1px solid var(--line);
+  border-radius:var(--r-card); background:var(--bg)}
+.ported .pr-card.pr-pop{border-color:var(--blue); background:#F5F8FF}
+.ported .pr-card.pr-dark{background:var(--ink); border-color:var(--ink)}
+.ported .pr-card.pr-dark h3,
+.ported .pr-card.pr-dark .pr-price,
+.ported .pr-card.pr-dark .pr-feat-head{color:#fff}
+.ported .pr-card.pr-dark .pr-tag,
+.ported .pr-card.pr-dark .pr-min,
+.ported .pr-card.pr-dark .pr-feat li{color:#C7D2E4}
+.ported .pr-card.pr-dark .pr-annual{color:#8FB4FF}
+.ported .pr-card.pr-dark .pr-feat li::before{color:#8FB4FF}
+
+.ported .pr-badge{position:absolute; top:calc(var(--s6) * -1); left:50%;
+  transform:translateX(-50%); white-space:nowrap;
+  padding:var(--s2) var(--s4); border-radius:var(--r-pill);
+  background:var(--blue); color:#fff; font-size:12px; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase}
+
+.ported .pr-top{display:block; margin-bottom:0}
+.ported .pr-top h3{margin:0; font-size:23px}
+.ported .pr-tag{margin:var(--s1) 0 0; font-size:15px; color:var(--muted)}
+.ported .pr-price{margin:var(--s6) 0 0; font-size:46px; font-weight:800;
+  line-height:1.05; letter-spacing:-.02em; color:var(--ink)}
+.ported .pr-price .pr-per{font-size:18px; font-weight:700; color:var(--muted)}
+.ported .pr-price.pr-quoted{font-size:34px}
+.ported .pr-min{margin:var(--s3) 0 0; font-size:15px; color:var(--ink-2)}
+.ported .pr-annual{margin:var(--s1) 0 0; font-size:14px; font-weight:700;
   color:var(--blue)}
-/* Compound, so it beats `.ported .pr-price` whatever the source order: a
-   quote is a sentence, not a number, and at price size it wrapped to two
-   lines and shouted over the real prices beside it. */
-.ported .pr-price.pr-quoted{font-size:clamp(20px,2.1vw,24px); line-height:1.25;
-  font-weight:800; letter-spacing:normal; color:var(--ink)}
-.ported .pr-card{display:flex; flex-direction:column; background:#fff;
-  border:1px solid var(--line); border-radius:var(--r-card); padding:var(--s8);
-  box-shadow:none}
-.ported .pr-card.is-rec{background:var(--f-blue);
-  border-color:color-mix(in srgb, var(--blue) 26%, transparent)}
-.ported .pr-top{display:flex; align-items:center; gap:var(--s3);
-  flex-wrap:wrap; margin-bottom:var(--s3)}
-.ported .pr-top h3{font-size:12.5px; font-weight:800; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--muted); margin:0}
-.ported .pr-top .pop{font-size:11px; font-weight:800; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--blue); background:#fff;
-  border:1px solid color-mix(in srgb, var(--blue) 30%, transparent);
-  border-radius:var(--r-pill); padding:4px 10px}
-.ported .pr-price{font-size:46px; line-height:1.05; font-weight:800;
-  color:var(--ink); letter-spacing:-.02em; margin:0 0 var(--s2)}
-/* "/mo per location" wraps as one piece, rather than leaving "location"
-   stranded on its own line under a 46px number. */
-.ported .pr-price em{font-size:17px; font-style:normal; font-weight:700;
-  color:var(--muted); white-space:nowrap}
-.ported .pr-min{font-size:15px; color:var(--ink-2); margin:0 0 var(--s6)}
-.ported .pr-feat{list-style:none; margin:0 0 var(--s6); padding:0;
-  display:grid; gap:10px}
-.ported .pr-feat li{position:relative; margin:0; padding-left:26px;
-  font-size:15px; line-height:22px; color:var(--ink-2)}
-.ported .pr-feat li::before{content:""; position:absolute; left:2px; top:7px;
-  width:12px; height:7px; border-left:2px solid var(--blue);
-  border-bottom:2px solid var(--blue); transform:rotate(-45deg)}
-.ported .pr-note{font-size:13.5px; line-height:20px; color:var(--muted);
-  margin:0 0 var(--s6)}
-.ported .pr-card .btn{margin-top:auto; width:100%; justify-content:center}
-.ported .pr-sub{text-align:center; font-size:16px; color:var(--muted);
-  margin:var(--s2) 0 0}
-@media(min-width:860px){ .ported .pr-grid-2{grid-template-columns:repeat(2,1fr);
-  max-width:880px; margin-left:auto; margin-right:auto} }
-.ported .pr-vnote{margin-top:var(--s6); text-align:center}
-.ported .pr-grid + .pr-vnote{text-align:center}
-.ported [id^="p-"] > .wrap > h2{text-align:center}
 
-/* ---- the demo page ---------------------------------------------------- */
-.ported .demo-hero{padding-top:var(--s16)}
-.ported .demo-in{max-width:720px}
-.ported .demo-cta-row{display:flex; flex-wrap:wrap; gap:var(--s3);
-  margin-top:var(--s8)}
-.ported .demo-call{margin-top:var(--s4)}
-.ported .demo-steps{counter-reset:step; list-style:none; padding:0;
-  max-width:760px; margin:var(--s12) auto 0; display:grid; gap:var(--s8)}
-.ported .demo-steps li{position:relative; padding-left:60px; margin:0}
-.ported .demo-steps li::before{counter-increment:step; content:counter(step,decimal-leading-zero);
-  position:absolute; left:0; top:2px; font-size:13px; font-weight:800;
-  letter-spacing:.06em; color:var(--blue); background:var(--f-blue);
-  border-radius:var(--r-pill); padding:7px 12px}
-.ported .demo-steps b{display:block; font-size:19px; line-height:26px;
+.ported .pr-feats{margin-top:var(--s6); padding-top:var(--s6);
+  border-top:1px solid var(--line); flex:1}
+.ported .pr-card.pr-dark .pr-feats{border-top-color:rgba(255,255,255,.18)}
+.ported .pr-feat-head{margin:0 0 var(--s4); font-size:15px; font-weight:800;
   color:var(--ink)}
-.ported .demo-steps span{display:block; margin-top:6px; font-size:16px;
-  line-height:25px; color:var(--ink-2)}
-.ported .demo-try{display:grid; grid-template-columns:1fr; gap:var(--s4);
-  max-width:900px; margin:var(--s8) auto 0}
-@media(min-width:760px){ .ported .demo-try{grid-template-columns:1fr 1fr} }
-.ported .demo-try > div{background:#fff; border:1px solid var(--line);
-  border-radius:var(--r-card); padding:var(--s6)}
-.ported .demo-try b{display:block; font-size:17px; color:var(--ink)}
-.ported .demo-try span{display:block; margin-top:6px; font-size:15.5px;
-  line-height:24px; color:var(--ink-2)}
-.ported .demo-after{max-width:720px}
-.ported .demo-after p{margin-bottom:var(--s4)}
+.ported .pr-feat{list-style:none; margin:0; padding:0}
+.ported .pr-feat li{position:relative; margin:0 0 var(--s3); padding-left:26px;
+  font-size:15px; line-height:1.45; color:var(--ink-2)}
+/* The ported layer already draws a tick here out of two rotated borders.
+   Setting only `content` on top of it left the glyph sitting inside half a
+   drawn box, so this resets that geometry before drawing the character. */
+.ported .pr-feat li::before{content:"\2713"; position:absolute; left:0; top:0;
+  width:auto; height:auto; border:0; transform:none; background:none;
+  font-weight:800; color:var(--blue)}
 
-/* ---- the FAQ page ----------------------------------------------------- */
-/* The old sheet puts a "+" marker on every summary and a dark translucent
-   background on the bare <header> tag. Both are its own site chrome, and both
-   land on anything written in that markup, so they are turned off here. */
-.ported .faq-list summary::before{content:none}
-.ported .faq-top{background:none; position:static; backdrop-filter:none;
-  border:0; padding:0}
-/* In this system .pay is the serif accent phrase inside a heading. In the OLD
-   sheet .pay is a payment-option CARD — which is why an unqualified rule here
-   set the whole of /win-back/'s "Choose how you pay" block in italic serif.
-   Only a .pay inside a heading is the accent phrase. */
-/* .hl is what the carried-over pages call the accent phrase; .pay is what this
-   system calls it. Same thing, so they render the same — one heading pattern
-   across the site rather than a serif italic on some pages and plain blue on
-   others. */
-.ported h1 .pay, .ported h2 .pay, .ported h3 .pay,
-.ported h1 .hl,  .ported h2 .hl,  .ported h3 .hl{
-  color:var(--ink);
-  display:inline; border:0; padding:0; border-radius:0;
-  background:none; box-shadow:none;
-  font-family:'Instrument Serif',Georgia,serif; font-style:italic;
-  font-weight:400; letter-spacing:.005em}
-.ported .faq-page{padding:var(--s16) var(--s6) var(--s24)}
-.ported .faq-top{max-width:720px; margin:0 auto var(--s16); text-align:center}
-.ported .faq-top h1{margin:var(--s3) 0 var(--s4)}
-.ported .faq-top .lede{margin-left:auto; margin-right:auto}
-/* The groups carry the rotation here: the page is one long list rather than
-   alternating sections, so the tint hangs off the panels instead. */
-.ported .faq-g{max-width:820px; margin:0 auto var(--s8);
-  border-radius:var(--r-card); padding:var(--s8) var(--s8) var(--s6)}
-.ported .faq-g:nth-of-type(4n+1){background:var(--f-blue)}
-.ported .faq-g:nth-of-type(4n+2){background:var(--f-cyan)}
-.ported .faq-g:nth-of-type(4n+3){background:var(--f-wb)}
-.ported .faq-g:nth-of-type(4n+4){background:var(--bg-soft)}
-.ported .faq-g .faq-list{border-top-color:rgba(13,23,41,.14)}
-.ported .faq-g details{border-bottom-color:rgba(13,23,41,.14)}
-@media(max-width:560px){ .ported .faq-g{padding:var(--s6) var(--s4) var(--s4)} }
-.ported .faq-g h2{font-size:14px; font-weight:800; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--wb); margin-bottom:var(--s4);
-  text-align:left}
-.ported .faq-list{border-top:1px solid var(--line)}
-.ported .faq-list details{border-bottom:1px solid var(--line)}
-.ported .faq-list summary{list-style:none; cursor:pointer; position:relative;
-  padding:var(--s4) 40px var(--s4) 0; font-size:17.5px; font-weight:700;
-  color:var(--ink); min-height:44px; display:flex; align-items:center}
-.ported .faq-list summary::-webkit-details-marker{display:none}
-.ported .faq-list summary::after{content:""; position:absolute; right:10px;
-  top:50%; width:10px; height:10px; margin-top:-7px;
-  border-right:2px solid var(--faint); border-bottom:2px solid var(--faint);
-  transform:rotate(45deg); transition:transform .18s ease}
-.ported .faq-list details[open] summary::after{transform:rotate(-135deg);
-  margin-top:-2px}
-.ported .faq-list summary:hover{color:var(--blue)}
-.ported .faq-list details p{margin:0 0 var(--s6); padding-right:40px;
-  font-size:16px; line-height:26px; color:var(--ink-2)}
-.ported .faq-end{max-width:760px; margin:0 auto; background:var(--f-cyan);
-  border-radius:var(--r-card); padding:var(--s12) var(--s8); text-align:center}
-.ported .faq-end h2{font-size:clamp(24px,3vw,32px); margin-bottom:var(--s3)}
-.ported .faq-end p{color:var(--ink-2); max-width:52ch; margin:0 auto}
-.ported .faq-cta{display:flex; gap:var(--s3); justify-content:center;
-  flex-wrap:wrap; margin-top:var(--s6)}
-@media(prefers-reduced-motion:reduce){
-  .ported .faq-list summary::after{transition:none}
+
+.ported .pr-extra{margin:var(--s6) 0 var(--s4); padding:var(--s3) var(--s4);
+  border-radius:var(--r-sm); background:var(--bg-soft); font-size:14px;
+  color:var(--ink-2)}
+.ported .pr-card .pr-cta-btn{width:100%; margin-top:auto; text-align:center}
+.ported .pr-card.pr-dark .pr-cta-btn{background:#fff; color:var(--ink);
+  border-color:#fff}
+
+.ported .pr-strip{list-style:none; display:flex; flex-wrap:wrap;
+  justify-content:center; gap:var(--s3) var(--s8); margin:var(--s12) 0 0;
+  padding:var(--s6) 0 0; border-top:1px solid var(--line)}
+.ported .pr-strip li{margin:0; font-size:14px; color:var(--ink-2)}
+
+/* ---- minutes, add-ons and setup --------------------------------------- */
+.ported .pr-three{display:grid; grid-template-columns:1fr; gap:var(--s8);
+  margin-top:var(--s8)}
+@media(min-width:900px){ .ported .pr-three{grid-template-columns:repeat(3,1fr)} }
+.ported .pr-col h3{margin:0 0 var(--s4); font-size:20px}
+.ported .pr-col p{font-size:15px}
+.ported .pr-table{width:100%; border-collapse:collapse; margin:var(--s4) 0;
+  background:var(--bg); border-radius:var(--r-sm); overflow:hidden;
+  font-size:14px}
+.ported .pr-table th, .ported .pr-table td{padding:var(--s3) var(--s4);
+  text-align:left; border-bottom:1px solid var(--line)}
+.ported .pr-table thead th{font-size:13px; color:var(--muted);
+  text-transform:none}
+.ported .pr-table tbody th{font-weight:700; color:var(--ink)}
+.ported .pr-table tr:last-child th,
+.ported .pr-table tr:last-child td{border-bottom:0}
+.ported .pr-addons{list-style:none; margin:0; padding:0}
+.ported .pr-addons li{margin:0 0 var(--s4); font-size:15px; color:var(--ink)}
+.ported .pr-addons li span{display:block; font-size:13px; color:var(--muted)}
+.ported .pr-note{font-size:14px; color:var(--muted)}
+
+/* ---- the move-up path -------------------------------------------------- */
+.ported .pth-wrap{margin-top:var(--s8); padding:var(--s8) var(--s6);
+  border-radius:var(--r-card); background:var(--bg-soft)}
+.ported .pth-intro{margin:0 0 var(--s8); font-size:15px}
+.ported .pth-intro b{display:block; font-size:17px; color:var(--ink)}
+.ported .pth-intro span{color:var(--muted)}
+.ported .pth{display:flex; flex-direction:column; gap:var(--s3);
+  align-items:stretch}
+@media(min-width:900px){
+  .ported .pth{flex-direction:row; align-items:center; gap:var(--s2)}
+  .ported .pth-card{flex:1}
 }
+.ported .pth-card{padding:var(--s4) var(--s6); background:var(--bg);
+  border:1px solid var(--line); border-radius:var(--r-card)}
+.ported .pth-card.pth-dark{background:var(--ink); border-color:var(--ink)}
+.ported .pth-card h4{margin:0; font-size:17px}
+.ported .pth-card.pth-dark h4{color:#fff}
+.ported .pth-price{margin:var(--s1) 0 0; font-size:14px; font-weight:700;
+  color:var(--ink-2)}
+.ported .pth-blurb{margin:0; font-size:14px; color:var(--muted)}
+.ported .pth-card.pth-dark .pth-price{color:#C7D2E4}
+.ported .pth-card.pth-dark .pth-blurb{color:#9FB0C9}
+.ported .pth-link{align-self:center; padding:var(--s1) var(--s3);
+  border-radius:var(--r-pill); background:var(--bg); border:1px solid var(--blue);
+  color:var(--blue); font-size:13px; font-weight:800; white-space:nowrap}
+
+.ported .trg-grid{display:grid; grid-template-columns:1fr; gap:var(--s6);
+  margin-top:var(--s8)}
+@media(min-width:900px){ .ported .trg-grid{grid-template-columns:repeat(3,1fr)} }
+.ported .trg{padding:var(--s6); background:var(--bg); border-radius:var(--r-card);
+  border:1px solid #E2A33C}
+.ported .trg h4{margin:0 0 var(--s4); font-size:17px; color:#8A5A12}
+.ported .trg ul{list-style:none; margin:0; padding:0}
+.ported .trg li{position:relative; margin:0 0 var(--s3); padding-left:16px;
+  font-size:14px; line-height:1.5; color:var(--ink-2)}
+.ported .trg li::before{content:"\2022"; position:absolute; left:0;
+  color:var(--muted)}
+.ported .pth-end{margin:var(--s8) 0 0; padding:var(--s4) var(--s6);
+  background:var(--bg); border-radius:var(--r-card); font-size:15px;
+  color:var(--ink-2)}
+.ported .pth-end b{color:var(--ink)}
+
+.ported .pr-end{text-align:center}
+.ported .pr-cta{display:flex; flex-wrap:wrap; justify-content:center;
+  gap:var(--s3); margin-top:var(--s6)}
 
 /* Playground: the demo number, and the calendar it books into. */
 .ported .pg-hero{text-align:center; max-width:760px; margin:0 auto var(--s12)}
@@ -1713,11 +1706,12 @@ your card or download invoices at any time from your billing portal.</p>
 Unused minutes don&rsquo;t carry over. We text you when you reach 80% of your
 monthly minutes, and again at 100%. Your line keeps answering either way &mdash;
 we never cut it off for going over.</p>
-<p><strong>Extra minutes.</strong> You can top up from your dashboard at any
-time: 50 minutes for $65, or 100 minutes for $120. A top-up applies to the
-billing period you buy it in and does not carry over. Minutes you use past your
-plan without a top-up are billed at $1.50 each on your next invoice. The texts
-above are how we tell you before that happens.</p>
+<p><strong>Extra minutes.</strong> Extra minutes come in packages, bought from
+your dashboard: 20 minutes for $20 on Personal Line, 50 minutes for $75 on Business Lite and 100 minutes for $110 on Business Pro. A package applies to the billing period you
+buy it in and does not carry over. There is no per-minute overage.
+Business plans never stop answering. If you run out, we add your plan's package automatically and let you know.
+Personal Line: without a package, callers past your minutes hear a short message that you can't take the call right now. The texts above are how we tell you
+before that happens.</p>
 
 <h2>Prepaid terms</h2>
 <p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
@@ -2023,9 +2017,9 @@ that apply there.</p>
   var IX = [
     ["AI receptionist", "/", "Answers on your existing number, books into your calendar and texts you the details.", "receptionist answering service phone call missed calls after hours overnight voicemail greeting answer", IMG+"hero-phones-2.webp"],
     ["Pricing", "/pricing/", "Every plan, every product, and what a minute costs when you go over.", "price pricing cost costs plan plans tier tiers monthly subscription how much cheap expensive quote budget", IMG+"dashboard.webp"],
-    ["Extra minutes and overage", "/pricing/", "$1.50 a minute over your plan, or packs of 50 and 100 bought in the dashboard.", "overage extra minutes pack packs bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
-    ["Prepaid plans", "/pricing/", "Pay three, six or twelve months up front instead of monthly.", "prepaid annual yearly upfront discount commitment term contract length save", ""],
-    ["Free trial", "/demo/", "14 days free at one location, up to 100 minutes.", "free trial try test pilot risk no card 14 days evaluate", ""],
+    ["Extra minutes", "/pricing/", "Packages bought from your dashboard: 20 minutes for $20, 50 for $75, 100 for $110. No per-minute overage.", "overage extra minutes package packages bundle top up topup usage limit included minutes went over bill", IMG+"dashboard.webp"],
+    ["Annual plans", "/pricing/", "Pay for the year and get 2 months free, with your rate locked for the term.", "annual yearly upfront discount commitment term contract length save prepaid", ""],
+    ["Free trial", "/demo/", "14 days free, up to 60 minutes, card on file. Personal Line is 7 days.", "free trial try test pilot risk no card 14 days evaluate", ""],
     ["Build your demo", "/demo/", "Build an assistant on your own business in about two minutes.", "demo build assistant beta self serve builder try hear sample preview", ""],
     ["Win-back calls", "/win-back/", "We call your own past customers when they come due. $2.50 per customer called.", "winback win back reactivation outbound lapsed dormant past customers campaign list database revive dead leads", IMG+"winback.webp"],
     ["Win-back pricing", "/win-back/#pay", "One-time campaign, always-on, or a build you own.", "winback cost price per customer campaign always on one time own build", ""],

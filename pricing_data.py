@@ -1,322 +1,202 @@
 #!/usr/bin/env python3
 """
-pricing_data.py — the plan data, and the only place it is written.
+pricing_data.py — reads pricing/catalog.json and nothing else.
 
-It used to parse index.html's `V` object, because that was where the numbers
-lived and a second copy would drift the first time a price changed. The five
-sector pages were removed on 2026-10-29 and `V` went with them, so the numbers
-now live here instead. The rule has not changed, only the address: ONE place
-holds a price, and the pricing page renders it.
-
-Each tier is [name, price, minutes, calls, [features...]], the shape the old
-object used, so the renderer did not need rewriting. A tier may carry two more
-entries: a price suffix ("per location") and an options dict — `from` for a
-"From $x" prefix, `note` for a line under the card, and `cta` for a button that
-is not the default one.
+It used to hold the plan tables itself. It no longer does: the catalog is the
+single source of truth, owned by the dashboard repo and copied byte-identical
+into this one, so a price can only be changed in one place. Everything this
+module exposes is either read straight from the catalog or computed from it.
+Nothing here hardcodes a price, a minute count or a trial term, and the build
+fails rather than render a figure that is not in the catalog.
 """
 
+import json
+import os
 import sys
 
-# Order they appear on the pricing page.
-VERTICALS = [
-    ("home", "Home services & trades"),
-    ("food", "Restaurants & cafés"),
-    ("clinic", "Clinics & dental"),
-    ("other", "Any other business"),
-]
+CATALOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "pricing", "catalog.json")
 
-PLANS = {
-    "home": {
-        "label": "Home services & trades",
-        "tiers": [
-            [
-                "Starter",
-                "$179",
-                "Up to 150 minutes",
-                "about 100 calls",
-                [
-                    "After-hours or overflow answering",
-                    "Live Google Calendar booking",
-                    "Emergency detection with instant transfer to you",
-                    "SMS summary to you with the caller's real number",
-                    "Caller confirmation text",
-                    "Missed-call text-back",
-                    "Spam filtering",
-                    "Dashboard with transcripts",
-                    "14-day call history",
-                ],
-            ],
-            [
-                "Growth",
-                "$349",
-                "Up to 300 minutes",
-                "about 200 calls",
-                [
-                    "Everything in Starter",
-                    "All-day coverage",
-                    "Transfer rules for any call",
-                    "2 calendars",
-                    "Appointment reminders",
-                    "Review-request texts",
-                    "Monthly performance report",
-                ],
-            ],
-            [
-                "Pro",
-                "$599",
-                "Up to 550 minutes",
-                "about 365 calls",
-                [
-                    "Everything in Growth",
-                    "Up to 3 lines and 5 calendars at one location",
-                    "Priority same-day support",
-                    "Quarterly win-back texts and calls to your own past customers (never cold lists or purchased leads)",
-                ],
-            ],
-        ],
-    },
-    "food": {
-        "label": "Restaurants & cafés",
-        "tiers": [
-            [
-                "Café Starter",
-                "$199",
-                "Up to 160 minutes",
-                "about 80 calls",
-                [
-                    "Answers hours, menu, catering and order questions",
-                    "Captures catering and booking requests",
-                    "Everything in Home Starter",
-                ],
-            ],
-            [
-                "Restaurant Growth",
-                "$349",
-                "Up to 300 minutes",
-                "about 100 calls",
-                [
-                    "Reservations into your calendar",
-                    "Transfers during service",
-                    "Everything in Home Growth",
-                ],
-            ],
-            [
-                "Enterprise",
-                None,
-                "More than one location, or a build of your own",
-                "",
-                [
-                    "Everything in Pro, at every location",
-                    "One account and one bill, however many lines",
-                    "Per-location greetings, hours and calendars",
-                ],
-                None,
-                {'quote': True,
-                 'note': 'Priced on a call, as one number rather than a range. '
-                         'The free trial covers one location; the rest go live on the paid plan.',
-                 'cta': ['Book a 30-minute call', 'https://calendly.com/hello-voicecaptures/30min']},
-            ],
-        ],
-    },
-    "clinic": {
-        "label": "Clinics & dental",
-        "tiers": [
-            [
-                "Essentials",
-                "$349",
-                "Up to 300 minutes",
-                "about 120 calls",
-                [
-                    "Message-taking",
-                    "Appointment requests booked to Google Calendar",
-                    "Urgent-call transfer to staff",
-                    "Recording off by default",
-                    "Transcripts deleted after 14 days",
-                    "Collects contact details and the general reason for the call, never symptoms, diagnoses or health card numbers",
-                ],
-            ],
-            [
-                "Growth",
-                "$599",
-                "Up to 550 minutes",
-                "",
-                [
-                    "Everything in Essentials",
-                    "Reminders",
-                    "2 calendars",
-                    "Monthly report",
-                ],
-            ],
-            [
-                "Pro",
-                "$899",
-                "Up to 850 minutes",
-                "",
-                [
-                    "Everything in Growth",
-                    "Multiple practitioners at one location",
-                    "Priority support",
-                ],
-            ],
-        ],
-    },
-    "other": {
-        "label": "Any other business",
-        # Same plans as home services: the call flow does not differ.
-        "tiers": [
-            [
-                "Starter",
-                "$179",
-                "Up to 150 minutes",
-                "about 100 calls",
-                [
-                    "After-hours or overflow answering",
-                    "Live Google Calendar booking",
-                    "Emergency detection with instant transfer to you",
-                    "SMS summary to you with the caller's real number",
-                    "Caller confirmation text",
-                    "Missed-call text-back",
-                    "Spam filtering",
-                    "Dashboard with transcripts",
-                    "14-day call history",
-                ],
-            ],
-            [
-                "Growth",
-                "$349",
-                "Up to 300 minutes",
-                "about 200 calls",
-                [
-                    "Everything in Starter",
-                    "All-day coverage",
-                    "Transfer rules for any call",
-                    "2 calendars",
-                    "Appointment reminders",
-                    "Review-request texts",
-                    "Monthly performance report",
-                ],
-            ],
-            [
-                "Pro",
-                "$599",
-                "Up to 550 minutes",
-                "about 365 calls",
-                [
-                    "Everything in Growth",
-                    "Up to 3 lines and 5 calendars at one location",
-                    "Priority same-day support",
-                    "Quarterly win-back texts and calls to your own past customers (never cold lists or purchased leads)",
-                ],
-            ],
-        ],
-    },
+# The contract these pages are built against. check() asserts the catalog still
+# matches it, so a copy that drifts from the dashboard's file stops the build
+# instead of quietly repricing the public page.
+EXPECTED = {
+    "personal":      {"monthly": 19,  "annual": 190,  "minutes": 30},
+    "business_lite": {"monthly": 99,  "annual": 990,  "minutes": 100},
+    "business_pro":  {"monthly": 199, "annual": 1990, "minutes": 250},
+    "enterprise":    {"monthly": None, "annual": None, "minutes": None},
 }
-
-# Prepaid terms. The percentages are applied to the monthly price at render
-# time rather than written out, so a changed monthly price cannot leave a
-# stale prepaid one beside it.
-TERMS = [
-    ("1", "Monthly", "pay as you go", 0.0),
-    ("3", "3 months", "save 5%", 0.05),
-    ("6", "6 months", "save 10%", 0.10),
-    ("12", "12 months", "2 months free", 1 / 6),
-]
-
-# What every plan includes, and what sits outside the tiers.
-INCLUDED = [
-    "We text you at 80% of your minutes, and again at 100%. The line never stops answering.",
-    "Top up from your dashboard — 50 minutes for $65, or 100 for $120.",
-    "Minutes used past your plan without a top-up are $1.50 each, on your next invoice.",
-]
-
-ADDONS = [
-    "Extra line or calendar — $29/mo",
-    "90-day history — $19/mo",
-    "1-year history — $49/mo",
-    "Practice-software, field-service or POS integration — from $500 + $39/mo, quoted",
-]
-
-SETUP = [
-    "Setup is included — we configure it for you.",
-    "Multi-location or custom call flows — $249 one-time.",
-]
-
-TRIAL = ("14 days free at one location, up to 100 minutes. Cancel before day 15 "
-         "and you pay nothing. On your real business number, with full setup and "
-         "real calls. Billed on day 15; we email you a reminder before then. "
-         "Month to month after that — cancel anytime.")
-
-FINE = [
-    "All prices in CAD. Month to month, cancel anytime.",
-    "Every plan answers 24/7 — after-hours, overflow or all day. You set that "
-    "with your forwarding, not your plan.",
-    "Call history, recordings and transcripts are kept for 14 days on every "
-    "plan. Longer history is an add-on. For clinics we recommend staying at 14 "
-    "days — on a patient-facing line, keeping less is the safer setting, not a "
-    "worse one.",
-    "Live booking on the call is included at every plan — never gated behind an "
-    "upgrade.",
-]
-
-# Which tier carries the "Recommended" flag, by index.
-RECOMMENDED = 1
-
-
-# Per-vertical trimmings: the subtitle under the heading, a note under the
-# cards, and which tier carries the "Recommended" flag.
-META = {
-    "home": {"trades": "Plumbing · HVAC · Electrical · Locksmith · Garage door", "priceNote": "", "rec": 1},
-    "food": {"trades": "Cafés · Restaurants · Takeout", "priceNote": "Priced like home services until we know your call volume.", "rec": 1},
-    "clinic": {"trades": "Dental · Vet · Physio · Chiro", "priceNote": "No caller health information is stored or logged.", "rec": 2},
-    "other": {"trades": "Salons · Studios · Tutors · Venues · Trades", "priceNote": "Priced like home services until we know your call volume.", "rec": 2},
-}
+SCHEMA_VERSION = 1
 
 
 def load() -> dict:
-    """The shape the pricing renderer expects, assembled from the tables above."""
-    check()
+    with open(CATALOG_PATH, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+CATALOG = load()
+PLANS = {p["key"]: p for p in CATALOG["plans"]}
+ORDER = [p["key"] for p in CATALOG["plans"]]
+PACKAGES = CATALOG["packages"]
+ENTITLEMENTS = CATALOG["entitlements"]
+ALIASES = CATALOG["plan_key_aliases"]
+
+
+def plan(key: str) -> dict:
+    return PLANS[key]
+
+
+def package_for(key: str):
+    """The extra-minute package a plan buys, or None for a quoted plan."""
+    pk = PLANS[key].get("package")
+    return PACKAGES[pk] if pk else None
+
+
+def per_minute(pkg: dict) -> float:
+    return pkg["price"] / pkg["minutes"]
+
+
+def money(n) -> str:
+    """$1,990 and $19 — no cents, which every figure in the catalog happens to be."""
+    return "$" + format(int(round(n)), ",")
+
+
+def per_month(annual: int) -> str:
+    """$15.83 — the monthly figure the annual table prints. Two decimals here
+    because 190/12 is not a round number and rounding it would misstate it."""
+    return "$" + format(annual / 12.0, ",.2f")
+
+
+def status_of(key) -> str:
+    return ENTITLEMENTS[key]["status"] if key else "live"
+
+
+def tag_for(key):
+    """The small tag beside a feature, or None when it is simply live."""
+    return CATALOG["status_tags"].get(status_of(key))
+
+
+def canonical_plan(value: str):
+    """Map an old ?plan= value onto a current key so old links keep working."""
+    if not value:
+        return None
+    v = value.strip().lower()
+    if v in PLANS:
+        return v
+    return ALIASES.get(v)
+
+
+# ---------------------------------------------------------------- derived ----
+# The "when is it time to move up?" figures. These compare a plan plus packages
+# against the next plan up, and they are computed rather than written down so a
+# price change cannot leave a stale comparison on the page.
+
+def with_packages(key: str, count: int) -> dict:
+    """What a plan costs, and how many minutes it gives, with N packages added."""
+    p, pkg = PLANS[key], package_for(key)
+    if not pkg:
+        sys.exit(f"pricing_data: {key!r} has no package to add")
     return {
-        key: {
-            "label": label,
-            "tiers": PLANS[key]["tiers"],
-            "trades": META[key]["trades"],
-            "priceNote": META[key]["priceNote"],
-            "rec": META[key]["rec"],
-        }
-        for key, label in VERTICALS
+        "cost": p["monthly"] + pkg["price"] * count,
+        "minutes": p["minutes"] + pkg["minutes"] * count,
+        "packages": count,
     }
 
 
+def packages_to_match(key: str, target_key: str):
+    """How many packages the cheaper plan needs before it costs at least as much
+    as the plan above it, and what you get for that money."""
+    target = PLANS[target_key]["monthly"]
+    for n in range(1, 13):
+        row = with_packages(key, n)
+        if row["cost"] >= target:
+            return row
+    return None
+
+
+def move_up() -> dict:
+    lite, pro = PLANS["business_lite"], PLANS["business_pro"]
+    return {
+        "lite_step": lite["monthly"] - PLANS["personal"]["monthly"],
+        "pro_step": pro["monthly"] - lite["monthly"],
+        # Personal + packages reaching the price of Business Lite.
+        "personal_match": packages_to_match("personal", "business_lite"),
+        # Business Lite plus one and two packages, against Business Pro.
+        "lite_one": with_packages("business_lite", 1),
+        "lite_two": with_packages("business_lite", 2),
+        "pro_minutes": pro["minutes"],
+        "pro_price": pro["monthly"],
+    }
+
+
+def all_prices() -> set:
+    """Every money figure the catalog permits on a page. The price-drift test
+    asserts no page prints a dollar amount outside this set."""
+    out = set()
+    for p in CATALOG["plans"]:
+        for f in ("monthly", "annual"):
+            if p.get(f):
+                out.add(int(p[f]))
+    for pkg in PACKAGES.values():
+        out.add(int(pkg["price"]))
+    for a in CATALOG["addons"]:
+        out.add(int(a["price"]))
+    out.add(int(CATALOG["integration"]["one_time_from"]))
+    out.add(int(CATALOG["integration"]["monthly"]))
+    m = move_up()
+    for row in (m["personal_match"], m["lite_one"], m["lite_two"]):
+        if row:
+            out.add(int(row["cost"]))
+    out.add(int(m["lite_step"]))
+    out.add(int(m["pro_step"]))
+    return out
+
+
 def check() -> None:
-    """Fail the build rather than ship a half-written plan."""
-    for key, label in VERTICALS:
-        plan = PLANS.get(key)
-        if not plan:
-            sys.exit(f"pricing_data: no plans for {key!r}")
-        if len(plan["tiers"]) < 3:
-            sys.exit(f"pricing_data: {key!r} has {len(plan['tiers'])} tiers, expected 3+")
-        for t in plan["tiers"]:
-            # `calls` is allowed to be empty: a per-location tier has no single
-            # call estimate to give, and inventing one would be worse than a gap.
-            opts = t[6] if len(t) > 6 else {}
-            # A quote-only tier carries no price on purpose: enterprise is
-            # settled on a call, and a "from" number would be the range we
-            # promise not to give. Everything else must still state one.
-            priced = t[1] is not None
-            if opts.get("quote"):
-                if priced:
-                    sys.exit(f"pricing_data: {t[0]!r} is quote-only but carries a price")
-            elif not priced or not t[1].startswith("$"):
-                sys.exit(f"pricing_data: {key!r} tier {t[0]!r} has no usable price")
-            if len(t) not in (5, 7) or not t[0] or not t[2] or not t[4]:
-                sys.exit(f"pricing_data: malformed tier in {key!r}: {t[0]!r}")
+    """Fail the build rather than ship a catalog that has drifted."""
+    if CATALOG.get("schema_version") != SCHEMA_VERSION:
+        sys.exit(f"catalog: schema_version {CATALOG.get('schema_version')!r}, "
+                 f"expected {SCHEMA_VERSION}")
+    if ORDER != ["personal", "business_lite", "business_pro", "enterprise"]:
+        sys.exit(f"catalog: plan keys/order drifted: {ORDER}")
+    for key, want in EXPECTED.items():
+        got = PLANS.get(key)
+        if not got:
+            sys.exit(f"catalog: missing plan {key!r}")
+        for field, value in want.items():
+            if got.get(field) != value:
+                sys.exit(f"catalog: {key}.{field} is {got.get(field)!r}, "
+                         f"expected {value!r}")
+    for key, p in PLANS.items():
+        if p["monthly"] and p["annual"] != p["monthly"] * 10:
+            sys.exit(f"catalog: {key} annual {p['annual']} is not 10x monthly "
+                     f"{p['monthly']} ({CATALOG['annual']['label']})")
+        if p.get("checkout_enabled") and p["key"] == "enterprise":
+            sys.exit("catalog: enterprise must never be checkout_enabled")
+        for f in p["features"]:
+            k = f.get("key")
+            if k and k not in ENTITLEMENTS:
+                sys.exit(f"catalog: {key} feature points at unknown "
+                         f"entitlement {k!r}")
+    for pk, pkg in PACKAGES.items():
+        if pkg["plan"] not in PLANS:
+            sys.exit(f"catalog: package {pk} points at unknown plan")
+    for value, target in ALIASES.items():
+        if target not in PLANS:
+            sys.exit(f"catalog: alias {value!r} points at unknown plan {target!r}")
+    if not move_up()["personal_match"]:
+        sys.exit("catalog: Personal never reaches the Business Lite price with "
+                 "packages; the move-up copy would have nothing to state")
 
 
 if __name__ == "__main__":
     check()
-    for key, label in VERTICALS:
-        print(f"{label}:")
-        for t in PLANS[key]["tiers"]:
-            name, price, mins, calls, feats = t[:5]
-            extra = "  +opts" if len(t) > 5 else ""
-            print(f"  {name:<20} {(price or 'quoted'):<8} {mins}  ({calls})  {len(feats)} features{extra}")
+    for key in ORDER:
+        p = PLANS[key]
+        price = money(p["monthly"]) if p["monthly"] else "quoted"
+        mins = f"{p['minutes']} min" if p["minutes"] else "sized on a call"
+        print(f"{p['name']:<16} {price:<8} {mins:<18} "
+              f"{len(p['features'])} features  checkout={p['checkout_enabled']}")
+    m = move_up()
+    print("\nmove-up:", {k: v for k, v in m.items()})
+    print("allowed prices:", sorted(all_prices()))
