@@ -1108,6 +1108,10 @@ const pctCls = p => p == null ? "" : p >= 100 ? "bad" : p >= 80 ? "warn" : "good
 const PLAN_LABEL = { home_starter: "Home Starter", home_growth: "Home Growth", home_pro: "Home Pro", cafe_starter: "Café Starter",
   restaurant_growth: "Restaurant Growth", multi_location: "Multi-location", clinic_essentials: "Clinic Essentials", clinic_growth: "Clinic Growth",
   clinic_pro: "Clinic Pro", custom: "Custom", personal: "Personal" };
+// Pricing v2 plan keys: shown, never offered in a legacy client's Plan picker
+// (labels as in pricing/catalog.json).
+const V2_LABEL = { business_lite: "Business Lite", business_pro: "Business Pro", enterprise: "Enterprise" };
+const planLabel = k => PLAN_LABEL[k] || V2_LABEL[k];
 const STATUS_CLS = { trialing: "warn", active: "good", past_due: "bad", cancelled: "" };
 const PALETTE = ["#3b6fd8", "#1f9d55", "#d97706", "#a855f7", "#dc2626", "#0891b2", "#db2777", "#65a30d", "#7c3aed", "#ea580c", "#0d9488", "#64748b"];
 const needsMigration = e => e && e.status === 503;
@@ -1294,7 +1298,7 @@ function renderOTable() {
   document.querySelectorAll("#oTable th.sort").forEach(th => { th.classList.toggle("on", th.dataset.k === oSort.k); th.classList.toggle("asc", th.dataset.k === oSort.k && oSort.asc); });
   $("oBody").innerHTML = rows.length ? rows.map(r => `<tr class="row" data-client="${esc(r.id)}">
     <td><b>${esc(r.business)}</b><div class="muted small">${esc(r.vertical || "no plan set")}</div></td>
-    <td>${esc(PLAN_LABEL[r.plan] || "—")}<div><span class="pill ${STATUS_CLS[r.status] || ""}">${esc(String(r.status).replace("_", " "))}</span>${r.serviceActive === false ? ` <span class="pill bad" title="${esc(r.servicePausedReason || "")}">paused</span>` : r.serviceMode === "on" ? ` <span class="pill" title="Always on">always on</span>` : ""}</div></td>
+    <td>${esc(planLabel(r.plan) || "—")}<div><span class="pill ${STATUS_CLS[r.status] || ""}">${esc(String(r.status).replace("_", " "))}</span>${r.serviceActive === false ? ` <span class="pill bad" title="${esc(r.servicePausedReason || "")}">paused</span>` : r.serviceMode === "on" ? ` <span class="pill" title="Always on">always on</span>` : ""}</div></td>
     <td class="small">${fmtDay(r.periodStart)} – ${fmtDay(r.periodEnd)}${r.trialDaysLeft != null ? `<div class="${r.trialDaysLeft <= 3 ? "warn-t" : "muted"}">${r.trialDaysLeft} trial day${r.trialDaysLeft === 1 ? "" : "s"} left</div>` : ""}</td>
     <td class="num">${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}${r.pctUsed != null ? `<div><span class="pill pct ${pctCls(r.pctUsed)}">${r.pctUsed}%</span></div>` : ""}</td>
     <td class="num">${r.calls}<div class="muted small">avg ${fmtDur(r.avgSeconds)}</div></td>
@@ -1339,8 +1343,10 @@ async function loadSettings() {
         <label>&nbsp;<button class="btn" id="stSave" type="button">Save rates</button></label>
       </div>
       <div class="muted small" style="margin-top:6px">Alerts are sent from ADMIN_SMS_FROM: <b class="${d.adminSmsFrom ? "good-t" : "bad-t"}">${d.adminSmsFrom ? "set" : "not set on Render — alerts are skipped"}</b>.</div>
-      <h3 style="margin-top:16px">Plans <span class="muted small">(what each tier includes; picking a plan for a client fills these in)</span></h3>
+      <h3 style="margin-top:16px">Plans <span class="muted small">(legacy clients, no plan_key: what each tier includes; picking a plan for a client fills these in)</span></h3>
       <div id="plansBox" class="small muted">Loading…</div>
+      <h3 style="margin-top:16px">Pricing v2 <span class="muted small">(read-only, from pricing/catalog.json: clients with a plan_key only; change the file, not this page)</span></h3>
+      <div id="catalogBox" class="small muted">Loading…</div>
       <h3 style="margin-top:16px">Extra minutes &amp; Stripe</h3>
       <div class="muted small" style="margin-bottom:6px">Plans never stop answering on minutes: past the allowance, overage is billed on the next invoice. Rates are copied onto each billing period when it opens, so a change here applies from each client's next period (prepaid clients: after their term). Per-client exceptions: open the client → Overrides.</div>
       <div class="form-grid">
@@ -1384,6 +1390,16 @@ async function loadSettings() {
         catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
       };
     }).catch(e => { $("plansBox").innerHTML = needsMigration(e) ? `<span class="warn-t">Run migrations/2026-10-23-service-control.sql to edit plans.</span>` : `<span class="err">${esc(e.message)}</span>`; });
+    // Pricing v2 catalog (read-only)
+    api(`${B}/catalog`).then(cd => {
+      const c = cd.catalog, money = v => typeof v === "number" ? `$${v}` : esc(String(v ?? "—"));
+      $("catalogBox").innerHTML = `<table class="sub-table"><thead><tr><th>Plan</th><th>Month</th><th>Year</th><th>Minutes</th><th>Trial</th><th>Extra minutes</th><th>History</th><th>Checkout</th></tr></thead><tbody>${Object.entries(c.plans).map(([k, p]) => `<tr>
+        <td>${esc(p.label)} <span class="muted">${esc(k)}</span></td><td>${money(p.price_cad && p.price_cad.month !== undefined ? p.price_cad.month : p.price_cad)}</td><td>${money(p.price_cad && p.price_cad.year !== undefined ? p.price_cad.year : p.price_cad)}</td>
+        <td>${esc(String(p.minutes))}</td><td>${esc(`${p.trial.days} d${p.trial.minutes_cap != null ? ` / ${p.trial.minutes_cap} min` : ""}`)}</td>
+        <td>${p.package && p.package.minutes ? esc(`${p.package.minutes} min for $${p.package.price_cad}`) : esc(String(p.package))}</td><td>${esc(String(p.retention_days))}${typeof p.retention_days === "number" ? " d" : ""}</td>
+        <td>${p.checkout_enabled ? `<span class="good-t">open</span>` : `<span class="muted">closed</span>`}</td></tr>`).join("")}</tbody></table>
+        <div class="muted" style="margin-top:4px">Add-ons: ${Object.values(c.addons).map(a => esc(`${a.label} $${a.price_cad}/mo`)).join(" · ")}. Old plans map for display: ${Object.entries(cd.legacyMap).map(([o, n]) => esc(`${PLAN_LABEL[o] || o} → ${c.plans[n].label}`)).join(", ")}.</div>`;
+    }).catch(e => { $("catalogBox").innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Not deployed yet (TorontoLeads pricing v2 PR 1).</span>` : `<span class="err">${esc(e.message)}</span>`; });
     // Stripe products
     const spRow = p => `<tr>
       <td><select data-k="kind"><option value="topup" ${p.kind === "topup" ? "selected" : ""}>Extra minutes</option><option value="history" ${p.kind === "history" ? "selected" : ""}>Call history</option><option value="plan" ${p.kind === "plan" ? "selected" : ""}>Plan</option></select></td>
@@ -1449,7 +1465,7 @@ async function loadClient() {
     const r = d.client;
     const pages = d.total != null ? Math.max(1, Math.ceil(d.total / d.pageSize)) : null;
     box.innerHTML = `<h1>${esc(r.business)} <span class="pill ${STATUS_CLS[r.status] || ""}" style="vertical-align:middle">${esc(String(r.status).replace("_", " "))}</span></h1>
-      <div class="sub">${esc(PLAN_LABEL[r.plan] || "No plan set")} · ${fmtDay(d.range.start)} – ${fmtDay(d.range.end)} · retention ${r.retentionDays} days · recordings ${r.recordingEnabled ? "kept" : "<b>off</b>"}</div>
+      <div class="sub">${esc(planLabel(r.plan) || "No plan set")} · ${fmtDay(d.range.start)} – ${fmtDay(d.range.end)} · retention ${r.retentionDays} days · recordings ${r.recordingEnabled ? "kept" : "<b>off</b>"}</div>
       <div class="card mb" id="svcCard"><div class="muted">Loading…</div></div>
       <div class="stats six">
         ${card("Minutes", `${fmtMin(r.minutes)}${r.allowance ? ` / ${r.allowance}` : ""}`, r.pctUsed != null ? `<span class="pill ${pctCls(r.pctUsed)}">${r.pctUsed}% used</span>` : "")}
