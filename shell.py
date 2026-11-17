@@ -538,11 +538,15 @@ PRICING_CSS = """
 .ported .pr-addons li:last-child{border-bottom:0}
 .ported .ad-t{display:block; font-size:14px; color:var(--ink)}
 .ported .ad-t b{display:block; font-weight:700; line-height:1.3}
-.ported .ad-n{display:block; margin-top:2px; font-size:12.5px; color:var(--muted)}
+.ported .ad-n{display:block; margin-top:2px; font-size:12.5px;
+  line-height:1.35; color:var(--muted)}
 .ported .ad-p{flex:none; align-self:flex-start; white-space:nowrap;
   padding:var(--s1) var(--s3); border-radius:var(--r-pill);
   background:var(--bg-soft); font-size:13px; font-weight:800; color:var(--ink)}
-.ported .ad-p-wide{white-space:normal; text-align:right; line-height:1.3}
+.ported .ad-p-wide{white-space:normal; text-align:left; line-height:1.3}
+.ported .pr-addons li.ad-stack{display:block}
+.ported .pr-addons li.ad-stack .ad-p{display:inline-block;
+  margin-top:var(--s2)}
 
 .ported .mcard-facts{list-style:none; margin:0 0 var(--s4); padding:0}
 .ported .mcard-facts li{display:flex; gap:var(--s2); align-items:flex-start;

@@ -2843,7 +2843,7 @@ def _addons_list():
                 f'<span class="ad-p">{pricing_data.money(a["price"])}'
                 f'/{a["per"]}</span></li>')
     i = cat["integration"]
-    out += (f'<li><span class="ad-t"><b>{i["label"]}</b>'
+    out += (f'<li class="ad-stack"><span class="ad-t"><b>{i["label"]}</b>'
             f'<span class="ad-n">{i["note"]}</span></span>'
             f'<span class="ad-p ad-p-wide">from {pricing_data.money(i["one_time_from"])} '
             f'one-time<br>+ {pricing_data.money(i["monthly"])}/mo</span></li>')
