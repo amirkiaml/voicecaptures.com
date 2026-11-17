@@ -1,0 +1,34 @@
+{
+  "owner": "Amir",
+  "source_commit": "93ea2cc",
+  "source": "build-pages.py, the #p-wb section of the pricing page, as shipped before the catalog rewrite",
+  "note_to_editors": "Win-back pricing. Separate from pricing/catalog.json and not touched by the Dashboard thread. The plans, packages, trials, minutes, annual toggle and HST wording in that catalog do NOT apply here. The compliance wording in `note` (consent, own past customers only, the free pilot terms) is not to be reworded without Amir.",
+  "section_id": "p-wb",
+  "heading_original": "Win-back campaigns",
+  "heading": "Win-back: reach your past customers",
+  "sub": "Outbound calls to your own past customers &mdash; priced separately from the receptionist, and you can buy either on its own",
+  "columns": [
+    {
+      "name": "One-time campaign",
+      "price": "$2.50",
+      "price_suffix": "per customer on your list",
+      "price_class": "pr-price",
+      "body": "A single push through a list you give us &mdash; seasonal maintenance, annual recalls, lapsed customers."
+    },
+    {
+      "name": "Always-on",
+      "price": "$2.50",
+      "price_suffix": "per customer, + $99/mo",
+      "price_class": "pr-price",
+      "body": "Each customer called automatically when they come due, rather than in one batch."
+    },
+    {
+      "name": "Build and own it",
+      "price": "Priced on a call",
+      "price_suffix": null,
+      "price_class": "pr-price pr-price-q",
+      "body": "We build the system and hand it over, running on phone and AI accounts you own. You pay the providers directly, at cost."
+    }
+  ],
+  "note": "<b>The first 20% of your list is a free pilot</b> (at least 25 names, at most 100), so you see your real booking rate before you pay anything. We call your own past customers only &mdash; never cold lists or purchased leads. <a href=\"/win-back/\">How win-back works</a>."
+}

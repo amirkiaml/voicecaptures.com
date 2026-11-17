@@ -12,6 +12,8 @@ Replaces the older build-legal.py. Delete that file; deploy.ps1 calls this one.
     python build-pages.py
 """
 
+import json
+import os
 import pathlib
 
 import pricing_data
@@ -2758,6 +2760,33 @@ def _triggers():
     return out
 
 
+def _winback_section():
+    """Win-back, rendered from pricing/winback.json and nothing else.
+
+    It prices a different product (reaching a business's own past customers)
+    and it is NOT governed by pricing/catalog.json: no plan, package, trial,
+    minute count, annual toggle or HST line applies to it. The copy, the
+    prices and the compliance sentences are a verbatim snapshot of the
+    section as it shipped, and tests/winback-snapshot.test.js fails if the
+    rendered page drifts from that file by a character.
+    """
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "pricing", "winback.json"), encoding="utf-8") as fh:
+        wb = json.load(fh)
+    cols = ""
+    for c in wb["columns"]:
+        suffix = f'<em> {c["price_suffix"]}</em>' if c["price_suffix"] else ""
+        cols += (f'<div class="pr-col"><h3>{c["name"]}</h3>'
+                 f'<p class="{c["price_class"]}">{c["price"]}{suffix}</p>'
+                 f'<p>{c["body"]}</p></div>')
+    return (f'\n<section id="{wb["section_id"]}" class="alt">\n  <div class="wrap">\n'
+            f'    <h2>{wb["heading"]}</h2>\n'
+            f'    <p class="pr-sub">{wb["sub"]}</p>\n'
+            f'    <div class="pr-cols">{cols}</div>\n'
+            f'    <p class="fine pr-vnote">{wb["note"]}</p>\n'
+            f'  </div>\n</section>\n')
+
+
 def _pricing_body():
     pricing_data.check()
     cat = pricing_data.CATALOG
@@ -2802,7 +2831,8 @@ def _pricing_body():
   </div>
 </section>
 
-<section id="p-minutes" class="alt">
+{_winback_section()}
+<section id="p-minutes">
   <div class="wrap">
     <h2>Minutes, add-ons and setup</h2>
     <div class="pr-three">
