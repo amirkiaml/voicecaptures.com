@@ -1654,7 +1654,7 @@ footer{background:var(--bg-soft); padding:var(--s16) 0 var(--s8)}
 <main class="wrap doc">
 <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Legal</p>
 <h1>Privacy <span class="pay">policy.</span></h1>
-<p class="updated">Last updated: 24 October 2026</p>
+<p class="updated">Last updated: 17 November 2026</p>
 
 <p class="intro"><strong>VoiceCaptures</strong> is a registered business based in
 Toronto, Ontario, Canada. This policy explains what we collect when our AI voice assistant answers
@@ -1735,9 +1735,14 @@ handle this information only on the clinic&rsquo;s instructions and for the
 clinic&rsquo;s purposes.</p>
 
 <h2>How long we keep it</h2>
-<p>Recordings, transcripts and call details are kept for <strong>14 days</strong>
-and then deleted. A business client can choose to keep them for 90 days or one
-year. Win-back lists are used only for that business&rsquo;s campaigns and are
+<p>Recordings, transcripts and call details are kept for
+<strong>14 days on Personal Line and Business Lite, and 90 days on Business Pro</strong>, and then deleted. A business client can
+choose to keep them longer with the history add-on, up to one year.
+<strong>For clinics we recommend staying at
+14 days</strong> &mdash; on a
+patient-facing line, keeping less is the safer setting, not a worse one.</p>
+<p><strong>Trial accounts that never convert are deleted after 7 days</strong>,
+along with anything recorded during the trial. Win-back lists are used only for that business&rsquo;s campaigns and are
 deleted when the business asks, or when they stop working with us. To have your
 own record deleted sooner, email <a href="mailto:hello@voicecaptures.com">hello@voicecaptures.com</a>.</p>
 <p>Job applications are kept while we consider them and for future opportunities,
@@ -1753,6 +1758,24 @@ Deleted data can take up to a further 30 days to clear a provider&rsquo;s
 backup systems. While information is with a provider it may be subject to US
 law. We use service providers only to run the service, and each one receives
 only what it needs to do its part.</p>
+<p>The providers we rely on, and what each one handles:</p>
+<ul>
+  <li><strong>Vapi</strong> &mdash; runs the live call (United States)</li>
+  <li><strong>OpenAI</strong> &mdash; the language model the assistant speaks with
+  (United States)</li>
+  <li><strong>Twilio</strong> &mdash; carries calls and text messages (United
+  States)</li>
+  <li><strong>Stripe</strong> &mdash; payments and billing (United States; we
+  never see or store your card number)</li>
+  <li><strong>Resend</strong> &mdash; the emails we send you (United States)</li>
+  <li><strong>Supabase</strong> &mdash; the database holding your call records
+  (Canada)</li>
+</ul>
+<p><strong>If you turn on the caller-sentiment add-on</strong>, the transcript of
+each call is sent to OpenAI to be scored. With the add-on off, no transcript is
+sent for scoring. For clinics we recommend leaving it off.</p>
+<p>VoiceCaptures is sold to businesses in Canada and the service is built around
+Canadian numbers, carriers and law.</p>
 
 <h2>If there is a security incident</h2>
 <p>If we find that information we hold about you or your callers may have been
@@ -1826,6 +1849,7 @@ Toronto, Ontario, Canada<br>
         <h4 class="f-h2">Legal</h4>
         <ul>
           <li><a href="/privacy/">Privacy Policy</a></li>
+          <li><a href="/caller-texts/">Caller texts</a></li>
           <li><a href="/terms/">Terms of Service</a></li>
         </ul>
       </div>
@@ -1961,6 +1985,7 @@ Toronto, Ontario, Canada<br>
     ["Hear the demo line", "tel:+16476921081", "(647) 692-1081, our live demo line, answering right now.", "demo line hear listen sample example live try call it", ""],
     ["About", "/about/", "Who we are and how we build.", "about company who we are story mission team founded toronto canada canadian", ""],
     ["Careers", "/careers/", "Part-time sales and marketing, Toronto and remote.", "careers career jobs job hiring hire role roles work open positions sdr sales marketing part time remote apply", ""],
+    ["Caller texts", "/caller-texts/", "What we text the people who call you, how to stop it, and what you are responsible for.", "caller texts sms messages stop help casl consent opt out unsubscribe review request reminder confirmation text back", ""],
     ["Privacy", "/privacy/", "What we collect, who processes it, and how long it is kept.", "privacy policy data retention gdpr pipeda phipa personal information subprocessor subprocessors processors security encryption breach notification delete", ""],
     ["Security and subprocessors", "/privacy/", "Where data is hosted and which services touch it.", "security hosting host render supabase vapi twilio elevenlabs openai resend google server location virginia us data residency", ""],
     ["Terms", "/terms/", "The terms the service runs under.", "terms conditions contract agreement legal sla uptime outage credit cancel cancellation refund notice period liability", ""],

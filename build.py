@@ -81,7 +81,8 @@ def sitemap(slugs) -> str:
         for s, p in [("", "1.0")] + [(f"{x}/", "0.9") for x in slugs]
                      + [("pricing/", "0.9"), ("demo/", "0.9"), ("playground/", "0.8"), ("faq/", "0.8"),
                         ("win-back/", "0.8"), ("contact/", "0.8"), ("about/", "0.7"), ("careers/", "0.7"),
-                        ("privacy/", "0.3"), ("terms/", "0.3"), ("login", "0.3")]
+                        ("privacy/", "0.3"), ("terms/", "0.3"),
+                        ("caller-texts/", "0.3"), ("login", "0.3")]
     )
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}\n</urlset>\n'
 
