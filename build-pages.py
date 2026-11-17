@@ -34,13 +34,71 @@ def _package_phrases() -> str:
     return ", ".join(parts[:-1]) + " and " + parts[-1]
 
 
+def _trial_phrases() -> str:
+    """"7 days and 15 minutes on Personal Line, 14 days and 60 minutes on
+    Business" -- the terms page states the trial the catalog sells."""
+    seen, parts = set(), []
+    for key in pricing_data.ORDER:
+        p = pricing_data.PLANS[key]
+        t = p.get("trial") or {}
+        if not t.get("minutes_cap"):
+            continue
+        shape = (t["days"], t["minutes_cap"])
+        name = p["name"] if key == "personal" else "Business"
+        if shape in seen:
+            continue
+        seen.add(shape)
+        parts.append(f"{t['days']} days and {t['minutes_cap']} minutes on {name}")
+    ent = pricing_data.PLANS["enterprise"]["trial"]
+    parts.append(f"{ent['days']} days on Enterprise, at {ent['note']}")
+    return ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
+def _retention_phrase() -> str:
+    """"14 days on Personal Line and Business Lite, and 90 days on Business Pro",
+    built from the catalog so the privacy page cannot promise a window the plans
+    do not give."""
+    by_days = {}
+    for key in pricing_data.ORDER:
+        p = pricing_data.PLANS[key]
+        if p.get("retention_days"):
+            by_days.setdefault(p["retention_days"], []).append(p["name"])
+    parts = []
+    for days, names in sorted(by_days.items()):
+        who = " and ".join([", ".join(names[:-1]), names[-1]] if len(names) > 1
+                           else names)
+        parts.append(f"{days} days on {who}")
+    return ", and ".join(parts)
+
+
+def _annual_phrase() -> str:
+    a = pricing_data.CATALOG["annual"]
+    return (f"twelve months for the price of "
+            f"{12 - a['months_free']} ({a['label']})")
+
+
+def _promo_phrases() -> str:
+    pr = pricing_data.CATALOG["promos"]
+    ra, pt = pr["referral_affiliate"], pr["personal_tester"]
+    return (f"a referral or affiliate code gives up to {ra['days']} days and "
+            f"{ra['minutes_cap']} minutes, and a tester code gives "
+            f"{pricing_data.PLANS['personal']['name']} free for "
+            f"{pt['free_months']} months at {pt['monthly_minutes']} minutes a "
+            f"month")
+
+
 # The plain-language billing rules, read from the catalog so the terms page
 # and the pricing page cannot state different ones.
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "24 October 2026"
-TERMS_UPDATED = "11 November 2026"
+PRIVACY_UPDATED = "17 November 2026"
+TERMS_UPDATED = "17 November 2026"
+
+# The version the in-product consent text is keyed to. The dashboard and
+# self-serve repos show matching wording under the same constant; bump it
+# here and there together when any consent clause below changes.
+CONSENT_VERSION = "2026-11-17"
 
 # Share cards. A page gets its own when the default card would misdescribe it;
 # everything else uses the default. The filenames are versioned because
@@ -1318,6 +1376,10 @@ CAREERS_SCRIPT = f"""
 
 # -------------------------------------------------------------- win-back ----
 
+# Note to ourselves, deliberately not an HTML comment: the win-back page
+# has no proof or case-study block. Nothing goes there until there is a
+# real campaign with real numbers and the client's permission to quote
+# them.
 WINBACK_BODY = f"""
 
 <section class="wb-hero">
@@ -1732,9 +1794,6 @@ WINBACK_BODY = f"""
   </div>
 </section>
 
-<!-- PLACEHOLDER: proof / case study. Nothing goes here until there is a real
-     campaign with real numbers and the client's permission to quote them. -->
-
 <section>
   <div class="wrap center">
     <h2>Also fits</h2>
@@ -1921,9 +1980,14 @@ handle this information only on the clinic&rsquo;s instructions and for the
 clinic&rsquo;s purposes.</p>
 
 <h2>How long we keep it</h2>
-<p>Recordings, transcripts and call details are kept for <strong>14 days</strong>
-and then deleted. A business client can choose to keep them for 90 days or one
-year. Win-back lists are used only for that business&rsquo;s campaigns and are
+<p>Recordings, transcripts and call details are kept for
+<strong>{_retention_phrase()}</strong>, and then deleted. A business client can
+choose to keep them longer with the history add-on, up to one year.
+<strong>For clinics we recommend staying at
+{pricing_data.PLANS["personal"]["retention_days"]} days</strong> &mdash; on a
+patient-facing line, keeping less is the safer setting, not a worse one.</p>
+<p><strong>Trial accounts that never convert are deleted after 7 days</strong>,
+along with anything recorded during the trial. Win-back lists are used only for that business&rsquo;s campaigns and are
 deleted when the business asks, or when they stop working with us. To have your
 own record deleted sooner, email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 <p>Job applications are kept while we consider them and for future opportunities,
@@ -1939,6 +2003,44 @@ Deleted data can take up to a further 30 days to clear a provider&rsquo;s
 backup systems. While information is with a provider it may be subject to US
 law. We use service providers only to run the service, and each one receives
 only what it needs to do its part.</p>
+<p>The providers we rely on, and what each one handles:</p>
+<ul>
+  <li><strong>Vapi</strong> &mdash; runs the live call (United States)</li>
+  <li><strong>OpenAI</strong> &mdash; the language model the assistant speaks with
+  (United States)</li>
+  <li><strong>Twilio</strong> &mdash; carries calls and text messages (United
+  States)</li>
+  <li><strong>Stripe</strong> &mdash; payments and billing (United States; we
+  never see or store your card number)</li>
+  <li><strong>Resend</strong> &mdash; the emails we send you (United States)</li>
+  <li><strong>Supabase</strong> &mdash; the database holding your call records
+  (Canada)</li>
+</ul>
+<p><strong>If you turn on the caller-sentiment add-on</strong>, the transcript of
+each call is sent to OpenAI to be scored. With the add-on off, no transcript is
+sent for scoring. For clinics we recommend leaving it off.</p>
+<p>VoiceCaptures is live in Canada. We are rolling out to more countries, and
+the service is built around Canadian numbers, carriers and law.</p>
+
+<h2>The international waitlist</h2>
+<p>If the service is not yet available where you are, you can ask us to tell you
+when it opens.</p>
+<p><strong>What we collect:</strong> your email address and your country, which are
+required, and your business type and website if you choose to give them. We also
+record that you ticked the consent box, when you ticked it, and which version of
+the wording you were shown.</p>
+<p><strong>What we do with it.</strong> We use it for one thing: to email you when
+VoiceCaptures opens in your country. That is a single notice per country. We do not
+sell it, we do not add you to a marketing list, and we do not promise a date.</p>
+<p><strong>Unsubscribing.</strong> Every email we send from the waitlist has an
+unsubscribe link. Unsubscribing deletes your entry rather than merely flagging it,
+and you can also ask us to delete it at any time by emailing
+<a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+<p><strong>How long we keep it: 12 months</strong> from the day you consented, and
+then it is deleted automatically. Sooner, if you unsubscribe or ask us to delete
+it.</p>
+<p>Waitlist entries are held with the same providers listed above, which means
+outside Canada.</p>
 
 <h2>If there is a security incident</h2>
 <p>If we find that information we hold about you or your callers may have been
@@ -1965,6 +2067,30 @@ when you called. We will reply within 30 days.</p>
 </main>
 """
 
+# TODO(owner) items that used to sit as HTML comments inside the pages.
+# They are here instead: an HTML comment ships to the public with the
+# page, and a note about pending legal review is not something to
+# publish in the markup of the terms it is about.
+# TODO(owner): lawyer review of the consent wording shown to visitors outsid
+#   e Canada. CASL governs the Canadian side; other countries have their own r
+#   egimes (GDPR consent and the ePrivacy rules in the EU and UK, CAN-SPAM in 
+#   the US, the Privacy Act and Spam Act in Australia) and the single tick-box
+#    has to be defensible under the ones we actually collect from.
+#
+# TODO(owner): link "international waitlist" once the hosted waitlist page h
+#   as an address. It is deliberately unlinked rather than pointed at a page t
+#   hat is not the waitlist.
+#
+# TODO(owner): lawyer review of this wording, in particular the suspension r
+#   emedy and whether the representation should be a warranty, a condition, or
+#    simply a factual statement.
+#
+# TODO(owner): the closing window is not defined. Pick a number of days and 
+#   put it here and in the catalog before this page is published.
+#
+# TODO(owner): who qualifies as an affiliate, and what they are paid, is not
+#    stated here because it has not been decided.
+#
 TERMS_BODY = f"""<main class="wrap doc">
 <p class="eyebrow"><svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5 9.8 12.2 3.5 10l6.3-1.7z"/></svg>Legal</p>
 <h1>Terms <span class="pay">of service.</span></h1>
@@ -1988,6 +2114,22 @@ through another channel if we need to. Carriers and inboxes sometimes delay or
 filter messages for reasons no sender controls, so your dashboard holds every
 call and message and is the record to check if something has not arrived.</p>
 
+<h2>Where the service is available</h2>
+<p><strong>VoiceCaptures is sold to customers in Canada.</strong> The service is
+built around Canadian phone numbers, carriers and law, and we do not currently
+offer it elsewhere.</p>
+<p><strong>You tell us you are in Canada when you sign up.</strong> On a business
+plan you confirm that the business is located in Canada and that you are
+authorised to sign it up; on a personal line you confirm that you live in Canada.
+That confirmation is part of your agreement with us, and we keep a record of it
+with the wording you were shown and the date.</p>
+<p><strong>If it is not true, we may suspend or end the account.</strong> Where we
+can we will ask you first and give you a chance to put it right. If an account is
+ended for this reason, unused prepaid or annual time is handled under the billing
+terms above.</p>
+<p>If you are outside Canada, you can join our international waitlist and we will
+email you when VoiceCaptures opens in your country. We do not promise a date.</p>
+
 <h2>Plans and locations</h2>
 <p>Each plan covers one business location, with the minutes, lines and calendars
 shown on our pricing page. Two or more locations need a plan for each location,
@@ -1997,17 +2139,20 @@ line goes live, prorated to a single billing date for the account. Your quote
 names the planned go-live date for each location.</p>
 
 <h2>Free trial</h2>
-<p>Your first 14 days are free, up to 100 minutes of calls, at one location, on
-your real business number. We take a card when you sign up. If you don&rsquo;t
-cancel before the trial ends, your plan starts automatically on day 15 and we
-charge that card. We email you a reminder before the trial ends. Cancel during
-the trial and you pay nothing.</p>
-<p><strong>The 14 days start when your line goes live</strong> &mdash; the day
-calls begin reaching the assistant &mdash; not the day you sign up. Setup time
-does not come out of your trial.</p>
-<p><strong>If you reach 100 minutes before the trial ends</strong>, the line keeps
-answering. We call you and start your plan early rather than letting calls go
-unanswered.</p>
+<p>Every plan starts with a free trial on your real number, with a card on file.
+The length and the minute cap depend on the plan:
+{_trial_phrases()}. We take a card when you sign up and charge nothing during the
+trial.</p>
+<p><strong>The trial converts automatically.</strong> If you do not cancel before
+it ends, your plan starts the next day and we charge the card on file at the price
+shown on our pricing page. We email you a reminder before that happens. Cancel
+during the trial and you pay nothing.</p>
+<p><strong>The days start when your line goes live</strong> &mdash; the day calls
+begin reaching the assistant &mdash; not the day you sign up. Setup time does not
+come out of your trial.</p>
+<p><strong>If you reach the trial&rsquo;s minute cap before it ends</strong>, the
+line keeps answering. We contact you and start your plan early rather than letting
+calls go unanswered.</p>
 <p><strong>More than one location:</strong> the trial covers one location, which
 is enough to show you how the assistant handles your calls. Your remaining
 locations go live on the paid plan. Multi-location trials run 21 days, since more
@@ -2023,7 +2168,8 @@ your card or download invoices at any time from your billing portal.</p>
 
 <h2>Minutes</h2>
 <p>A minute is time our assistant spends on a live call, including transfers.
-Unused minutes don&rsquo;t carry over. We text you when you reach 80% of your
+<strong>Calls our system marks as spam, and calls shorter than 10 seconds, are
+not billable minutes.</strong> Unused minutes don&rsquo;t carry over. We text you when you reach 80% of your
 monthly minutes, and again at 100%. Your line keeps answering either way &mdash;
 we never cut it off for going over.</p>
 <p><strong>Extra minutes.</strong> Extra minutes come in packages, bought from
@@ -2033,7 +2179,43 @@ buy it in and does not carry over. There is no per-minute overage.
 {TERMS_RULES["personal_out_of_minutes"]} The texts above are how we tell you
 before that happens.</p>
 
+<h2>Automatic minute packages</h2>
+<p><strong>On a business plan, you authorise us to charge your saved card for one
+extra-minute package when your plan&rsquo;s minutes run out</strong>, at the price
+shown on our pricing page, so your line keeps answering. You agree to this when you
+sign up, and it is the only charge we make without asking you first.</p>
+<p><strong>At most {TERMS_RULES["auto_package_cap"]} automatic packages in a
+billing period.</strong> After the second one we stop adding them, tell you, and
+talk to you about a plan that fits your call volume instead.</p>
+<p><strong>We tell you every time</strong>, by text and by email, naming the
+package and the amount, when it is added.</p>
+<p><strong>Turning it off.</strong> You can switch automatic packages off in your
+dashboard at any time. With it off, your line still answers and we will contact you
+when the minutes run out, but no package is added and no charge is made.</p>
+<p><strong>If the charge fails</strong>, we do not add the package. We tell you and
+ask you to update your card. Your line keeps answering while we sort it out; the
+missed-payment terms below apply if the card stays unpaid.</p>
+<p>A Personal Line is never charged automatically.
+{TERMS_RULES["personal_out_of_minutes"]}</p>
+
+<h2>Annual plans</h2>
+<p>You can pay for a year instead of by the month. An annual plan is
+{_annual_phrase()}, charged once, with your rate locked for the term.</p>
+<p><strong>Cancel early and the unused months come back as account credit</strong>
+&mdash; credit against future VoiceCaptures invoices, not a refund to your card.
+Credit does not expire while your account is open.</p>
+<p><strong>Refunds.</strong> Within the closing window after an annual charge we
+will refund it in full on request. After that window we do not refund unused
+months as cash; a partial refund, or moving unused package credit to another
+period, is considered case by case and is at our discretion.
+</p>
+<p><strong>Minutes stay monthly</strong> on an annual plan. Paying for a year does
+not pool a year of minutes: your allowance is per month and does not carry over.</p>
+
 <h2>Prepaid terms</h2>
+<p class="note">These terms apply to prepaid 3, 6 and 12-month terms bought before
+annual plans replaced them. They are unchanged for every client already on one.
+New plans are monthly or annual.</p>
 <p>You can pay for 3, 6 or 12 months up front instead of monthly, at a discount that
 rises with the term. The prices are on our pricing page. A prepaid term begins after
 your free trial ends, not instead of it. The whole term is charged once, on day 15,
@@ -2085,12 +2267,26 @@ again.</p>
 confirmation, booking details or information to a caller who asks for it; a
 text-back to a caller whose call was missed; and appointment reminders. We also
 text you about your account, such as usage alerts.</p>
-<p>Some plans include texts or calls that promote your business, such as review
-requests and win-back messages. These go only to your own customers, on your
-behalf and under your business name, and every one identifies your business and
-lets the person opt out. You are responsible for having the consent Canadian
-anti-spam law requires to contact them; generally, that means they bought from you
-in the last two years, or they agreed to hear from you.</p>
+<h3>Texts to your callers</h3>
+<p><strong>Texts to your callers are off by default.</strong> Confirmation texts,
+missed-call text-back, appointment reminders and review requests are each switched
+on by you, in your dashboard. We send nothing to your callers until you turn them
+on.</p>
+<p><strong>We send them on your behalf, under your business name.</strong> Every
+message identifies your business and tells the person how to stop. Anyone can reply
+STOP to any message, and we honour it for every message type without asking
+you.</p>
+<p><strong>You are responsible for having the right to message them.</strong>
+Canada&rsquo;s anti-spam law applies to these messages. For a message that promotes
+your business &mdash; a review request above all &mdash; that generally means
+express consent, or an existing business relationship such as a purchase in the
+last two years. A confirmation a caller asked for on the call is a different thing
+from a marketing message, and you are responsible for knowing which you are
+sending.</p>
+<p>By switching these on you confirm you have that right, and you agree to cover us
+for claims, penalties and costs arising from messages sent to people you did not
+have the right to contact. Our <a href="/caller-texts/">Caller texts</a> notice
+sets out each message type and how to stop it.</p>
 <p>Anyone can reply <strong>STOP</strong> to any text to opt out, or
 <strong>HELP</strong> for help.</p>
 
@@ -2108,6 +2304,27 @@ numbers against Canada&rsquo;s National Do Not Call List where the law requires 
 call only during permitted hours, and remove anyone who asks not to be contacted.
 You confirm that you collected the list lawfully and may contact the people on it.
 Campaign prices and what counts as a booking are set out in your quote.</p>
+
+<h2>Recording and telling callers it is an AI</h2>
+<p>Our assistant&rsquo;s greeting says the call is recorded. <strong>You are
+responsible for recording your calls lawfully</strong> and for any further
+disclosure your province, your profession or your regulator requires, including
+telling callers they are speaking to an automated assistant where that is
+required of you.</p>
+<p>You can ask us to change the greeting, to turn recording off, or both.
+<strong>For clinics, recording is off by default</strong>, and our assistant is
+built not to ask for health information: it collects contact details and the
+general reason for the call.</p>
+
+<h2>Referral, affiliate and tester codes</h2>
+<p>We sometimes issue codes that give a longer trial or a free period:
+{_promo_phrases()}. A code applies to a new account only, one per business, and
+cannot be combined with another code or applied to a plan you are already paying
+for. When the free period ends, the plan bills normally at the price on our pricing
+page unless you cancel first.</p>
+<p>We may end, change or withdraw any code programme at any time. Codes already in
+use keep their stated term.
+</p>
 
 <h2>Your responsibilities</h2>
 <p>Give us accurate information for your assistant&rsquo;s script, use the service
@@ -2128,6 +2345,18 @@ handle this information.</p>
 <p>The service is provided as is. We don&rsquo;t promise the assistant will be
 error-free or always available; it depends on phone, AI and internet providers we
 don&rsquo;t control.</p>
+<p><strong>What the assistant says is generated by an AI model, and it can be
+wrong.</strong> It can mishear a caller, take down a name or a number
+incorrectly, answer a question inaccurately, or miss something that was said. We
+do not warrant that anything it says, books, records or summarises is accurate or
+complete.</p>
+<p><strong>Check your bookings and messages.</strong> The dashboard holds every
+call, and it is the record to rely on. Decisions you or your callers make on
+what the assistant said are yours: we are not responsible for a booking taken
+wrongly, a message passed on incorrectly, or an answer it gave about your
+business.</p>
+<p>Do not rely on the assistant for anything urgent or safety-related. It is not
+an emergency service, and callers with emergencies are told to call 911.</p>
 
 <h2>Availability and outages</h2>
 <p>The assistant only works while the telephony, AI and hosting providers behind
@@ -2158,9 +2387,11 @@ is breached and your data may be involved, we notify you as set out in our
 <a href="/privacy/">Privacy Policy</a>.</p>
 
 <h2>Limitation of liability</h2>
-<p>To the extent the law allows, our total liability for any claim is limited to
-the fees you paid us in the three months before the claim. We are not liable for
-indirect or consequential loss, including lost business, bookings or revenue.</p>
+<p>To the extent the law allows, <strong>our total liability for any claim is
+limited to the fees you paid us in the twelve months before the claim</strong>.
+We are not liable for indirect or consequential loss, including lost business,
+lost bookings, lost revenue or lost data.</p>
+<p>Nothing in these terms limits liability that cannot be limited by law.</p>
 
 <h2>Changes</h2>
 <p>We will email you at least 30 days before we change these terms or your price.
@@ -3256,6 +3487,61 @@ PLAYGROUND_SCRIPT = """
 """
 
 
+CALLER_TEXTS_BODY = f"""<main class="wrap doc">
+<h1>Caller texts</h1>
+<p class="updated">Last updated: {TERMS_UPDATED} &middot; consent version
+{CONSENT_VERSION}</p>
+
+<p>This page is about text messages sent to <strong>the people who call your
+business</strong>. For the texts we send <em>you</em> &mdash; call summaries and
+usage alerts &mdash; see <a href="/terms/">our Terms</a>.</p>
+
+<h2>They are off until you turn them on</h2>
+<p>Nothing is sent to your callers by default. Each kind of message is a switch in
+your dashboard:</p>
+<ul>
+  <li><strong>Confirmation texts</strong> &mdash; the details of what was booked
+  or taken down, to a caller who wants them.</li>
+  <li><strong>Missed-call text-back</strong> &mdash; a text to someone whose call
+  was not answered.</li>
+  <li><strong>Appointment reminders</strong> &mdash; before a booked
+  appointment.</li>
+  <li><strong>Review requests</strong> &mdash; after a job or a visit.</li>
+</ul>
+
+<h2>Who they come from</h2>
+<p>They go out under your business name, on your behalf. Every message says which
+business it is from and how to stop them.</p>
+
+<h2>Stopping them</h2>
+<p>Anyone can reply <strong>STOP</strong> to any message and we stop texting that
+number, for every kind of message, straight away and without asking you first.
+<strong>HELP</strong> replies with how to reach us. Message and data rates may
+apply, and carriers are not liable for delayed or undelivered messages.</p>
+
+<h2>What you are responsible for</h2>
+<p>Canada&rsquo;s anti-spam law governs these messages, and you are the sender.
+Before switching one on, you need the right to contact those people.</p>
+<p>A <strong>review request</strong> promotes your business, so it needs the
+clearest basis: express consent, or a real existing business relationship such as
+a purchase in the last two years. A <strong>confirmation the caller asked for on
+the call</strong> is a different thing. Knowing which you are sending is your
+call, not ours.</p>
+<p>If you switch these on, you confirm you have that right and you agree to cover
+us for claims, penalties and costs that come from messages sent to people you did
+not have the right to contact. The full wording is in
+<a href="/terms/">our Terms</a>.</p>
+
+<h2>Clinics</h2>
+<p>We recommend leaving review requests off on a patient-facing line, and our
+assistant does not ask callers for health information. Talk to us before turning
+any caller texts on for a clinic.</p>
+
+<h2>Questions</h2>
+<p>Email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+</main>"""
+
+
 PAGES = [
     ("faq", "Common questions | VoiceCaptures",
      "How an AI receptionist works, what setup takes, what happens to your "
@@ -3306,6 +3592,11 @@ PAGES = [
     ("privacy", "Privacy Policy",
      "How VoiceCaptures collects, uses and deletes call recordings, transcripts, "
      "caller phone numbers and contact form submissions.", PRIVACY_BODY, ""),
+
+    ("caller-texts", "Caller texts",
+     "What VoiceCaptures sends to the people who call your business, how to "
+     "stop it, and what the account owner is responsible for under Canadian "
+     "anti-spam law.", CALLER_TEXTS_BODY, ""),
 
     ("terms", "Terms of Service",
      "Terms for the VoiceCaptures AI answering service, including SMS terms, "
