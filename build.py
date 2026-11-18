@@ -244,15 +244,17 @@ def check_encoding(raw: bytes, src: str) -> None:
 
 
 def stamp_assets() -> None:
-    """Write talk.js's content hash into every page that loads it.
+    """Write each long-cached script's content hash into every page that loads it.
 
-    It is served with a long max-age, so without a version in the URL a browser
-    will keep an old copy beside new HTML. That shipped once: the voice panel
-    the hero was meant to replace came back on a live screen.
+    They are served with a long max-age, so without a version in the URL a
+    browser will keep an old copy beside new HTML. That shipped once: the voice
+    panel the hero was meant to replace came back on a live screen.
     """
     import stamp
 
-    stamp.stamp(ROOT / "talk.js", sorted(ROOT.glob("**/*.html")))
+    pages = sorted(ROOT.glob("**/*.html"))
+    for asset in stamp.ASSETS:
+        stamp.stamp(ROOT / asset, pages)
 
 
 def main():

@@ -122,11 +122,20 @@ def parts() -> dict:
     if not talk:
         sys.exit("index.html does not load talk.js — the shell would ship without Speak.")
 
+    # Lifted from index.html rather than written out here, the same way the
+    # header, footer and nav script are, so the home page and every built page
+    # load the one file and cannot drift to two different versions of it.
+    attr = re.search(r'<script src="/attr\.js[^"]*" defer></script>', src)
+    if not attr:
+        sys.exit("index.html does not load attr.js — built pages would lose "
+                 "campaign attribution while the home page kept it.")
+
     return {
         "style": style,
         "header": header,
         "footer": footer,
         "nav_script": nav[0],
+        "attr": attr.group(0),
         "talk": talk.group(0),
         "h1_decl": _decl(style, "h1"),
         "h2_decl": _decl(style, "h2"),
@@ -722,6 +731,7 @@ def build(old_css: str) -> str:
         + "\n\n<script>"
         + p["nav_script"]
         + "</script>\n@@SCRIPT@@\n"
+        + p["attr"] + "\n"
         + p["talk"]
         + "\n</body>\n</html>\n"
     )
