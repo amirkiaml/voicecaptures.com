@@ -1373,6 +1373,9 @@ async function loadSettings() {
       <table class="sub-table"><thead><tr><th>Month</th><th>Item</th><th>Amount</th><th>Note</th><th></th></tr></thead><tbody>${
         f.items.length ? f.items.map(x => `<tr><td>${esc(String(x.month).slice(0, 7))}</td><td>${esc(x.item)}</td><td class="num">${bothM(x.both)} <span class="muted small">(entered ${esc(x.currency)})</span></td><td class="small">${esc(x.note || "")}</td>
           <td><button class="linkbtn" data-delfc="${x.id}">remove</button></td></tr>`).join("") : `<tr><td colspan="5" class="muted">None entered.</td></tr>`}</tbody></table>
+      <h3 style="margin-top:16px">Costs <span class="muted small">(every cost in one place; alert only: nothing here changes a model, prompt or line)</span></h3>
+      <div id="readyBox" class="small muted">Loading…</div>
+      <div id="costsBox" class="small muted">Loading…</div>
       <h3 style="margin-top:16px">Retention cleanup</h3>
       <div class="small">Mode: <b>${d.cleanupMode === "delete" ? "deleting expired transcripts and recordings daily" : "dry run (counts only) — set RETENTION_CLEANUP=on on Render to delete"}</b>.
         ${lastRun ? `Last run ${esc(fmtWhen(lastRun.ran_at))}: ${lastRun.artifacts_expired} expired, ${lastRun.artifacts_deleted} deleted, ${lastRun.recordings_deleted} recordings removed.` : "Not run yet."}
@@ -1400,6 +1403,8 @@ async function loadSettings() {
         <td>${p.checkout_enabled ? `<span class="good-t">open</span>` : `<span class="muted">closed</span>`}</td></tr>`).join("")}</tbody></table>
         <div class="muted" style="margin-top:4px">Add-ons: ${Object.values(c.addons).map(a => esc(`${a.label} $${a.price_cad}/mo`)).join(" · ")}. Old plans map for display: ${Object.entries(cd.legacyMap).map(([o, n]) => esc(`${PLAN_LABEL[o] || o} → ${c.plans[n].label}`)).join(", ")}.</div>`;
     }).catch(e => { $("catalogBox").innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Not deployed yet (TorontoLeads pricing v2 PR 1).</span>` : `<span class="err">${esc(e.message)}</span>`; });
+    loadReadiness();
+    loadCosts();
     // Stripe products
     const spRow = p => `<tr>
       <td><select data-k="kind"><option value="topup" ${p.kind === "topup" ? "selected" : ""}>Extra minutes</option><option value="history" ${p.kind === "history" ? "selected" : ""}>Call history</option><option value="plan" ${p.kind === "plan" ? "selected" : ""}>Plan</option></select></td>
@@ -1444,6 +1449,132 @@ async function loadSettings() {
     $("clDry").onclick = async () => { try { const r = await api(`${B}/cleanup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "dry-run" }) });
       $("stMsg").textContent = `Dry run: ${r.artifacts_expired} record(s) past their retention date.`; } catch (e) { $("stMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; } };
   } catch (e) { el.innerHTML = needsMigration(e) ? migrationNote(e.message) : `<div class="err">${esc(e.message)}</div>`; }
+}
+
+/* ---------- Launch readiness (admin-costs.js: /admin/billing/costs/readiness) ----------
+ * Every plan's catalog feature that is rolling_out or coming_soon, with a
+ * manual fallback, target date and owner note. A feature leaves the list
+ * when catalog.json marks it live. Banner: a plan open for checkout with any
+ * listed feature that has no manual fallback. */
+const FEATURE_LABEL = k => String(k).replace(/_/g, " ").replace(/^\w/, c => c.toUpperCase());
+async function loadReadiness() {
+  const box = $("readyBox"); if (!box) return;
+  try { renderReadiness(await api(`${B}/costs/readiness`)); }
+  catch (e) { box.innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Launch readiness: not deployed yet (TorontoLeads pricing v2 PR 6).</span>` : needsMigration(e) ? `<span class="warn-t">${esc(e.message)}</span>` : `<span class="err">${esc(e.message)}</span>`; }
+}
+function renderReadiness(d) {
+  const box = $("readyBox");
+  box.innerHTML = `${d.warning ? `<div class="err" role="alert" id="readyWarn" style="margin-bottom:6px">⚠ ${esc(d.warning.text)} Write what you'll do by hand for each one below.</div>` : ""}
+    <div class="k2">Launch readiness <span class="muted small" style="text-transform:none;letter-spacing:0">— features promised on a plan but not live yet (from pricing/catalog.json; a feature leaves this list when it's marked live)</span></div>
+    ${d.items.length ? `<table class="sub-table" id="readyTable"><thead><tr><th>Plan</th><th>Feature</th><th>Status</th><th>Manual fallback</th><th>Target date</th><th>Owner note</th><th></th></tr></thead><tbody>${d.items.map((i, n) => `<tr data-rd="${n}" data-plan="${esc(i.plan_key)}" data-feature="${esc(i.feature)}">
+      <td>${esc(i.plan)}${i.checkout_enabled ? "" : ` <span class="muted">(checkout closed)</span>`}</td><td>${esc(FEATURE_LABEL(i.feature))}</td><td>${esc(i.status.replace("_", " "))}</td>
+      <td><input class="inline-in ${i.missingFallback ? "bad-t" : ""}" data-f="manual_fallback" style="width:260px" placeholder="${i.missingFallback ? "Needed: what you'll do by hand" : "What you'll do by hand"}" value="${esc(i.manual_fallback || "")}"></td>
+      <td><input class="inline-in" type="date" data-f="target_date" value="${esc(i.target_date || "")}"></td>
+      <td><input class="inline-in" data-f="owner_note" style="width:180px" value="${esc(i.owner_note || "")}"></td>
+      <td><button class="linkbtn" data-rdsave="${n}">save</button></td></tr>`).join("")}</tbody></table>` : `<div class="good-t">Every promised feature is live.</div>`}
+    <div id="readyMsg" class="small"></div>`;
+  box.querySelectorAll("[data-rdsave]").forEach(b => b.onclick = async () => {
+    const tr = b.closest("tr"), v = f => tr.querySelector(`[data-f=${f}]`).value;
+    try { renderReadiness(await api(`${B}/costs/readiness`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan_key: tr.dataset.plan, feature: tr.dataset.feature,
+        manual_fallback: v("manual_fallback"), target_date: v("target_date") || null, owner_note: v("owner_note") }) })); $("readyMsg").innerHTML = `<span class="good-t">Saved.</span>`; }
+    catch (e) { $("readyMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  });
+}
+/* ---------- Costs (admin-costs.js: GET /admin/billing/costs) ----------
+ * Not yet tracked, vendor limits, cost per minute per plan with thresholds,
+ * flags (clients over threshold, prompts over the token caps, tool retry
+ * loops), fixed and outside-Vapi costs, margins per plan, scenarios A–D.
+ * Every number is editable here and saved to the server. */
+let COSTS = null;
+const cad = n => n == null ? "—" : `CA$${Number(n).toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+async function loadCosts() {
+  const box = $("costsBox"); if (!box) return;
+  try { COSTS = await api(`${B}/costs`); renderCosts(); }
+  catch (e) { box.innerHTML = /404|Not found/i.test(e.message) ? `<span class="muted">Not deployed yet (TorontoLeads pricing v2 PR 6).</span>` : needsMigration(e) ? `<span class="warn-t">${esc(e.message)}</span>` : `<span class="err">${esc(e.message)}</span>`; }
+}
+function renderCosts() {
+  const c = COSTS, m = c.model, box = $("costsBox");
+  const num = (path, v, step = "0.001", w = 80) => `<input class="inline-in" style="width:${w}px" type="number" min="0" step="${step}" data-model="${esc(path)}" value="${esc(v)}">`;
+  const open = m.not_tracked.filter(x => !x.done).length;
+  const groups = Object.entries(c.perMinute.groups);
+  const groupLabel = { personal: "Personal", business_lite: "Business Lite", business_pro: "Business Pro", clinic: "Clinic", enterprise: "Enterprise" };
+  box.innerHTML = `
+    <div class="k2">Not yet tracked <span class="muted small" style="text-transform:none;letter-spacing:0">— ${open} open</span></div>
+    <div id="ntList">${m.not_tracked.map((x, i) => `<label class="small" style="display:block"><input type="checkbox" data-nt="${i}" ${x.done ? "checked" : ""}> ${esc(x.item)}</label>`).join("")}</div>
+    <div class="filters" style="margin-top:4px"><input id="ntNew" type="search" placeholder="Add a missing cost or number" aria-label="New item"><button class="btn" id="ntAdd" type="button">Add</button></div>
+
+    <div class="k2" style="margin-top:12px">Vendor limits</div>
+    <table class="sub-table" id="vlTable"><thead><tr><th>Vendor</th><th>Balance / spend</th><th>Auto top-up</th><th>Hard stop</th><th>Last checked</th><th>Note</th><th></th></tr></thead><tbody>${c.vendorLimits.map(v => `<tr data-vl="${v.id}">
+      <td><b>${esc(v.vendor)}</b></td><td><input class="inline-in" data-f="balance" value="${esc(v.balance || "")}"></td><td><input class="inline-in" data-f="auto_reload" value="${esc(v.auto_reload || "")}"></td>
+      <td><input class="inline-in" data-f="hard_stop" value="${esc(v.hard_stop || "")}"></td><td><input class="inline-in" type="date" data-f="last_checked" value="${esc(String(v.last_checked || "").slice(0, 10))}"></td>
+      <td><input class="inline-in" data-f="note" value="${esc(v.note || "")}"></td><td><button class="linkbtn" data-vlsave="${v.id}" data-vendor="${esc(v.vendor)}">save</button></td></tr>`).join("")}</tbody></table>
+
+    <div class="k2" style="margin-top:12px">Cost per minute (${esc(c.range.from)} to ${esc(c.range.to)}, CAD)</div>
+    <div class="small">Floor ${cad(c.floorCadPerMin)}/min: Vapi platform ${num("floor_cad_per_min.vapi_platform", m.floor_cad_per_min.vapi_platform)} voice ${num("floor_cad_per_min.voice", m.floor_cad_per_min.voice)} speech-to-text ${num("floor_cad_per_min.stt", m.floor_cad_per_min.stt)} Twilio ${num("floor_cad_per_min.twilio", m.floor_cad_per_min.twilio)}, plus the model (LLM) below.</div>
+    <table class="sub-table"><thead><tr><th>Plan</th><th>Clients</th><th>Minutes</th><th>Cost</th><th>of which LLM</th><th>Per minute</th><th>Alert above</th></tr></thead><tbody>${groups.map(([k, g]) => `<tr>
+      <td>${esc(groupLabel[k] || k)}</td><td class="num">${g.clients}</td><td class="num">${Math.round(g.minutes)}</td><td class="num">${cad(g.costCad)}</td><td class="num">${cad(g.llmCad)}</td>
+      <td class="num ${g.perMinCad != null && g.perMinCad > g.threshold ? "bad-t" : ""}">${g.perMinCad == null ? "—" : cad(g.perMinCad)}</td>
+      <td>${m.alert_cad_per_min[k] != null ? num(`alert_cad_per_min.${k}`, m.alert_cad_per_min[k], "0.01", 70) : cad(g.threshold)}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">No calls in this range.</td></tr>`}</tbody></table>
+    <div class="small" style="margin-top:6px"><b>Over threshold:</b> ${c.perMinute.flagged.length ? c.perMinute.flagged.map(x => `${esc(x.business)} ${cad(x.perMinCad)}/min (alert ${cad(x.threshold)})`).join(" · ") : "none"}</div>
+    <div class="small"><b>Tool retry loops</b> (2+ failed /intake or /sms in one call): ${c.toolLoops.length ? c.toolLoops.map(x => `${esc(x.callId)} (${x.intake} intake, ${x.sms} sms)`).join(" · ") : "none"}</div>
+    <div class="small"><b>Prompt size caps</b> (tokens): Personal ${num("prompt_token_caps.personal", m.prompt_token_caps.personal, "100")} Lite ${num("prompt_token_caps.business_lite", m.prompt_token_caps.business_lite, "100")} Pro ${num("prompt_token_caps.business_pro", m.prompt_token_caps.business_pro, "100")}
+      <button class="btn" id="psCheck" type="button">Check prompt sizes</button> <span id="psOut"></span></div>
+
+    <div class="k2" style="margin-top:12px">Fixed and outside-Vapi costs <span class="muted small" style="text-transform:none;letter-spacing:0">— "in margin" items come off the Overview's net margin when ADMIN_COSTS_IN_MARGIN=on (USD at ${esc(c.usdToCad)})</span></div>
+    <table class="sub-table" id="ciTable"><thead><tr><th>Item</th><th>Now (per month)</th><th>At 1,000 tenants</th><th>Currency</th><th>In margin?</th><th>Note</th><th></th></tr></thead><tbody>${c.items.map(i => `<tr data-ci="${i.id}">
+      <td><b>${esc(i.item)}</b></td>
+      <td>${i.kind === "pct_revenue" ? `<input class="inline-in" style="width:60px" type="number" min="0" step="0.1" data-f="pct" value="${esc(i.pct ?? "")}">% + <input class="inline-in" style="width:60px" type="number" min="0" step="0.01" data-f="per_charge" value="${esc(i.per_charge ?? "")}"> per charge`
+        : `<input class="inline-in" style="width:90px" type="number" min="0" step="0.01" data-f="now_amount" value="${esc(i.now_amount)}"> <span class="muted">${cad(i.nowCad)}</span>`}</td>
+      <td>${i.kind === "pct_revenue" ? `<span class="muted">same %</span>` : `<input class="inline-in" style="width:90px" type="number" min="0" step="0.01" data-f="at_1000_amount" value="${esc(i.at_1000_amount ?? "")}">`}</td>
+      <td><select data-f="currency"><option ${i.currency === "CAD" ? "selected" : ""}>CAD</option><option ${i.currency === "USD" ? "selected" : ""}>USD</option></select></td>
+      <td><input type="checkbox" data-f="in_margin" ${i.in_margin ? "checked" : ""}></td><td><input class="inline-in" data-f="note" style="width:220px" value="${esc(i.note || "")}"></td>
+      <td><button class="linkbtn" data-cisave="${i.id}" data-item="${esc(i.item)}" data-kind="${esc(i.kind)}">save</button> <button class="linkbtn" data-cidel="${i.id}">remove</button></td></tr>`).join("")}</tbody></table>
+    <div class="filters" style="margin-top:4px"><input id="ciNew" type="search" placeholder="New cost item" aria-label="New cost item"><button class="btn" id="ciAdd" type="button">+ Add item</button></div>
+
+    <div class="k2" style="margin-top:12px">Margin per plan at full usage</div>
+    <table class="sub-table"><thead><tr><th>Plan</th><th>Price</th><th>Best</th><th>Today</th><th>Worst</th></tr></thead><tbody>${Object.entries(c.margins).map(([k, r]) => `<tr>
+      <td>${esc(groupLabel[k] || k)}</td><td class="num">${cad(r.today.price)}</td>${["best", "today", "worst"].map(l => `<td class="num ${r[l].marginPct < 0 ? "bad-t" : ""}">${cad(r[l].cost)} · ${r[l].marginPct}%</td>`).join("")}</tr>`).join("")}</tbody></table>
+    <div class="small" style="margin-top:4px">Cost per minute (CAD): ${["best", "today", "worst"].map(l => `<b>${l}</b> Personal ${num(`cpm.${l}.personal`, m.cpm[l].personal)} business ${num(`cpm.${l}.business`, m.cpm[l].business)} clinic ${num(`cpm.${l}.clinic`, m.cpm[l].clinic)}`).join("<br>")}</div>
+    <div class="small">Usage (% of plan minutes): best ${num("usage_pct.best", m.usage_pct.best, "1", 60)} expected ${num("usage_pct.expected", m.usage_pct.expected, "1", 60)} heavy ${num("usage_pct.heavy", m.usage_pct.heavy, "1", 60)} ·
+      Overhead per client (CAD/month): Personal ${num("overhead_cad.personal", m.overhead_cad.personal, "0.01")} Lite ${num("overhead_cad.business_lite", m.overhead_cad.business_lite, "0.01")} Pro ${num("overhead_cad.business_pro", m.overhead_cad.business_pro, "0.01")} clinic ${num("overhead_cad.clinic", m.overhead_cad.clinic, "0.01")} ·
+      Clinic ${num("clinic.price_cad", m.clinic.price_cad, "1")} CAD for ${num("clinic.minutes", m.clinic.minutes, "1")} min</div>
+
+    <div class="k2" style="margin-top:12px">Scenarios</div>
+    <table class="sub-table"><thead><tr><th>Scenario</th><th>Personal</th><th>Lite</th><th>Pro</th><th>Clinics</th><th>Revenue</th><th>All costs</th><th>Profit (expected)</th><th>Margin</th><th>Worst case</th></tr></thead><tbody>${Object.entries(c.scenarios).map(([k, sc]) => { const e = sc.rows["expected/today"], w = sc.rows["heavy/worst"]; return `<tr>
+      <td>${esc(sc.label)}</td>${["personal", "business_lite", "business_pro", "clinic"].map(p => `<td>${num(`scenarios.${k}.${p}`, sc.counts[p], "1", 70)}</td>`).join("")}
+      <td class="num">${cad(e.revenue)}</td><td class="num">${cad(e.variable + e.fixed)}</td><td class="num ${e.profit < 0 ? "bad-t" : ""}">${cad(e.profit)}</td><td class="num">${e.marginPct ?? "—"}%</td>
+      <td class="num ${sc.worstNegative ? "bad-t" : ""}">${cad(w.profit)}${sc.worstNegative ? " ⚠ loses money" : ""}</td></tr>`; }).join("")}</tbody></table>
+    <div class="filters" style="margin-top:6px"><button class="btn" id="cmSave" type="button">Save assumptions</button><span id="cMsg" class="small"></span></div>`;
+  wireCosts();
+}
+function wireCosts() {
+  const box = $("costsBox"), msg = (t, bad) => { $("cMsg").innerHTML = bad ? `<span class="err">${esc(t)}</span>` : `<span class="good-t">${esc(t)}</span>`; };
+  const post = (p, body) => api(`${B}/costs${p}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const saveModel = async patch => { try { await post("/model", patch); await loadCosts(); msg("Saved."); } catch (e) { msg(e.message, true); } };
+  $("cmSave").onclick = () => {
+    const patch = {};
+    box.querySelectorAll("[data-model]").forEach(el => { const ks = el.dataset.model.split("."); let o = patch; ks.slice(0, -1).forEach(k => { o = o[k] = o[k] || {}; }); o[ks.at(-1)] = Number(el.value); });
+    saveModel(patch);
+  };
+  box.querySelectorAll("[data-nt]").forEach(el => el.onchange = () => { const list = COSTS.model.not_tracked.map((x, i) => i === Number(el.dataset.nt) ? { ...x, done: el.checked } : x); saveModel({ not_tracked: list }); });
+  $("ntAdd").onclick = () => { const t = $("ntNew").value.trim(); if (t) saveModel({ not_tracked: [...COSTS.model.not_tracked, { item: t, done: false }] }); };
+  box.querySelectorAll("[data-vlsave]").forEach(b => b.onclick = async () => {
+    const tr = b.closest("tr"), v = f => tr.querySelector(`[data-f=${f}]`).value;
+    try { await post("/vendor-limits", { id: Number(b.dataset.vlsave), vendor: b.dataset.vendor, balance: v("balance"), auto_reload: v("auto_reload"), hard_stop: v("hard_stop"), last_checked: v("last_checked"), note: v("note") }); msg("Saved."); } catch (e) { msg(e.message, true); }
+  });
+  box.querySelectorAll("[data-cisave]").forEach(b => b.onclick = async () => {
+    const tr = b.closest("tr"), v = f => { const el = tr.querySelector(`[data-f=${f}]`); return el ? (el.type === "checkbox" ? el.checked : el.value) : undefined; };
+    try { await post("/items", { id: Number(b.dataset.cisave), item: b.dataset.item, kind: b.dataset.kind, now_amount: v("now_amount") ?? 0, at_1000_amount: v("at_1000_amount"), pct: v("pct"), per_charge: v("per_charge"), currency: v("currency"), in_margin: v("in_margin"), note: v("note") });
+      await loadCosts(); msg("Saved."); } catch (e) { msg(e.message, true); }
+  });
+  box.querySelectorAll("[data-cidel]").forEach(b => b.onclick = async () => { if (!confirmInline(b)) return;
+    try { await api(`${B}/costs/items/${b.dataset.cidel}`, { method: "DELETE" }); await loadCosts(); } catch (e) { msg(e.message, true); } });
+  $("ciAdd").onclick = async () => { const t = $("ciNew").value.trim(); if (!t) return; try { await post("/items", { item: t, now_amount: 0, currency: "CAD", in_margin: true }); await loadCosts(); } catch (e) { msg(e.message, true); } };
+  $("psCheck").onclick = async () => {
+    $("psOut").textContent = "Checking (read-only)…";
+    try { const r = await post("/prompt-sizes", {}); $("psOut").innerHTML = r.over.length ? r.over.map(x => `<span class="bad-t">${esc(x.business)} ${x.tokens.toLocaleString()} tokens (cap ${x.cap.toLocaleString()})</span>`).join(" · ") : `<span class="good-t">All ${r.results.length} within their caps.</span>`; }
+    catch (e) { $("psOut").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  };
 }
 
 /* ---------- client drill-down ---------- */
