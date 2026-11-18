@@ -1683,7 +1683,8 @@ async function loadClient() {
           : `<div class="muted small">No calls deleted.</div>`}
       </div>
       <div class="card mb" id="relCard" hidden></div>
-      <div class="card mb" id="mapCard" hidden></div>`;
+      <div class="card mb" id="mapCard" hidden></div>
+      <div class="card mb" id="loginCard" hidden></div>`;
     stackedBars($("cDaily"), d.daily.map(x => fmtDay(x.day)), [{ name: "Minutes", color: PALETTE[0], values: d.daily.map(x => x.minutes) }]);
     pieChart($("cPie"), [
       { label: "Vapi", value: r.vapiCost.cad, color: "#3b6fd8" },
@@ -1696,6 +1697,7 @@ async function loadClient() {
     wireService(r);
     wireRelease();
     wireMapPlan();
+    wireLogin();
     if ($("sentBackfill")) $("sentBackfill").onclick = async e => {
       e.preventDefault(); const b = e.target; b.disabled = true; b.textContent = "Scoring… (up to a minute)";
       try { const x = await api(`${B}/client/${encodeURIComponent(CL.id)}/sentiment-backfill`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
@@ -1798,6 +1800,33 @@ const relHistory = h => !h || !h.length ? "" : `<details class="small" style="ma
     <td>${esc(a.at ? fmtWhen(a.at) : "")}</td><td>${esc(a.by || "")}</td>
     <td class="${a.result === "released" ? "good-t" : "bad-t"}">${esc(a.result)}${a.statusBefore && a.statusBefore !== "cancelled" ? ` <span class="muted">(was ${esc(a.statusBefore)})</span>` : ""}</td>
     <td>${(a.steps || []).map(x => `${esc(x.step.replace(/_/g, " "))}${x.ok ? "" : ` <span class="bad-t">failed</span>`}`).join(", ")} · ${a.recordingsDeleted || 0} file${a.recordingsDeleted === 1 ? "" : "s"}</td></tr>`).join("")}</tbody></table></details>`;
+/* ---------- Dashboard login (dashboard-login.js, ADMIN_LOGIN_ALERTS) ----------
+ * How the last dashboard invite went for this client, and Resend invite.
+ * Hidden when the server answers 404 (flag off) or for clients that have
+ * never been sent one by the self-serve handoff. */
+const LOGIN_TEXT = { invited: "Invite sent", existing: "Already had an account", failed: "Invite FAILED: no way in yet", unavailable: "Invite couldn't be sent (Supabase Auth unavailable)" };
+async function wireLogin() {
+  const id = CL.id, card = $("loginCard"), url = `${B}/client/${encodeURIComponent(id)}`;
+  if (!card) return;
+  let d;
+  try { d = await api(`${url}/login`); } catch (e) { card.hidden = true; return; }
+  if (CL.id !== id || (!d.status && !d.selfServe)) { card.hidden = true; return; }
+  const draw = (d, msg = "") => {
+    card.hidden = false;
+    card.innerHTML = `<h3>Dashboard login</h3>
+      <div class="small ${d.needsAction ? "err" : ""}" id="lgStatus">${esc(LOGIN_TEXT[d.status] || "No invite recorded yet")}${d.at ? ` · ${esc(String(d.at).slice(0, 16).replace("T", " "))}` : ""}${d.email ? ` · ${esc(d.email)}` : ""}</div>
+      <div class="filters" style="margin-top:6px"><button class="btn" id="lgResend" type="button">Resend invite</button><span id="lgMsg" class="small">${msg}</span></div>`;
+    $("lgResend").onclick = async () => {
+      $("lgResend").disabled = true; $("lgMsg").textContent = "Sending…";
+      let r;
+      try { r = await api(`${url}/resend-invite`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }); }
+      catch (e) { $("lgMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; $("lgResend").disabled = false; return; }
+      const fresh = await api(`${url}/login`).catch(() => d);
+      draw(fresh, `<span class="good-t">${r.login === "existing" ? "They already had an account: sign-in link sent." : "Invite sent."}</span>`);
+    };
+  };
+  draw(d);
+}
 /* ---------- Map to new plan (admin-plan-map.js) ----------
  * By hand, one client at a time: preview what changes and what stays, type the
  * business name, give a reason. Writes an audit row. Nothing moves anyone else. */
