@@ -1766,6 +1766,7 @@ function renderV2Bill() {
           : `<button type="button" class="btn-ghost" data-addon="${esc(k)}" data-on="${a.active ? "0" : "1"}" ${p.addonsRunning ? "" : "disabled"}>${a.active ? "Remove" : "Add"}</button>`}</div>`).join("")}
       <div class="v2-msg" id="v2AddonMsg"></div></div>`);
   }
+  sec.push(`<div class="v2-sec"><p class="v2-h">Monthly reports</p><div class="v2-row"><button type="button" class="btn-ghost" id="v2Reports">Show reports</button></div><div id="v2ReportList"></div></div>`);
   sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
     <div class="v2-row"><button type="button" class="btn-ghost" id="v2Rcpt">Show receipts</button></div><div id="v2RcptList"></div></div>`);
   $("v2BillBody").innerHTML = sec.join("");
@@ -1817,6 +1818,12 @@ function wireV2Bill() {
     const r = await post("addon", { key: el.dataset.addon, enabled: on });
     msg("v2AddonMsg", r.ok ? "Saved." : r.error || "Couldn't save."); if (r.ok) loadV2Bill();
   });
+  const rp = $("v2Reports");
+  if (rp) rp.onclick = async () => {
+    const r = await api("/api/dashboard/v2/reports"); const d = await r.json().catch(() => ({ reports: [] }));
+    $("v2ReportList").innerHTML = (d.reports || []).length ? d.reports.map(x => { const v = x.data || {}; return `<div class="v2-row"><span><b>${esc(String(x.month).slice(0, 7))}</b>: ${v.calls} calls (${v.spam} spam screened out), ${v.minutes} minutes, ${v.booked} booked${v.busiestHour != null ? `, busiest at ${v.busiestHour}:00` : ""}</span></div>`; }).join("")
+      : `<div class="v2-row muted">${r.status === 403 || r.status === 404 ? "Monthly reports come with Business Pro." : "Your first report arrives on the 1st of next month."}</div>`;
+  };
   const rc = $("v2Rcpt");
   if (rc) rc.onclick = async () => {
     const r = await api("/api/dashboard/v2/invoices"); const d = await r.json().catch(() => ({ invoices: [] }));
@@ -1910,6 +1917,7 @@ function renderV2() {
   sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
     ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>${v2Soon(cm)}</div>` : ""}
     ${toggles.map(([k, l]) => v2Usable(f[k]) ? `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}${v2Soon(f[k])}</label>` : "").join("")}
+    ${v2Usable(f.review_requests) ? `<div class="v2-row"><label>Google review link <input type="url" id="v2Review" placeholder="https://g.page/r/…/review" style="max-width:100%"></label><button type="button" class="btn-ghost" id="v2ReviewSave">Save</button></div>` : ""}
     <div class="v2-msg" id="v2MoreMsg"></div></div>`);
   // Locked features: what an upgrade or add-on unlocks
   const locked = Object.entries(f).filter(([k, x]) => V2_LOCKED[k] && x && (x.status === "none" || x.status === "addon" || x.status === "coming_soon"));
@@ -1953,6 +1961,7 @@ function wireV2() {
     const emails = [...document.querySelectorAll(".v2Em")].map(i => i.value.trim()).filter(Boolean);
     msg("v2EmMsg", "Saving…"); await after("v2EmMsg", await v2Post("email-recipients", { emails }), "Saved.", false);
   });
+  on("v2ReviewSave", async () => { msg("v2MoreMsg", "Saving…"); await after("v2MoreMsg", await v2Post("review-link", { link: $("v2Review").value.trim() }), "Saved.", false); });
   const cov = $("v2Cov");
   if (cov) cov.onchange = async () => { msg("v2MoreMsg", "Saving…"); await after("v2MoreMsg", await v2Post("feature", { key: "coverage_mode", value: cov.value }), "Saved.", false); };
   document.querySelectorAll(".v2Tg").forEach(el => { el.onchange = async () => { msg("v2MoreMsg", "Saving…"); const r = await v2Post("feature", { key: el.dataset.k, value: el.checked }); if (!r.ok) el.checked = !el.checked; await after("v2MoreMsg", r, "Saved.", false); }; });

@@ -44,6 +44,7 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/v2/billing") return R(BILL, ${status});
   if (p === "/api/dashboard/v2/plans") return R(PLANS, ${status});
   if (p === "/api/dashboard/v2/settings") return R({ v2: false });
+  if (p === "/api/dashboard/v2/reports") return R({ reports: [{ month: "2026-11-01", data: { calls: 42, spam: 3, minutes: 96, booked: 7, busiestHour: 10 } }] });
   if (p === "/api/dashboard/v2/invoices") return R({ invoices: [{ date: "2026-11-01", total_cad: 111.87, status: "paid", url: "https://invoice.stripe.com/i/x" }] });
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
   if (p === "/api/dashboard/v2/plan") return R({ changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
@@ -100,6 +101,8 @@ async function loadV2() {}
   ok(true, "Not now: dismissed");
   await page.click("#v2Rcpt"); await page.waitForSelector("#v2RcptList a");
   eq(await page.getAttribute("#v2RcptList a", "href"), "https://invoice.stripe.com/i/x", "receipts: Stripe's hosted links");
+  await page.click("#v2Reports"); await page.waitForFunction(() => /42 calls/.test($("v2ReportList").textContent));
+  eq(await page.textContent("#v2ReportList"), "2026-11: 42 calls (3 spam screened out), 96 minutes, 7 booked, busiest at 10:00", "monthly reports listed");
   eq(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, "390 px: no sideways scroll");
 
   console.log("Personal out of minutes, trial");

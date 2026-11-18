@@ -18,6 +18,7 @@ const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
 const markup = /(<div class="card v2" id="v2Card"[\s\S]*?<\/dialog>)/.exec(html)[1];
 const js = /(\/\* ---------- Pricing v2 settings ----------[\s\S]*?)\nasync function api\(/.exec(html)[1];
 ok(html.includes("    loadV2();\n"), "load() calls loadV2()");
+ok(/v2Post\("review-link", \{ link: \$\("v2Review"\)\.value\.trim\(\) \}\)/.test(html) && /v2Usable\(f\.review_requests\) \? `<div class="v2-row"><label>Google review link/.test(html), "Pro: the Google review link field, shown only where review requests are on the plan");
 
 const CONSENT = { version: "2026-11-17.1", caller_sms: "CALLER TEXT CONSENT", transfer: "TRANSFER CONSENT" };
 const F = (status, extra = {}) => ({ status, running: true, ...extra });
