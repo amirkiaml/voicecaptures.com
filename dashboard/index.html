@@ -549,6 +549,9 @@
   .v2 .v2-sec:first-of-type { border-top: 0; }
   .v2 .v2-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 600; margin: 0 0 6px; }
   .v2 .v2-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--gray-soft); color: var(--muted); }
+  /* "Rolling out" is the one badge that changes what the owner can do, so it is not grey. */
+  .v2 .v2-badge.soon { background: var(--accent-soft); color: var(--accent); }
+  .v2 .v2-soon-note { font-size: 12px; color: var(--muted); }
   .v2 .v2-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
   .v2 .v2-row input[type=text], .v2 .v2-row input[type=tel], .v2 .v2-row input[type=email], .v2 .v2-row select { min-width: 0; max-width: 100%; }
   .v2 label.v2-row.chk-inline { display: flex; flex-wrap: nowrap; align-items: flex-start; }
@@ -1043,7 +1046,13 @@ function statusPill(c) {
 
 function renderMessages(list) {
   if (!list || !list.length) return `<div class="k">Texts sent</div><div class="muted">No texts or emails were sent for this call.</div>`;
-  const who = m => m.recipient === "caller" ? "To caller" : "To your team";
+  /*
+   * "TO YOUR TEAM" IS WRONG ON A PERSONAL LINE: it is one person's own phone, and there is
+   * no team to send anything to. `v2b` is the billing payload, which may not have arrived
+   * the first time the log draws — `loadV2Bill` re-renders it when it does, and until then
+   * the wording is the one that has always been there.
+   */
+  const who = m => m.recipient === "caller" ? "To caller" : (v2b && v2b.plan && v2b.plan.key === "personal" ? "To you" : "To your team");
   const fmtTm = iso => new Date(iso).toLocaleTimeString("en-CA", { timeZone: TZ(), hour: "numeric", minute: "2-digit" });
   return `<div class="k">Texts sent</div><div class="msgs">${list.map(m => `
     <div class="msg ${m.status === "failed" ? "failed" : ""}">
@@ -1714,16 +1723,72 @@ const toLogin = () => location.replace("/login/?next=/dashboard/");
  * From GET /api/dashboard/v2/billing and /api/dashboard/v2/plans (both 404
  * when the server's PRICING_V2_BILLING is off, 403 legacy: card hidden).
  * Every number comes from the API (the catalog on the server). */
-let v2b = null, v2p = null, v2Interval = null;
-const v2Money = n => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
+let v2b = null, v2p = null, v2Interval = null, v2Rep = null, v2Inv = null;
+/*
+ * A FIGURE THE SERVER MIGHT NOT HAVE SENT.
+ *
+ * `v2Money(undefined)` was "$NaN", and it reached the page: the plan-cost sentence read
+ * "At this period's usage, Personal Line costs $NaN for 30 minutes." Upstream, `compare()`
+ * builds `stay.cost` as `cur.price_cad.month + ...`, and a plan whose `price_cad` is the
+ * string "quoted" (Enterprise, in pricing/catalog.json) has no `.month` — so the sum is NaN
+ * and every reader of it printed NaN.
+ *
+ * Fixed here rather than only there, because a money formatter that can print "$NaN" will
+ * do it again for the next field that goes missing. `v2Has` is what the sentences ask
+ * before they are built: no figure, no sentence — never a sentence with a hole in it.
+ */
+const v2Has = n => Number.isFinite(Number(n));
+const v2Money = n => (v2Has(n) ? `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}` : "");
+/*
+ * WHAT TO DO ABOUT SOMETHING THAT IS STILL ROLLING OUT. The badge says why there is no
+ * button; the address says what to do instead, which is the part a badge alone leaves out.
+ */
+const V2_SALES = "sales@voicecaptures.com";
+const v2RollingOut = () =>
+  `<span class="v2-badge soon">Rolling out</span> <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
+/** A plan somebody can actually move to from here: priced, and with its checkout open. */
+const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
+/**
+ * WHAT STAYING COSTS, said only where the numbers exist.
+ *
+ * Two sentences, each conditional on its own figures. The second half is dropped on its
+ * own rather than taking the first half with it, and an Enterprise next step keeps saying
+ * it is priced on a call, which needs no figures at all.
+ */
+function v2CostLine(st, nx) {
+  const parts = [];
+  if (v2Has(st.cost) && v2Has(st.coversMinutes)) {
+    parts.push(`At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes`
+      + (st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : "") + ".");
+  }
+  if (nx && nx.quoted) parts.push(`${esc(nx.label)}: priced on a call.`);
+  else if (nx && v2Has(nx.price) && v2Has(nx.minutes)) parts.push(`${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.`);
+  return parts.length ? `<div class="v2-row muted" style="font-size:13px">${parts.join(" ")}</div>` : "";
+}
 async function loadV2Bill() {
   const card = $("v2Bill");
   try {
-    const [rb, rp] = await Promise.all([api("/api/dashboard/v2/billing"), api("/api/dashboard/v2/plans")]);
+    const [rb, rp, rr, ri] = await Promise.all([
+      api("/api/dashboard/v2/billing"), api("/api/dashboard/v2/plans"),
+      /* Fetched here, not on a button: see the note where they are rendered. A section that
+         cannot work is a section that is never drawn, so its answer has to be in hand
+         before the card is built. */
+      api("/api/dashboard/v2/reports"), api("/api/dashboard/v2/invoices"),
+    ]);
     if (!rb.ok) { card.hidden = true; return; }
     v2b = await rb.json(); v2p = rp.ok ? await rp.json() : null;
+    v2Rep = rr.ok ? { ok: true, ...(await rr.json().catch(() => ({}))) } : null;
+    v2Inv = ri.ok ? { ok: true, ...(await ri.json().catch(() => ({}))) } : null;
     if (!v2Interval) v2Interval = v2b.plan.billing;
     renderV2Bill(); card.hidden = false;
+    /*
+     * AND THE CALL LOG LEARNS WHOSE LINE THIS IS. The log says who a text went to, and on a
+     * personal line "To your team" is wrong — there is no team. The plan key is the only
+     * thing on this page that knows, and it arrives here, after the log has drawn once.
+     */
+    /* Guarded: the log is a different card, and this one must not disappear because that
+       one is absent — which is exactly what happened in the billing card's own harness. */
+    if (typeof allCalls !== "undefined" && allCalls.length && typeof renderLog === "function") renderLog(allCalls);
   } catch { card.hidden = true; }
 }
 const b2trial = () => v2b && v2b.trial;
@@ -1749,29 +1814,64 @@ function renderV2Bill() {
     <label class="v2-row chk-inline"><input type="checkbox" id="v2Auto" ${b.autoPackage.enabled ? "checked" : ""} ${b.autoPackage.running ? "" : "disabled"}> When I run out, add ${pk.minutes} minutes for ${v2Money(pk.price_cad)} + tax to my card (at most ${b.autoPackage.max} a period)</label>
     <div class="v2-msg" id="v2AutoMsg"></div></div>`);
   if (p && p.prompts && p.prompts.length) sec.push(p.prompts.map(x => `<div class="v2-prompt"><p class="v2-h">${esc(x.title)}</p><div>${esc(x.body)}</div>
-    <div class="v2-row">${x.kind === "pro_to_enterprise" ? `<a class="btn" href="/contact/">Book a call</a>` : `<button type="button" class="btn" data-up="${esc(p.compare.next && p.compare.next.plan || "")}">See ${esc(p.compare.next ? p.compare.next.label : "plans")}</button>`}
+    <div class="v2-row">${x.kind === "pro_to_enterprise" ? `<a class="btn" href="/contact/">Book a call</a>`
+      /* The button scrolls to that plan's tile. While the tile has no Switch on it — its
+         checkout is off and it is marked Rolling out — the button leads to a dead end, so
+         the prompt keeps its words and loses the button. */
+      : v2Switchable(p.compare.next) ? `<button type="button" class="btn" data-up="${esc(p.compare.next.plan || "")}">See ${esc(p.compare.next.label)}</button>` : ""}
     <button type="button" class="btn-ghost" data-dismiss="${esc(x.kind)}">Not now</button></div></div>`).join(""));
   if (p) {
     const st = p.compare.stay, nx = p.compare.next;
     sec.push(`<div class="v2-sec" id="v2Plans"><p class="v2-h">Your plan</p>
       ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(String(b.pendingPlan.at || "").slice(0, 10))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
-      <div class="v2-row muted" style="font-size:13px">At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes${st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : ""}.${nx && !nx.quoted ? ` ${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.` : nx ? ` ${esc(nx.label)}: priced on a call.` : ""}</div>
+      ${v2CostLine(st, nx)}
       <div class="v2-row" role="radiogroup" aria-label="Billing"><label class="chk-inline"><input type="radio" name="v2Iv" value="month" ${v2Interval === "month" ? "checked" : ""}> Monthly</label>
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
-        <b>${esc(x.label)}</b><div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div><div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
-        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row"><span class="v2-badge">Rolling out</span></div>`}</div>`; }).join("")}</div>
+        <b>${esc(x.label)}</b>${v2Has(v2Interval === "year" ? x.year : x.month) ? `<div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div>` : `<div class="muted" style="font-size:13px">Priced on a call</div>`}<div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
+        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
       <div class="v2-msg" id="v2PlanMsg"></div></div>`);
     const addons = Object.entries(p.addons).filter(([, a]) => a.status !== "quoted");
-    if (addons.length) sec.push(`<div class="v2-sec"><p class="v2-h">Add-ons${p.addonsRunning ? "" : ` <span class="v2-badge">Rolling out</span>`}</p>
+    /*
+     * ADD-ONS THAT ARE ROLLING OUT OFFER NOTHING TO PRESS.
+     *
+     * The section said "Rolling out" at the top and then gave every row a disabled "Add"
+     * button, or an "Upgrade" badge for one that is not on this plan — two invitations to
+     * buy something that cannot be bought yet. While the section is rolling out a row is
+     * its name and its price, and the heading says what to do instead.
+     */
+    if (addons.length) sec.push(`<div class="v2-sec"><p class="v2-h">Add-ons${p.addonsRunning ? "" : ` ${v2RollingOut()}`}</p>
       ${addons.map(([k, a]) => `<div class="v2-row">${esc(a.label)} · ${v2Money(a.price_cad)}/month
-        ${a.status === "included" ? `<span class="v2-badge">Included</span>` : a.status === "none" ? `<span class="v2-badge">Upgrade</span>`
-          : `<button type="button" class="btn-ghost" data-addon="${esc(k)}" data-on="${a.active ? "0" : "1"}" ${p.addonsRunning ? "" : "disabled"}>${a.active ? "Remove" : "Add"}</button>`}</div>`).join("")}
+        ${!p.addonsRunning ? "" : a.status === "included" ? `<span class="v2-badge">Included</span>` : a.status === "none" ? `<span class="v2-badge">Upgrade</span>`
+          : `<button type="button" class="btn-ghost" data-addon="${esc(k)}" data-on="${a.active ? "0" : "1"}">${a.active ? "Remove" : "Add"}</button>`}</div>`).join("")}
       <div class="v2-msg" id="v2AddonMsg"></div></div>`);
   }
-  sec.push(`<div class="v2-sec"><p class="v2-h">Monthly reports</p><div class="v2-row"><button type="button" class="btn-ghost" id="v2Reports">Show reports</button></div><div id="v2ReportList"></div></div>`);
-  sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
-    <div class="v2-row"><button type="button" class="btn-ghost" id="v2Rcpt">Show receipts</button></div><div id="v2RcptList"></div></div>`);
+  /*
+   * NO BUTTON THAT LEADS TO AN ERROR.
+   *
+   * Both of these were a "Show reports" / "Show receipts" button that fetched on click and,
+   * where the feature was off or the plan did not include it, answered with an apology. The
+   * lists are fetched with the rest of the card instead, and each section follows one rule:
+   *
+   *   the request worked, with rows      -> show them
+   *   the request worked, nothing yet    -> show the section and say so plainly
+   *   the request failed or is off       -> no section at all
+   */
+  if (v2Rep && v2Rep.ok && v2Rep.running !== false) {
+    const rows = v2Rep.reports || [];
+    sec.push(`<div class="v2-sec"><p class="v2-h">Monthly reports</p>${rows.length
+      ? rows.map(x => { const v = x.data || {}; return `<div class="v2-row"><span><b>${esc(String(x.month).slice(0, 7))}</b>: ${v.calls} calls (${v.spam} spam screened out), ${v.minutes} minutes, ${v.booked} booked${v.busiestHour != null ? `, busiest at ${v.busiestHour}:00` : ""}</span></div>`; }).join("")
+      : `<div class="v2-row muted">Your first report appears after your first full month.</div>`}</div>`);
+  }
+  const receipts = v2Inv && v2Inv.ok ? (v2Inv.invoices || []) : null;
+  if (receipts || b.credit > 0) {
+    /* The day the first charge lands: the trial's end, or this period's, whichever applies. */
+    const firstCharge = String((b.trial && b.trial.end) || (b.period && b.period.end) || "").slice(0, 10);
+    sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
+      ${!receipts ? "" : receipts.length
+        ? receipts.map(i => `<div class="v2-row">${esc(i.date || "")} · ${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("")
+        : `<div class="v2-row muted">No receipts yet${firstCharge ? `: your first charge is ${esc(firstCharge)}` : ""}.</div>`}</div>`);
+  }
   $("v2BillBody").innerHTML = sec.join("");
   wireV2Bill();
 }
@@ -1829,17 +1929,6 @@ function wireV2Bill() {
     const r = await post("addon", { key: el.dataset.addon, enabled: on });
     msg("v2AddonMsg", r.ok ? "Saved." : r.error || "Couldn't save."); if (r.ok) loadV2Bill();
   });
-  const rp = $("v2Reports");
-  if (rp) rp.onclick = async () => {
-    const r = await api("/api/dashboard/v2/reports"); const d = await r.json().catch(() => ({ reports: [] }));
-    $("v2ReportList").innerHTML = (d.reports || []).length ? d.reports.map(x => { const v = x.data || {}; return `<div class="v2-row"><span><b>${esc(String(x.month).slice(0, 7))}</b>: ${v.calls} calls (${v.spam} spam screened out), ${v.minutes} minutes, ${v.booked} booked${v.busiestHour != null ? `, busiest at ${v.busiestHour}:00` : ""}</span></div>`; }).join("")
-      : `<div class="v2-row muted">${r.status === 403 || r.status === 404 ? "Monthly reports come with Business Pro." : "Your first report arrives on the 1st of next month."}</div>`;
-  };
-  const rc = $("v2Rcpt");
-  if (rc) rc.onclick = async () => {
-    const r = await api("/api/dashboard/v2/invoices"); const d = await r.json().catch(() => ({ invoices: [] }));
-    $("v2RcptList").innerHTML = (d.invoices || []).length ? d.invoices.map(i => `<div class="v2-row">${esc(i.date || "")} · ${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("") : `<div class="v2-row muted">No receipts yet.</div>`;
-  };
 }
 
 /* ---------- Pricing v2 settings ----------

@@ -33,7 +33,7 @@ const PLANS = (o = {}) => ({ plans: [plan("personal", "Personal Line", 19, 190, 
     addon_history_365: { label: "1-year call history", price_cad: 49, status: "quoted", active: false } },
   addonsRunning: true, prompts: [{ kind: "lite_to_pro", title: "Time for Business Pro?", body: "Lite plus two extra packages is $249 for 200 minutes; Business Pro is $199 for 250." }], trial: null, ...o });
 
-const page0 = (bill, plans, status = 200) => `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>${style}</style><body>${markup}<script>
+const page0 = (bill, plans, status = 200, rep = { reports: [{ month: "2026-11-01", data: { calls: 42, spam: 3, minutes: 96, booked: 7, busiestHour: 10 } }] }, inv = { invoices: [{ date: "2026-11-01", total_cad: 111.87, status: "paid", url: "https://invoice.stripe.com/i/x" }] }, repStatus = 200, invStatus = 200) => `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>${style}</style><body>${markup}<script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 window.sent = []; window.confirms = []; window.confirm = t => { confirms.push(t); return true; };
@@ -44,8 +44,8 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/v2/billing") return R(BILL, ${status});
   if (p === "/api/dashboard/v2/plans") return R(PLANS, ${status});
   if (p === "/api/dashboard/v2/settings") return R({ v2: false });
-  if (p === "/api/dashboard/v2/reports") return R({ reports: [{ month: "2026-11-01", data: { calls: 42, spam: 3, minutes: 96, booked: 7, busiestHour: 10 } }] });
-  if (p === "/api/dashboard/v2/invoices") return R({ invoices: [{ date: "2026-11-01", total_cad: 111.87, status: "paid", url: "https://invoice.stripe.com/i/x" }] });
+  if (p === "/api/dashboard/v2/reports") return R(${JSON.stringify(rep)}, ${repStatus});
+  if (p === "/api/dashboard/v2/invoices") return R(${JSON.stringify(inv)}, ${invStatus});
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
   if (p === "/api/dashboard/v2/plan") return R(o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
   return R({ ok: true });
@@ -59,7 +59,7 @@ async function loadV2() {}
   const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
   await ctx.route("**/*", r => r.request().url().startsWith("data:") ? r.continue() : r.abort());
   let page; const errs = [];
-  const open = async (b, p, st) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st)); await page.evaluate(() => loadV2Bill()); };
+  const open = async (b, p, st, ...rest) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st, ...rest)); await page.evaluate(() => loadV2Bill()); };
   const sentTo = path => page.evaluate(p => sent.filter(x => x.p === p), path);
 
   console.log("Hidden");
@@ -99,10 +99,10 @@ async function loadV2() {}
   eq((await sentTo("/api/dashboard/v2/addon"))[0].body, { key: "addon_calendar", enabled: true }, "add-on: confirm, then sent");
   await page.click("[data-dismiss=lite_to_pro]"); await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/prompts/dismiss"));
   ok(true, "Not now: dismissed");
-  await page.click("#v2Rcpt"); await page.waitForSelector("#v2RcptList a");
-  eq(await page.getAttribute("#v2RcptList a", "href"), "https://invoice.stripe.com/i/x", "receipts: Stripe's hosted links");
-  await page.click("#v2Reports"); await page.waitForFunction(() => /42 calls/.test($("v2ReportList").textContent));
-  eq(await page.textContent("#v2ReportList"), "2026-11: 42 calls (3 spam screened out), 96 minutes, 7 booked, busiest at 10:00", "monthly reports listed");
+  /* Both lists come with the card now, so there is no button to press and none to fail. */
+  ok(await page.$("#v2Rcpt") === null && await page.$("#v2Reports") === null, "no Show buttons: the lists arrive with the card");
+  eq(await page.getAttribute(".v2-sec a[href^='https://invoice.stripe.com']", "href"), "https://invoice.stripe.com/i/x", "receipts: Stripe's hosted links");
+  ok(/2026-11: 42 calls \(3 spam screened out\), 96 minutes, 7 booked, busiest at 10:00/.test(await page.textContent("#v2BillBody")), "monthly reports listed");
   eq(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, "390 px: no sideways scroll");
 
   console.log("Personal out of minutes, trial");
@@ -132,6 +132,52 @@ async function loadV2() {}
   ok(tc === `Switch to Business Lite now? You're still in your free trial, so nothing is charged today. Your first charge is $99 a month on ${tEnd}, when the trial ends. Your trial's minutes and end date stay the same.`, "in a trial: no \"charged the difference today\"; first charge on the trial end");
   await page.waitForFunction(() => /First charge/.test($("v2PlanMsg").textContent));
   eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, "You're on Business Lite. First charge $99 a month on 2026-11-27."], "…sends expect: trial; says when the first charge is");
+  console.log("Figures the server did not send");
+  /*
+   * "$NaN" REACHED THE PAGE. `compare()` builds `stay.cost` as `cur.price_cad.month + ...`,
+   * and a plan whose `price_cad` is the string "quoted" has no `.month`, so the sum is NaN
+   * and the sentence read "Personal Line costs $NaN for 30 minutes".
+   */
+  await open(BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: null, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 12, allowance: 30, packages: [] }, credit: 0 }),
+    PLANS({ compare: { stay: { label: "Personal Line", cost: undefined, coversMinutes: 30, packages: 0 }, next: { plan: "business_lite", label: "Business Lite", price: 99, minutes: 100 } }, prompts: [] }));
+  const noFig = await page.textContent("#v2BillBody");
+  ok(!/NaN/.test(noFig), "a figure the server did not send never renders as $NaN");
+  ok(!/Personal Line costs/.test(noFig), "...and the half of the sentence that needed it is dropped whole");
+  ok(/Business Lite is \$99 for 100\./.test(noFig), "...while the half that has its figures still reads");
+
+  console.log("Rolling out: nothing to press, and somewhere to write");
+  await open(BILL(), PLANS({ addonsRunning: false, prompts: [],
+    addons: { addon_calendar: { label: "Extra calendar or line", price_cad: 29, status: "none", active: false },
+      addon_history_90: { label: "90-day call history", price_cad: 19, status: "available", active: false } } }));
+  const sections = await page.$$eval(".v2-sec", els => els.map(e => ({ h: (e.querySelector(".v2-h") || {}).textContent || "", t: e.textContent, btns: e.querySelectorAll("button").length })));
+  const addonSec = sections.find(x => /Add-ons/.test(x.h));
+  ok(/Rolling out/.test(addonSec.h) && /sales@voicecaptures\.com/.test(addonSec.h), "add-ons rolling out: a Rolling out badge and the address, in the heading");
+  eq(addonSec.btns, 0, "add-ons rolling out: no Add, no Remove");
+  ok(!/Upgrade/.test(addonSec.t), "add-ons rolling out: no Upgrade badge either");
+  ok(/Extra calendar or line · \$29\/month/.test(addonSec.t) && /90-day call history · \$19\/month/.test(addonSec.t), "add-ons rolling out: rows keep their name and price");
+  ok(await page.$eval(".v2-sec .v2-badge.soon", e => getComputedStyle(e).backgroundColor !== getComputedStyle(e.closest(".v2-sec")).backgroundColor), "the Rolling out badge is a coloured badge, not the grey one");
+  const proTile = await page.$eval(".v2-plans .v2-plan:last-child", e => ({ t: e.textContent, btns: e.querySelectorAll("button").length, mail: !!e.querySelector("a[href^='mailto:']") }));
+  ok(/Rolling out/.test(proTile.t) && proTile.btns === 0 && proTile.mail, "Business Pro tile: no button, a Rolling out badge and the address");
+
+  console.log("A prompt that leads nowhere");
+  await open(BILL(), PLANS({ prompts: [{ kind: "lite_to_pro", title: "Time for Business Pro?", body: "…" }],
+    compare: { stay: { label: "Business Lite", cost: 174, coversMinutes: 150, packages: 1 }, next: { plan: "business_pro", label: "Business Pro", price: 199, minutes: 250, checkoutEnabled: false } } }));
+  ok(await page.$("[data-up]") === null, "no 'See Business Pro' button while that plan cannot be switched to");
+  ok(/Time for Business Pro\?/.test(await page.textContent(".v2-prompt")) && await page.$("[data-dismiss]") !== null, "...the prompt keeps its words and its Not now");
+
+  console.log("Reports and receipts: shown, said plainly, or not at all");
+  await open(BILL({ credit: 0, trial: null }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
+  const empty = await page.textContent("#v2BillBody");
+  ok(/Monthly reports/.test(empty) && /Your first report appears after your first full month\./.test(empty), "reports, none yet: the section is shown and says so");
+  ok(/No receipts yet: your first charge is 2026-12-01\./.test(empty), "receipts, none yet: the section says when the first charge lands");
+  ok(!/Show reports|Show receipts/.test(empty), "and neither is a button that would have to ask");
+
+  await open(BILL({ credit: 0 }), PLANS({ prompts: [] }), 200, { reports: [], running: false }, { invoices: [] });
+  ok(!/Monthly reports/.test(await page.textContent("#v2BillBody")), "reports the server says are not running: no section");
+  await open(BILL({ credit: 0 }), PLANS({ prompts: [] }), 200, { error: "no" }, { error: "no" }, 404, 500);
+  const gone = await page.textContent("#v2BillBody");
+  ok(!/Monthly reports/.test(gone) && !/Billing/.test(gone), "a request that failed: no section at all, and no button to an error");
 
   eq(errs, [], "no page errors");
   await browser.close();
