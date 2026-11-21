@@ -551,6 +551,24 @@
   .v2 .v2-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--gray-soft); color: var(--muted); }
   /* "Rolling out" is the one badge that changes what the owner can do, so it is not grey. */
   .v2 .v2-badge.soon { background: var(--accent-soft); color: var(--accent); }
+  /*
+    THE ONE RED BUTTON ON THIS PAGE. "Start my plan now" ends the free trial and takes the
+    money today, which is the only control here that does something a visitor cannot undo
+    — so it does not look like "Switch" or "Add" next to it.
+  */
+  /* Global, like .btn and .btn-ghost: the dialog that confirms this sits outside the card. */
+  .btn-danger { background: var(--bad); color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; font: inherit; font-weight: 700; cursor: pointer; }
+  .btn-danger:hover { filter: brightness(0.94); }
+  .v2 .v2-start-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 2px; }
+  .v2 .v2-start-note { font-size: 13px; color: var(--muted); }
+  /* The modal's facts: a label and a value per line, so the money is not buried in prose. */
+  .v2-modal .v2-facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0 0 12px; font-size: 14px; }
+  .v2-modal .v2-facts dt { color: var(--muted); }
+  .v2-modal .v2-facts dd { margin: 0; font-weight: 600; }
+  /* The business card's fields: the page's own font, not the browser's textarea default. */
+  .v2 .v2TellF { width: 100%; font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  .v2 #v2Tell label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .v2 #v2Tell .v2-row { display: block; margin-bottom: 10px; }
   .v2 .v2-soon-note { font-size: 12px; color: var(--muted); }
   .v2 .v2-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
   .v2 .v2-row input[type=text], .v2 .v2-row input[type=tel], .v2 .v2-row input[type=email], .v2 .v2-row select { min-width: 0; max-width: 100%; }
@@ -691,6 +709,22 @@
   <div class="card v2" id="v2Bill" hidden>
     <div id="v2BillBody"></div>
   </div>
+  <!--
+    THE PLAN MODAL, which replaced `window.confirm`.
+    A confirm() gives one line of text, no formatting and no way to say what a change does
+    to the features and the data behind them — and a plan change is the one thing on this
+    page that moves money. This says the plan, the price, when it takes effect and what
+    happens to what they already have, and it is the same dialog for "Start my plan now".
+  -->
+  <dialog class="v2-modal" id="v2PlanModal" aria-labelledby="v2PlanModalH">
+    <h3 id="v2PlanModalH" style="margin:0 0 8px"></h3>
+    <dl class="v2-facts" id="v2PlanModalFacts"></dl>
+    <div class="v2-text" id="v2PlanModalText"></div>
+    <div class="set-actions">
+      <button type="button" class="btn-ghost" id="v2PlanModalNo">Cancel</button>
+      <button type="button" class="btn" id="v2PlanModalYes"></button>
+    </div>
+  </dialog>
   <div class="card v2" id="v2Card" hidden>
     <p class="panel-title" id="v2Title">Your plan</p>
     <p class="panel-sub" id="v2Sub"></p>
@@ -1815,7 +1849,7 @@ function renderV2Bill() {
     ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
   if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
     <div class="v2-row">${daysLeft(b.trial.end)} days and ${b.trial.left != null ? b.trial.left : Math.max(0, b.trial.cap - usedMin)} of ${b.trial.cap} minutes left. Your plan starts on ${esc(String(b.trial.end).slice(0, 10))}.</div>
-    <div class="v2-row"><button type="button" class="btn-ghost" id="v2Start">Start my plan now</button></div><div class="v2-msg" id="v2StartMsg"></div></div>`);
+    </div>`);
   sec.push(`<div class="v2-sec"><p class="v2-h">Minutes this period</p>
     <div class="v2-meter${usedMin >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${usedMin}"><i style="width:${pct}%"></i></div>
     <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used · resets ${esc(String(per.end).slice(0, 10))}</span></div>
@@ -1843,7 +1877,21 @@ function renderV2Bill() {
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
         <b>${esc(x.label)}</b>${v2Has(v2Interval === "year" ? x.year : x.month) ? `<div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div>` : `<div class="muted" style="font-size:13px">Priced on a call</div>`}<div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
         ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
+      ${b.trial ? `<div class="v2-start-row">
+        <button type="button" class="btn-danger" id="v2Start">Start my plan now</button>
+        <span class="v2-start-note">Ends your free trial today and charges the card on file. Otherwise it starts by itself on ${esc(v2Day(b.trial.end))}.</span>
+      </div><div class="v2-msg" id="v2StartMsg"></div>` : ""}
       <div class="v2-msg" id="v2PlanMsg"></div></div>`);
+    /*
+     * A SCHEDULED DOWNGRADE, AND THE ONE THING PEOPLE ASK ABOUT IT: whether the assistant
+     * forgets the business. It does not — the facts live on the customer, not on the plan
+     * — and saying so here is cheaper than answering it in support.
+     */
+    if (b.pendingPlan && !v2IsBusiness(b.pendingPlan.plan_key) && v2IsBusiness(b.plan && b.plan.key)) {
+      sec.push(`<div class="v2-sec"><p class="v2-h">What happens to what we know</p>
+        <div class="v2-row muted" style="font-size:13px">Everything your assistant knows about your business — the name, the hours, the services, the answers you have given us — is kept. If you move back up it is all still there.</div></div>`);
+    }
+    sec.push(v2TellCard(b));
     const addons = Object.entries(p.addons).filter(([, a]) => a.status !== "quoted");
     /*
      * ADD-ONS THAT ARE ROLLING OUT OFFER NOTHING TO PRESS.
@@ -1893,6 +1941,124 @@ function renderV2Bill() {
   $("v2BillBody").innerHTML = sec.join("");
   wireV2Bill();
 }
+/**
+ * THE PLAN DIALOG. Resolves true when they press the confirming button, false otherwise.
+ *
+ * It replaced `window.confirm`, which could say one unformatted line and nothing about what
+ * a change does to the features and the data behind them. Everything shown is passed in:
+ * this function knows how to show a decision, not how to work one out.
+ */
+/**
+ * WHAT HAPPENS AFTER THE PLAN ACTUALLY CHANGED.
+ *
+ * An upgrade to a business plan buys an assistant that answers questions about the
+ * business — and on the day it is bought we know almost nothing about that business, so
+ * the thing they just paid for cannot do its job yet. The card asks for exactly what the
+ * self-serve Business builder asks for, and sends it to the team.
+ *
+ * REMEMBERED ACROSS RELOADS in localStorage, because the upgrade is a moment and the
+ * answers are a sit-down job: closing the tab should not lose the ask.
+ *
+ * TODO(owner): localStorage is per browser, so the card follows the device rather than
+ * the account, and clearing site data loses it. A flag on the customer row — set when the
+ * upgrade lands, cleared when the answers arrive — is the right home for this, and it
+ * would also let the welcome email point at the same card. Not invented here.
+ */
+const V2_TELL_KEY = "vc_tell_business";
+const v2IsBusiness = k => String(k || "").startsWith("business_");
+/*
+ * THIS SESSION FIRST, STORAGE SECOND. A private window throws on localStorage, and so does
+ * a page with no origin — and in both the owner has still just upgraded and still needs to
+ * be asked. The variable answers for this tab; storage is only what carries it to the next
+ * one, and its absence costs the reminder, not the card.
+ */
+let v2TellMem = null;
+const v2TellWanted = () => {
+  if (v2TellMem !== null) return v2TellMem;
+  try { return localStorage.getItem(V2_TELL_KEY) === "1"; } catch { return false; }
+};
+const v2TellSet = on => {
+  v2TellMem = on;
+  try { on ? localStorage.setItem(V2_TELL_KEY, "1") : localStorage.removeItem(V2_TELL_KEY); } catch { /* see above */ }
+};
+
+function v2AfterPlanChange(x, r) {
+  /* Only an upgrade that took effect NOW: a scheduled downgrade changes nothing today. */
+  if (r.changed === "now" && v2IsBusiness(x.key)) v2TellSet(true);
+}
+
+/** The six questions the Business builder asks, in its order and with its limits. */
+const V2_TELL_FIELDS = [
+  ["name", "What is the business called?", "text", 120, "The name callers know you by"],
+  ["type", "What kind of business is it?", "text", 60, "Clinic, plumber, restaurant…"],
+  ["what", "What do you do?", "area", 300, "Services, one per line or comma separated"],
+  ["hours", "When are you open?", "text", 120, "Mon-Fri 9am-6pm, Sat 9am-1pm"],
+  ["area", "Where do you serve?", "text", 120, "Downtown Toronto and the east end"],
+  ["asks", "What do callers usually ask?", "area", 300, "Prices, parking, whether you take walk-ins…"],
+];
+/**
+ * THE TEAM'S OWN CHANNEL, not a new one. `POST /api/dashboard/change-request` is the
+ * authenticated, rate-limited route that already emails the team, and it takes `text` and
+ * `topics`. Its limit is 1000 characters for the whole message, which is why the fields
+ * above are bounded to fit inside it and the page counts what is left.
+ */
+const V2_TELL_MAX = 1000;
+const v2TellText = vals => V2_TELL_FIELDS.map(([k, q]) => `${q}\n${(vals[k] || "").trim() || "—"}`).join("\n\n");
+
+function v2TellCard(b) {
+  if (!v2TellWanted() || !v2IsBusiness(b.plan && b.plan.key)) return "";
+  /* Prefilled from the only thing this page knows: the name on the account. */
+  const name = (typeof last !== "undefined" && last && last.businessName) || "";
+  return `<div class="v2-sec" id="v2Tell"><p class="v2-h">Tell us about your business</p>
+    <div class="v2-row muted" style="font-size:13px">Your assistant answers from these. Send them over and we will set it up — you can change anything later.</div>
+    ${V2_TELL_FIELDS.map(([k, q, kind, max, hint]) => `<div class="v2-row">
+      <label for="v2Tell-${k}">${esc(q)}</label>
+      ${kind === "area"
+        ? `<textarea id="v2Tell-${k}" class="v2TellF" data-k="${k}" rows="2" maxlength="${max}" placeholder="${esc(hint)}"></textarea>`
+        : `<input id="v2Tell-${k}" class="v2TellF" data-k="${k}" type="text" maxlength="${max}" placeholder="${esc(hint)}" value="${k === "name" ? esc(name) : ""}">`}
+    </div>`).join("")}
+    <div class="v2-row"><button type="button" class="btn" id="v2TellSend">Send to our team</button>
+      <button type="button" class="btn-ghost" id="v2TellNo">Not now</button>
+      <span class="v2-start-note" id="v2TellCount"></span></div>
+    <div class="v2-msg" id="v2TellMsg"></div></div>`;
+}
+
+function v2PlanConfirm({ title, facts, text, yes, danger }) {
+  const dlg = $("v2PlanModal"), ok = $("v2PlanModalYes"), no = $("v2PlanModalNo");
+  $("v2PlanModalH").textContent = title;
+  $("v2PlanModalFacts").innerHTML = facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+  $("v2PlanModalText").textContent = text || "";
+  ok.textContent = yes;
+  ok.className = danger ? "btn-danger" : "btn";
+  return new Promise(done => {
+    const end = v => { dlg.close(); ok.onclick = no.onclick = null; dlg.onclose = null; done(v); };
+    ok.onclick = () => end(true);
+    no.onclick = () => end(false);
+    /* Escape, or the backdrop: the same as Cancel. */
+    dlg.onclose = () => { ok.onclick = no.onclick = null; dlg.onclose = null; done(false); };
+    dlg.showModal();
+  });
+}
+
+/**
+ * WHAT A PRICE IS, SAID THE WAY THE REST OF THE SERVICE SAYS IT.
+ *
+ * Every price this company quotes — the trial emails, the out-of-minutes texts, the
+ * auto-package consent — is "$X + tax", because the prices are `tax_behavior: "exclusive"`
+ * and Stripe Tax works out the HST from the customer's address when the invoice is cut.
+ * Nothing in this service knows the tax, so nothing here invents one.
+ *
+ * TODO(owner): an exact total needs a server route that asks Stripe for a preview (an
+ * upcoming invoice, or a Tax Calculation) and hands back the number it would really
+ * charge. Same for the PRORATED amount on an upgrade, which Stripe works out to the day
+ * and which this page therefore cannot state either. Both are named as such below rather
+ * than guessed at.
+ */
+const v2PlusTax = (n, per) => `${v2Money(n)} + tax${per ? ` a ${per}` : ""}`;
+const v2PlanPrice = (x, interval) => v2PlusTax(interval === "year" ? x.year : x.month, interval === "year" ? "year" : "month");
+/** A date as the rest of this card writes one. */
+const v2Day = d => String(d || "").slice(0, 10);
+
 const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k;
 function wireV2Bill() {
   const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
@@ -1902,9 +2068,48 @@ function wireV2Bill() {
     const r = await post("package/checkout");
     if (r.ok && r.url) location.href = r.url; else msg("v2BuyMsg", r.error || "Couldn't start the purchase.");
   });
+  /* The business card: counts what is left, then sends it down the team's own channel. */
+  const tellVals = () => Object.fromEntries([...document.querySelectorAll(".v2TellF")].map(el => [el.dataset.k, el.value]));
+  const tellCount = () => { const el = $("v2TellCount"); if (el) el.textContent = `${v2TellText(tellVals()).length} / ${V2_TELL_MAX}`; };
+  document.querySelectorAll(".v2TellF").forEach(el => el.oninput = tellCount);
+  tellCount();
+  const tellNo = $("v2TellNo");
+  if (tellNo) tellNo.onclick = () => { v2TellSet(false); renderV2Bill(); };
+  const tellSend = $("v2TellSend");
+  if (tellSend) tellSend.onclick = async () => {
+    const vals = tellVals();
+    if (!V2_TELL_FIELDS.some(([k]) => (vals[k] || "").trim())) { msg("v2TellMsg", "Fill in what you can first."); return; }
+    const text = v2TellText(vals);
+    /* The route refuses anything longer, so it is caught here where it can be fixed. */
+    if (text.length > V2_TELL_MAX) { msg("v2TellMsg", `That is ${text.length} characters and the limit is ${V2_TELL_MAX}. Shorten an answer and send again.`); return; }
+    tellSend.disabled = true; msg("v2TellMsg", "Sending…");
+    const r = await api("/api/dashboard/change-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, topics: ["name", "hours", "services"] }) });
+    let d = {}; try { d = await r.json(); } catch {}
+    tellSend.disabled = false;
+    if (r.ok && d.ok) { v2TellSet(false); msg("v2TellMsg", d.message || "Thanks — we have got it and will set it up."); setTimeout(renderV2Bill, 1200); }
+    else msg("v2TellMsg", d.error || "Could not send that. Please try again.");
+  };
+
   const st = $("v2Start");
   if (st) st.onclick = async () => {
-    if (!window.confirm(`Start your ${v2b.plan.label} plan now? Your card is charged today.`)) return;
+    /*
+     * THE WHOLE PERIOD, NOT A PART ONE. `start-plan` sets `trial_end: "now"` with
+     * `proration_behavior: "none"`, so Stripe invoices the plan's ordinary price for the
+     * period that starts today — which is a figure this page does have, unlike the
+     * prorated one on an upgrade.
+     */
+    const mine = (v2p && v2p.plans.find(q => q.current)) || null;
+    const billing = (v2b.plan && v2b.plan.billing) || "month";
+    const facts = [["Plan", v2b.plan.label], ["Charged today", mine ? v2PlanPrice(mine, billing) : "your plan's price + tax"],
+      ["Then", `every ${billing === "year" ? "year" : "month"} on the same day`]];
+    const ok = await v2PlanConfirm({
+      title: "Start your plan today?",
+      facts,
+      text: "This ends your free trial now and charges the card on file today. The tax is added by Stripe from your address. The days left in your trial are not carried over, and this cannot be undone from here.",
+      yes: "Start my plan and charge me",
+      danger: true,
+    });
+    if (!ok) return;
     const r = await post("start-plan"); msg("v2StartMsg", r.ok ? "Done. Your plan has started." : r.error || "Couldn't start it."); if (r.ok) setTimeout(loadV2Bill, 1500);
   };
   const au = $("v2Auto");
@@ -1920,20 +2125,51 @@ function wireV2Bill() {
   document.querySelectorAll("#v2Bill input[name=v2Iv]").forEach(el => el.onchange = () => { v2Interval = el.value; renderV2Bill(); });
   document.querySelectorAll("#v2Bill [data-plan]").forEach(el => el.onclick = async () => {
     const x = v2p.plans.find(q => q.key === el.dataset.plan), cur = v2p.plans.find(q => q.current);
-    const price = v2Interval === "year" ? `${v2Money(x.year)} a year` : `${v2Money(x.month)} a month`;
+    /*
+     * THE SAME TEST THE SERVER MAKES. `changePlan` in billing-v2.js ranks the plans and
+     * treats month -> year on the same plan as an upgrade; this mirrors it so the dialog
+     * promises what the route will actually do. The server decides; this only describes.
+     */
     const up = x.month > cur.month || (x.key === cur.key && v2Interval === "year");
-    // In a free trial nothing has been paid: the switch is immediate, nothing is charged today, and the
-    // first charge is the new price when the trial ends (billing-v2.js changePlanInTrial). The server
-    // checks Stripe agrees (expect) and refuses rather than do something this dialog didn't say.
-    const inTrial = !!b2trial(), trialEnd = inTrial ? String(v2b.trial.end).slice(0, 10) : "";
-    const ask = inTrial ? `Switch to ${x.label} now? You're still in your free trial, so nothing is charged today. Your first charge is ${price} on ${trialEnd}, when the trial ends. Your trial's minutes and end date stay the same.`
-      : up ? `Move to ${x.label} (${price}) now? You're charged the difference for the rest of this period today.` : `Move to ${x.label} (${price}) at the end of this period? You keep ${cur.label} until then.`;
-    if (!window.confirm(ask)) return;
+    /*
+     * IN A FREE TRIAL NOTHING HAS BEEN PAID, so a switch either way is IMMEDIATE: the
+     * trial keeps its minutes and its end date, nothing is charged today, and the first
+     * charge is the new plan's price when the trial ends (billing-v2.js
+     * `changePlanInTrial`). That is why a trial downgrade is not "scheduled" like a paid
+     * one — it happens now — and why the button below says Switch rather than Schedule.
+     */
+    const inTrial = !!b2trial(), trialEnd = inTrial ? v2Day(v2b.trial.end) : "";
+    const price = v2Interval === "year" ? `${v2Money(x.year)} a year` : `${v2Money(x.month)} a month`;
+    const facts = [["New plan", `${x.label} · ${x.minutes} minutes a month`], ["Price", v2PlanPrice(x, v2Interval)]];
+    let text, yes;
+    if (inTrial) {
+      facts.push(["When", `Now — no charge until ${trialEnd}`]);
+      text = `You are still in your free trial, so nothing is charged today. Your trial's minutes and end date stay the same, and your first charge is the ${x.label} price on ${trialEnd}, when it ends. `
+        + (up ? `Everything ${x.label} includes switches on straight away.` : `Features that ${x.label} does not include stop, and everything your assistant already knows is kept.`);
+      yes = `Switch to ${x.label}`;
+    } else if (up) {
+      facts.push(["When", "Charged now"]);
+      text = `You move to ${x.label} today and are charged for the rest of this period at the new price. Stripe works out that part-period amount to the day, and the tax with it. `
+        + `Everything ${x.label} includes switches on straight away.`;
+      yes = `Move to ${x.label}`;
+    } else {
+      /* A paid downgrade is scheduled and NOT prorated (`proration_behavior: "none"`),
+         which is what "no refund" means here — the route's own behaviour, not a policy
+         sentence written on this page. */
+      const at = v2Day(v2b && v2b.period && v2b.period.end);
+      facts.push(["When", at ? `Takes effect ${at}` : "Takes effect at the end of this period"]);
+      text = `You keep ${cur.label} and everything it includes until then, and there is no refund for the rest of this period. `
+        + `After that, features ${x.label} does not include stop. Everything your assistant already knows about your business is kept.`;
+      yes = "Schedule the change";
+    }
+    if (!await v2PlanConfirm({ title: inTrial ? `Switch to ${x.label}?` : `Move to ${x.label}?`, facts, text, yes })) return;
     msg("v2PlanMsg", "Saving…");
+    /* `expect` is the server's guard: it checks Stripe agrees about the trial and refuses
+       rather than do something this dialog did not say. Kept from #62. */
     const r = await post("plan", { plan_key: x.key, billing: v2Interval, expect: inTrial ? "trial" : "paid" });
-    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${String(r.firstChargeAt || trialEnd).slice(0, 10)}.` : r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${String(r.at || "").slice(0, 10)}.`) : r.error || "Couldn't change the plan.";
+    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${v2Day(r.firstChargeAt || trialEnd)}.` : r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${v2Day(r.at)}.`) : r.error || "Couldn't change the plan.";
     // Reload first: the re-render replaces #v2PlanMsg, which used to wipe this message.
-    if (r.ok) { await loadV2Bill(); loadV2(); }
+    if (r.ok) { v2AfterPlanChange(x, r); await loadV2Bill(); loadV2(); }
     msg("v2PlanMsg", said);
   });
   document.querySelectorAll("#v2Bill [data-keep]").forEach(el => el.onclick = async () => {
