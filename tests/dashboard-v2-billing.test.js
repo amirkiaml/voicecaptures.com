@@ -133,6 +133,11 @@ async function loadV2() {}
   await page.waitForFunction(() => /First charge/.test($("v2PlanMsg").textContent));
   eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, "You're on Business Lite. First charge $99 a month on 2026-11-27."], "…sends expect: trial; says when the first charge is");
 
+  console.log("A plan priced on a call (price_cad \"quoted\")");
+  await open(BILL(), PLANS({ prompts: [], compare: { stay: { plan: "enterprise", label: "Enterprise", quoted: true }, next: null } }));
+  const qt = await page.textContent("#v2Plans");
+  ok(/Enterprise is priced on a call/.test(qt) && !/NaN|undefined/.test(qt), "Your plan: \"Enterprise is priced on a call\", no $NaN / undefined");
+
   eq(errs, [], "no page errors");
   await browser.close();
   console.log(`\n${pass} checks passed`);
