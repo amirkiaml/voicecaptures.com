@@ -164,7 +164,11 @@ async function loadV2() {}
   await page.click("[data-plan=personal]");
   const inTrial = await planModal();
   ok(/no charge until/.test(inTrial.facts.join(" ")), "a plan change during a trial: no charge until the trial ends");
-  ok(/Your free trial is unchanged/.test(inTrial.text) && !/Charged now/.test(inTrial.facts.join(" ")), "...and it never says charged now");
+  ok(/still in your free trial, so nothing is charged today/.test(inTrial.text) && !/Charged now/.test(inTrial.facts.join(" ")), "...and it never says charged now");
+  /* From #62, and it has to survive the dialog: a trial switch is immediate, so a trial
+     DOWNGRADE is not "scheduled" — the button says Switch, not Schedule. */
+  ok(inTrial.title === "Switch to Personal Line?" && inTrial.yes === "Switch to Personal Line", "...a trial change is a switch, not a scheduled one");
+  ok(/trial's minutes and end date stay the same/.test(inTrial.text), "...and the trial itself is untouched");
   await page.click("#v2PlanModalNo");
 
   console.log("Personal trial: one minutes figure, and switching in a trial");
@@ -180,8 +184,14 @@ async function loadV2() {}
   await open(PER_T({ used: 1, left: 14 }, { left: 14 }), PPLANS);
   ok(/14 of 15 minutes left/.test(await page.textContent("#v2Bill")) && /1\s*of 15 minutes used/.test(await page.textContent("#v2Bill")), "0:59 call: 14 left, 1 used");
   await page.click("[data-plan=business_lite]");
-  const tc = await page.evaluate(() => confirms.at(-1));
-  ok(tc === `Switch to Business Lite now? You're still in your free trial, so nothing is charged today. Your first charge is $99 a month on ${tEnd}, when the trial ends. Your trial's minutes and end date stay the same.`, "in a trial: no \"charged the difference today\"; first charge on the trial end");
+  /* #62's wording, now in the dialog rather than a confirm(): the same four promises. */
+  const tc = await planModal();
+  ok(tc.title === "Switch to Business Lite?", "in a trial: a switch, offered as one");
+  ok(tc.facts.join(" ").includes(`no charge until ${tEnd}`), "in a trial: nothing charged today, and the date it starts");
+  ok(/still in your free trial, so nothing is charged today/.test(tc.text) && !/charged the difference/.test(tc.text), "in a trial: no \"charged the difference today\"");
+  ok(new RegExp(`first charge is the Business Lite price on ${tEnd}`).test(tc.text), "in a trial: the first charge is the NEW plan's price, when the trial ends");
+  ok(/trial's minutes and end date stay the same/.test(tc.text), "in a trial: the trial itself is untouched");
+  await page.click("#v2PlanModalYes");
   await page.waitForFunction(() => /First charge/.test($("v2PlanMsg").textContent));
   eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, "You're on Business Lite. First charge $99 a month on 2026-11-27."], "…sends expect: trial; says when the first charge is");
   console.log("Figures the server did not send");
