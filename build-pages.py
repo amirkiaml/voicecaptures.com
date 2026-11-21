@@ -100,8 +100,13 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "17 November 2026"
-TERMS_UPDATED = "17 November 2026"
+PRIVACY_UPDATED = "21 November 2026"
+TERMS_UPDATED = "21 November 2026"
+# Its own date, because this page borrowed the terms' one and so moved whenever the terms
+# did. A "last updated" that changes while the words do not is the one thing a date like
+# this is for, and on a consent page it is worth being exact about. The consent VERSION
+# below is already separate, and neither moves unless this page's own wording does.
+CALLER_TEXTS_UPDATED = "17 November 2026"
 
 # The version the in-product consent text is keyed to. The dashboard and
 # self-serve repos show matching wording under the same constant; bump it
@@ -1938,6 +1943,13 @@ assistant rather than a person.</p>
       contact their past customers on their behalf.</li>
   <li><strong>Billing details for our business clients</strong> &mdash; handled by
       Stripe. We never see or store full card numbers.</li>
+  <li><strong>Self-serve sign-up</strong> &mdash; if you build a line yourself on this
+      website: your email address and mobile number, the answers used to build your demo
+      assistant (your name, what you do, your priorities, your screening choices and your
+      website), the consent you gave with the wording you agreed to and the time you
+      agreed to it, and your sign-in details. We use these to run the demo, start your
+      trial, text you about your line and email you about your account. If you never
+      start a trial, the demo and the answers behind it are deleted.</li>
 </ul>
 
 <h2>How we use it</h2>
@@ -2093,8 +2105,10 @@ when you called. We will reply within 30 days.</p>
 #   emedy and whether the representation should be a warranty, a condition, or
 #    simply a factual statement.
 #
-# TODO(owner): the closing window is not defined. Pick a number of days and 
-#   put it here and in the catalog before this page is published.
+# TODO(owner): the closing window is 7 days on this page now, and matches the
+#   prepaid-term window below it. It is still not in the catalog, so the number
+#   lives only here -- a second place that says it would be a second place for it
+#   to go stale.
 #
 # TODO(owner): who qualifies as an affiliate, and what they are paid, is not
 #    stated here because it has not been decided.
@@ -2181,7 +2195,8 @@ not billable minutes.</strong> Unused minutes don&rsquo;t carry over. We text yo
 monthly minutes, and again at 100%. Your line keeps answering either way &mdash;
 we never cut it off for going over.</p>
 <p><strong>Extra minutes.</strong> Extra minutes come in packages, bought from
-your dashboard: {_package_phrases()}. A package applies to the billing period you
+your dashboard: {_package_phrases()}. Minutes you buy during your free trial carry
+into your first paid period; after that a package applies to the billing period you
 buy it in and does not carry over. There is no per-minute overage.
 {TERMS_RULES["business_never_stops"]}
 {TERMS_RULES["personal_out_of_minutes"]} The texts above are how we tell you
@@ -2212,7 +2227,7 @@ missed-payment terms below apply if the card stays unpaid.</p>
 <p><strong>Cancel early and the unused months come back as account credit</strong>
 &mdash; credit against future VoiceCaptures invoices, not a refund to your card.
 Credit does not expire while your account is open.</p>
-<p><strong>Refunds.</strong> Within the closing window after an annual charge we
+<p><strong>Refunds.</strong> Within 7 days of the day we charge it we
 will refund it in full on request. After that window we do not refund unused
 months as cash; a partial refund, or moving unused package credit to another
 period, is considered case by case and is at our discretion.
@@ -2246,10 +2261,10 @@ with the date and the amount, so you can decide before you are charged.</p>
 <p><strong>To stop it renewing</strong>, open <strong>Manage billing</strong> in your
 dashboard and cancel. That takes effect at the end of the term you are in: the line
 keeps answering until then, and nothing further is charged.</p>
-<p><strong>You have 14 days to change your mind.</strong> Ask within 14 days of
+<p><strong>You have 7 days to change your mind.</strong> Ask within 7 days of
 the day we charge a term and we refund that payment in full and pause your line. To
-ask, email <a href="mailto:{EMAIL}">{EMAIL}</a> within those 14 days.</p>
-<p><strong>After those 14 days we do not refund unused months.</strong> Cancelling
+ask, email <a href="mailto:{EMAIL}">{EMAIL}</a> within those 7 days.</p>
+<p><strong>After those 7 days we do not refund unused months.</strong> Cancelling
 stops the next renewal rather than ending the term you have paid for, and the service
 runs to the end of it.</p>
 <p><strong>If we cannot provide the service</strong>, we refund the full months you
@@ -3755,7 +3770,7 @@ PLAYGROUND_SCRIPT = """
 
 CALLER_TEXTS_BODY = f"""<main class="wrap doc">
 <h1>Caller texts</h1>
-<p class="updated">Last updated: {TERMS_UPDATED} &middot; consent version
+<p class="updated">Last updated: {CALLER_TEXTS_UPDATED} &middot; consent version
 {CONSENT_VERSION}</p>
 
 <p>This page is about text messages sent to <strong>the people who call your
