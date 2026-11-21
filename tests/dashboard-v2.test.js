@@ -17,6 +17,16 @@ ok(true, `${scripts.length} inline script(s) parse`);
 const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
 const markup = /(<div class="card v2" id="v2Card"[\s\S]*?<\/dialog>)/.exec(html)[1];
 const js = /(\/\* ---------- Pricing v2 settings ----------[\s\S]*?)\nasync function api\(/.exec(html)[1];
+/**
+ * THE HANDFUL OF HELPERS BOTH CARDS SHARE, sliced out of the page rather than retyped.
+ *
+ * "Rolling out" is one badge with one look wherever it appears, so what draws it lives
+ * above both cards in the page's single script. This harness takes only the settings
+ * section, so without this the section references functions that are not here and the
+ * card silently fails to render — which is exactly what it did.
+ */
+const shared = /(const V2_SALES = [\s\S]*?const v2SoonNote = [^\n]*\n)/.exec(html);
+if (!shared) throw new Error("the shared rolling-out helpers moved; update this slice");
 ok(html.includes("    loadV2();\n"), "load() calls loadV2()");
 ok(/v2Post\("review-link", \{ link: \$\("v2Review"\)\.value\.trim\(\) \}\)/.test(html) && /v2Usable\(f\.review_requests\) \? `<div class="v2-row"><label>Google review link/.test(html), "Pro: the Google review link field, shown only where review requests are on the plan");
 
@@ -41,6 +51,7 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/calendar/connect") return new Response(JSON.stringify({ error: "Google sign-in isn't set up on the server." }), { status: 503 });
   return new Response(JSON.stringify({ ok: true }), { status: 200 });
 }
+${shared[1]}
 ${js}
 </script>`;
 
@@ -65,6 +76,17 @@ ${js}
   const body = await page.textContent("#v2Body");
   ok(/Appointment reminders Upgrade/.test(body) && /Caller mood Add-on/.test(body), "locked cards: reminders (upgrade), caller mood (add-on)");
   ok(/Texts to callers Rolling out/.test(body), "caller texts marked rolling out");
+  /*
+   * AND IT STANDS OUT, HERE TOO. "Rolling out" is the one badge that changes what the
+   * owner can do, so it is coloured wherever it is said and carries the address beside it
+   * — once per heading, not on every control inside the section.
+   */
+  const soon = await page.$$eval("#v2Body .v2-badge", els => els.map(e => ({ t: e.textContent, soon: e.classList.contains("soon") })));
+  ok(soon.filter(x => x.t === "Rolling out").length > 0 && soon.filter(x => x.t === "Rolling out").every(x => x.soon),
+    "every Rolling out badge on the settings card is the coloured one");
+  ok(soon.filter(x => x.t !== "Rolling out").every(x => !x.soon), "and no other status borrowed the colour");
+  const heads = await page.$$eval("#v2Body .v2-h", els => els.filter(e => /Rolling out/.test(e.textContent)).map(e => e.querySelectorAll("a[href^='mailto:sales@voicecaptures.com']").length));
+  ok(heads.length > 0 && heads.every(n => n === 1), "a heading that is rolling out carries the address exactly once");
 
   console.log("Consent");
   await page.fill(".v2Em >> nth=2", "typed@x.test");
