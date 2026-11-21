@@ -1726,18 +1726,21 @@ async function loadV2Bill() {
     renderV2Bill(); card.hidden = false;
   } catch { card.hidden = true; }
 }
+const b2trial = () => v2b && v2b.trial;
 function renderV2Bill() {
   const b = v2b, p = v2p, pk = b.plan.package, per = b.period, sec = [];
-  const pct = per.allowance ? Math.min(100, Math.round(per.used / per.allowance * 100)) : 0;
+  // Whole minutes, rounded up: the API's rule (usage.js minutesOf). ceil also turns an older API's decimals into the same figure.
+  const usedMin = Math.max(0, Math.ceil(Number(per.used) - 1e-9) || 0);
+  const pct = per.allowance ? Math.min(100, Math.round(usedMin / per.allowance * 100)) : 0;
   const daysLeft = d => Math.max(0, Math.ceil((Date.parse(d) - Date.now()) / 864e5));
   if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
     ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
   if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
-    <div class="v2-row">${daysLeft(b.trial.end)} days and ${Math.max(0, Math.round(b.trial.cap - per.used))} of ${b.trial.cap} minutes left. Your plan starts on ${esc(String(b.trial.end).slice(0, 10))}.</div>
+    <div class="v2-row">${daysLeft(b.trial.end)} days and ${b.trial.left != null ? b.trial.left : Math.max(0, b.trial.cap - usedMin)} of ${b.trial.cap} minutes left. Your plan starts on ${esc(String(b.trial.end).slice(0, 10))}.</div>
     <div class="v2-row"><button type="button" class="btn-ghost" id="v2Start">Start my plan now</button></div><div class="v2-msg" id="v2StartMsg"></div></div>`);
   sec.push(`<div class="v2-sec"><p class="v2-h">Minutes this period</p>
-    <div class="v2-meter${per.used >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${Math.round(per.used)}"><i style="width:${pct}%"></i></div>
-    <div class="v2-row"><span><b>${Math.round(per.used)}</b> of ${per.allowance} minutes used · resets ${esc(String(per.end).slice(0, 10))}</span></div>
+    <div class="v2-meter${usedMin >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${usedMin}"><i style="width:${pct}%"></i></div>
+    <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used · resets ${esc(String(per.end).slice(0, 10))}</span></div>
     ${per.packages.length ? `<div class="v2-row muted" style="font-size:13px">Extra this period: ${per.packages.map(x => `${x.minutes} min`).join(", ")}</div>` : ""}
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
     ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
@@ -1801,11 +1804,19 @@ function wireV2Bill() {
     const x = v2p.plans.find(q => q.key === el.dataset.plan), cur = v2p.plans.find(q => q.current);
     const price = v2Interval === "year" ? `${v2Money(x.year)} a year` : `${v2Money(x.month)} a month`;
     const up = x.month > cur.month || (x.key === cur.key && v2Interval === "year");
-    if (!window.confirm(up ? `Move to ${x.label} (${price}) now? You're charged the difference for the rest of this period today.` : `Move to ${x.label} (${price}) at the end of this period? You keep ${cur.label} until then.`)) return;
+    // In a free trial nothing has been paid: the switch is immediate, nothing is charged today, and the
+    // first charge is the new price when the trial ends (billing-v2.js changePlanInTrial). The server
+    // checks Stripe agrees (expect) and refuses rather than do something this dialog didn't say.
+    const inTrial = !!b2trial(), trialEnd = inTrial ? String(v2b.trial.end).slice(0, 10) : "";
+    const ask = inTrial ? `Switch to ${x.label} now? You're still in your free trial, so nothing is charged today. Your first charge is ${price} on ${trialEnd}, when the trial ends. Your trial's minutes and end date stay the same.`
+      : up ? `Move to ${x.label} (${price}) now? You're charged the difference for the rest of this period today.` : `Move to ${x.label} (${price}) at the end of this period? You keep ${cur.label} until then.`;
+    if (!window.confirm(ask)) return;
     msg("v2PlanMsg", "Saving…");
-    const r = await post("plan", { plan_key: x.key, billing: v2Interval });
-    msg("v2PlanMsg", r.ok ? (r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${String(r.at || "").slice(0, 10)}.`) : r.error || "Couldn't change the plan.");
-    if (r.ok) { loadV2Bill(); loadV2(); }
+    const r = await post("plan", { plan_key: x.key, billing: v2Interval, expect: inTrial ? "trial" : "paid" });
+    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${String(r.firstChargeAt || trialEnd).slice(0, 10)}.` : r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${String(r.at || "").slice(0, 10)}.`) : r.error || "Couldn't change the plan.";
+    // Reload first: the re-render replaces #v2PlanMsg, which used to wipe this message.
+    if (r.ok) { await loadV2Bill(); loadV2(); }
+    msg("v2PlanMsg", said);
   });
   document.querySelectorAll("#v2Bill [data-keep]").forEach(el => el.onclick = async () => {
     const cur = v2p.plans.find(q => q.current);
