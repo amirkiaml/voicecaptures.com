@@ -17,7 +17,13 @@ const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/scri
 for (const [i, sc] of scripts.entries()) new vm.Script(sc, { filename: `dashboard-inline-${i}.js` });
 ok(true, `${scripts.length} inline script(s) parse (no name clashes with the rest of the page)`);
 const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
-const markup = /(<div class="card v2" id="v2Bill"[\s\S]*?<\/dialog>)/.exec(html)[1];
+/*
+ * GREEDY TO THE LAST </dialog>, deliberately. This card has two dialogs behind it now —
+ * its own plan dialog and the consent one it shares with the settings card — and a lazy
+ * match stops at whichever comes first in the file, which silently left the consent modal
+ * out of the harness the day a second dialog was added.
+ */
+const markup = /(<div class="card v2" id="v2Bill"[\s\S]*<\/dialog>)/.exec(html)[1];
 const js = /(\/\* ---------- Pricing v2 usage, packages, plan, add-ons ----------[\s\S]*?)\nasync function api\(/.exec(html)[1];
 ok(html.includes("    loadV2Bill();\n"), "load() calls loadV2Bill()");
 ok(!/\$(19|99|199|20|75|110)\b/.test(js.replace(/\$\{[^}]*\}/g, "")), "no plan or package price written into the page script");
@@ -37,6 +43,7 @@ const page0 = (bill, plans, status = 200, rep = { reports: [{ month: "2026-11-01
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 window.sent = []; window.confirms = []; window.confirm = t => { confirms.push(t); return true; };
+window.last = { businessName: "Bluewave Plumbing" };
 const BILL = ${JSON.stringify(bill)}, PLANS = ${JSON.stringify(plans)};
 async function api(p, o = {}) {
   sent.push({ p, body: o.body ? JSON.parse(o.body) : null });
@@ -48,6 +55,7 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/v2/invoices") return R(${JSON.stringify(inv)}, ${invStatus});
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
   if (p === "/api/dashboard/v2/plan") return R(o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
+  if (p === "/api/dashboard/change-request") return R({ ok: true, message: "Thanks, we have got it." });
   return R({ ok: true });
 }
 ${js}
@@ -61,6 +69,15 @@ async function loadV2() {}
   let page; const errs = [];
   const open = async (b, p, st, ...rest) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st, ...rest)); await page.evaluate(() => loadV2Bill()); };
   const sentTo = path => page.evaluate(p => sent.filter(x => x.p === p), path);
+  /* The plan dialog's contents, and the button that confirms it. */
+  const planModal = () => page.evaluate(() => ({
+    title: $("v2PlanModalH").textContent,
+    facts: [...$("v2PlanModalFacts").children].map(e => e.textContent),
+    text: $("v2PlanModalText").textContent,
+    yes: $("v2PlanModalYes").textContent,
+    danger: $("v2PlanModalYes").className === "btn-danger",
+    open: $("v2PlanModal").open,
+  }));
 
   console.log("Hidden");
   await open({ error: "Not found" }, {}, 404); ok(await page.isHidden("#v2Bill"), "flag off (404): hidden");
@@ -86,14 +103,27 @@ async function loadV2() {}
   await page.waitForFunction(() => $("v2AutoMsg").textContent === "On.");
   eq((await sentTo("/api/dashboard/v2/auto-package"))[0].body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "accepted: enabled + the version shown");
   await page.click("[data-plan=personal]");
-  ok((await page.evaluate(() => confirms.at(-1))).startsWith("Move to Personal Line ($19 a month) at the end of this period? You keep Business Lite until then."), "downgrade: confirm says it happens at the period end");
+  const down = await planModal();
+  ok(down.open && down.title === "Move to Personal Line?", "downgrade: a dialog, not a confirm()");
+  ok(down.facts.join(" | ").includes("$19 + tax a month"), "downgrade: the price, with tax named the way the rest of the service names it");
+  ok(/Takes effect\s*2026-12-01/.test(down.facts.join(" ")), "downgrade: the date it takes effect");
+  ok(/no refund for the rest of this period/.test(down.text), "downgrade: no refund");
+  ok(/everything your assistant already knows about your business is kept/i.test(down.text), "downgrade: the knowledge base is kept");
+  await page.click("#v2PlanModalYes");
   await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/plan"));
   eq((await sentTo("/api/dashboard/v2/plan"))[0].body, { plan_key: "personal", billing: "month", expect: "paid" }, "…sends the plan, interval, and that it expects a paid plan");
   ok(await page.$("[data-plan=business_pro]") === null && /Rolling out/.test(await page.textContent(".v2-plans")), "Pro with checkout off: no switch button, Rolling out");
   await page.check("input[name=v2Iv][value=year]");
   ok(/\$990\/year/.test(await page.textContent(".v2-plans")) && await page.$("[data-plan=business_lite]"), "annual: prices per year; switching Lite to annual is offered");
   await page.click("[data-plan=business_lite]");
-  ok((await page.evaluate(() => confirms.at(-1))).startsWith("Move to Business Lite ($990 a year) now?"), "monthly → annual: an upgrade now");
+  const up = await planModal();
+  ok(up.facts.join(" | ").includes("$990 + tax a year"), "monthly → annual: the annual price with tax");
+  ok(/Charged now/.test(up.facts.join(" ")) && /charged for the rest of this period at the new price/.test(up.text), "monthly → annual: an upgrade, charged now and prorated");
+  ok(/Stripe works out that part-period amount to the day/.test(up.text), "...and it says who works the part-period amount out, rather than inventing one");
+  const planCalls = (await sentTo("/api/dashboard/v2/plan")).length;
+  await page.click("#v2PlanModalNo");
+  eq((await sentTo("/api/dashboard/v2/plan")).length, planCalls, "Cancel on the dialog changes nothing");
+  ok(await page.evaluate(() => !$("v2PlanModal").open), "...and closes it");
   await page.click("[data-addon=addon_calendar]");
   await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/addon"));
   eq((await sentTo("/api/dashboard/v2/addon"))[0].body, { key: "addon_calendar", enabled: true }, "add-on: confirm, then sent");
@@ -112,8 +142,30 @@ async function loadV2() {}
   ok(await page.$("#v2Auto") === null && await page.$eval(".v2-meter", e => e.classList.contains("over")), "no auto-package on Personal; the meter shows over");
   await open(BILL({ trial: { end: new Date(Date.now() + 5 * 864e5).toISOString().slice(0, 10), cap: 60 }, period: { kind: "trial", start: "2026-11-15", end: "2026-11-29", used: 12, allowance: 60, packages: [] } }), PLANS({ prompts: [] }));
   ok(/(4|5) days and 48 of 60 minutes left/.test(await page.textContent("#v2Bill")), "trial card: days and minutes left");
-  await page.click("#v2Start"); await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/start-plan"));
-  ok((await page.evaluate(() => confirms.at(-1))).includes("Your card is charged today"), "start my plan now: confirm, then sent");
+  /* The red button sits with the plan change now, not in the trial card above it. */
+  ok(await page.$eval("#v2Start", e => e.className) === "btn-danger", "start my plan now: a red button");
+  ok(await page.$eval("#v2Start", e => !!e.closest("#v2Plans")), "...beside the plan change, not in the trial card");
+  await page.click("#v2Start");
+  const start = await planModal();
+  ok(start.danger, "start my plan now: the confirming button is the red one too");
+  /* And the rule reaches it: the dialog is outside the card, so a .v2-scoped rule would not. */
+  ok(await page.$eval("#v2PlanModalYes", e => getComputedStyle(e).backgroundColor) === "rgb(220, 38, 38)",
+    "...and it is actually painted red, not just classed as it");
+  ok(start.facts.join(" | ").includes("Charged today") && start.facts.join(" | ").includes("+ tax"), "start my plan now: what is charged today, with tax");
+  ok(/every month on the same day/.test(start.facts.join(" ")), "...and when it recurs");
+  ok(/ends your free trial now and charges the card on file today/i.test(start.text), "start my plan now: says plainly what it does");
+  await page.click("#v2PlanModalYes");
+  await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/start-plan"));
+  ok(true, "...and only then is it sent");
+
+  /* And in a trial a plan change promises no charge until the trial ends. A fresh card,
+     because the one above has just started its plan. */
+  await open(BILL({ trial: { end: "2026-12-04", cap: 60 }, period: { kind: "trial", start: "2026-11-15", end: "2026-11-29", used: 12, allowance: 60, packages: [] } }), PLANS({ prompts: [] }));
+  await page.click("[data-plan=personal]");
+  const inTrial = await planModal();
+  ok(/no charge until/.test(inTrial.facts.join(" ")), "a plan change during a trial: no charge until the trial ends");
+  ok(/Your free trial is unchanged/.test(inTrial.text) && !/Charged now/.test(inTrial.facts.join(" ")), "...and it never says charged now");
+  await page.click("#v2PlanModalNo");
 
   console.log("Personal trial: one minutes figure, and switching in a trial");
   const tEnd = new Date(Date.now() + 6 * 864e5).toISOString().slice(0, 10);
@@ -191,6 +243,71 @@ async function loadV2() {}
   ok(/v2-badge soon">Rolling out</.test(auto) && /mailto:sales@voicecaptures\.com/.test(auto), "automatic extra minutes: the same coloured badge and the same address");
   const grey = await page.$$eval(".v2-badge:not(.soon)", els => els.map(e => e.textContent));
   ok(!grey.includes("Rolling out"), "no grey 'Rolling out' badge is left anywhere on the card");
+
+  console.log("After an upgrade to Business");
+  await open(BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: null, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 12, allowance: 30, packages: [] }, credit: 0, trial: null }),
+    PLANS({ prompts: [], compare: { stay: { label: "Personal Line", cost: 19, coversMinutes: 30, packages: 0 }, next: { plan: "business_lite", label: "Business Lite", price: 99, minutes: 100 } },
+      plans: [plan("personal", "Personal Line", 19, 190, 30, true), plan("business_lite", "Business Lite", 99, 990, 100, false), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)] }));
+  ok(await page.$("#v2Tell") === null, "before the upgrade there is no card asking about the business");
+  await page.click("[data-plan=business_lite]");
+  await page.click("#v2PlanModalYes");
+  await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/plan"));
+  /*
+   * THE CARD IS ARMED BY THE UPGRADE AND SHOWN BY THE PAYLOAD, which is two steps on
+   * purpose: an upgrade that did not actually land must not produce the card. The fake
+   * server here keeps answering with the old plan, so the two are asserted separately —
+   * first that the upgrade armed it, then that a business payload draws it.
+   */
+  ok(await page.evaluate(() => v2TellWanted()), "an upgrade to Business that took effect now arms the card");
+  ok(await page.$("#v2Tell") === null, "...and it stays away while the billing payload still says Personal");
+  ok(await page.evaluate(() => { v2TellSet(false); v2AfterPlanChange({ key: "personal" }, { changed: "at_period_end" }); return v2TellWanted(); }) === false,
+    "a scheduled downgrade arms nothing");
+  ok(await page.evaluate(() => { v2AfterPlanChange({ key: "business_pro" }, { changed: "now" }); return v2TellWanted(); }), "any Business plan arms it");
+
+  await open(BILL({ plan: { key: "business_lite", label: "Business Lite", billing: "month", minutes: 100, package: null, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 12, allowance: 100, packages: [] }, credit: 0, trial: null }), PLANS({ prompts: [] }));
+  await page.evaluate(() => { v2TellSet(true); renderV2Bill(); });
+  await page.waitForSelector("#v2Tell");
+  ok(true, "on a Business plan, with the card armed, it is drawn");
+  eq(await page.$$eval("#v2Tell .v2TellF", els => els.map(e => e.dataset.k)), ["name", "type", "what", "hours", "area", "asks"],
+    "...with the Business builder's six fields, in its order");
+  eq(await page.inputValue("#v2Tell-name"), "Bluewave Plumbing", "...the business name prefilled from what we already know");
+
+  /* It is sent down the team's own authenticated, rate-limited channel. */
+  await page.fill("#v2Tell-what", "Drain cleaning, water heaters");
+  await page.fill("#v2Tell-hours", "Mon-Fri 8-6");
+  await page.click("#v2TellSend");
+  await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/change-request"));
+  const tell = (await sentTo("/api/dashboard/change-request"))[0].body;
+  ok(/Bluewave Plumbing/.test(tell.text) && /Drain cleaning, water heaters/.test(tell.text) && /Mon-Fri 8-6/.test(tell.text), "the answers reach the team");
+  ok(/What do callers usually ask\?\n—/.test(tell.text), "...and a question left blank is sent as blank, not left out");
+  ok(tell.text.length <= 1000, "...inside the route's 1000-character limit");
+  eq(tell.topics, ["name", "hours", "services"], "...with topics the route accepts");
+  await page.waitForFunction(() => /Thanks/.test($("v2TellMsg").textContent));
+  ok(true, "the team's reply is shown");
+
+  console.log("Nothing to send, and Not now");
+  await open(BILL({ plan: { key: "business_lite", label: "Business Lite", billing: "month", minutes: 100, package: null, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 12, allowance: 100, packages: [] }, credit: 0, trial: null }), PLANS({ prompts: [] }));
+  await page.evaluate(() => { v2TellSet(true); renderV2Bill(); });
+  await page.waitForSelector("#v2Tell");
+  const before = (await sentTo("/api/dashboard/change-request")).length;
+  /* Cleared, because the name arrives prefilled and a prefilled card is not an empty one. */
+  await page.fill("#v2Tell-name", "");
+  await page.click("#v2TellSend");
+  await page.waitForFunction(() => /Fill in what you can/.test($("v2TellMsg").textContent));
+  eq((await sentTo("/api/dashboard/change-request")).length, before, "an empty card sends nothing");
+  await page.click("#v2TellNo");
+  ok(await page.$("#v2Tell") === null, "Not now puts it away");
+
+  console.log("After a downgrade");
+  await open(BILL({ plan: { key: "business_lite", label: "Business Lite", billing: "month", minutes: 100, package: null, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 12, allowance: 100, packages: [] }, credit: 0, trial: null,
+      pendingPlan: { plan_key: "personal", billing: "month", at: "2026-12-01" } }), PLANS({ prompts: [] }));
+  const kept = await page.textContent("#v2BillBody");
+  ok(/What happens to what we know/.test(kept) && /is kept/.test(kept), "a scheduled downgrade says the business knowledge base is kept");
+  ok(await page.$("#v2Tell") === null, "...and does not ask them to fill the business form in again");
 
   eq(errs, [], "no page errors");
   await browser.close();
