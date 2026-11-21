@@ -1755,7 +1755,8 @@ function renderV2Bill() {
     const st = p.compare.stay, nx = p.compare.next;
     sec.push(`<div class="v2-sec" id="v2Plans"><p class="v2-h">Your plan</p>
       ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(String(b.pendingPlan.at || "").slice(0, 10))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
-      <div class="v2-row muted" style="font-size:13px">At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes${st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : ""}.${nx && !nx.quoted ? ` ${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.` : nx ? ` ${esc(nx.label)}: priced on a call.` : ""}</div>
+      ${!st ? "" : st.quoted ? `<div class="v2-row muted" style="font-size:13px">${esc(st.label)} is priced on a call. Questions about your plan? <a href="/contact/">Talk to us</a>.</div>`
+        : `<div class="v2-row muted" style="font-size:13px">At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes${st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : ""}.${nx && !nx.quoted ? ` ${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.` : nx ? ` ${esc(nx.label)}: priced on a call.` : ""}</div>`}
       <div class="v2-row" role="radiogroup" aria-label="Billing"><label class="chk-inline"><input type="radio" name="v2Iv" value="month" ${v2Interval === "month" ? "checked" : ""}> Monthly</label>
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
