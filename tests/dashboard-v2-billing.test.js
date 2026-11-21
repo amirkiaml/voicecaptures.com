@@ -167,17 +167,30 @@ async function loadV2() {}
   ok(/Time for Business Pro\?/.test(await page.textContent(".v2-prompt")) && await page.$("[data-dismiss]") !== null, "...the prompt keeps its words and its Not now");
 
   console.log("Reports and receipts: shown, said plainly, or not at all");
-  await open(BILL({ credit: 0, trial: null }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
+  await open(BILL({ credit: 0, trial: { end: "2026-12-04", cap: 60 } }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
   const empty = await page.textContent("#v2BillBody");
   ok(/Monthly reports/.test(empty) && /Your first report appears after your first full month\./.test(empty), "reports, none yet: the section is shown and says so");
-  ok(/No receipts yet: your first charge is 2026-12-01\./.test(empty), "receipts, none yet: the section says when the first charge lands");
+  ok(/No receipts yet: your first charge is 2026-12-04\./.test(empty), "receipts in a trial: the section names the day the trial ends");
   ok(!/Show reports|Show receipts/.test(empty), "and neither is a button that would have to ask");
+
+  /* Off a trial there is no first charge to name: the period end is when the NEXT one
+     lands, which is a different promise, so no date is attached to it. */
+  await open(BILL({ credit: 0, trial: null }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
+  const noTrial = await page.textContent("#v2BillBody");
+  ok(/No receipts yet\./.test(noTrial) && !/first charge/.test(noTrial), "receipts off a trial: no date promised");
 
   await open(BILL({ credit: 0 }), PLANS({ prompts: [] }), 200, { reports: [], running: false }, { invoices: [] });
   ok(!/Monthly reports/.test(await page.textContent("#v2BillBody")), "reports the server says are not running: no section");
   await open(BILL({ credit: 0 }), PLANS({ prompts: [] }), 200, { error: "no" }, { error: "no" }, 404, 500);
   const gone = await page.textContent("#v2BillBody");
   ok(!/Monthly reports/.test(gone) && !/Billing/.test(gone), "a request that failed: no section at all, and no button to an error");
+
+  console.log("Rolling out, everywhere it is said");
+  await open(BILL({ autoPackage: { available: true, running: false, enabled: false, max: 2 } }), PLANS({ prompts: [] }));
+  const auto = await page.$$eval(".v2-sec", els => (els.find(e => /Automatic extra minutes/.test((e.querySelector(".v2-h") || {}).textContent || "")) || {}).outerHTML || "");
+  ok(/v2-badge soon">Rolling out</.test(auto) && /mailto:sales@voicecaptures\.com/.test(auto), "automatic extra minutes: the same coloured badge and the same address");
+  const grey = await page.$$eval(".v2-badge:not(.soon)", els => els.map(e => e.textContent));
+  ok(!grey.includes("Rolling out"), "no grey 'Rolling out' badge is left anywhere on the card");
 
   eq(errs, [], "no page errors");
   await browser.close();

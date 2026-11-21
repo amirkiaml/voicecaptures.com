@@ -1744,8 +1744,21 @@ const v2Money = n => (v2Has(n) ? `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}` 
  * button; the address says what to do instead, which is the part a badge alone leaves out.
  */
 const V2_SALES = "sales@voicecaptures.com";
-const v2RollingOut = () =>
-  `<span class="v2-badge soon">Rolling out</span> <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
+const v2SoonNoteHtml = () => ` <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
+const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2SoonNoteHtml()}`;
+/**
+ * IS THIS FEATURE ROLLING OUT? Two different fields mean it, and they can both be set:
+ * `status` is what the PLAN gives, `running` is whether the server has it switched on.
+ */
+const v2IsSoon = f => !!f && (f.status === "rolling_out" || f.running === false);
+/**
+ * The address, ONCE per heading, however many of its badges are rolling out.
+ *
+ * Section headings get it; the per-control badges inside a section do not, because the
+ * heading above them has already said it and repeating a mailto on every checkbox is
+ * noise rather than help.
+ */
+const v2SoonNote = (...fs) => (fs.some(v2IsSoon) ? v2SoonNoteHtml() : "");
 /** A plan somebody can actually move to from here: priced, and with its checkout open. */
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
@@ -1810,7 +1823,7 @@ function renderV2Bill() {
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
     ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
     <div class="v2-msg" id="v2BuyMsg"></div></div>`);
-  if (b.autoPackage.available && pk) sec.push(`<div class="v2-sec"><p class="v2-h">Automatic extra minutes${b.autoPackage.running ? "" : ` <span class="v2-badge">Rolling out</span>`}</p>
+  if (b.autoPackage.available && pk) sec.push(`<div class="v2-sec"><p class="v2-h">Automatic extra minutes${b.autoPackage.running ? "" : ` ${v2RollingOut()}`}</p>
     <label class="v2-row chk-inline"><input type="checkbox" id="v2Auto" ${b.autoPackage.enabled ? "checked" : ""} ${b.autoPackage.running ? "" : "disabled"}> When I run out, add ${pk.minutes} minutes for ${v2Money(pk.price_cad)} + tax to my card (at most ${b.autoPackage.max} a period)</label>
     <div class="v2-msg" id="v2AutoMsg"></div></div>`);
   if (p && p.prompts && p.prompts.length) sec.push(p.prompts.map(x => `<div class="v2-prompt"><p class="v2-h">${esc(x.title)}</p><div>${esc(x.body)}</div>
@@ -1865,8 +1878,13 @@ function renderV2Bill() {
   }
   const receipts = v2Inv && v2Inv.ok ? (v2Inv.invoices || []) : null;
   if (receipts || b.credit > 0) {
-    /* The day the first charge lands: the trial's end, or this period's, whichever applies. */
-    const firstCharge = String((b.trial && b.trial.end) || (b.period && b.period.end) || "").slice(0, 10);
+    /*
+     * THE DATE IS THE TRIAL'S END, and only a customer who is in a trial gets one.
+     * Anyone else has no first charge to name — their period end is when the NEXT one
+     * lands, which is a different promise — so they are told plainly that there is
+     * nothing yet, with no date attached to it.
+     */
+    const firstCharge = b.trial ? String(b.trial.end || "").slice(0, 10) : "";
     sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
       ${!receipts ? "" : receipts.length
         ? receipts.map(i => `<div class="v2-row">${esc(i.date || "")} · ${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("")
@@ -1942,8 +1960,9 @@ const V2_LOCKED = { caller_sms: "Confirmation texts to callers", transfer: "Live
   priority_support: "Priority support", custom_routing: "Custom routing", textback: "Missed-call text-back", coverage_mode: "Coverage mode" };
 let v2 = null;
 const v2Usable = f => f && (f.status === "live" || f.status === "rolling_out");
-const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge">${esc(V2_STATUS[f.status] || f.status)}</span>` : "";
-const v2Soon = f => f && f.running === false ? ` <span class="v2-badge">Rolling out</span>` : "";
+/* "Rolling out" is coloured wherever it appears; the other statuses stay grey. */
+const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge${f.status === "rolling_out" ? " soon" : ""}">${esc(V2_STATUS[f.status] || f.status)}</span>` : "";
+const v2Soon = f => f && f.running === false ? ` <span class="v2-badge soon">Rolling out</span>` : "";
 async function v2Post(path, body) {
   const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   let d = {}; try { d = await r.json(); } catch {}
@@ -1981,7 +2000,7 @@ function renderV2() {
   const sec = [];
   // Integrations
   const g = f.calendar_google;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Calendar ${v2Badge(g)}</p>
+  sec.push(`<div class="v2-sec"><p class="v2-h">Calendar ${v2Badge(g)}${v2SoonNote(g)}</p>
     ${v2Usable(g) ? `<div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
       ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>`
       : `<div class="v2-row v2-locked">Your receptionist can book into Google Calendar on Business Lite and Pro.</div>`}
@@ -1989,14 +2008,14 @@ function renderV2() {
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Texts to callers ${v2Badge(cs)}${v2Soon(cs)}</p>
+  sec.push(`<div class="v2-sec"><p class="v2-h">Texts to callers ${v2Badge(cs)}${v2Soon(cs)}${v2SoonNote(cs)}</p>
     ${!v2Usable(cs) ? `<div class="v2-row v2-locked">Callers who leave a message can get a confirmation text. Available on Business Lite and Pro.</div>`
       : cs.trialBlocked ? `<div class="v2-row">Caller texts start with your paid plan.</div>`
       : `<label class="v2-row chk-inline"><input type="checkbox" id="v2Sms" ${cs.enabled ? "checked" : ""} ${cs.running ? "" : "disabled"}> Send a confirmation text to callers who ask for one (they can reply STOP)</label>`}
     <div class="v2-msg" id="v2SmsMsg"></div></div>`);
   // Live transfer
   const t = f.transfer;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer ${v2Badge(t)}${v2Soon(t)}</p>
+  sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer ${v2Badge(t)}${v2Soon(t)}${v2SoonNote(t)}</p>
     ${!v2Usable(t) ? `<div class="v2-row v2-locked">Put urgent callers through to a person. Available on Business Lite and Pro.</div>`
       : `<div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}" ${t.running ? "" : "disabled"}></label>
         <label>Ring for <select id="v2TrRing" ${t.running ? "" : "disabled"}>${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
@@ -2006,7 +2025,7 @@ function renderV2() {
     <div class="v2-msg" id="v2TrMsg"></div></div>`);
   // Email recipients
   const er = f.email_recipients, max = (er && er.max) || 1;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email${v2Soon(er)}</p>
+  sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email${v2Soon(er)}${v2SoonNote(er)}</p>
     <div class="v2-row">${Array.from({ length: max }, (_, i) => `<input type="email" class="v2Em" placeholder="name@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Email ${i + 1}">`).join("")}
     <button type="button" class="btn" id="v2EmSave">Save</button></div>
     ${max < 3 ? `<div class="v2-row muted" style="font-size:13px">Up to 3 addresses on Business Lite and Pro.</div>` : ""}
