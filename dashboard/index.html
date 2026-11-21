@@ -1803,6 +1803,30 @@ const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false &&
  * it is priced on a call, which needs no figures at all.
  */
 function v2CostLine(st, nx) {
+  /*
+   * NO COMPARISON AT ALL: no line. The server sends none for a plan it cannot rank, and
+   * reading `st.cost` off nothing is how this function would have thrown rather than
+   * printed a sentence with a hole in it.
+   */
+  if (!st) return '';
+  /*
+   * A PLAN PRICED ON A CALL SAYS SO, rather than saying nothing.
+   *
+   * This is the other half of the $NaN, and the half the server fixed: Enterprise's
+   * `price_cad` is the string "quoted", so `compare.stay` comes back as `{ quoted: true }`
+   * (TorontoLeads#141). The guards below would have dropped the sentence and left an
+   * Enterprise customer with no line about their own plan — true, but useless. The sentence
+   * they get instead names the one thing they can do about it.
+   */
+  if (st.quoted) {
+    return `<div class="v2-row muted" style="font-size:13px">${esc(st.label)} is priced on a call. `
+      + `Questions about your plan? <a href="/contact/">Talk to us</a>.</div>`;
+  }
+  /*
+   * AND THE GUARDS STAY for everything else. `quoted` is the shape the server now sends on
+   * purpose; a figure that is simply missing is still a figure that must not reach the page
+   * as "$NaN", whatever went wrong upstream to lose it.
+   */
   const parts = [];
   if (v2Has(st.cost) && v2Has(st.coversMinutes)) {
     parts.push(`At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes`

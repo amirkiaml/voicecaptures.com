@@ -309,6 +309,11 @@ async function loadV2() {}
   ok(/What happens to what we know/.test(kept) && /is kept/.test(kept), "a scheduled downgrade says the business knowledge base is kept");
   ok(await page.$("#v2Tell") === null, "...and does not ask them to fill the business form in again");
 
+  console.log("A plan priced on a call (price_cad \"quoted\")");
+  await open(BILL(), PLANS({ prompts: [], compare: { stay: { plan: "enterprise", label: "Enterprise", quoted: true }, next: null } }));
+  const qt = await page.textContent("#v2Plans");
+  ok(/Enterprise is priced on a call/.test(qt) && !/NaN|undefined/.test(qt), "Your plan: \"Enterprise is priced on a call\", no $NaN / undefined");
+
   eq(errs, [], "no page errors");
   await browser.close();
   console.log(`\n${pass} checks passed`);
