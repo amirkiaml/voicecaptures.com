@@ -47,7 +47,7 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/v2/reports") return R({ reports: [{ month: "2026-11-01", data: { calls: 42, spam: 3, minutes: 96, booked: 7, busiestHour: 10 } }] });
   if (p === "/api/dashboard/v2/invoices") return R({ invoices: [{ date: "2026-11-01", total_cad: 111.87, status: "paid", url: "https://invoice.stripe.com/i/x" }] });
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
-  if (p === "/api/dashboard/v2/plan") return R({ changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
+  if (p === "/api/dashboard/v2/plan") return R(o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
   return R({ ok: true });
 }
 ${js}
@@ -88,7 +88,7 @@ async function loadV2() {}
   await page.click("[data-plan=personal]");
   ok((await page.evaluate(() => confirms.at(-1))).startsWith("Move to Personal Line ($19 a month) at the end of this period? You keep Business Lite until then."), "downgrade: confirm says it happens at the period end");
   await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/plan"));
-  eq((await sentTo("/api/dashboard/v2/plan"))[0].body, { plan_key: "personal", billing: "month" }, "…sends the plan and interval");
+  eq((await sentTo("/api/dashboard/v2/plan"))[0].body, { plan_key: "personal", billing: "month", expect: "paid" }, "…sends the plan, interval, and that it expects a paid plan");
   ok(await page.$("[data-plan=business_pro]") === null && /Rolling out/.test(await page.textContent(".v2-plans")), "Pro with checkout off: no switch button, Rolling out");
   await page.check("input[name=v2Iv][value=year]");
   ok(/\$990\/year/.test(await page.textContent(".v2-plans")) && await page.$("[data-plan=business_lite]"), "annual: prices per year; switching Lite to annual is offered");
@@ -114,6 +114,24 @@ async function loadV2() {}
   ok(/(4|5) days and 48 of 60 minutes left/.test(await page.textContent("#v2Bill")), "trial card: days and minutes left");
   await page.click("#v2Start"); await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/start-plan"));
   ok((await page.evaluate(() => confirms.at(-1))).includes("Your card is charged today"), "start my plan now: confirm, then sent");
+
+  console.log("Personal trial: one minutes figure, and switching in a trial");
+  const tEnd = new Date(Date.now() + 6 * 864e5).toISOString().slice(0, 10);
+  const PER_T = (per, trial) => BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: { minutes: 20, price_cad: 20 }, checkoutEnabled: true },
+    autoPackage: { available: false, running: true, enabled: false, max: 2 }, credit: 0, trial: { end: tEnd, cap: 15, ...trial }, period: { kind: "trial", start: "2026-11-20", end: tEnd, allowance: 15, packages: [], ...per } });
+  const PPLANS = PLANS({ prompts: [], plans: [plan("personal", "Personal Line", 19, 190, 30, true), plan("business_lite", "Business Lite", 99, 990, 100, false), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)] });
+  for (const [label, bill] of [["API before this fix (1:29 = 1.48)", PER_T({ used: 1.48 }, {})], ["API with the rule", PER_T({ used: 2, left: 13 }, { left: 13 })]]) {
+    await open(bill, PPLANS);
+    const tt = await page.textContent("#v2Bill");
+    ok(/13 of 15 minutes left/.test(tt) && /2\s*of 15 minutes used/.test(tt), `1:29 call, ${label}: "13 of 15 minutes left" and "2 of 15 minutes used"`);
+  }
+  await open(PER_T({ used: 1, left: 14 }, { left: 14 }), PPLANS);
+  ok(/14 of 15 minutes left/.test(await page.textContent("#v2Bill")) && /1\s*of 15 minutes used/.test(await page.textContent("#v2Bill")), "0:59 call: 14 left, 1 used");
+  await page.click("[data-plan=business_lite]");
+  const tc = await page.evaluate(() => confirms.at(-1));
+  ok(tc === `Switch to Business Lite now? You're still in your free trial, so nothing is charged today. Your first charge is $99 a month on ${tEnd}, when the trial ends. Your trial's minutes and end date stay the same.`, "in a trial: no \"charged the difference today\"; first charge on the trial end");
+  await page.waitForFunction(() => /First charge/.test($("v2PlanMsg").textContent));
+  eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, "You're on Business Lite. First charge $99 a month on 2026-11-27."], "…sends expect: trial; says when the first charge is");
 
   eq(errs, [], "no page errors");
   await browser.close();
