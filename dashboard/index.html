@@ -862,6 +862,16 @@ const fmtPhone = v => { const d = String(v || "").replace(/\D/g, ""); const m = 
 // Every time on this page is shown in the business's own timezone (Customize).
 const TZ = () => (typeof S !== "undefined" && S && S.timezone) || "America/Toronto";
 const fmtWhen = iso => new Date(iso).toLocaleString("en-CA", { timeZone: TZ(), month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+/* THE date format for a day, everywhere on this page: "Dec 21" ("Jan 5, 2027" in another
+   year). A plain date ("2026-12-21") is that calendar day; a timestamp is its day in the
+   business's timezone. Anything unreadable comes back as "". */
+const fmtDay = d => {
+  const v = String(d == null ? "" : d).trim(); if (!v) return "";
+  const plain = /^\d{4}-\d{2}-\d{2}$/.test(v), t = new Date(plain ? `${v}T12:00:00Z` : v);
+  if (isNaN(t)) return "";
+  const tz = plain ? "UTC" : TZ(), y = t.toLocaleDateString("en-CA", { timeZone: tz, year: "numeric" });
+  return t.toLocaleDateString("en-US", { timeZone: tz, month: "short", day: "numeric", ...(y !== String(new Date().getFullYear()) ? { year: "numeric" } : {}) });
+};
 function tzLabel(tz) {
   try {
     const name = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "long" })
@@ -1575,7 +1585,7 @@ function applySections() {
 function renderUsage(u) {
   const el = $("usageCard");
   if (!u) { el.hidden = true; return; }
-  const fmtD = s => new Date(s + "T12:00:00Z").toLocaleDateString("en-CA", { month: "short", day: "numeric", timeZone: "UTC" });
+  const fmtD = fmtDay;
   // Self-serve trials carry the exact end (the moment the line went live + the
   // trial length): shown as a date and time in the business's timezone. Every
   // other card keeps its date, exactly as before.
@@ -1872,11 +1882,15 @@ function renderV2Bill() {
   if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
     ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
   if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
-    <div class="v2-row">${daysLeft(b.trial.end)} days and ${b.trial.left != null ? b.trial.left : Math.max(0, b.trial.cap - usedMin)} of ${b.trial.cap} minutes left. Your plan starts on ${esc(String(b.trial.end).slice(0, 10))}.</div>
+    <div class="v2-row">${daysLeft(b.trial.end)} days and ${b.trial.left != null ? b.trial.left : Math.max(0, b.trial.cap - usedMin)} of ${b.trial.cap} minutes left. Your plan starts on ${esc(fmtDay(b.trial.end))}.</div>
     </div>`);
-  sec.push(`<div class="v2-sec"><p class="v2-h">Minutes this period</p>
-    <div class="v2-meter${usedMin >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${usedMin}"><i style="width:${pct}%"></i></div>
-    <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used · resets ${esc(String(per.end).slice(0, 10))}</span></div>
+  /* "Minutes this period: X of Y" is the top card's (renderUsage). The Billing card repeats
+     the meter only when that card isn't on the page; otherwise it keeps what's its own:
+     the extra minutes bought, what doesn't count, and the Buy button. */
+  const topCard = !!($("usageCard") && !$("usageCard").hidden);
+  sec.push(`<div class="v2-sec"><p class="v2-h">${topCard ? "Extra minutes" : "Minutes this period"}</p>
+    ${topCard ? "" : `<div class="v2-meter${usedMin >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${usedMin}"><i style="width:${pct}%"></i></div>
+    <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used · resets ${esc(fmtDay(per.end))}</span></div>`}
     ${per.packages.length ? `<div class="v2-row muted" style="font-size:13px">Extra this period: ${per.packages.map(x => `${x.minutes} min`).join(", ")}</div>` : ""}
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
     ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
@@ -1894,7 +1908,7 @@ function renderV2Bill() {
   if (p) {
     const st = p.compare.stay, nx = p.compare.next;
     sec.push(`<div class="v2-sec" id="v2Plans"><p class="v2-h">Your plan</p>
-      ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(String(b.pendingPlan.at || "").slice(0, 10))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
+      ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(fmtDay(b.pendingPlan.at))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
       ${v2CostLine(st, nx)}
       <div class="v2-row" role="radiogroup" aria-label="Billing"><label class="chk-inline"><input type="radio" name="v2Iv" value="month" ${v2Interval === "month" ? "checked" : ""}> Monthly</label>
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
@@ -1948,7 +1962,12 @@ function renderV2Bill() {
       ? rows.map(x => { const v = x.data || {}; return `<div class="v2-row"><span><b>${esc(String(x.month).slice(0, 7))}</b>: ${v.calls} calls (${v.spam} spam screened out), ${v.minutes} minutes, ${v.booked} booked${v.busiestHour != null ? `, busiest at ${v.busiestHour}:00` : ""}</span></div>`; }).join("")
       : `<div class="v2-row muted">Your first report appears after your first full month.</div>`}</div>`);
   }
-  const receipts = v2Inv && v2Inv.ok ? (v2Inv.invoices || []) : null;
+  /* A $0 invoice is not a receipt. The one Stripe makes when the trial starts
+     (billing_reason subscription_create, sent by the API as `reason`) is labelled "Free trial
+     start"; every other $0 row (a plan change in the trial, an older API with no reason) is left
+     out. Rows with money on them are always shown. */
+  const receipts = v2Inv && v2Inv.ok ? (v2Inv.invoices || []).flatMap(i => Number(i.total_cad) !== 0 ? [i]
+    : i.reason === "subscription_create" ? [{ ...i, label: "Free trial start" }] : []) : null;
   if (receipts || b.credit > 0) {
     /*
      * THE DATE IS THE TRIAL'S END, and only a customer who is in a trial gets one.
@@ -1956,10 +1975,10 @@ function renderV2Bill() {
      * lands, which is a different promise — so they are told plainly that there is
      * nothing yet, with no date attached to it.
      */
-    const firstCharge = b.trial ? String(b.trial.end || "").slice(0, 10) : "";
+    const firstCharge = b.trial ? fmtDay(b.trial.end) : "";
     sec.push(`<div class="v2-sec"><p class="v2-h">Billing</p>${b.credit > 0 ? `<div class="v2-row"><span>Account credit: <b>${v2Money(b.credit)}</b> (used on your next invoices)</span></div>` : ""}
       ${!receipts ? "" : receipts.length
-        ? receipts.map(i => `<div class="v2-row">${esc(i.date || "")} · ${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("")
+        ? receipts.map(i => `<div class="v2-row">${esc(fmtDay(i.date))} · ${i.label ? `${esc(i.label)} · ` : ""}${v2Money(i.total_cad)} · ${esc(i.status)} ${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">View</a>` : ""}</div>`).join("")
         : `<div class="v2-row muted">No receipts yet${firstCharge ? `: your first charge is ${esc(firstCharge)}` : ""}.</div>`}</div>`);
   }
   $("v2BillBody").innerHTML = sec.join("");
@@ -2081,7 +2100,7 @@ function v2PlanConfirm({ title, facts, text, yes, danger }) {
 const v2PlusTax = (n, per) => `${v2Money(n)} + tax${per ? ` a ${per}` : ""}`;
 const v2PlanPrice = (x, interval) => v2PlusTax(interval === "year" ? x.year : x.month, interval === "year" ? "year" : "month");
 /** A date as the rest of this card writes one. */
-const v2Day = d => String(d || "").slice(0, 10);
+const v2Day = fmtDay;
 
 const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k;
 function wireV2Bill() {

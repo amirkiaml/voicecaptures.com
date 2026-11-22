@@ -23,6 +23,8 @@ const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
  * match stops at whichever comes first in the file, which silently left the consent modal
  * out of the harness the day a second dialog was added.
  */
+// The page's own day formatter (and the timezone it reads), not a copy.
+const fmtDaySrc = /(const fmtDay = d => \{[\s\S]*?\n\};)/.exec(html)[1], tzSrc = /(const TZ = \(\) => [^\n]*)/.exec(html)[1];
 const markup = /(<div class="card v2" id="v2Bill"[\s\S]*<\/dialog>)/.exec(html)[1];
 const js = /(\/\* ---------- Pricing v2 usage, packages, plan, add-ons ----------[\s\S]*?)\nasync function api\(/.exec(html)[1];
 ok(html.includes("    loadV2Bill();\n"), "load() calls loadV2Bill()");
@@ -33,6 +35,10 @@ const BILL = (o = {}) => ({ plan: { key: "business_lite", label: "Business Lite"
   period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 120, allowance: 150, packages: [{ minutes: 50, price_cad: 75, source: "package" }], shortCalls: 2 },
   outOfMinutes: false, autoPackage: { available: true, running: true, enabled: false, max: 2 }, consent: { version: "2026-11-17.1", auto_package: "AUTO PACKAGE CONSENT" },
   credit: 30, pendingPlan: null, trial: null, ...o });
+// The page's one day format: "Dec 1" ("Jan 5, 2027" in another year). Plain dates are that calendar day.
+const day = (d, tz = "America/Toronto") => { const plain = /^\d{4}-\d{2}-\d{2}$/.test(d), t = new Date(plain ? `${d}T12:00:00Z` : d), z = plain ? "UTC" : tz;
+  const y = t.toLocaleDateString("en-CA", { timeZone: z, year: "numeric" });
+  return t.toLocaleDateString("en-US", { timeZone: z, month: "short", day: "numeric", ...(y !== String(new Date().getFullYear()) ? { year: "numeric" } : {}) }); };
 const PLANS = (o = {}) => ({ plans: [plan("personal", "Personal Line", 19, 190, 30, false), plan("business_lite", "Business Lite", 99, 990, 100, true), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)],
   billing: "month", compare: { stay: { label: "Business Lite", cost: 174, coversMinutes: 150, packages: 1 }, next: { plan: "business_pro", label: "Business Pro", price: 199, minutes: 250 } },
   addons: { addon_calendar: { label: "Extra calendar or line", price_cad: 29, status: "available", active: false }, addon_history_90: { label: "90-day call history", price_cad: 19, status: "available", active: true },
@@ -44,6 +50,8 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 window.sent = []; window.confirms = []; window.confirm = t => { confirms.push(t); return true; };
 window.last = { businessName: "Bluewave Plumbing" };
+${tzSrc}
+${fmtDaySrc}
 const BILL = ${JSON.stringify(bill)}, PLANS = ${JSON.stringify(plans)};
 async function api(p, o = {}) {
   sent.push({ p, body: o.body ? JSON.parse(o.body) : null });
@@ -86,7 +94,7 @@ async function loadV2() {}
   console.log("Business Lite");
   await open(BILL(), PLANS());
   const t = await page.textContent("#v2Bill");
-  ok(/120\s*of 150 minutes used · resets 2026-12-01/.test(t) && /Extra this period: 50 min/.test(t) && /under 10 seconds don't count/.test(t), "meter: used of allowance, reset date, packages, what doesn't count");
+  ok(t.includes(`120 of 150 minutes used · resets ${day("2026-12-01")}`) && /Extra this period: 50 min/.test(t) && /under 10 seconds don't count/.test(t), "meter (no top card on the page): used of allowance, reset date in the page's one format, packages, what doesn't count");
   ok(/Buy 50 extra minutes for \$75/.test(t), "buy button from the API's package");
   ok(/Time for Business Pro\?/.test(t) && /\$249 for 200 minutes/.test(t), "this period's prompt with the math");
   ok(/At this period's usage, Business Lite costs \$174 for 150 minutes \(1 extra package\)\. Business Pro is \$199 for 250\./.test(t), "cost of staying vs the next plan");
@@ -106,7 +114,7 @@ async function loadV2() {}
   const down = await planModal();
   ok(down.open && down.title === "Move to Personal Line?", "downgrade: a dialog, not a confirm()");
   ok(down.facts.join(" | ").includes("$19 + tax a month"), "downgrade: the price, with tax named the way the rest of the service names it");
-  ok(/Takes effect\s*2026-12-01/.test(down.facts.join(" ")), "downgrade: the date it takes effect");
+  ok(down.facts.join(" ").includes(`Takes effect ${day("2026-12-01")}`), "downgrade: the date it takes effect");
   ok(/no refund for the rest of this period/.test(down.text), "downgrade: no refund");
   ok(/everything your assistant already knows about your business is kept/i.test(down.text), "downgrade: the knowledge base is kept");
   await page.click("#v2PlanModalYes");
@@ -187,13 +195,13 @@ async function loadV2() {}
   /* #62's wording, now in the dialog rather than a confirm(): the same four promises. */
   const tc = await planModal();
   ok(tc.title === "Switch to Business Lite?", "in a trial: a switch, offered as one");
-  ok(tc.facts.join(" ").includes(`no charge until ${tEnd}`), "in a trial: nothing charged today, and the date it starts");
+  ok(tc.facts.join(" ").includes(`no charge until ${day(tEnd)}`), "in a trial: nothing charged today, and the date it starts");
   ok(/still in your free trial, so nothing is charged today/.test(tc.text) && !/charged the difference/.test(tc.text), "in a trial: no \"charged the difference today\"");
-  ok(new RegExp(`first charge is the Business Lite price on ${tEnd}`).test(tc.text), "in a trial: the first charge is the NEW plan's price, when the trial ends");
+  ok(new RegExp(`first charge is the Business Lite price on ${day(tEnd)}`).test(tc.text), "in a trial: the first charge is the NEW plan's price, when the trial ends");
   ok(/trial's minutes and end date stay the same/.test(tc.text), "in a trial: the trial itself is untouched");
   await page.click("#v2PlanModalYes");
   await page.waitForFunction(() => /First charge/.test($("v2PlanMsg").textContent));
-  eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, "You're on Business Lite. First charge $99 a month on 2026-11-27."], "…sends expect: trial; says when the first charge is");
+  eq([(await sentTo("/api/dashboard/v2/plan"))[0].body, await page.textContent("#v2PlanMsg")], [{ plan_key: "business_lite", billing: "month", expect: "trial" }, `You're on Business Lite. First charge $99 a month on ${day("2026-11-27T15:00:00Z")}.`], "…sends expect: trial; says when the first charge is");
   console.log("Figures the server did not send");
   /*
    * "$NaN" REACHED THE PAGE. `compare()` builds `stay.cost` as `cur.price_cad.month + ...`,
@@ -232,7 +240,7 @@ async function loadV2() {}
   await open(BILL({ credit: 0, trial: { end: "2026-12-04", cap: 60 } }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
   const empty = await page.textContent("#v2BillBody");
   ok(/Monthly reports/.test(empty) && /Your first report appears after your first full month\./.test(empty), "reports, none yet: the section is shown and says so");
-  ok(/No receipts yet: your first charge is 2026-12-04\./.test(empty), "receipts in a trial: the section names the day the trial ends");
+  ok(empty.includes(`No receipts yet: your first charge is ${day("2026-12-04")}.`), "receipts in a trial: the section names the day the trial ends");
   ok(!/Show reports|Show receipts/.test(empty), "and neither is a button that would have to ask");
 
   /* Off a trial there is no first charge to name: the period end is when the NEXT one
@@ -323,6 +331,31 @@ async function loadV2() {}
   await open(BILL(), PLANS({ prompts: [], compare: { stay: { plan: "enterprise", label: "Enterprise", quoted: true }, next: null } }));
   const qt = await page.textContent("#v2Plans");
   ok(/Enterprise is priced on a call/.test(qt) && !/NaN|undefined/.test(qt), "Your plan: \"Enterprise is priced on a call\", no $NaN / undefined");
+
+  console.log("Polish (Nov 22): one minutes figure, one date format, no $0 receipts");
+  // The top card ("Minutes this period: 2 of 50") is on the page: the Billing card doesn't repeat it.
+  await open(BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: { minutes: 20, price_cad: 20 }, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-21", end: "2026-12-21", used: 2, allowance: 50, packages: [{ minutes: 20, price_cad: 0, source: "trial_carry" }] }, credit: 0, trial: null }),
+    PLANS({ prompts: [] }), 200, { reports: [], running: true },
+    { invoices: [{ date: "2026-11-21", total_cad: 22.6, status: "paid", reason: "manual", url: "https://invoice.stripe.com/i/b" }, { date: "2026-11-21", total_cad: 21.47, status: "paid", reason: "subscription_update", url: "https://invoice.stripe.com/i/a" },
+      { date: "2026-11-21", total_cad: 0, status: "paid", reason: "subscription_update" }, { date: "2026-11-14", total_cad: 0, status: "paid", reason: "subscription_create" }] });
+  await page.evaluate(async () => { const u = document.createElement("div"); u.id = "usageCard"; u.className = "card usage"; u.textContent = "Minutes this period: 2 of 50"; document.body.prepend(u); await loadV2Bill(); });
+  const pb = await page.textContent("#v2Bill");
+  ok(!/of 50 minutes used/.test(pb) && !/Minutes this period/.test(pb) && /Extra minutes/.test(pb) && /Extra this period: 20 min/.test(pb) && /Buy 20 extra minutes/.test(pb),
+    "top card on the page: the Billing card drops its own \"2 of 50\" and keeps the extra minutes and the Buy button");
+  const rows = await page.$$eval("#v2BillBody .v2-sec:last-child .v2-row", els => els.map(e => e.textContent.replace(/\s+/g, " ").trim()));
+  eq(rows, [`${day("2026-11-21")} · $22.60 · paid View`, `${day("2026-11-21")} · $21.47 · paid View`, `${day("2026-11-14")} · Free trial start · $0 · paid`],
+    "receipts: both charges; the trial's $0 invoice labelled \"Free trial start\"; the other $0 row left out");
+  ok(!/\d{4}-\d{2}-\d{2}/.test(pb), "no 2026-12-21-style date anywhere in the card");
+  // An older API with no `reason`: every $0 row is left out.
+  await open(BILL({ credit: 0, trial: null }), PLANS({ prompts: [] }), 200, { reports: [], running: true },
+    { invoices: [{ date: "2026-11-21", total_cad: 21.47, status: "paid" }, { date: "2026-11-14", total_cad: 0, status: "paid" }] });
+  eq(await page.$$eval("#v2BillBody .v2-sec:last-child .v2-row", els => els.length), 1, "older API (no reason): $0 rows hidden, the charge shown");
+  // Trial, pending change, receipts promise: all in the one format.
+  await open(BILL({ credit: 0, trial: { end: "2026-12-04", cap: 60 }, pendingPlan: { plan_key: "personal", billing: "month", at: "2026-12-21T05:00:00Z" } }), PLANS({ prompts: [] }), 200, { reports: [], running: true }, { invoices: [] });
+  const dt = await page.textContent("#v2Bill");
+  ok(dt.includes(`Your plan starts on ${day("2026-12-04")}.`) && dt.includes(`on ${day("2026-12-21T05:00:00Z")}.`) && dt.includes(`your first charge is ${day("2026-12-04")}.`) && !/\d{4}-\d{2}-\d{2}/.test(dt),
+    "trial start, scheduled change and first charge: \"Dec 4\" style, never 2026-12-04");
 
   eq(errs, [], "no page errors");
   await browser.close();
