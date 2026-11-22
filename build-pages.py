@@ -100,8 +100,8 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "21 November 2026"
-TERMS_UPDATED = "21 November 2026"
+PRIVACY_UPDATED = "22 November 2026"
+TERMS_UPDATED = "22 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
 # this is for, and on a consent page it is worth being exact about. The consent VERSION
