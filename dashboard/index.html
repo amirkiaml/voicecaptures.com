@@ -2182,6 +2182,7 @@ function wireV2Bill() {
      * one — it happens now — and why the button below says Switch rather than Schedule.
      */
     const inTrial = !!b2trial(), trialEnd = inTrial ? v2Day(v2b.trial.end) : "";
+    let prorationDate = null;
     const price = v2Interval === "year" ? `${v2Money(x.year)} a year` : `${v2Money(x.month)} a month`;
     const facts = [["New plan", `${x.label} · ${x.minutes} minutes a month`], ["Price", v2PlanPrice(x, v2Interval)]];
     let text, yes;
@@ -2191,10 +2192,19 @@ function wireV2Bill() {
         + (up ? `Everything ${x.label} includes switches on straight away.` : `Features that ${x.label} does not include stop, and everything your assistant already knows is kept.`);
       yes = `Switch to ${x.label}`;
     } else if (up) {
-      facts.push(["When", "Charged now"]);
-      text = `You move to ${x.label} today and are charged for the rest of this period at the new price. Stripe works out that part-period amount to the day, and the tax with it. `
-        + `Everything ${x.label} includes switches on straight away.`;
-      yes = `Move to ${x.label}`;
+      /* THE CHARGE, BEFORE THE CLICK. GET /plan/preview asks Stripe what this upgrade
+         invoices today (its proration lines, before tax) and fixes a proration_date; the
+         change below sends that date back so Stripe charges exactly this. If Stripe can't
+         preview, the server's estimate comes back with exact: false and is said as "about". */
+      let pv = null;
+      try { const pr = await api(`/api/dashboard/v2/plan/preview?plan_key=${encodeURIComponent(x.key)}&billing=${encodeURIComponent(v2Interval)}`); if (pr.ok) pv = await pr.json(); } catch {}
+      prorationDate = pv && pv.proration_date || null;
+      const today = pv && typeof pv.today_cad === "number" ? `${pv.exact ? "" : "about "}${v2PlusTax(pv.today_cad)}` : null;
+      const from = v2Day(pv && pv.renews || (v2b && v2b.period && v2b.period.end));
+      facts.push(["Charged today", today || "The difference for the rest of this period"]);
+      text = `You move to ${x.label} now${today ? ` and are charged ${today} today` : " and are charged today"} for the rest of this billing period at the new price`
+        + `${from ? `; from ${from} you pay ${v2PlanPrice(x, v2Interval)}` : ""}. Everything ${x.label} includes switches on straight away. You'll get an email with the receipt.`;
+      yes = today ? `Pay ${today.replace(" + tax", "")} + tax and move` : `Move to ${x.label}`;
     } else {
       /* A paid downgrade is scheduled and NOT prorated (`proration_behavior: "none"`),
          which is what "no refund" means here — the route's own behaviour, not a policy
@@ -2206,11 +2216,18 @@ function wireV2Bill() {
       yes = "Schedule the change";
     }
     if (!await v2PlanConfirm({ title: inTrial ? `Switch to ${x.label}?` : `Move to ${x.label}?`, facts, text, yes })) return;
+    // One change at a time: every Switch button is off until this one answers (a second
+    // click used to send the same downgrade twice, and two emails with two undo links).
+    const planBtns = [...document.querySelectorAll("#v2Bill [data-plan]")];
+    planBtns.forEach(bt => { bt.disabled = true; });
     msg("v2PlanMsg", "Saving…");
     /* `expect` is the server's guard: it checks Stripe agrees about the trial and refuses
        rather than do something this dialog did not say. Kept from #62. */
-    const r = await post("plan", { plan_key: x.key, billing: v2Interval, expect: inTrial ? "trial" : "paid" });
-    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${v2Day(r.firstChargeAt || trialEnd)}.` : r.changed === "now" ? `You're on ${x.label}.` : `Changing to ${x.label} on ${v2Day(r.at)}.`) : r.error || "Couldn't change the plan.";
+    let r;
+    try { r = await post("plan", { plan_key: x.key, billing: v2Interval, expect: inTrial ? "trial" : "paid", ...(prorationDate ? { proration_date: prorationDate } : {}) }); }
+    finally { planBtns.forEach(bt => { bt.disabled = false; }); }
+    const charged = r.charged && typeof r.charged.before_tax_cad === "number" ? ` Charged today: ${v2PlusTax(r.charged.before_tax_cad)}.` : "";
+    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${v2Day(r.firstChargeAt || trialEnd)}.` : r.changed === "now" ? `You're now on ${x.label}.${charged}` : `Changing to ${x.label} on ${v2Day(r.at)}.`) : r.error || "Couldn't change the plan.";
     // Reload first: the re-render replaces #v2PlanMsg, which used to wipe this message.
     if (r.ok) { v2AfterPlanChange(x, r); await loadV2Bill(); loadV2(); }
     msg("v2PlanMsg", said);
