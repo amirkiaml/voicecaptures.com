@@ -106,6 +106,9 @@ ${js}
   ok(await page.$(".v2Tg[data-k=textback]") === null && await page.$(".v2Tg[data-k=report]") === null,
     "a live feature the server has switched off: no control, no badge");
   ok(!/Custom routing/.test(body), "a rolling_out feature: not drawn, and not listed as missing either");
+  /* Every live feature on this fixture has a control, so the summary has nothing to add
+     and is not drawn as an empty heading. */
+  ok(!/On your plan/.test(body), "nothing live without a control: no empty \"On your plan\" heading");
 
   console.log("Consent");
   await page.fill(".v2Em >> nth=2", "typed@x.test");
@@ -141,6 +144,19 @@ ${js}
   console.log("Business Pro: at most two tags, then the team");
   await open(PRO);
   const pro = await page.textContent("#v2Body");
+  /*
+   * AND IT SAYS WHAT PRO ACTUALLY HAS. Caller mood and ninety days of history are live on
+   * Pro and have no setting of their own, so before this they were on the dashboard
+   * nowhere: not in "Not on your plan" (they are on it) and not as a control (there is
+   * none). Calendar is live in this fixture AND has a control, so it is not repeated
+   * here; text-back and the monthly report are live but switched off at the server, which
+   * is not something they have.
+   */
+  const onPlan = await page.$$eval("#v2Body .v2-sec", els => { const e = els.find(x => /On your plan/.test((x.querySelector(".v2-h") || {}).textContent || ""));
+    return e ? [...e.querySelectorAll(".v2-row")].map(r => r.textContent.trim()) : null; });
+  eq(onPlan, ["Caller mood", "90 days of call history"], "On your plan: the live features that have no setting of their own");
+  ok(!onPlan.some(r => /Calendar/.test(r)), "...not the ones with a working control above");
+  ok(!onPlan.some(r => /text-back|Monthly report/i.test(r)), "...and not one the server has switched off");
   const tags = await page.$$eval("#v2Body .v2-badge.soon", els => els.map(e => e.closest(".v2-row").textContent.trim()));
   /*
    * PRO IS SOLD ON WHAT HAS NOT SHIPPED: ten of its entitlements are rolling_out. Drawing

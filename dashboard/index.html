@@ -2278,6 +2278,23 @@ const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge">${esc(V2
  * already paying for, which is worse than silence. Nothing here is called live.
  */
 const V2_SOON_TAGS = { business_pro: ["reminders", "review_requests"] };
+/*
+ * WHAT IS ON THE PLAN, in the card that otherwise only says what is not.
+ *
+ * This is the other half of "show only what the catalog marks live". The card listed what
+ * an upgrade would unlock, and on Pro what was still coming, and never what the customer
+ * actually has: Pro's live entitlements — caller mood, ninety days of history, priority
+ * support — have no setting to show, so they appeared nowhere on the dashboard at all.
+ *
+ * The statuses still come from the server. This map only supplies the words.
+ */
+const V2_ON_PLAN = { ...V2_LOCKED,
+  /* The ones every plan has from the first day. `/v2/settings` does not send these in
+     `features` yet — it builds fifteen keys by hand — so they are named here by their
+     catalog key and will appear the moment the server includes them. */
+  answers_existing_number: "Answers on your existing number", spam_screening: "Spam and robocall screening",
+  messages_summary: "Messages, with a text and email summary", dashboard: "This dashboard",
+  tailored_to_business: "Answers from what we know about your business" };
 async function v2Post(path, body) {
   const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   let d = {}; try { d = await r.json(); } catch {}
@@ -2314,6 +2331,19 @@ function renderV2() {
   $("v2Title").textContent = `Your plan: ${p.label}`;
   $("v2Sub").textContent = `${p.minutes} minutes a month` + (p.package ? ` · extra ${p.package.minutes} minutes for $${p.package.price_cad}` : "");
   const sec = [];
+  const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]].filter(([k]) => v2Usable(f[k]));
+  /*
+   * ON YOUR PLAN: the live features that have no setting of their own.
+   *
+   * A feature with a working control below is left out — a control the owner can press is
+   * a better statement that something is on the plan than a line of text about it — and
+   * so is one the server has switched off, because `v2Usable` is the single gate and a
+   * feature that cannot be used is not a feature they have.
+   */
+  const withControl = new Set(["calendar_google", "caller_sms", "transfer", "email_recipients", "coverage_mode", ...toggles.map(([k]) => k)].filter(k => v2Usable(f[k])));
+  const onPlan = Object.entries(f).filter(([k, x]) => V2_ON_PLAN[k] && v2Usable(x) && !withControl.has(k));
+  if (onPlan.length) sec.push(`<div class="v2-sec"><p class="v2-h">On your plan</p>
+    ${onPlan.map(([k]) => `<div class="v2-row">${esc(V2_ON_PLAN[k])}</div>`).join("")}</div>`);
   /*
    * A SECTION PER THING THEY CAN DO, AND NOTHING FOR THE REST.
    *
@@ -2352,7 +2382,6 @@ function renderV2() {
     <div class="v2-msg" id="v2EmMsg"></div></div>`);
   // Settings-only features
   const cm = f.coverage_mode;
-  const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]].filter(([k]) => v2Usable(f[k]));
   if (v2Usable(cm) || toggles.length) sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
     ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>` : ""}
     ${toggles.map(([k, l]) => `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}</label>`).join("")}
