@@ -98,7 +98,17 @@ async function loadV2() {}
   ok(t.includes(`120 of 150 minutes used · resets ${day("2026-12-01")}`) && /Extra this period: 50 min/.test(t) && /under 10 seconds don't count/.test(t), "meter (no top card on the page): used of allowance, reset date in the page's one format, packages, what doesn't count");
   ok(/Buy 50 extra minutes for \$75/.test(t), "buy button from the API's package");
   ok(/Time for Business Pro\?/.test(t) && /\$249 for 200 minutes/.test(t), "this period's prompt with the math");
-  ok(/At this period's usage, Business Lite costs \$174 for 150 minutes \(1 extra package\)\. Business Pro is \$199 for 250\./.test(t), "cost of staying vs the next plan");
+  /*
+   * THE PLAN THEY ARE ON, AND NO OTHER.
+   *
+   * This sentence used to end with the plan above — under "Your plan", a Lite customer
+   * read "Business Pro is $199 for 250" as its last words, and a Personal one read
+   * "Business Lite is $99 for 100". The tiles below name every plan with its own price,
+   * its own minutes and its own Switch button.
+   */
+  ok(/At this period's usage, Business Lite costs \$174 for 150 minutes \(1 extra package\)\./.test(t), "the cost of the plan they are on, at this usage");
+  const costRow = await page.$eval("#v2Plans .v2-row.muted", e => e.textContent);
+  ok(!/Business Pro/.test(costRow) && !/\$199/.test(costRow), "...and the plan above is not named in it");
   ok(/Account credit: \$30/.test(t), "credit balance");
   eq(await page.$$eval("[data-addon]", a => a.map(x => [x.dataset.addon, x.textContent])), [["addon_calendar", "Add"], ["addon_history_90", "Remove"]], "add-ons: add / remove; the quoted one not shown");
   await page.click("[data-buy]"); await page.waitForFunction(() => $("v2BuyMsg").textContent.includes("isn't available"));
@@ -121,6 +131,20 @@ async function loadV2() {}
   await page.click("#v2PlanModalYes");
   await page.waitForFunction(() => sent.some(x => x.p === "/api/dashboard/v2/plan"));
   eq((await sentTo("/api/dashboard/v2/plan"))[0].body, { plan_key: "personal", billing: "month", expect: "paid" }, "…sends the plan, interval, and that it expects a paid plan");
+  /*
+   * AND SAYS IT ONCE. The reload draws the pending-plan row at the top of the section —
+   * the date, the interval and the button that undoes it — and the message under the card
+   * used to repeat the same date two inches below it. The row is the one that keeps the
+   * facts: it comes from the server and survives a reload.
+   */
+  await page.evaluate(() => { BILL.pendingPlan = { plan_key: "personal", billing: "month", at: "2026-12-23" }; });
+  await page.click("[data-plan=personal]"); await planModal(); await page.click("#v2PlanModalYes");
+  await page.waitForFunction(() => $("v2PlanMsg").textContent === "Scheduled.");
+  const notices = await page.$$eval("#v2Plans .v2-row, #v2PlanMsg", els => els.map(e => e.textContent).filter(x => /Changing to/.test(x)));
+  eq(notices.length, 1, "a scheduled change is stated once, not twice");
+  ok(/Changing to Personal Line/.test(notices[0]) && notices[0].includes(day("2026-12-23")) && /Keep my plan/.test(notices[0]),
+    "...in the row that carries the date and the way to undo it");
+  await page.evaluate(() => { BILL.pendingPlan = null; });
   ok(await page.$("[data-plan=business_pro]") === null && /Rolling out/.test(await page.textContent(".v2-plans")), "Pro with checkout off: no switch button, Rolling out");
   await page.check("input[name=v2Iv][value=year]");
   ok(/\$990\/year/.test(await page.textContent(".v2-plans")) && await page.$("[data-plan=business_lite]"), "annual: prices per year; switching Lite to annual is offered");
@@ -214,19 +238,20 @@ async function loadV2() {}
     PLANS({ compare: { stay: { label: "Personal Line", cost: undefined, coversMinutes: 30, packages: 0 }, next: { plan: "business_lite", label: "Business Lite", price: 99, minutes: 100 } }, prompts: [] }));
   const noFig = await page.textContent("#v2BillBody");
   ok(!/NaN/.test(noFig), "a figure the server did not send never renders as $NaN");
-  ok(!/Personal Line costs/.test(noFig), "...and the half of the sentence that needed it is dropped whole");
-  ok(/Business Lite is \$99 for 100\./.test(noFig), "...while the half that has its figures still reads");
+  ok(!/Personal Line costs/.test(noFig), "...and the sentence that needed it is dropped whole");
+  /* It used to fall back to the next plan up, which is how a sentence about somebody's own
+     plan could end up naming only a plan they were not on. */
+  ok(!/Business Lite is/.test(noFig) && !/\$99 for 100/.test(noFig), "...with the plan above not standing in for it");
 
-  console.log("Rolling out: nothing to press, and somewhere to write");
+  console.log("Rolling out: nothing to press, and nothing to read either");
   await open(BILL(), PLANS({ addonsRunning: false, prompts: [],
     addons: { addon_calendar: { label: "Extra calendar or line", price_cad: 29, status: "none", active: false },
       addon_history_90: { label: "90-day call history", price_cad: 19, status: "available", active: false } } }));
   const sections = await page.$$eval(".v2-sec", els => els.map(e => ({ h: (e.querySelector(".v2-h") || {}).textContent || "", t: e.textContent, btns: e.querySelectorAll("button").length })));
-  const addonSec = sections.find(x => /Add-ons/.test(x.h));
-  ok(/Rolling out/.test(addonSec.h) && /sales@voicecaptures\.com/.test(addonSec.h), "add-ons rolling out: a Rolling out badge and the address, in the heading");
-  eq(addonSec.btns, 0, "add-ons rolling out: no Add, no Remove");
-  ok(!/Upgrade/.test(addonSec.t), "add-ons rolling out: no Upgrade badge either");
-  ok(/Extra calendar or line · \$29\/month/.test(addonSec.t) && /90-day call history · \$19\/month/.test(addonSec.t), "add-ons rolling out: rows keep their name and price");
+  /* It was a "Rolling out" heading over a price list with nothing to press: the prices of
+     things that cannot be bought. The section waits until the server can sell them. */
+  ok(!sections.some(x => /Add-ons/.test(x.h)), "add-ons the server cannot sell yet: no section at all");
+  ok(!/Extra calendar or line|90-day call history/.test(await page.textContent("#v2BillBody")), "...and no price list for them either");
   ok(await page.$eval(".v2-sec .v2-badge.soon", e => getComputedStyle(e).backgroundColor !== getComputedStyle(e.closest(".v2-sec")).backgroundColor), "the Rolling out badge is a coloured badge, not the grey one");
   const proTile = await page.$eval(".v2-plans .v2-plan:last-child", e => ({ t: e.textContent, btns: e.querySelectorAll("button").length, mail: !!e.querySelector("a[href^='mailto:']") }));
   ok(/Rolling out/.test(proTile.t) && proTile.btns === 0 && proTile.mail, "Business Pro tile: no button, a Rolling out badge and the address");
@@ -256,10 +281,12 @@ async function loadV2() {}
   const gone = await page.textContent("#v2BillBody");
   ok(!/Monthly reports/.test(gone) && !/Billing/.test(gone), "a request that failed: no section at all, and no button to an error");
 
-  console.log("Rolling out, everywhere it is said");
+  console.log("Automatic extra minutes, before the server can do it");
   await open(BILL({ autoPackage: { available: true, running: false, enabled: false, max: 2 } }), PLANS({ prompts: [] }));
-  const auto = await page.$$eval(".v2-sec", els => (els.find(e => /Automatic extra minutes/.test((e.querySelector(".v2-h") || {}).textContent || "")) || {}).outerHTML || "");
-  ok(/v2-badge soon">Rolling out</.test(auto) && /mailto:sales@voicecaptures\.com/.test(auto), "automatic extra minutes: the same coloured badge and the same address");
+  /* A "Rolling out" badge over a disabled checkbox: a row that asks to be read and then
+     does nothing. It appears when the server can act on it. */
+  ok(!/Automatic extra minutes/.test(await page.textContent("#v2BillBody")) && await page.$("#v2Auto") === null,
+    "the server has it off: no section, and no checkbox that cannot be ticked");
   const grey = await page.$$eval(".v2-badge:not(.soon)", els => els.map(e => e.textContent));
   ok(!grey.includes("Rolling out"), "no grey 'Rolling out' badge is left anywhere on the card");
 
