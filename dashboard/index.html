@@ -1613,9 +1613,10 @@ function renderUsage(u) {
 function usageNote(u, pct, fmtD) {
   const r = u.rates || {}, m = n => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
   const topups = r.topup50 != null ? `Top up ahead and it's cheaper: 50 min ${m(r.topup50)} or 100 min ${m(r.topup100)}.` : "";
-  if (u.trial) return pct >= 100 ? "Your trial minutes are used up. We keep answering a little longer, then calls ring your phone directly until you start your plan."
+  const after = u.whilePaused === "message" ? "callers hear a short message" : "calls ring your phone directly";
+  if (u.trial) return pct >= 100 ? `Your trial minutes are used up. We keep answering a little longer, then ${after} until you start your plan.`
     : pct >= 80 ? `${pct}% of your trial minutes used.` : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`;
-  if (u.hardCap) return pct >= 100 ? "You've used this period's minutes. We keep answering a little longer, then calls ring your phone directly until you add minutes." : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`;
+  if (u.hardCap) return pct >= 100 ? `You've used this period's minutes. We keep answering a little longer, then ${after} until you add minutes.` : `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}`;
   if (u.overMinutes > 0) return u.overageWaived ? `${esc(u.overMinutes)} minutes over your plan this period — no charge. We keep answering as usual.`
     : `${esc(u.overMinutes)} minutes over your plan · about ${m(u.overageCharge)} on your next invoice (${m(r.overage)}/min). We keep answering. ${topups}`;
   if (pct >= 100) return `You've used this period's minutes. We keep answering; extra minutes are ${m(r.overage)}/min on your next invoice. ${topups}`;
@@ -1623,6 +1624,13 @@ function usageNote(u, pct, fmtD) {
   return `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}${u.extraMinutes ? ` · includes ${esc(u.extraMinutes)} extra minutes` : ""}`;
 }
 
+/* What a caller gets while the line is paused. The API says it (service.stateFor whilePaused,
+   usage.whilePaused): a self-serve line plays a short message and is never forwarded, which is
+   what the owner's email and text already said and what callers heard (live test, Nov 23).
+   Without the field (legacy clients): their calls really do ring the owner, as before. */
+const pausedCallers = s => s && s.whilePaused === "message"
+  ? "Nothing is lost. While it's paused, callers hear a short message that you can't take the call right now."
+  : "Nothing is lost: your calls ring your phone directly until it's back on.";
 /* Paused receptionist: why, where calls go now, and the client's own buy links. */
 const PAUSE_WHY = { minutes_used: "this period's minutes are used up", trial_cap: "your free trial's minutes are used up",
   trial_ended: "your free trial has ended", cancelled: "your account is cancelled", admin: "it's switched off" };
@@ -1650,7 +1658,7 @@ function renderService(s) {
   }
   const trial = s.reason === "trial_ended" || s.reason === "trial_cap";
   el.innerHTML = `<h3>Your AI receptionist is paused</h3>
-    <div>Because ${esc(PAUSE_WHY[s.reason] || "it's switched off")}. Nothing is lost: your calls ring your phone directly until it's back on.</div>
+    <div>Because ${esc(PAUSE_WHY[s.reason] || "it's switched off")}. ${pausedCallers(s)}</div>
     ${s.reason === "admin" || s.reason === "cancelled" ? "" : buyButtons(s.links, trial ? ["plan", "topup"] : ["topup", "plan"])}
     <div class="muted" style="font-size:13px;margin-top:10px">${s.reason === "admin" || s.reason === "cancelled" ? "" : "It switches back on as soon as payment goes through. "}Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
   el.hidden = false;
