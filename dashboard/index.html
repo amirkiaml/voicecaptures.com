@@ -2320,11 +2320,16 @@ function renderV2() {
         ${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : ""}</div>`}
     <div class="v2-msg" id="v2TrMsg"></div></div>`);
   // Email recipients
-  const er = f.email_recipients, max = (er && er.max) || 1;
+  /* The owner always gets every summary (the API counts them in the plan's limit), so only the
+     extra people are editable: Business Lite and Pro = you + 2 more. An older API without
+     `extra` falls back to the plan's limit minus one. */
+  const er = f.email_recipients, max = (er && er.max) || 1, extra = er && Number.isInteger(er.extra) ? er.extra : Math.max(0, max - 1);
   sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email${v2Soon(er)}${v2SoonNote(er)}</p>
-    <div class="v2-row">${Array.from({ length: max }, (_, i) => `<input type="email" class="v2Em" placeholder="name@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Email ${i + 1}">`).join("")}
+    <div class="v2-row">Always sent to you${er && er.owner ? ` (<b>${esc(er.owner)}</b>)` : ""}.</div>
+    ${extra ? `<div class="v2-row">${Array.from({ length: extra }, (_, i) => `<input type="email" class="v2Em" placeholder="teammate@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Also send to, ${i + 1} of ${extra}">`).join("")}
     <button type="button" class="btn" id="v2EmSave">Save</button></div>
-    ${max < 3 ? `<div class="v2-row muted" style="font-size:13px">Up to 3 addresses on Business Lite and Pro.</div>` : ""}
+    <div class="v2-row muted" style="font-size:13px">They get the same summary as you; their addresses aren't shown to each other.</div>`
+    : `<div class="v2-row muted" style="font-size:13px">Add up to 2 more people on Business Lite and Pro.</div>`}
     <div class="v2-msg" id="v2EmMsg"></div></div>`);
   // Settings-only features
   const cm = f.coverage_mode;

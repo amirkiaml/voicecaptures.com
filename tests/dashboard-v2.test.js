@@ -34,12 +34,12 @@ const CONSENT = { version: "2026-11-17.1", caller_sms: "CALLER TEXT CONSENT", tr
 const F = (status, extra = {}) => ({ status, running: true, ...extra });
 const LITE = { v2: true, plan: { key: "business_lite", label: "Business Lite", minutes: 100, package: { minutes: 50, price_cad: 75 }, emailRecipientsMax: 3 },
   features: { caller_sms: F("rolling_out", { enabled: false }), transfer: F("rolling_out", { enabled: false, destination: null, ringSeconds: 20 }), calendar_google: F("live", { connected: false }),
-    calendar_outlook: F("coming_soon"), calendar_apple: F("coming_soon"), email_recipients: F("live", { emails: ["a@x.test"], max: 3 }), coverage_mode: F("live", { value: null, running: false }),
+    calendar_outlook: F("coming_soon"), calendar_apple: F("coming_soon"), email_recipients: F("live", { emails: ["a@x.test"], max: 3, owner: "owner@bluewave.test", extra: 2 }), coverage_mode: F("live", { value: null, running: false }),
     textback: F("live", { value: false, running: false }), reminders: F("none", { value: null }), review_requests: F("none", { value: null }), report: F("live", { value: false, running: false }),
     sentiment: F("addon"), history_90: F("none"), priority_support: F("none"), custom_routing: F("none") }, consent: CONSENT };
 const PER = JSON.parse(JSON.stringify(LITE));
 Object.assign(PER.plan, { key: "personal", label: "Personal", minutes: 30, package: { minutes: 20, price_cad: 20 }, emailRecipientsMax: 1 });
-Object.assign(PER.features, { caller_sms: F("none"), transfer: F("none"), calendar_google: F("none"), email_recipients: F("live", { emails: [], max: 1 }) });
+Object.assign(PER.features, { caller_sms: F("none"), transfer: F("none"), calendar_google: F("none"), email_recipients: F("live", { emails: [], max: 1, owner: "me@personal.test", extra: 0 }) });
 
 const page0 = (settings, status = 200) => `<!doctype html><meta name=viewport content="width=device-width,initial-scale=1"><style>${style}</style><body>${markup}<script>
 const $ = id => document.getElementById(id);
@@ -72,7 +72,8 @@ ${js}
   ok(await page.isVisible("#v2Card"), "shown");
   eq([await page.textContent("#v2Title"), await page.textContent("#v2Sub")], ["Your plan: Business Lite", "100 minutes a month · extra 50 minutes for $75"], "plan line from the API (no price in the page)");
   ok(await page.isVisible("#v2CalOn") && /Outlook Coming soon · Apple Coming soon/.test(await page.textContent("#v2Body")), "Google connect button; Outlook and Apple coming soon");
-  eq(await page.$$eval(".v2Em", a => a.map(i => i.value)), ["a@x.test", "", ""], "three email fields");
+  eq(await page.$$eval(".v2Em", a => a.map(i => i.value)), ["a@x.test", ""], "two more email fields (the owner is the third)");
+  ok((await page.textContent("#v2Body")).includes("Always sent to you (owner@bluewave.test)."), "…and the owner shown as always included");
   const body = await page.textContent("#v2Body");
   ok(/Appointment reminders Upgrade/.test(body) && /Caller mood Add-on/.test(body), "locked cards: reminders (upgrade), caller mood (add-on)");
   ok(/Texts to callers Rolling out/.test(body), "caller texts marked rolling out");
@@ -89,7 +90,7 @@ ${js}
   ok(heads.length > 0 && heads.every(n => n === 1), "a heading that is rolling out carries the address exactly once");
 
   console.log("Consent");
-  await page.fill(".v2Em >> nth=2", "typed@x.test");
+  await page.fill(".v2Em >> nth=1", "typed@x.test");
   await page.click("#v2Sms");
   ok(await page.isVisible("#v2Modal") && (await page.textContent("#v2ModalText")) === "CALLER TEXT CONSENT", "the switch opens the modal with the server's exact text");
   ok(await page.isDisabled("#v2ModalYes"), "Switch on disabled until the box is ticked");
@@ -100,7 +101,7 @@ ${js}
   eq((await page.evaluate(() => sent)).find(x => x.p.includes("caller-sms")).body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "accepted: sends enabled + accept + the version shown");
   await page.waitForFunction(() => $("v2SmsMsg") && $("v2SmsMsg").textContent === "On.");
   ok(true, "…then the card reloads from the server and says On.");
-  eq(await page.inputValue(".v2Em >> nth=2"), "typed@x.test", "…keeping what was typed, unsaved, in another field");
+  eq(await page.inputValue(".v2Em >> nth=1"), "typed@x.test", "…keeping what was typed, unsaved, in another field");
 
   console.log("Transfer, emails, settings, calendar");
   await page.fill("#v2TrNum", "416-555-0188"); await page.selectOption("#v2TrRing", "25");
@@ -109,9 +110,9 @@ ${js}
   await page.waitForFunction(() => sent.some(x => x.p.includes("transfer")));
   eq((await page.evaluate(() => sent)).find(x => x.p.includes("transfer")).body, { enabled: true, destination: "416-555-0188", ring_seconds: 25, accept: true, consent_version: "2026-11-17.1" }, "transfer: number, ring time, consent");
   await page.waitForFunction(() => $("v2TrMsg").textContent === "Saved.");
-  await page.fill(".v2Em >> nth=1", "b@x.test"); await page.click("#v2EmSave");
+  await page.click("#v2EmSave");
   await page.waitForFunction(() => sent.some(x => x.p.includes("email-recipients")));
-  eq((await page.evaluate(() => sent)).find(x => x.p.includes("email-recipients")).body, { emails: ["a@x.test", "b@x.test", "typed@x.test"] }, "emails: the filled fields");
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("email-recipients")).body, { emails: ["a@x.test", "typed@x.test"] }, "emails: the filled fields (the owner isn't sent; always included)");
   await page.selectOption("#v2Cov", "after_hours");
   await page.waitForFunction(() => sent.some(x => x.p.includes("/feature")));
   eq((await page.evaluate(() => sent)).find(x => x.p.includes("/feature")).body, { key: "coverage_mode", value: "after_hours" }, "coverage mode saved");
@@ -121,7 +122,8 @@ ${js}
 
   console.log("Personal");
   await open(PER);
-  eq(await page.$$eval(".v2Em", a => a.length), 1, "one email field, with the upgrade note");
+  eq([await page.$$eval(".v2Em", a => a.length), /Always sent to you \(me@personal\.test\)\./.test(await page.textContent("#v2Body")), /Add up to 2 more people on Business Lite and Pro/.test(await page.textContent("#v2Body"))],
+    [0, true, true], "Personal: summaries to the owner, no extra fields, the upgrade note");
   ok(await page.$("#v2Sms") === null && await page.$("#v2TrSave") === null && await page.$("#v2CalOn") === null, "no caller texts, transfer or calendar controls");
   ok(/Confirmation texts to callers Upgrade/.test(await page.textContent("#v2Body")), "…shown as locked cards");
 
