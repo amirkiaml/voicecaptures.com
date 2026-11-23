@@ -1790,29 +1790,19 @@ const v2Money = n => (v2Has(n) ? `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}` 
 const V2_SALES = "sales@voicecaptures.com";
 const v2SoonNoteHtml = () => ` <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
 const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2SoonNoteHtml()}`;
-/**
- * IS THIS FEATURE ROLLING OUT? Two different fields mean it, and they can both be set:
- * `status` is what the PLAN gives, `running` is whether the server has it switched on.
- */
-const v2IsSoon = f => !!f && (f.status === "rolling_out" || f.running === false);
-/**
- * The address, ONCE per heading, however many of its badges are rolling out.
- *
- * Section headings get it; the per-control badges inside a section do not, because the
- * heading above them has already said it and repeating a mailto on every checkbox is
- * noise rather than help.
- */
-const v2SoonNote = (...fs) => (fs.some(v2IsSoon) ? v2SoonNoteHtml() : "");
 /** A plan somebody can actually move to from here: priced, and with its checkout open. */
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
- * WHAT STAYING COSTS, said only where the numbers exist.
+ * WHAT THE PLAN THEY ARE ON COSTS AT THIS USAGE. Their plan, and no other.
  *
- * Two sentences, each conditional on its own figures. The second half is dropped on its
- * own rather than taking the first half with it, and an Enterprise next step keeps saying
- * it is priced on a call, which needs no figures at all.
+ * It used to end with the plan ABOVE theirs — so under the heading "Your plan", the last
+ * sentence of the section named a plan the customer was not on, with its price, and with
+ * no unit on its minutes. On a Personal trial it named Business Lite; on Business Lite it
+ * named Business Pro. Every plan's price and minutes are in the tiles directly below,
+ * each with its own Switch button, so the comparison was saying again, less clearly and
+ * in the wrong place, what the thing beneath it already says.
  */
-function v2CostLine(st, nx) {
+function v2CostLine(st) {
   /*
    * NO COMPARISON AT ALL: no line. The server sends none for a plan it cannot rank, and
    * reading `st.cost` off nothing is how this function would have thrown rather than
@@ -1837,14 +1827,10 @@ function v2CostLine(st, nx) {
    * purpose; a figure that is simply missing is still a figure that must not reach the page
    * as "$NaN", whatever went wrong upstream to lose it.
    */
-  const parts = [];
-  if (v2Has(st.cost) && v2Has(st.coversMinutes)) {
-    parts.push(`At this period's usage, ${esc(st.label)} costs ${v2Money(st.cost)} for ${st.coversMinutes} minutes`
-      + (st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : "") + ".");
-  }
-  if (nx && nx.quoted) parts.push(`${esc(nx.label)}: priced on a call.`);
-  else if (nx && v2Has(nx.price) && v2Has(nx.minutes)) parts.push(`${esc(nx.label)} is ${v2Money(nx.price)} for ${nx.minutes}.`);
-  return parts.length ? `<div class="v2-row muted" style="font-size:13px">${parts.join(" ")}</div>` : "";
+  if (!(v2Has(st.cost) && v2Has(st.coversMinutes))) return "";
+  return `<div class="v2-row muted" style="font-size:13px">At this period's usage, ${esc(st.label)} costs `
+    + `${v2Money(st.cost)} for ${st.coversMinutes} minutes`
+    + (st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : "") + `.</div>`;
 }
 async function loadV2Bill() {
   const card = $("v2Bill");
@@ -1895,8 +1881,10 @@ function renderV2Bill() {
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
     ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
     <div class="v2-msg" id="v2BuyMsg"></div></div>`);
-  if (b.autoPackage.available && pk) sec.push(`<div class="v2-sec"><p class="v2-h">Automatic extra minutes${b.autoPackage.running ? "" : ` ${v2RollingOut()}`}</p>
-    <label class="v2-row chk-inline"><input type="checkbox" id="v2Auto" ${b.autoPackage.enabled ? "checked" : ""} ${b.autoPackage.running ? "" : "disabled"}> When I run out, add ${pk.minutes} minutes for ${v2Money(pk.price_cad)} + tax to my card (at most ${b.autoPackage.max} a period)</label>
+  /* Not drawn at all until the server has it switched on: it was a "Rolling out" badge
+     over a disabled checkbox, which is a row that asks to be read and then does nothing. */
+  if (b.autoPackage.available && pk && b.autoPackage.running) sec.push(`<div class="v2-sec"><p class="v2-h">Automatic extra minutes</p>
+    <label class="v2-row chk-inline"><input type="checkbox" id="v2Auto" ${b.autoPackage.enabled ? "checked" : ""}> When I run out, add ${pk.minutes} minutes for ${v2Money(pk.price_cad)} + tax to my card (at most ${b.autoPackage.max} a period)</label>
     <div class="v2-msg" id="v2AutoMsg"></div></div>`);
   if (p && p.prompts && p.prompts.length) sec.push(p.prompts.map(x => `<div class="v2-prompt"><p class="v2-h">${esc(x.title)}</p><div>${esc(x.body)}</div>
     <div class="v2-row">${x.kind === "pro_to_enterprise" ? `<a class="btn" href="/contact/">Book a call</a>`
@@ -1906,10 +1894,10 @@ function renderV2Bill() {
       : v2Switchable(p.compare.next) ? `<button type="button" class="btn" data-up="${esc(p.compare.next.plan || "")}">See ${esc(p.compare.next.label)}</button>` : ""}
     <button type="button" class="btn-ghost" data-dismiss="${esc(x.kind)}">Not now</button></div></div>`).join(""));
   if (p) {
-    const st = p.compare.stay, nx = p.compare.next;
+    const st = p.compare.stay;
     sec.push(`<div class="v2-sec" id="v2Plans"><p class="v2-h">Your plan</p>
       ${b.pendingPlan ? `<div class="v2-row">Changing to <b>${esc(planName(b.pendingPlan.plan_key))}</b> (${b.pendingPlan.billing === "year" ? "annual" : "monthly"}) on ${esc(fmtDay(b.pendingPlan.at))}. <button type="button" class="btn-ghost" data-keep="1">Keep my plan</button></div>` : ""}
-      ${v2CostLine(st, nx)}
+      ${v2CostLine(st)}
       <div class="v2-row" role="radiogroup" aria-label="Billing"><label class="chk-inline"><input type="radio" name="v2Iv" value="month" ${v2Interval === "month" ? "checked" : ""}> Monthly</label>
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
@@ -1932,16 +1920,15 @@ function renderV2Bill() {
     sec.push(v2TellCard(b));
     const addons = Object.entries(p.addons).filter(([, a]) => a.status !== "quoted");
     /*
-     * ADD-ONS THAT ARE ROLLING OUT OFFER NOTHING TO PRESS.
+     * ADD-ONS NOBODY CAN BUY YET ARE NOT A SECTION.
      *
-     * The section said "Rolling out" at the top and then gave every row a disabled "Add"
-     * button, or an "Upgrade" badge for one that is not on this plan — two invitations to
-     * buy something that cannot be bought yet. While the section is rolling out a row is
-     * its name and its price, and the heading says what to do instead.
+     * It said "Rolling out" at the top and then listed every add-on with its price and
+     * nothing to press — a price list for things that cannot be bought. The section waits
+     * until the server can sell them.
      */
-    if (addons.length) sec.push(`<div class="v2-sec"><p class="v2-h">Add-ons${p.addonsRunning ? "" : ` ${v2RollingOut()}`}</p>
+    if (addons.length && p.addonsRunning) sec.push(`<div class="v2-sec"><p class="v2-h">Add-ons</p>
       ${addons.map(([k, a]) => `<div class="v2-row">${esc(a.label)} · ${v2Money(a.price_cad)}/month
-        ${!p.addonsRunning ? "" : a.status === "included" ? `<span class="v2-badge">Included</span>` : a.status === "none" ? `<span class="v2-badge">Upgrade</span>`
+        ${a.status === "included" ? `<span class="v2-badge">Included</span>` : a.status === "none" ? `<span class="v2-badge">Upgrade</span>`
           : `<button type="button" class="btn-ghost" data-addon="${esc(k)}" data-on="${a.active ? "0" : "1"}">${a.active ? "Remove" : "Add"}</button>`}</div>`).join("")}
       <div class="v2-msg" id="v2AddonMsg"></div></div>`);
   }
@@ -2189,7 +2176,7 @@ function wireV2Bill() {
     if (inTrial) {
       facts.push(["When", `Now — no charge until ${trialEnd}`]);
       text = `You are still in your free trial, so nothing is charged today. Your trial's minutes and end date stay the same, and your first charge is the ${x.label} price on ${trialEnd}, when it ends. `
-        + (up ? `Everything ${x.label} includes switches on straight away.` : `Features that ${x.label} does not include stop, and everything your assistant already knows is kept.`);
+        + (up ? `Your plan changes now; features roll out as they're ready.` : `Features that ${x.label} does not include stop, and everything your assistant already knows is kept.`);
       yes = `Switch to ${x.label}`;
     } else if (up) {
       /* THE CHARGE, BEFORE THE CLICK. GET /plan/preview asks Stripe what this upgrade
@@ -2203,7 +2190,7 @@ function wireV2Bill() {
       const from = v2Day(pv && pv.renews || (v2b && v2b.period && v2b.period.end));
       facts.push(["Charged today", today || "The difference for the rest of this period"]);
       text = `You move to ${x.label} now${today ? ` and are charged ${today} today` : " and are charged today"} for the rest of this billing period at the new price`
-        + `${from ? `; from ${from} you pay ${v2PlanPrice(x, v2Interval)}` : ""}. Everything ${x.label} includes switches on straight away. You'll get an email with the receipt.`;
+        + `${from ? `; from ${from} you pay ${v2PlanPrice(x, v2Interval)}` : ""}. Your plan changes now; features roll out as they're ready. You'll get an email with the receipt.`;
       yes = today ? `Pay ${today.replace(" + tax", "")} + tax and move` : `Move to ${x.label}`;
     } else {
       /* A paid downgrade is scheduled and NOT prorated (`proration_behavior: "none"`),
@@ -2227,7 +2214,13 @@ function wireV2Bill() {
     try { r = await post("plan", { plan_key: x.key, billing: v2Interval, expect: inTrial ? "trial" : "paid", ...(prorationDate ? { proration_date: prorationDate } : {}) }); }
     finally { planBtns.forEach(bt => { bt.disabled = false; }); }
     const charged = r.charged && typeof r.charged.before_tax_cad === "number" ? ` Charged today: ${v2PlusTax(r.charged.before_tax_cad)}.` : "";
-    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${v2Day(r.firstChargeAt || trialEnd)}.` : r.changed === "now" ? `You're now on ${x.label}.${charged}` : `Changing to ${x.label} on ${v2Day(r.at)}.`) : r.error || "Couldn't change the plan.";
+    /* A SCHEDULED CHANGE IS SAID ONCE. The reload above draws the pending-plan row at the
+       top of this section — "Changing to Personal Line (monthly) on Dec 23", with the
+       button that undoes it — so this message said the same date again two inches below
+       it. The row is the one that keeps the facts: it comes from the server, it survives a
+       reload, and it is where "Keep my plan" lives. Everything else still reports here,
+       because nothing else leaves a row behind. */
+    const said = r.ok ? (r.trial ? `You're on ${x.label}. First charge ${price} on ${v2Day(r.firstChargeAt || trialEnd)}.` : r.changed === "now" ? `You're now on ${x.label}.${charged}` : "Scheduled.") : r.error || "Couldn't change the plan.";
     // Reload first: the re-render replaces #v2PlanMsg, which used to wipe this message.
     if (r.ok) { v2AfterPlanChange(x, r); await loadV2Bill(); loadV2(); }
     msg("v2PlanMsg", said);
@@ -2255,10 +2248,53 @@ const V2_LOCKED = { caller_sms: "Confirmation texts to callers", transfer: "Live
   reminders: "Appointment reminders", review_requests: "Review requests", report: "Monthly report", sentiment: "Caller mood", history_90: "90 days of call history",
   priority_support: "Priority support", custom_routing: "Custom routing", textback: "Missed-call text-back", coverage_mode: "Coverage mode" };
 let v2 = null;
-const v2Usable = f => f && (f.status === "live" || f.status === "rolling_out");
-/* "Rolling out" is coloured wherever it appears; the other statuses stay grey. */
-const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge${f.status === "rolling_out" ? " soon" : ""}">${esc(V2_STATUS[f.status] || f.status)}</span>` : "";
-const v2Soon = f => f && f.running === false ? ` <span class="v2-badge soon">Rolling out</span>` : "";
+/*
+ * ONLY WHAT WORKS TODAY GETS A ROW.
+ *
+ * This used to count `rolling_out` as usable, which is how the card filled with controls
+ * that could not do anything: on Business Lite every one of Calendar, caller texts, live
+ * transfer, text-back, coverage mode and email recipients is `rolling_out` in the catalog,
+ * so the card was six headings, six "Rolling out" badges and no working control under any
+ * of them. Two gates now, and a feature has to pass both:
+ *
+ *   - the CATALOG says `live`. Nothing on this page may promote a feature to live; when a
+ *     feature works and the catalog still says rolling_out, the catalog is what to change.
+ *   - the SERVER has it switched on (`running`). A live feature whose flag is off is a
+ *     disabled control with the same problem, and the POST route refuses it anyway.
+ */
+const v2Usable = f => f && f.status === "live" && f.running !== false;
+/* What it would take to get a feature that is NOT on this plan: "Upgrade", "Add-on". All
+   grey — "Rolling out" is no longer one of these, because a feature that is rolling out
+   is not drawn at all. */
+const v2Badge = f => f && f.status !== "live" ? `<span class="v2-badge">${esc(V2_STATUS[f.status] || f.status)}</span>` : "";
+/*
+ * THE ONE PLACE A "ROLLING OUT" TAG IS STILL WORTH ITS SPACE.
+ *
+ * Business Pro is sold largely on features that have not shipped: ten of its entitlements
+ * are `rolling_out`. Drawing none of them tells a Pro customer nothing about what they
+ * bought, and tagging all ten is the wall of badges this change exists to remove. So the
+ * plan may name two — the pair the pricing page stars as Pro's own — and the rest become
+ * one line to the team. Lite names none: its tags sat on features its customers were
+ * already paying for, which is worse than silence. Nothing here is called live.
+ */
+const V2_SOON_TAGS = { business_pro: ["reminders", "review_requests"] };
+/*
+ * WHAT IS ON THE PLAN, in the card that otherwise only says what is not.
+ *
+ * This is the other half of "show only what the catalog marks live". The card listed what
+ * an upgrade would unlock, and on Pro what was still coming, and never what the customer
+ * actually has: Pro's live entitlements — caller mood, ninety days of history, priority
+ * support — have no setting to show, so they appeared nowhere on the dashboard at all.
+ *
+ * The statuses still come from the server. This map only supplies the words.
+ */
+const V2_ON_PLAN = { ...V2_LOCKED,
+  /* The ones every plan has from the first day. `/v2/settings` does not send these in
+     `features` yet — it builds fifteen keys by hand — so they are named here by their
+     catalog key and will appear the moment the server includes them. */
+  answers_existing_number: "Answers on your existing number", spam_screening: "Spam and robocall screening",
+  messages_summary: "Messages, with a text and email summary", dashboard: "This dashboard",
+  tailored_to_business: "Answers from what we know about your business" };
 async function v2Post(path, body) {
   const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   let d = {}; try { d = await r.json(); } catch {}
@@ -2285,7 +2321,8 @@ async function loadV2(keepEdits = false) {
     if (!r.ok) { card.hidden = true; return; }
     const d = await r.json();
     if (!d || d.v2 !== true) { card.hidden = true; return; }
-    v2 = d; renderV2(); card.hidden = false;
+    v2 = d; const drew = renderV2(); card.hidden = !drew;
+    if (!drew) return;
     if (typed) { const now = [...card.querySelectorAll("input[type=tel], input[type=email], select")]; if (now.length === typed.length) now.forEach((el, i) => { el.value = typed[i]; }); }
   } catch { card.hidden = true; }
 }
@@ -2294,53 +2331,86 @@ function renderV2() {
   $("v2Title").textContent = `Your plan: ${p.label}`;
   $("v2Sub").textContent = `${p.minutes} minutes a month` + (p.package ? ` · extra ${p.package.minutes} minutes for $${p.package.price_cad}` : "");
   const sec = [];
-  // Integrations
+  const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]].filter(([k]) => v2Usable(f[k]));
+  /*
+   * ON YOUR PLAN: the live features that have no setting of their own.
+   *
+   * A feature with a working control below is left out — a control the owner can press is
+   * a better statement that something is on the plan than a line of text about it — and
+   * so is one the server has switched off, because `v2Usable` is the single gate and a
+   * feature that cannot be used is not a feature they have.
+   */
+  const withControl = new Set(["calendar_google", "caller_sms", "transfer", "email_recipients", "coverage_mode", ...toggles.map(([k]) => k)].filter(k => v2Usable(f[k])));
+  const onPlan = Object.entries(f).filter(([k, x]) => V2_ON_PLAN[k] && v2Usable(x) && !withControl.has(k));
+  if (onPlan.length) sec.push(`<div class="v2-sec"><p class="v2-h">On your plan</p>
+    ${onPlan.map(([k]) => `<div class="v2-row">${esc(V2_ON_PLAN[k])}</div>`).join("")}</div>`);
+  /*
+   * A SECTION PER THING THEY CAN DO, AND NOTHING FOR THE REST.
+   *
+   * Each section used to be drawn whatever its status, with its control swapped for a
+   * sentence about which plan it needs. Those sentences belong on the pricing page: on
+   * the dashboard they are six headings telling the owner what their own line cannot do.
+   * "Not on your plan", below, still says it once, in a list, where it is useful.
+   */
+  // Calendar
   const g = f.calendar_google;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Calendar ${v2Badge(g)}${v2SoonNote(g)}</p>
-    ${v2Usable(g) ? `<div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
-      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>`
-      : `<div class="v2-row v2-locked">Your receptionist can book into Google Calendar on Business Lite and Pro.</div>`}
-    <div class="v2-row v2-locked">Outlook ${v2Badge(f.calendar_outlook)} · Apple ${v2Badge(f.calendar_apple)}</div>
+  if (v2Usable(g)) sec.push(`<div class="v2-sec"><p class="v2-h">Calendar</p>
+    <div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
+      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Texts to callers ${v2Badge(cs)}${v2Soon(cs)}${v2SoonNote(cs)}</p>
-    ${!v2Usable(cs) ? `<div class="v2-row v2-locked">Callers who leave a message can get a confirmation text. Available on Business Lite and Pro.</div>`
-      : cs.trialBlocked ? `<div class="v2-row">Caller texts start with your paid plan.</div>`
-      : `<label class="v2-row chk-inline"><input type="checkbox" id="v2Sms" ${cs.enabled ? "checked" : ""} ${cs.running ? "" : "disabled"}> Send a confirmation text to callers who ask for one (they can reply STOP)</label>`}
+  if (v2Usable(cs)) sec.push(`<div class="v2-sec"><p class="v2-h">Texts to callers</p>
+    ${cs.trialBlocked ? `<div class="v2-row">Caller texts start with your paid plan.</div>`
+      : `<label class="v2-row chk-inline"><input type="checkbox" id="v2Sms" ${cs.enabled ? "checked" : ""}> Send a confirmation text to callers who ask for one (they can reply STOP)</label>`}
     <div class="v2-msg" id="v2SmsMsg"></div></div>`);
   // Live transfer
   const t = f.transfer;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer ${v2Badge(t)}${v2Soon(t)}${v2SoonNote(t)}</p>
-    ${!v2Usable(t) ? `<div class="v2-row v2-locked">Put urgent callers through to a person. Available on Business Lite and Pro.</div>`
-      : `<div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}" ${t.running ? "" : "disabled"}></label>
-        <label>Ring for <select id="v2TrRing" ${t.running ? "" : "disabled"}>${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
-        <div class="v2-row muted" style="font-size:13px">Use a different phone from the one that forwards to your receptionist, or the call would loop. If nobody answers, the caller leaves a message.</div>
-        <div class="v2-row"><button type="button" class="btn" id="v2TrSave" ${t.running ? "" : "disabled"}>${t.enabled ? "Save" : "Switch on"}</button>
-        ${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : ""}</div>`}
+  if (v2Usable(t)) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
+    <div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}"></label>
+      <label>Ring for <select id="v2TrRing">${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
+    <div class="v2-row muted" style="font-size:13px">Use a different phone from the one that forwards to your receptionist, or the call would loop. If nobody answers, the caller leaves a message.</div>
+    <div class="v2-row"><button type="button" class="btn" id="v2TrSave">${t.enabled ? "Save" : "Switch on"}</button>
+    ${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : ""}</div>
     <div class="v2-msg" id="v2TrMsg"></div></div>`);
   // Email recipients
   const er = f.email_recipients, max = (er && er.max) || 1;
-  sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email${v2Soon(er)}${v2SoonNote(er)}</p>
+  if (v2Usable(er)) sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email</p>
     <div class="v2-row">${Array.from({ length: max }, (_, i) => `<input type="email" class="v2Em" placeholder="name@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Email ${i + 1}">`).join("")}
     <button type="button" class="btn" id="v2EmSave">Save</button></div>
     ${max < 3 ? `<div class="v2-row muted" style="font-size:13px">Up to 3 addresses on Business Lite and Pro.</div>` : ""}
     <div class="v2-msg" id="v2EmMsg"></div></div>`);
   // Settings-only features
   const cm = f.coverage_mode;
-  const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]];
-  sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
-    ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>${v2Soon(cm)}</div>` : ""}
-    ${toggles.map(([k, l]) => v2Usable(f[k]) ? `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}${v2Soon(f[k])}</label>` : "").join("")}
+  if (v2Usable(cm) || toggles.length) sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
+    ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>` : ""}
+    ${toggles.map(([k, l]) => `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}</label>`).join("")}
     ${v2Usable(f.review_requests) ? `<div class="v2-row"><label>Google review link <input type="url" id="v2Review" placeholder="https://g.page/r/…/review" style="max-width:100%"></label><button type="button" class="btn-ghost" id="v2ReviewSave">Save</button></div>` : ""}
     <div class="v2-msg" id="v2MoreMsg"></div></div>`);
-  // Locked features: what an upgrade or add-on unlocks
-  const locked = Object.entries(f).filter(([k, x]) => V2_LOCKED[k] && x && (x.status === "none" || x.status === "addon" || x.status === "coming_soon"));
+  /*
+   * WHAT IS COMING, ON THE PLAN THAT IS MOSTLY MADE OF IT: at most two named, and one
+   * line to the team for everything else. See V2_SOON_TAGS.
+   */
+  const named = (V2_SOON_TAGS[p.key] || []).filter(k => f[k] && f[k].status === "rolling_out").slice(0, 2);
+  if (named.length) sec.push(`<div class="v2-sec"><p class="v2-h">Rolling out next</p>
+    ${named.map(k => `<div class="v2-row">${esc(V2_LOCKED[k] || k)} <span class="v2-badge soon">Rolling out</span></div>`).join("")}
+    ${Object.entries(f).some(([k, x]) => x && x.status === "rolling_out" && !named.includes(k))
+      ? `<div class="v2-row muted" style="font-size:13px">More of your plan is on the way. Want something sooner, or need it now? <a href="mailto:${V2_SALES}">Talk to us (${V2_SALES})</a>.</div>` : ""}</div>`);
+  /*
+   * NOT ON YOUR PLAN: what an upgrade or an add-on would get them, and nothing else.
+   *
+   * `coming_soon` is gone from this list. It was only ever Outlook and Apple Calendar, and
+   * a dated promise on somebody's paid dashboard is worth less than the space it takes.
+   */
+  const locked = Object.entries(f).filter(([k, x]) => V2_LOCKED[k] && x && (x.status === "none" || x.status === "addon"));
   if (locked.length) sec.push(`<div class="v2-sec"><p class="v2-h">Not on your plan</p>
     ${locked.map(([k, x]) => `<div class="v2-row v2-locked">${esc(V2_LOCKED[k])} ${v2Badge(x)}</div>`).join("")}
     <div class="v2-row muted" style="font-size:13px">See "Your plan" above to move up.</div></div>`);
   $("v2Body").innerHTML = sec.join("");
   wireV2();
+  /* Nothing to show is not the same as something to show badly: the plan, its minutes and
+     its price are all on the Billing card, so an empty settings card is just a title. */
+  return sec.length > 0;
 }
 function wireV2() {
   const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };

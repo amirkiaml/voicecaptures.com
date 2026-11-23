@@ -25,18 +25,31 @@ const js = /(\/\* ---------- Pricing v2 settings ----------[\s\S]*?)\nasync func
  * section, so without this the section references functions that are not here and the
  * card silently fails to render — which is exactly what it did.
  */
-const shared = /(const V2_SALES = [\s\S]*?const v2SoonNote = [^\n]*\n)/.exec(html);
+const shared = /(const V2_SALES = [\s\S]*?const v2Switchable = [^\n]*\n)/.exec(html);
 if (!shared) throw new Error("the shared rolling-out helpers moved; update this slice");
 ok(html.includes("    loadV2();\n"), "load() calls loadV2()");
 ok(/v2Post\("review-link", \{ link: \$\("v2Review"\)\.value\.trim\(\) \}\)/.test(html) && /v2Usable\(f\.review_requests\) \? `<div class="v2-row"><label>Google review link/.test(html), "Pro: the Google review link field, shown only where review requests are on the plan");
 
 const CONSENT = { version: "2026-11-17.1", caller_sms: "CALLER TEXT CONSENT", transfer: "TRANSFER CONSENT" };
 const F = (status, extra = {}) => ({ status, running: true, ...extra });
+/*
+ * THE FIXTURE EXERCISES EVERY GATE, which is why it is not one plan's real entitlements:
+ *   live + running          -> a working control (calendar, caller texts, transfer, emails, coverage)
+ *   live + running: false   -> nothing: the server would refuse the POST (textback, report)
+ *   rolling_out             -> nothing (custom_routing)
+ *   coming_soon             -> nothing, not even in "Not on your plan" (Outlook, Apple)
+ *   none / addon            -> a row in "Not on your plan" (reminders, review requests, caller mood)
+ */
 const LITE = { v2: true, plan: { key: "business_lite", label: "Business Lite", minutes: 100, package: { minutes: 50, price_cad: 75 }, emailRecipientsMax: 3 },
-  features: { caller_sms: F("rolling_out", { enabled: false }), transfer: F("rolling_out", { enabled: false, destination: null, ringSeconds: 20 }), calendar_google: F("live", { connected: false }),
-    calendar_outlook: F("coming_soon"), calendar_apple: F("coming_soon"), email_recipients: F("live", { emails: ["a@x.test"], max: 3 }), coverage_mode: F("live", { value: null, running: false }),
+  features: { caller_sms: F("live", { enabled: false }), transfer: F("live", { enabled: false, destination: null, ringSeconds: 20 }), calendar_google: F("live", { connected: false }),
+    calendar_outlook: F("coming_soon"), calendar_apple: F("coming_soon"), email_recipients: F("live", { emails: ["a@x.test"], max: 3 }), coverage_mode: F("live", { value: null }),
     textback: F("live", { value: false, running: false }), reminders: F("none", { value: null }), review_requests: F("none", { value: null }), report: F("live", { value: false, running: false }),
-    sentiment: F("addon"), history_90: F("none"), priority_support: F("none"), custom_routing: F("none") }, consent: CONSENT };
+    sentiment: F("addon"), history_90: F("none"), priority_support: F("none"), custom_routing: F("rolling_out") }, consent: CONSENT };
+/* Business Pro: the plan that is mostly made of features that have not shipped. */
+const PRO = JSON.parse(JSON.stringify(LITE));
+Object.assign(PRO.plan, { key: "business_pro", label: "Business Pro", minutes: 250 });
+Object.assign(PRO.features, { reminders: F("rolling_out", { value: null }), review_requests: F("rolling_out", { value: null }),
+  report: F("rolling_out", { value: null }), custom_routing: F("rolling_out"), sentiment: F("live"), history_90: F("live") });
 const PER = JSON.parse(JSON.stringify(LITE));
 Object.assign(PER.plan, { key: "personal", label: "Personal", minutes: 30, package: { minutes: 20, price_cad: 20 }, emailRecipientsMax: 1 });
 Object.assign(PER.features, { caller_sms: F("none"), transfer: F("none"), calendar_google: F("none"), email_recipients: F("live", { emails: [], max: 1 }) });
@@ -71,22 +84,31 @@ ${js}
   await open(LITE);
   ok(await page.isVisible("#v2Card"), "shown");
   eq([await page.textContent("#v2Title"), await page.textContent("#v2Sub")], ["Your plan: Business Lite", "100 minutes a month · extra 50 minutes for $75"], "plan line from the API (no price in the page)");
-  ok(await page.isVisible("#v2CalOn") && /Outlook Coming soon · Apple Coming soon/.test(await page.textContent("#v2Body")), "Google connect button; Outlook and Apple coming soon");
+  ok(await page.isVisible("#v2CalOn"), "Google connect button");
+  /* Outlook and Apple were a row of their own under Calendar, and a "Coming soon" badge
+     each. A dated promise is not a setting: it belongs on the pricing page. */
+  ok(!/Outlook|Apple/.test(await page.textContent("#v2Body")), "no Outlook or Apple row, and no Coming soon badge for them");
   eq(await page.$$eval(".v2Em", a => a.map(i => i.value)), ["a@x.test", "", ""], "three email fields");
   const body = await page.textContent("#v2Body");
   ok(/Appointment reminders Upgrade/.test(body) && /Caller mood Add-on/.test(body), "locked cards: reminders (upgrade), caller mood (add-on)");
-  ok(/Texts to callers Rolling out/.test(body), "caller texts marked rolling out");
   /*
-   * AND IT STANDS OUT, HERE TOO. "Rolling out" is the one badge that changes what the
-   * owner can do, so it is coloured wherever it is said and carries the address beside it
-   * — once per heading, not on every control inside the section.
+   * NO "ROLLING OUT" TAGS ON LITE.
+   *
+   * Every one of Calendar, caller texts, live transfer, text-back, coverage mode and email
+   * recipients is `rolling_out` in the catalog for Lite, so the card was six headings, six
+   * coloured badges and no working control under any of them — tags on the features its
+   * customers were already paying for. A feature is drawn when it works, or not at all.
    */
-  const soon = await page.$$eval("#v2Body .v2-badge", els => els.map(e => ({ t: e.textContent, soon: e.classList.contains("soon") })));
-  ok(soon.filter(x => x.t === "Rolling out").length > 0 && soon.filter(x => x.t === "Rolling out").every(x => x.soon),
-    "every Rolling out badge on the settings card is the coloured one");
-  ok(soon.filter(x => x.t !== "Rolling out").every(x => !x.soon), "and no other status borrowed the colour");
-  const heads = await page.$$eval("#v2Body .v2-h", els => els.filter(e => /Rolling out/.test(e.textContent)).map(e => e.querySelectorAll("a[href^='mailto:sales@voicecaptures.com']").length));
-  ok(heads.length > 0 && heads.every(n => n === 1), "a heading that is rolling out carries the address exactly once");
+  ok(!/Rolling out/.test(body), "Lite: no Rolling out tag anywhere on the card");
+  ok(await page.$$eval("#v2Body .v2-badge", els => els.every(e => !e.classList.contains("soon"))), "...and no coloured badge either: what is left is grey");
+  /* Live on the plan, switched off at the server: the POST route would refuse it, so there
+     is no control to press and no badge to explain one. */
+  ok(await page.$(".v2Tg[data-k=textback]") === null && await page.$(".v2Tg[data-k=report]") === null,
+    "a live feature the server has switched off: no control, no badge");
+  ok(!/Custom routing/.test(body), "a rolling_out feature: not drawn, and not listed as missing either");
+  /* Every live feature on this fixture has a control, so the summary has nothing to add
+     and is not drawn as an empty heading. */
+  ok(!/On your plan/.test(body), "nothing live without a control: no empty \"On your plan\" heading");
 
   console.log("Consent");
   await page.fill(".v2Em >> nth=2", "typed@x.test");
@@ -118,6 +140,35 @@ ${js}
   await page.click("#v2CalOn"); await page.waitForFunction(() => $("v2CalMsg").textContent.includes("set up"));
   ok(true, "Google connect: the server's error shown when it isn't set up");
   eq(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, "390 px wide: no sideways scroll");
+
+  console.log("Business Pro: at most two tags, then the team");
+  await open(PRO);
+  const pro = await page.textContent("#v2Body");
+  /*
+   * AND IT SAYS WHAT PRO ACTUALLY HAS. Caller mood and ninety days of history are live on
+   * Pro and have no setting of their own, so before this they were on the dashboard
+   * nowhere: not in "Not on your plan" (they are on it) and not as a control (there is
+   * none). Calendar is live in this fixture AND has a control, so it is not repeated
+   * here; text-back and the monthly report are live but switched off at the server, which
+   * is not something they have.
+   */
+  const onPlan = await page.$$eval("#v2Body .v2-sec", els => { const e = els.find(x => /On your plan/.test((x.querySelector(".v2-h") || {}).textContent || ""));
+    return e ? [...e.querySelectorAll(".v2-row")].map(r => r.textContent.trim()) : null; });
+  eq(onPlan, ["Caller mood", "90 days of call history"], "On your plan: the live features that have no setting of their own");
+  ok(!onPlan.some(r => /Calendar/.test(r)), "...not the ones with a working control above");
+  ok(!onPlan.some(r => /text-back|Monthly report/i.test(r)), "...and not one the server has switched off");
+  const tags = await page.$$eval("#v2Body .v2-badge.soon", els => els.map(e => e.closest(".v2-row").textContent.trim()));
+  /*
+   * PRO IS SOLD ON WHAT HAS NOT SHIPPED: ten of its entitlements are rolling_out. Drawing
+   * none of them tells a Pro customer nothing about what they bought; tagging all ten is
+   * the wall of badges this change removes. Two, and one line to the team for the rest.
+   */
+  eq(tags, ["Appointment reminders Rolling out", "Review requests Rolling out"], "two named, and only two");
+  const mails = await page.$$eval("#v2Body a[href^='mailto:sales@voicecaptures.com']", els => els.map(e => e.textContent));
+  eq(mails, ["Talk to us (sales@voicecaptures.com)"], "the rest is one line to the team, with the address in it");
+  ok(await page.$(".v2Tg[data-k=reminders]") === null && await page.$(".v2Tg[data-k=review_requests]") === null,
+    "...and a tag is not a switch: neither has a control");
+  ok(!/Not on your plan/.test(pro) || !/Appointment reminders Upgrade/.test(pro), "a feature that is rolling out is not also listed as an upgrade");
 
   console.log("Personal");
   await open(PER);
