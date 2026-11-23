@@ -62,7 +62,8 @@ async function api(p, o = {}) {
   if (p === "/api/dashboard/v2/reports") return R(${JSON.stringify(rep)}, ${repStatus});
   if (p === "/api/dashboard/v2/invoices") return R(${JSON.stringify(inv)}, ${invStatus});
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
-  if (p === "/api/dashboard/v2/plan") return R(o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" });
+  if (p.startsWith("/api/dashboard/v2/plan/preview")) return window.PREVIEW ? R(window.PREVIEW) : R({ error: "Not available right now." }, 503);
+  if (p === "/api/dashboard/v2/plan") return R(window.PLAN_REPLY || (o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" }));
   if (p === "/api/dashboard/change-request") return R({ ok: true, message: "Thanks, we have got it." });
   return R({ ok: true });
 }
@@ -78,14 +79,14 @@ async function loadV2() {}
   const open = async (b, p, st, ...rest) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st, ...rest)); await page.evaluate(() => loadV2Bill()); };
   const sentTo = path => page.evaluate(p => sent.filter(x => x.p === p), path);
   /* The plan dialog's contents, and the button that confirms it. */
-  const planModal = () => page.evaluate(() => ({
+  const planModal = async () => (await page.waitForFunction(() => $("v2PlanModal").open), page.evaluate(() => ({
     title: $("v2PlanModalH").textContent,
     facts: [...$("v2PlanModalFacts").children].map(e => e.textContent),
     text: $("v2PlanModalText").textContent,
     yes: $("v2PlanModalYes").textContent,
     danger: $("v2PlanModalYes").className === "btn-danger",
     open: $("v2PlanModal").open,
-  }));
+  })));
 
   console.log("Hidden");
   await open({ error: "Not found" }, {}, 404); ok(await page.isHidden("#v2Bill"), "flag off (404): hidden");
@@ -126,8 +127,8 @@ async function loadV2() {}
   await page.click("[data-plan=business_lite]");
   const up = await planModal();
   ok(up.facts.join(" | ").includes("$990 + tax a year"), "monthly → annual: the annual price with tax");
-  ok(/Charged now/.test(up.facts.join(" ")) && /charged for the rest of this period at the new price/.test(up.text), "monthly → annual: an upgrade, charged now and prorated");
-  ok(/Stripe works out that part-period amount to the day/.test(up.text), "...and it says who works the part-period amount out, rather than inventing one");
+  ok(up.facts.join(" | ").includes("Charged today | The difference for the rest of this period") && /are charged today for the rest of this billing period at the new price/.test(up.text),
+    "monthly → annual, no preview from Stripe: says it's charged today, for the rest of the period, without inventing an amount");
   const planCalls = (await sentTo("/api/dashboard/v2/plan")).length;
   await page.click("#v2PlanModalNo");
   eq((await sentTo("/api/dashboard/v2/plan")).length, planCalls, "Cancel on the dialog changes nothing");
@@ -356,6 +357,32 @@ async function loadV2() {}
   const dt = await page.textContent("#v2Bill");
   ok(dt.includes(`Your plan starts on ${day("2026-12-04")}.`) && dt.includes(`on ${day("2026-12-21T05:00:00Z")}.`) && dt.includes(`your first charge is ${day("2026-12-04")}.`) && !/\d{4}-\d{2}-\d{2}/.test(dt),
     "trial start, scheduled change and first charge: \"Dec 4\" style, never 2026-12-04");
+
+  console.log("Upgrade on a paid plan: the charge before the click (Nov 22)");
+  await open(BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: { minutes: 20, price_cad: 20 }, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-21", end: "2026-12-21", used: 2, allowance: 30, packages: [] }, credit: 0, trial: null }),
+    PLANS({ prompts: [], plans: [plan("personal", "Personal Line", 19, 190, 30, true), plan("business_lite", "Business Lite", 99, 990, 100, false), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)] }));
+  await page.evaluate(() => { window.PREVIEW = { ok: true, up: true, exact: true, today_cad: 52.81, proration_date: 1763850000, renews: "2026-12-21T05:00:00Z" };
+    window.PLAN_REPLY = { changed: "now", plan_key: "business_lite", charged: { before_tax_cad: 52.81, total_cad: 59.68 } }; });
+  await page.click("[data-plan=business_lite]");
+  const ex = await planModal();
+  ok(ex.facts.join(" | ").includes("Charged today | $52.81 + tax") && ex.text.includes("and are charged $52.81 + tax today") && ex.text.includes(`from ${day("2026-12-21T05:00:00Z")} you pay $99 + tax a month`) && ex.yes === "Pay $52.81 + tax and move",
+    "the dialog states the charge (Stripe's preview) before the click, and the button says it");
+  await page.evaluate(() => { window.__gate = new Promise(r => { window.__open = r; }); const a = window.api; window.api = async (p, o) => { if (p === "/api/dashboard/v2/plan") await window.__gate; return a(p, o); }; });
+  await page.click("#v2PlanModalYes");
+  await page.waitForFunction(() => /Saving/.test($("v2PlanMsg").textContent));
+  ok(await page.$$eval("#v2Bill [data-plan]", els => els.length > 0 && els.every(e => e.disabled)), "while it saves, every Switch button is off (no second request)");
+  await page.evaluate(() => window.__open());
+  await page.waitForFunction(() => /You're now on/.test($("v2PlanMsg").textContent));
+  eq([(await sentTo("/api/dashboard/v2/plan")).at(-1).body.proration_date, await page.textContent("#v2PlanMsg")], [1763850000, "You're now on Business Lite. Charged today: $52.81 + tax."], "…sends the preview's proration_date; says what was charged");
+  await page.evaluate(() => { window.PREVIEW = { ok: true, up: true, exact: false, today_cad: 51.2, proration_date: 1763850000, renews: "2026-12-21T05:00:00Z" }; window.PLAN_REPLY = null; });
+  await open(BILL({ plan: { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: { minutes: 20, price_cad: 20 }, checkoutEnabled: true },
+      period: { kind: "billing", start: "2026-11-21", end: "2026-12-21", used: 2, allowance: 30, packages: [] }, credit: 0, trial: null }),
+    PLANS({ prompts: [], plans: [plan("personal", "Personal Line", 19, 190, 30, true), plan("business_lite", "Business Lite", 99, 990, 100, false)] }));
+  await page.evaluate(() => { window.PREVIEW = { ok: true, up: true, exact: false, today_cad: 51.2, proration_date: 1763850000, renews: "2026-12-21T05:00:00Z" }; });
+  await page.click("[data-plan=business_lite]");
+  ok((await planModal()).facts.join(" | ").includes("Charged today | about $51.20 + tax"), "Stripe couldn't preview: the server's estimate, said as \"about\"");
+  await page.click("#v2PlanModalNo");
 
   eq(errs, [], "no page errors");
   await browser.close();
