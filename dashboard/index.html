@@ -1865,6 +1865,18 @@ function renderV2Bill() {
   const usedMin = Math.max(0, Math.ceil(Number(per.used) - 1e-9) || 0);
   const pct = per.allowance ? Math.min(100, Math.round(usedMin / per.allowance * 100)) : 0;
   const daysLeft = d => Math.max(0, Math.ceil((Date.parse(d) - Date.now()) / 864e5));
+  /* Cancellation (FEATURE_SCHEDULED_CANCEL; `cancel` is null when it's off).
+     Scheduled in the Stripe portal: "Your plan is cancelled. Service ends Dec 23." + Keep my plan,
+     which clears the cancel in Stripe through the API (not a portal link).
+     After the period ends: Cancelled + Reactivate (a new Checkout), unless the number has been released. */
+  const cx = b.cancel;
+  if (cx && cx.cancelled) sec.push(`<div class="v2-banner" id="v2Cancelled"><b>Cancelled.</b> Your receptionist isn't answering, and your past calls are still here.
+    ${cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>`
+      : `<div class="v2-row muted" style="font-size:13px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
+    <div class="v2-msg" id="v2CancelMsg"></div></div>`);
+  else if (cx && cx.at) sec.push(`<div class="v2-banner" id="v2CancelBanner"><b>Your plan is cancelled. Service ends ${esc(fmtDay(cx.at))}.</b> Until then everything works as usual.
+    <div class="v2-row"><button type="button" class="btn" id="v2KeepPlan">Keep my plan</button></div>
+    <div class="v2-msg" id="v2CancelMsg"></div></div>`);
   if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
     ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
   if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
@@ -2093,6 +2105,20 @@ const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k
 function wireV2Bill() {
   const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
   const post = async (path, body) => { const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }); let d = {}; try { d = await r.json(); } catch {} return { ok: r.ok, ...d }; };
+  const keep = $("v2KeepPlan");
+  if (keep) keep.onclick = async () => {
+    keep.disabled = true; msg("v2CancelMsg", "Keeping your plan…");
+    const r = await post("keep-plan", {});
+    if (r.ok) { await loadV2Bill(); return; }
+    keep.disabled = false; msg("v2CancelMsg", r.error || "Couldn't keep your plan.");
+  };
+  const react = $("v2Reactivate");
+  if (react) react.onclick = async () => {
+    react.disabled = true; msg("v2CancelMsg", "Opening checkout…");
+    const r = await post("reactivate", {});
+    if (r.ok && r.url) { location.href = r.url; return; }
+    react.disabled = false; msg("v2CancelMsg", r.error || "Couldn't start the checkout.");
+  };
   document.querySelectorAll("#v2Bill [data-buy]").forEach(el => el.onclick = async () => {
     msg("v2BuyMsg", "Opening checkout…");
     const r = await post("package/checkout");

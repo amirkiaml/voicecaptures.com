@@ -56,12 +56,14 @@ const BILL = ${JSON.stringify(bill)}, PLANS = ${JSON.stringify(plans)};
 async function api(p, o = {}) {
   sent.push({ p, body: o.body ? JSON.parse(o.body) : null });
   const R = (b, s = 200) => new Response(JSON.stringify(b), { status: s });
-  if (p === "/api/dashboard/v2/billing") return R(BILL, ${status});
+  if (p === "/api/dashboard/v2/billing") return R(window.BILL_NOW || BILL, ${status});
   if (p === "/api/dashboard/v2/plans") return R(PLANS, ${status});
   if (p === "/api/dashboard/v2/settings") return R({ v2: false });
   if (p === "/api/dashboard/v2/reports") return R(${JSON.stringify(rep)}, ${repStatus});
   if (p === "/api/dashboard/v2/invoices") return R(${JSON.stringify(inv)}, ${invStatus});
   if (p === "/api/dashboard/v2/package/checkout") return R({ error: "Buying minutes isn't available right now." }, 503);
+  if (p === "/api/dashboard/v2/keep-plan") { window.BILL_NOW && (window.BILL_NOW.cancel = { at: null, cancelled: false, canReactivate: false }); return R({ ok: true, kept: true }); }
+  if (p === "/api/dashboard/v2/reactivate") return window.REACT_FAIL ? R({ error: "Restarting isn't available right now." }, 503) : R({ url: "https://checkout.stripe.com/c/pay/cs_react" });
   if (p.startsWith("/api/dashboard/v2/plan/preview")) return window.PREVIEW ? R(window.PREVIEW) : R({ error: "Not available right now." }, 503);
   if (p === "/api/dashboard/v2/plan") return R(window.PLAN_REPLY || (o.body.includes('"expect":"trial"') ? { changed: "now", trial: true, firstChargeAt: "2026-11-27T15:00:00Z" } : { changed: o.body.includes("personal") ? "at_period_end" : "now", at: "2026-12-01T00:00:00Z" }));
   if (p === "/api/dashboard/change-request") return R({ ok: true, message: "Thanks, we have got it." });
@@ -410,6 +412,28 @@ async function loadV2() {}
   await page.click("[data-plan=business_lite]");
   ok((await planModal()).facts.join(" | ").includes("Charged today | about $51.20 + tax"), "Stripe couldn't preview: the server's estimate, said as \"about\"");
   await page.click("#v2PlanModalNo");
+
+  console.log("Cancellation: banner, Keep my plan, Reactivate (Nov 23)");
+  const lite = { plan: { key: "business_lite", label: "Business Lite", billing: "month", minutes: 100, package: { minutes: 50, price_cad: 75 }, checkoutEnabled: true }, credit: 0, trial: null };
+  await open(BILL({ ...lite, cancel: { at: "2026-12-23T05:00:00Z", cancelled: false, canReactivate: false } }), PLANS({ prompts: [] }));
+  const cb = await page.textContent("#v2CancelBanner");
+  ok(cb.includes(`Your plan is cancelled. Service ends ${day("2026-12-23T05:00:00Z")}.`) && !!(await page.$("#v2KeepPlan")), "scheduled cancel: \"Your plan is cancelled. Service ends Dec 23.\" with Keep my plan");
+  ok(!(await page.$$eval("#v2CancelBanner a", as => as.some(a => /billing\.stripe\.com/.test(a.href)))), "…Keep my plan is a button, not a portal link");
+  await page.evaluate(b => { window.BILL_NOW = b; }, BILL({ ...lite, cancel: { at: "2026-12-23T05:00:00Z", cancelled: false, canReactivate: false } }));
+  await page.click("#v2KeepPlan");
+  await page.waitForFunction(() => !document.getElementById("v2CancelBanner"));
+  eq((await sentTo("/api/dashboard/v2/keep-plan")).length, 1, "Keep my plan: one POST to keep-plan; the banner goes after the reload");
+  await open(BILL({ ...lite, cancel: { at: null, cancelled: true, canReactivate: true } }), PLANS({ prompts: [] }));
+  ok((await page.textContent("#v2Cancelled")).includes("Cancelled.") && !(await page.$("#v2CancelBanner")), "after the period: Cancelled, no \"service ends\" banner");
+  const nav = [];
+  await page.route("https://checkout.stripe.com/**", r => { nav.push(r.request().url()); r.abort(); });
+  await page.click("#v2Reactivate").catch(() => {});
+  await page.waitForTimeout(300);
+  eq(nav[0], "https://checkout.stripe.com/c/pay/cs_react", "Reactivate: POSTs reactivate and goes to the new Checkout it returns");
+  await open(BILL({ ...lite, cancel: { at: null, cancelled: true, canReactivate: false } }), PLANS({ prompts: [] }));
+  ok(!(await page.$("#v2Reactivate")) && /Your old number has been released/.test(await page.textContent("#v2Cancelled")), "number released: no Reactivate, says to start again");
+  await open(BILL({ ...lite, cancel: null }), PLANS({ prompts: [] }));
+  ok(!(await page.$("#v2CancelBanner")) && !(await page.$("#v2Cancelled")), "flag off (no cancel block): nothing shown");
 
   eq(errs, [], "no page errors");
   await browser.close();
