@@ -2444,7 +2444,8 @@ function renderV2() {
   const g = f.calendar_google;
   if (v2Usable(g)) sec.push(`<div class="v2-sec"><p class="v2-h">Calendar</p>
     <div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
-      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>
+      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : g.canConnect === false ? "" : `<button type="button" class="btn" id="v2CalOn">${g.blocked ? "Try again" : "Connect Google Calendar"}</button>`}</div>
+    ${!g.connected && g.blocked ? `<div class="v2-row muted" id="v2CalBlocked">${esc(g.blocked)}</div>` : ""}
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
