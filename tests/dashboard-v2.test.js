@@ -170,6 +170,17 @@ ${js}
     "...and a tag is not a switch: neither has a control");
   ok(!/Not on your plan/.test(pro) || !/Appointment reminders Upgrade/.test(pro), "a feature that is rolling out is not also listed as an upgrade");
 
+  console.log("After-hours mode (options from the API)");
+  const AHS = JSON.parse(JSON.stringify(LITE));
+  AHS.features.coverage_mode = F("live", { value: null, options: ["24_7", "after_hours"] });
+  await open(AHS);
+  eq(await page.$$eval("#v2Cov option", o => o.map(x => [x.value, x.textContent])), [["24_7", "answer as usual"], ["after_hours", "say you're closed, give your hours, take a message"]], "only the two modes the API offers, said as what happens; no overflow");
+  ok(/Outside your opening hours/.test(await page.textContent("#v2Body")), "…labelled by what it does");
+  await page.evaluate(() => { window.sent.length = 0; });
+  await page.selectOption("#v2Cov", "after_hours");
+  await page.waitForFunction(() => sent.some(x => x.p.includes("/feature")));
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("/feature")).body, { key: "coverage_mode", value: "after_hours" }, "…and saves the choice");
+
   console.log("Personal");
   await open(PER);
   eq(await page.$$eval(".v2Em", a => a.length), 1, "one email field, with the upgrade note");
