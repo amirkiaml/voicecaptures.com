@@ -101,7 +101,7 @@ TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "24 November 2026"
-TERMS_UPDATED = "22 November 2026"
+TERMS_UPDATED = "24 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
 # this is for, and on a consent page it is worth being exact about. The consent VERSION
@@ -1977,6 +1977,9 @@ assistant rather than a person.</p>
 
 <p>Texts to callers are sent as part of handling their call: confirmations,
 information they asked for, missed-call text-backs and appointment reminders.
+Before a missed-call text-back, our receptionist asks the caller during the call
+whether it may text them at that number, and the text is sent only if they say
+yes. Their answer is kept with the call record.
 Promotional texts, such as review requests or win-back messages, are sent only on
 behalf of a business the person has bought from, and always allow opting out. We
 do not sell or share mobile numbers or SMS consent with third parties for their
@@ -2318,13 +2321,18 @@ again.</p>
 <h2>Text messages</h2>
 <p>Our assistant sends texts that are part of handling a call: a summary to you; a
 confirmation, booking details or information to a caller who asks for it; a
-text-back to a caller whose call was missed; and appointment reminders. We also
+text-back to a caller who, during the call, said we may text them; and appointment
+reminders. We also
 text you about your account, such as usage alerts.</p>
 <h3>Texts to your callers</h3>
 <p><strong>Texts to your callers are off by default.</strong> Confirmation texts,
 missed-call text-back, appointment reminders and review requests are each switched
 on by you, in your dashboard. We send nothing to your callers until you turn them
 on.</p>
+<p><strong>Missed-call text-back is sent only with the caller&rsquo;s permission.</strong>
+Before texting back a caller who did not leave a message, our receptionist asks them
+during the call whether it may text them at that number. We text only callers who
+say yes, and we keep their answer with the call record.</p>
 <p><strong>We send them on your behalf, under your business name.</strong> Every
 message identifies your business and tells the person how to stop. Anyone can reply
 STOP to any message, and we honour it for every message type without asking
@@ -3814,8 +3822,10 @@ your dashboard:</p>
   <li><strong>Confirmation texts</strong> &mdash; after taking a message or booking
   an appointment, our assistant asks the caller once whether they would like a text
   confirming it, and sends one only if they say yes.</li>
-  <li><strong>Missed-call text-back</strong> &mdash; a text to someone whose call
-  was not answered.</li>
+  <li><strong>Missed-call text-back</strong> &mdash; when a caller doesn&rsquo;t
+  leave a message, our assistant asks them during the call whether it may text them
+  at that number, and texts them only if they say yes. Their answer is kept with the
+  call record.</li>
   <li><strong>Appointment reminders</strong> &mdash; before a booked
   appointment.</li>
   <li><strong>Review requests</strong> &mdash; after a job or a visit.</li>
