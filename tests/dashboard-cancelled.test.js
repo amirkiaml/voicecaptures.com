@@ -25,7 +25,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 let S = null, last = null, v2b = null; window.sent = [];
 const loadGuide = () => Promise.resolve(${JSON.stringify(guide)});
-async function api(p, o = {}) { sent.push(p); window.record && window.record(p); return new Response(JSON.stringify({ url: "https://checkout.stripe.com/c/pay/cs_top" }), { status: 200 }); }
+async function api(p, o = {}) { sent.push(p); window.record && window.record(p); return new Response(JSON.stringify(window.REACT || { url: "https://checkout.stripe.com/c/pay/cs_top" }), { status: 200 }); }
 ${top}
 </script>`;
 
@@ -88,6 +88,16 @@ ${top}
   eq(await page.textContent("#pausedReactivateTerms"), "You'll be charged $19 + tax today.", "otherwise: \"You'll be charged $19 + tax today.\"");
   await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
   ok(!(await page.$("#pausedReactivateTerms")) && !!(await page.$("#pausedReactivate")), "an API that doesn't say: the button, and no promise either way");
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true, reactivate: { mode: "invite", until: "2026-12-04T02:00:00Z" } })]);
+  eq(await page.textContent("#pausedReactivateTerms"), "Nothing is charged until Dec 3. No card needed.", "invite with trial left: \"Nothing is charged until Dec 3. No card needed.\"");
+  await page.evaluate(() => { window.REACT = { restored: true, until: "2026-12-04T02:00:00Z" }; });
+  await page.click("#pausedReactivate");
+  await page.waitForFunction(() => /back on/.test(document.getElementById("pausedMsg").textContent));
+  ok(/Your receptionist is back on\./.test(await page.textContent("#pausedMsg")), "…pressing it: no Checkout; \"Your receptionist is back on.\" and the page reloads");
+  await page.waitForTimeout(1600);   // the page reloads itself after a restore; start again from a fresh page
+  await page.setContent(page0());
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true, reactivate: { mode: "today", amount_cad: 19, billing: "month", card: true } })]);
+  eq(await page.textContent("#pausedReactivateTerms"), "You'll be charged $19 + tax today, with a card.", "invite whose trial ended: \"You'll be charged $19 + tax today, with a card.\"");
 
   console.log("Cancelled: the usage card");
   await page.evaluate(() => renderUsage({ minutesUsed: 0, minutesAllowed: 15, percent: 0, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, cancelled: true, cancelledOn: "2026-11-23", rates: {} }));
