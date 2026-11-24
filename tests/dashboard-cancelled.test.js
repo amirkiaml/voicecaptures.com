@@ -47,6 +47,20 @@ ${top}
   await page.click("#pausedReactivate").catch(() => {});
   await page.waitForTimeout(300);
   ok(posted.includes("/api/dashboard/v2/reactivate") && nav[0] === "https://checkout.stripe.com/c/pay/cs_top", "…which POSTs reactivate and opens the new Checkout");
+  /*
+   * A FRESH DOCUMENT, NOT A SECOND setContent ON THIS ONE.
+   *
+   * `page0()` declares `const $` and `const esc` at the top level of its script. Calling
+   * setContent again runs that script in a context that already has them, so it threw
+   * "Identifier '$' has already been declared" on its first line and every function below
+   * it — renderService included — was never defined. The failure then surfaced on the next
+   * evaluate as "renderService is not defined", which reads like the page lost a function
+   * rather than like the test reloading over itself.
+   *
+   * about:blank first gives the script a context of its own. Nothing about the page under
+   * test changed; the three checks above it were passing and still do.
+   */
+  await page.goto("about:blank");
   await page.setContent(page0());
   await page.evaluate(([s, b]) => { v2b = { ...b, canManage: false }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
   ok(!(await page.$("#pausedReactivate")) && /The account owner can reactivate it/.test(await page.textContent("#pausedCard")), "a teammate (canManage false): no button that would only answer 403; says the owner can");
