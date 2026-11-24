@@ -1655,6 +1655,7 @@ function renderService(s) {
     const b = $("pausedReactivate");
     if (b) b.onclick = () => v2ReactivateClick(b, "pausedMsg");
     el.hidden = false;
+    pausedForwardingNote(el);
     return;
   }
   const trial = s.reason === "trial_ended" || s.reason === "trial_cap";
@@ -1663,6 +1664,21 @@ function renderService(s) {
     ${s.reason === "admin" || s.reason === "cancelled" ? "" : buyButtons(s.links, trial ? ["plan", "topup"] : ["topup", "plan"])}
     <div class="muted" style="font-size:13px;margin-top:10px">${s.reason === "admin" || s.reason === "cancelled" ? "" : "It switches back on as soon as payment goes through. "}Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
   el.hidden = false;
+  if (s.whilePaused === "message") pausedForwardingNote(el);
+}
+/* A paused or cancelled self-serve line plays a message: an owner who forwarded their phone to it
+   has sent their unanswered callers into that message. Say how to turn forwarding off, in the
+   forwarding guide's own words (whilePaused.text, then the Q&A's "How do I turn it off?").
+   TODO(owner): forwarding detection (SPEC §7) isn't built, so it's said to every such owner as an "if". */
+function pausedForwardingNote(el) {
+  if (typeof loadGuide !== "function") return;
+  loadGuide().then(g => {
+    const off = g && g.whilePaused && (g.faq || []).find(f => f.q === "How do I turn it off?");
+    if (!off || el.hidden || el.querySelector(".paused-fwd")) return;
+    const p = document.createElement("div"); p.className = "paused-fwd"; p.style.cssText = "font-size:13px;margin-top:10px";
+    p.textContent = `${g.whilePaused.text} ${off.a.join(" ")}`;
+    el.appendChild(p);
+  }).catch(() => {});
 }
 
 /* Read-only: retention is a paid add-on set by VoiceCaptures. */
