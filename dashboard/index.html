@@ -1630,7 +1630,9 @@ function usageNote(u, pct, fmtD) {
 function reactivateTermsLine(r) {
   if (!r) return "";
   if (r.mode === "trial" && r.until) return `Nothing is charged until ${fmtDay(r.until)}.`;
-  if (r.mode === "today" && r.amount_cad != null) { const n = Number(r.amount_cad); return `You'll be charged $${n.toFixed(n % 1 ? 2 : 0)} + tax today.`; }
+  // An invite with trial left: no Checkout, no card (owner, 2026-11-23).
+  if (r.mode === "invite" && r.until) return `Nothing is charged until ${fmtDay(r.until)}. No card needed.`;
+  if (r.mode === "today" && r.amount_cad != null) { const n = Number(r.amount_cad); return `You'll be charged $${n.toFixed(n % 1 ? 2 : 0)} + tax today${r.card ? ", with a card" : ""}.`; }
   return "";
 }
 /* What a caller gets while the line is paused. The API says it (service.stateFor whilePaused,
@@ -1932,7 +1934,7 @@ function renderV2Bill() {
     ${b.canManage === false ? `<div class="v2-row muted" style="font-size:13px">The account owner can keep the plan from this dashboard.</div>` : `<div class="v2-row"><button type="button" class="btn" id="v2KeepPlan">Keep my plan</button></div>`}
     <div class="v2-msg" id="v2CancelMsg"></div></div>`);
   if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
-    ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
+    ${pk && !(cx && cx.cancelled) ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);
   if (b.trial) sec.push(`<div class="v2-sec"><p class="v2-h">Free trial</p>
     <div class="v2-row">${daysLeft(b.trial.end)} days and ${b.trial.left != null ? b.trial.left : Math.max(0, b.trial.cap - usedMin)} of ${b.trial.cap} minutes left. Your plan starts on ${esc(fmtDay(b.trial.end))}.</div>
     </div>`);
@@ -1945,7 +1947,7 @@ function renderV2Bill() {
     <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used${per.frozen ? " before you cancelled" : ` · resets ${esc(fmtDay(per.end))}`}</span></div>`}
     ${per.packages.length ? `<div class="v2-row muted" style="font-size:13px">Extra this period: ${per.packages.map(x => `${x.minutes} min`).join(", ")}</div>` : ""}
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
-    ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
+    ${pk && !b.outOfMinutes && !(cx && cx.cancelled) ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
     <div class="v2-msg" id="v2BuyMsg"></div></div>`);
   /* Not drawn at all until the server has it switched on: it was a "Rolling out" badge
      over a disabled checkbox, which is a row that asks to be read and then does nothing. */
@@ -1968,7 +1970,7 @@ function renderV2Bill() {
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
         <b>${esc(x.label)}</b>${v2Has(v2Interval === "year" ? x.year : x.month) ? `<div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div>` : `<div class="muted" style="font-size:13px">Priced on a call</div>`}<div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
-        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
+        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : cx && cx.cancelled ? "" : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
       ${b.trial ? `<div class="v2-start-row">
         <button type="button" class="btn-danger" id="v2Start">Start my plan now</button>
         <span class="v2-start-note">Ends your free trial today and charges the card on file. Otherwise it starts by itself on ${esc(v2Day(b.trial.end))}.</span>
@@ -2159,10 +2161,12 @@ const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k
 // Reactivate (a new Checkout), from the Billing card or the top card.
 async function v2ReactivateClick(btn, msgId) {
   const say = t => { const el = $(msgId); if (el) el.textContent = t; };
-  btn.disabled = true; say("Opening checkout…");
+  btn.disabled = true; say("One moment…");
   const r = await api("/api/dashboard/v2/reactivate", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
   let d = {}; try { d = await r.json(); } catch {}
-  if (r.ok && d.url) { location.href = d.url; return; }
+  if (r.ok && d.url) { say("Opening checkout…"); location.href = d.url; return; }
+  // An invite: restored on the spot, no Checkout. Reload so every card shows the line back on.
+  if (r.ok && d.restored) { say("Your receptionist is back on."); setTimeout(() => location.reload(), 1200); return; }
   btn.disabled = false; say(d.error || "Couldn't start the checkout.");
 }
 function wireV2Bill() {
