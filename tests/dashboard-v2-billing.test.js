@@ -434,6 +434,10 @@ async function loadV2() {}
   ok(!(await page.$("#v2Reactivate")) && /Your old number has been released/.test(await page.textContent("#v2Cancelled")), "number released: no Reactivate, says to start again");
   await open(BILL({ ...lite, cancel: null }), PLANS({ prompts: [] }));
   ok(!(await page.$("#v2CancelBanner")) && !(await page.$("#v2Cancelled")), "flag off (no cancel block): nothing shown");
+  await open(BILL({ ...lite, period: { kind: "trial", start: "2026-11-23", end: "2026-12-08", used: 0, allowance: 15, packages: [], shortCalls: 0, frozen: true, cancelledOn: "2026-11-23" },
+    cancel: { at: null, cancelled: true, canReactivate: true } }), PLANS({ prompts: [] }));
+  const fz = await page.textContent("#v2Bill");
+  ok(/0 of 15 minutes used before you cancelled/.test(fz) && !/resets/.test(fz), "cancelled (frozen period): \"used before you cancelled\", no \"resets\" date");
 
   eq(errs, [], "no page errors");
   await browser.close();

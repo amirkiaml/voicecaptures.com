@@ -1589,7 +1589,9 @@ function renderUsage(u) {
   // Self-serve trials carry the exact end (the moment the line went live + the
   // trial length): shown as a date and time in the business's timezone. Every
   // other card keeps its date, exactly as before.
-  const ends = u.trial && u.trialEndsAt ? `Trial ends ${fmtWhen(u.trialEndsAt)}` : `${u.trial ? "Trial ends" : "Resets"} ${fmtD(u.resetDate)}`;
+  // Cancelled (pricing v2): the period they cancelled in, frozen. Nothing resets and no trial ends.
+  const ends = u.cancelled ? (u.cancelledOn ? `Cancelled ${fmtD(u.cancelledOn)}` : "Cancelled")
+    : u.trial && u.trialEndsAt ? `Trial ends ${fmtWhen(u.trialEndsAt)}` : `${u.trial ? "Trial ends" : "Resets"} ${fmtD(u.resetDate)}`;
   if (!u.minutesAllowed) { // no plan set yet: minutes used only
     el.className = "card usage";
     el.innerHTML = `<div class="u-top"><span class="u-val">Minutes this ${u.trial ? "trial" : "period"}: ${esc(Math.round(u.minutesUsed))}</span>
@@ -1631,6 +1633,21 @@ function buyButtons(links, kinds) {
 function renderService(s) {
   const el = $("pausedCard");
   if (!s || s.active !== false) { el.hidden = true; return; }
+  /* CANCELLED (pricing v2): the red card at the top is what the owner reads, so it carries the
+     way back. The Reactivate button used to live only in the Billing card further down, under
+     a red card that said nothing about it (live test, Nov 23). */
+  const cx = typeof v2b !== "undefined" && v2b && v2b.cancel && v2b.cancel.cancelled ? v2b.cancel : null;
+  if (cx) {
+    el.innerHTML = `<h3>Your plan is cancelled</h3>
+      <div>Your receptionist isn't answering. Your past calls are still here.</div>
+      ${cx.canReactivate ? `<div class="buy"><button type="button" class="btn" id="pausedReactivate">Reactivate ${esc(v2b.plan.label)}</button></div>`
+        : `<div class="muted" style="font-size:13px;margin-top:10px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
+      <div class="muted" style="font-size:13px;margin-top:10px" id="pausedMsg">Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
+    const b = $("pausedReactivate");
+    if (b) b.onclick = () => v2ReactivateClick(b, "pausedMsg");
+    el.hidden = false;
+    return;
+  }
   const trial = s.reason === "trial_ended" || s.reason === "trial_cap";
   el.innerHTML = `<h3>Your AI receptionist is paused</h3>
     <div>Because ${esc(PAUSE_WHY[s.reason] || "it's switched off")}. Nothing is lost: your calls ring your phone directly until it's back on.</div>
@@ -1870,6 +1887,8 @@ function renderV2Bill() {
      which clears the cancel in Stripe through the API (not a portal link).
      After the period ends: Cancelled + Reactivate (a new Checkout), unless the number has been released. */
   const cx = b.cancel;
+  // The top card says it too, with the button (renderService reads v2b).
+  if (cx && cx.cancelled && typeof renderService === "function" && typeof last !== "undefined" && last && last.service) renderService(last.service);
   if (cx && cx.cancelled) sec.push(`<div class="v2-banner" id="v2Cancelled"><b>Cancelled.</b> Your receptionist isn't answering, and your past calls are still here.
     ${cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>`
       : `<div class="v2-row muted" style="font-size:13px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
@@ -1888,7 +1907,7 @@ function renderV2Bill() {
   const topCard = !!($("usageCard") && !$("usageCard").hidden);
   sec.push(`<div class="v2-sec"><p class="v2-h">${topCard ? "Extra minutes" : "Minutes this period"}</p>
     ${topCard ? "" : `<div class="v2-meter${usedMin >= per.allowance ? " over" : ""}" role="meter" aria-valuemin="0" aria-valuemax="${per.allowance}" aria-valuenow="${usedMin}"><i style="width:${pct}%"></i></div>
-    <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used · resets ${esc(fmtDay(per.end))}</span></div>`}
+    <div class="v2-row"><span><b>${usedMin}</b> of ${per.allowance} minutes used${per.frozen ? " before you cancelled" : ` · resets ${esc(fmtDay(per.end))}`}</span></div>`}
     ${per.packages.length ? `<div class="v2-row muted" style="font-size:13px">Extra this period: ${per.packages.map(x => `${x.minutes} min`).join(", ")}</div>` : ""}
     <div class="v2-row muted" style="font-size:13px">Spam and calls under 10 seconds don't count.</div>
     ${pk && !b.outOfMinutes ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} extra minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}
@@ -2102,6 +2121,15 @@ const v2PlanPrice = (x, interval) => v2PlusTax(interval === "year" ? x.year : x.
 const v2Day = fmtDay;
 
 const planName = k => (v2p && v2p.plans.find(x => x.key === k) || {}).label || k;
+// Reactivate (a new Checkout), from the Billing card or the top card.
+async function v2ReactivateClick(btn, msgId) {
+  const say = t => { const el = $(msgId); if (el) el.textContent = t; };
+  btn.disabled = true; say("Opening checkout…");
+  const r = await api("/api/dashboard/v2/reactivate", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+  let d = {}; try { d = await r.json(); } catch {}
+  if (r.ok && d.url) { location.href = d.url; return; }
+  btn.disabled = false; say(d.error || "Couldn't start the checkout.");
+}
 function wireV2Bill() {
   const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
   const post = async (path, body) => { const r = await api(`/api/dashboard/v2/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) }); let d = {}; try { d = await r.json(); } catch {} return { ok: r.ok, ...d }; };
@@ -2113,12 +2141,7 @@ function wireV2Bill() {
     keep.disabled = false; msg("v2CancelMsg", r.error || "Couldn't keep your plan.");
   };
   const react = $("v2Reactivate");
-  if (react) react.onclick = async () => {
-    react.disabled = true; msg("v2CancelMsg", "Opening checkout…");
-    const r = await post("reactivate", {});
-    if (r.ok && r.url) { location.href = r.url; return; }
-    react.disabled = false; msg("v2CancelMsg", r.error || "Couldn't start the checkout.");
-  };
+  if (react) react.onclick = () => v2ReactivateClick(react, "v2CancelMsg");
   document.querySelectorAll("#v2Bill [data-buy]").forEach(el => el.onclick = async () => {
     msg("v2BuyMsg", "Opening checkout…");
     const r = await post("package/checkout");
