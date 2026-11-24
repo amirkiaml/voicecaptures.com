@@ -31,10 +31,18 @@ ${top}
 
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage();
-  const errs = []; page.on("pageerror", e => errs.push(e.message));
-  const posted = []; await page.exposeFunction("record", p => { posted.push(p); });
-  await page.setContent(page0());
+  // A fresh page for each step that navigates (Checkout) or reloads (a restore), instead of
+  // writing into a page that may be mid-navigation: no fixed sleeps, nothing timing-dependent.
+  const errs = [], posted = [];
+  let page = null;
+  const fresh = async () => {
+    if (page) await page.close();   // closing also cancels a reload the page had scheduled
+    page = await browser.newPage();
+    page.on("pageerror", e => errs.push(e.message));
+    await page.exposeFunction("record", p => { posted.push(p); });
+    await page.setContent(page0());
+  };
+  await fresh();
   const svc = { active: false, mode: "auto", reason: "cancelled", salesEmail: "sales@voicecaptures.com", links: [] };
   const bill = (cancel) => ({ plan: { label: "Personal Line" }, cancel });
 
@@ -43,12 +51,10 @@ ${top}
   const t1 = await page.textContent("#pausedCard");
   ok(/Your plan is cancelled/.test(t1) && /past calls are still here/.test(t1) && !/ring your phone/.test(t1), "the red card: cancelled, past calls kept (no \"calls ring your phone\")");
   ok(!!(await page.$("#pausedCard #pausedReactivate")) && /Reactivate Personal Line/.test(t1), "…with Reactivate on it, at the top");
-  const nav = [];
-  await page.route("https://checkout.stripe.com/**", r => { nav.push(r.request().url()); r.abort(); });
-  await page.click("#pausedReactivate").catch(() => {});
-  await page.waitForTimeout(300);
-  ok(posted.includes("/api/dashboard/v2/reactivate") && nav[0] === "https://checkout.stripe.com/c/pay/cs_top", "…which POSTs reactivate and opens the new Checkout");
-  await page.setContent(page0());
+  await page.route("https://checkout.stripe.com/**", r => r.abort());
+  const [toCheckout] = await Promise.all([page.waitForRequest("https://checkout.stripe.com/**"), page.click("#pausedReactivate")]);
+  ok(posted.includes("/api/dashboard/v2/reactivate") && toCheckout.url() === "https://checkout.stripe.com/c/pay/cs_top", "…which POSTs reactivate and opens the new Checkout");
+  await fresh();
   await page.evaluate(([s, b]) => { v2b = { ...b, canManage: false }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
   ok(!(await page.$("#pausedReactivate")) && /The account owner can reactivate it/.test(await page.textContent("#pausedCard")), "a teammate (canManage false): no button that would only answer 403; says the owner can");
   await page.evaluate(([s, b]) => { v2b = { ...b, canManage: true }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
@@ -77,7 +83,7 @@ ${top}
   await page.waitForSelector("#pausedCard .paused-fwd");
   ok(/##61#/.test(await page.textContent("#pausedCard")), "cancelled card: the same forwarding note");
   await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "minutes_used" }); }, svc);
-  await page.waitForTimeout(100);
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0))));   // the guide's note would have been added by now
   ok(!(await page.$("#pausedCard .paused-fwd")), "legacy paused (calls really ring the owner): no forwarding note");
   ok(!/##61#|##004#/.test(html.replace(/<script src[^>]*><\/script>/g, "")), "the off codes aren't written into the page: they come from forwarding-guide.json");
 
@@ -94,8 +100,7 @@ ${top}
   await page.click("#pausedReactivate");
   await page.waitForFunction(() => /back on/.test(document.getElementById("pausedMsg").textContent));
   ok(/Your receptionist is back on\./.test(await page.textContent("#pausedMsg")), "…pressing it: no Checkout; \"Your receptionist is back on.\" and the page reloads");
-  await page.waitForTimeout(1600);   // the page reloads itself after a restore; start again from a fresh page
-  await page.setContent(page0());
+  await fresh();   // the page would reload itself after a restore: start again from a fresh one
   await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true, reactivate: { mode: "today", amount_cad: 19, billing: "month", card: true } })]);
   eq(await page.textContent("#pausedReactivateTerms"), "You'll be charged $19 + tax today, with a card.", "invite whose trial ended: \"You'll be charged $19 + tax today, with a card.\"");
 
