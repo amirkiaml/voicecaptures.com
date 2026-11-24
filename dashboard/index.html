@@ -1624,6 +1624,15 @@ function usageNote(u, pct, fmtD) {
   return `${pct}% used · ${esc(fmtD(u.periodStart))} – ${esc(fmtD(u.periodEnd))}${u.extraMinutes ? ` · includes ${esc(u.extraMinutes)} extra minutes` : ""}`;
 }
 
+/* What pressing Reactivate does (the billing API's cancel.reactivate; owner, 2026-11-23): a cancel during
+   the trial with 3+ days left keeps the trial ("Nothing is charged until <date>"); otherwise the plan
+   starts today ("You'll be charged $X + tax today"). No sentence when an older API doesn't say. */
+function reactivateTermsLine(r) {
+  if (!r) return "";
+  if (r.mode === "trial" && r.until) return `Nothing is charged until ${fmtDay(r.until)}.`;
+  if (r.mode === "today" && r.amount_cad != null) { const n = Number(r.amount_cad); return `You'll be charged $${n.toFixed(n % 1 ? 2 : 0)} + tax today.`; }
+  return "";
+}
 /* What a caller gets while the line is paused. The API says it (service.stateFor whilePaused,
    usage.whilePaused): a self-serve line plays a short message and is never forwarded, which is
    what the owner's email and text already said and what callers heard (live test, Nov 23).
@@ -1649,7 +1658,7 @@ function renderService(s) {
     el.innerHTML = `<h3>Your plan is cancelled</h3>
       <div>Your receptionist isn't answering. Your past calls are still here.</div>
       ${cx.canReactivate && v2b.canManage === false ? `<div class="muted" style="font-size:13px;margin-top:10px">The account owner can reactivate it from this dashboard.</div>`
-        : cx.canReactivate ? `<div class="buy"><button type="button" class="btn" id="pausedReactivate">Reactivate ${esc(v2b.plan.label)}</button></div>`
+        : cx.canReactivate ? `<div class="buy"><button type="button" class="btn" id="pausedReactivate">Reactivate ${esc(v2b.plan.label)}</button></div>${reactivateTermsLine(cx.reactivate) ? `<div class="muted" style="font-size:13px" id="pausedReactivateTerms">${esc(reactivateTermsLine(cx.reactivate))}</div>` : ""}`
         : `<div class="muted" style="font-size:13px;margin-top:10px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
       <div class="muted" style="font-size:13px;margin-top:10px" id="pausedMsg">Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
     const b = $("pausedReactivate");
@@ -1916,7 +1925,7 @@ function renderV2Bill() {
   if (cx && cx.cancelled && typeof renderService === "function" && typeof last !== "undefined" && last && last.service) renderService(last.service);
   if (cx && cx.cancelled) sec.push(`<div class="v2-banner" id="v2Cancelled"><b>Cancelled.</b> Your receptionist isn't answering, and your past calls are still here.
     ${cx.canReactivate && b.canManage === false ? `<div class="v2-row muted" style="font-size:13px">The account owner can reactivate it from this dashboard.</div>`
-      : cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>`
+      : cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>${typeof reactivateTermsLine === "function" && reactivateTermsLine(cx.reactivate) ? `<div class="v2-row muted" style="font-size:13px" id="v2ReactivateTerms">${esc(reactivateTermsLine(cx.reactivate))}</div>` : ""}`
       : `<div class="v2-row muted" style="font-size:13px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
     <div class="v2-msg" id="v2CancelMsg"></div></div>`);
   else if (cx && cx.at) sec.push(`<div class="v2-banner" id="v2CancelBanner"><b>Your plan is cancelled. Service ends ${esc(fmtDay(cx.at))}.</b> Until then everything works as usual.

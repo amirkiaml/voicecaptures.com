@@ -11,6 +11,7 @@ const fs = require("fs"), path = require("path"), assert = require("assert");
 const { chromium } = require("playwright");
 let pass = 0;
 const ok = (c, m) => { assert.ok(c, m); pass++; console.log("  ✓", m); };
+const eq = (a, b, m) => { assert.deepStrictEqual(a, b, m); pass++; console.log("  ✓", m); };
 const html = fs.readFileSync(path.join(__dirname, "..", "dashboard", "index.html"), "utf8");
 const guide = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "dashboard", "forwarding-guide.json"), "utf8"));
 const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
@@ -79,6 +80,14 @@ ${top}
   await page.waitForTimeout(100);
   ok(!(await page.$("#pausedCard .paused-fwd")), "legacy paused (calls really ring the owner): no forwarding note");
   ok(!/##61#|##004#/.test(html.replace(/<script src[^>]*><\/script>/g, "")), "the off codes aren't written into the page: they come from forwarding-guide.json");
+
+  console.log("Reactivate: what it will cost (owner, 2026-11-23)");
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true, reactivate: { mode: "trial", until: "2026-12-04T02:00:00Z" } })]);
+  eq(await page.textContent("#pausedReactivateTerms"), "Nothing is charged until Dec 3.", "cancelled during the trial, 3+ days left: \"Nothing is charged until Dec 3.\" (the trial end, in Toronto)");
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true, reactivate: { mode: "today", amount_cad: 19, billing: "month" } })]);
+  eq(await page.textContent("#pausedReactivateTerms"), "You'll be charged $19 + tax today.", "otherwise: \"You'll be charged $19 + tax today.\"");
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  ok(!(await page.$("#pausedReactivateTerms")) && !!(await page.$("#pausedReactivate")), "an API that doesn't say: the button, and no promise either way");
 
   console.log("Cancelled: the usage card");
   await page.evaluate(() => renderUsage({ minutesUsed: 0, minutesAllowed: 15, percent: 0, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, cancelled: true, cancelledOn: "2026-11-23", rates: {} }));
