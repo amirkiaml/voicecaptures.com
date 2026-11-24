@@ -4,7 +4,8 @@
  *     "paused", with the button far down in the Billing card);
  *   - a released number: no button, says to start again;
  *   - the usage card says "Cancelled <day>", not "Resets" or "Trial ends";
- *   - anything else paused: the card is as before.
+ *   - anything else paused: the card is as before;
+ *   - what callers hear while paused follows the API (self-serve: a short message, never the owner's phone).
  *   node tests/dashboard-cancelled.test.js */
 const fs = require("fs"), path = require("path"), assert = require("assert");
 const { chromium } = require("playwright");
@@ -45,10 +46,23 @@ ${top}
   await page.waitForTimeout(300);
   ok(posted.includes("/api/dashboard/v2/reactivate") && nav[0] === "https://checkout.stripe.com/c/pay/cs_top", "…which POSTs reactivate and opens the new Checkout");
   await page.setContent(page0());
+  await page.evaluate(([s, b]) => { v2b = { ...b, canManage: false }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  ok(!(await page.$("#pausedReactivate")) && /The account owner can reactivate it/.test(await page.textContent("#pausedCard")), "a teammate (canManage false): no button that would only answer 403; says the owner can");
+  await page.evaluate(([s, b]) => { v2b = { ...b, canManage: true }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  ok(!!(await page.$("#pausedReactivate")), "the owner (canManage true): the button");
   await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: false })]);
   ok(!(await page.$("#pausedReactivate")) && /Your old number has been released/.test(await page.textContent("#pausedCard")), "number released: no button, says to start again");
   await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "minutes_used" }); }, svc);
   ok(/Your AI receptionist is paused/.test(await page.textContent("#pausedCard")) && !(await page.$("#pausedReactivate")), "any other pause (no cancel block): the card as before");
+
+  console.log("Paused: what callers hear (the API's whilePaused)");
+  await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "trial_cap", whilePaused: "message" }); }, svc);
+  const pm = await page.textContent("#pausedCard");
+  ok(/callers hear a short message that you can't take the call right now/.test(pm) && !/ring your phone/.test(pm), "self-serve paused: \"callers hear a short message\" (what the email, the text and the call itself say)");
+  await page.evaluate(s => { renderService({ ...s, reason: "minutes_used" }); }, svc);
+  ok(/your calls ring your phone directly until it's back on/.test(await page.textContent("#pausedCard")), "no whilePaused (legacy): \"calls ring your phone directly\", as before (and true for them)");
+  await page.evaluate(() => renderUsage({ minutesUsed: 16, minutesAllowed: 15, percent: 106, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, whilePaused: "message", rates: {} }));
+  ok(/then callers hear a short message until you start your plan/.test(await page.textContent("#usageCard")), "the trial usage note says the same");
 
   console.log("Cancelled: the usage card");
   await page.evaluate(() => renderUsage({ minutesUsed: 0, minutesAllowed: 15, percent: 0, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, cancelled: true, cancelledOn: "2026-11-23", rates: {} }));
@@ -57,7 +71,7 @@ ${top}
   await page.evaluate(() => renderUsage({ minutesUsed: 3, minutesAllowed: 30, percent: 10, periodStart: "2026-11-01", periodEnd: "2026-11-30", resetDate: "2026-12-01", trial: false, rates: {} }));
   ok(/Resets Dec 1/.test(await page.textContent("#usageCard")), "not cancelled: \"Resets\" as before");
 
-  ok(errs.length === 0, "no page errors");
+  ok(errs.length === 0, `no page errors ${errs.join(" | ")}`);
   await browser.close();
   console.log(`\n${pass} checks passed`);
 })().catch(e => { console.error(e); process.exit(1); });
