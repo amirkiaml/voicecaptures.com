@@ -12,6 +12,7 @@ const { chromium } = require("playwright");
 let pass = 0;
 const ok = (c, m) => { assert.ok(c, m); pass++; console.log("  ✓", m); };
 const html = fs.readFileSync(path.join(__dirname, "..", "dashboard", "index.html"), "utf8");
+const guide = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "dashboard", "forwarding-guide.json"), "utf8"));
 const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
 const cut = (from, to) => { const a = html.indexOf(from), b = html.indexOf(to, a); assert.ok(a > 0 && b > a, `found ${from}`); return html.slice(a, b); };
 const top = [/(const TZ = \(\) => [^\n]*)/.exec(html)[1], /(const fmtWhen = [^\n]*)/.exec(html)[1], /(const fmtDay = d => \{[\s\S]*?\n\};)/.exec(html)[1],
@@ -22,6 +23,7 @@ const page0 = () => `<!doctype html><meta name=viewport content="width=device-wi
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 let S = null, last = null, v2b = null; window.sent = [];
+const loadGuide = () => Promise.resolve(${JSON.stringify(guide)});
 async function api(p, o = {}) { sent.push(p); window.record && window.record(p); return new Response(JSON.stringify({ url: "https://checkout.stripe.com/c/pay/cs_top" }), { status: 200 }); }
 ${top}
 </script>`;
@@ -59,6 +61,20 @@ ${top}
   ok(/your calls ring your phone directly until it's back on/.test(await page.textContent("#pausedCard")), "no whilePaused (legacy): \"calls ring your phone directly\", as before (and true for them)");
   await page.evaluate(() => renderUsage({ minutesUsed: 16, minutesAllowed: 15, percent: 106, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, whilePaused: "message", rates: {} }));
   ok(/then callers hear a short message until you start your plan/.test(await page.textContent("#usageCard")), "the trial usage note says the same");
+
+  console.log("Paused or cancelled: turn call forwarding off");
+  const offA = guide.faq.find(f => f.q === "How do I turn it off?").a.join(" ");
+  await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "trial_cap", whilePaused: "message" }); }, svc);
+  await page.waitForSelector("#pausedCard .paused-fwd");
+  const fw = await page.textContent("#pausedCard .paused-fwd");
+  ok(fw === `${guide.whilePaused.text} ${offA}` && /##61#/.test(fw) && /##004#/.test(fw), "self-serve paused: \"If you forwarded your phone… turn forwarding off:\" + the guide's own off answer (##61#, or ##004#)");
+  await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  await page.waitForSelector("#pausedCard .paused-fwd");
+  ok(/##61#/.test(await page.textContent("#pausedCard")), "cancelled card: the same forwarding note");
+  await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "minutes_used" }); }, svc);
+  await page.waitForTimeout(100);
+  ok(!(await page.$("#pausedCard .paused-fwd")), "legacy paused (calls really ring the owner): no forwarding note");
+  ok(!/##61#|##004#/.test(html.replace(/<script src[^>]*><\/script>/g, "")), "the off codes aren't written into the page: they come from forwarding-guide.json");
 
   console.log("Cancelled: the usage card");
   await page.evaluate(() => renderUsage({ minutesUsed: 0, minutesAllowed: 15, percent: 0, periodStart: "2026-11-23", periodEnd: "2026-12-07", resetDate: "2026-12-08", trial: true, cancelled: true, cancelledOn: "2026-11-23", rates: {} }));
