@@ -1640,7 +1640,8 @@ function renderService(s) {
   if (cx) {
     el.innerHTML = `<h3>Your plan is cancelled</h3>
       <div>Your receptionist isn't answering. Your past calls are still here.</div>
-      ${cx.canReactivate ? `<div class="buy"><button type="button" class="btn" id="pausedReactivate">Reactivate ${esc(v2b.plan.label)}</button></div>`
+      ${cx.canReactivate && v2b.canManage === false ? `<div class="muted" style="font-size:13px;margin-top:10px">The account owner can reactivate it from this dashboard.</div>`
+        : cx.canReactivate ? `<div class="buy"><button type="button" class="btn" id="pausedReactivate">Reactivate ${esc(v2b.plan.label)}</button></div>`
         : `<div class="muted" style="font-size:13px;margin-top:10px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
       <div class="muted" style="font-size:13px;margin-top:10px" id="pausedMsg">Questions: <a href="mailto:${esc(s.salesEmail)}">${esc(s.salesEmail)}</a></div>`;
     const b = $("pausedReactivate");
@@ -1890,11 +1891,12 @@ function renderV2Bill() {
   // The top card says it too, with the button (renderService reads v2b).
   if (cx && cx.cancelled && typeof renderService === "function" && typeof last !== "undefined" && last && last.service) renderService(last.service);
   if (cx && cx.cancelled) sec.push(`<div class="v2-banner" id="v2Cancelled"><b>Cancelled.</b> Your receptionist isn't answering, and your past calls are still here.
-    ${cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>`
+    ${cx.canReactivate && b.canManage === false ? `<div class="v2-row muted" style="font-size:13px">The account owner can reactivate it from this dashboard.</div>`
+      : cx.canReactivate ? `<div class="v2-row"><button type="button" class="btn" id="v2Reactivate">Reactivate ${esc(b.plan.label)}</button></div>`
       : `<div class="v2-row muted" style="font-size:13px">Your old number has been released. Start again at <a href="/">voicecaptures.com</a>, or reply to any of our emails.</div>`}
     <div class="v2-msg" id="v2CancelMsg"></div></div>`);
   else if (cx && cx.at) sec.push(`<div class="v2-banner" id="v2CancelBanner"><b>Your plan is cancelled. Service ends ${esc(fmtDay(cx.at))}.</b> Until then everything works as usual.
-    <div class="v2-row"><button type="button" class="btn" id="v2KeepPlan">Keep my plan</button></div>
+    ${b.canManage === false ? `<div class="v2-row muted" style="font-size:13px">The account owner can keep the plan from this dashboard.</div>` : `<div class="v2-row"><button type="button" class="btn" id="v2KeepPlan">Keep my plan</button></div>`}
     <div class="v2-msg" id="v2CancelMsg"></div></div>`);
   if (b.outOfMinutes) sec.push(`<div class="v2-banner"><b>Your receptionist is paused: you're out of minutes.</b> Callers hear a short message.
     ${pk ? `<div class="v2-row"><button type="button" class="btn" data-buy="1">Buy ${pk.minutes} minutes for ${v2Money(pk.price_cad)}</button></div>` : ""}</div>`);

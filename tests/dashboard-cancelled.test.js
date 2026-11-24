@@ -45,6 +45,10 @@ ${top}
   await page.waitForTimeout(300);
   ok(posted.includes("/api/dashboard/v2/reactivate") && nav[0] === "https://checkout.stripe.com/c/pay/cs_top", "…which POSTs reactivate and opens the new Checkout");
   await page.setContent(page0());
+  await page.evaluate(([s, b]) => { v2b = { ...b, canManage: false }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  ok(!(await page.$("#pausedReactivate")) && /The account owner can reactivate it/.test(await page.textContent("#pausedCard")), "a teammate (canManage false): no button that would only answer 403; says the owner can");
+  await page.evaluate(([s, b]) => { v2b = { ...b, canManage: true }; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: true })]);
+  ok(!!(await page.$("#pausedReactivate")), "the owner (canManage true): the button");
   await page.evaluate(([s, b]) => { v2b = b; renderService(s); }, [svc, bill({ at: null, cancelled: true, canReactivate: false })]);
   ok(!(await page.$("#pausedReactivate")) && /Your old number has been released/.test(await page.textContent("#pausedCard")), "number released: no button, says to start again");
   await page.evaluate(s => { v2b = null; renderService({ ...s, reason: "minutes_used" }); }, svc);
@@ -57,7 +61,7 @@ ${top}
   await page.evaluate(() => renderUsage({ minutesUsed: 3, minutesAllowed: 30, percent: 10, periodStart: "2026-11-01", periodEnd: "2026-11-30", resetDate: "2026-12-01", trial: false, rates: {} }));
   ok(/Resets Dec 1/.test(await page.textContent("#usageCard")), "not cancelled: \"Resets\" as before");
 
-  ok(errs.length === 0, "no page errors");
+  ok(errs.length === 0, `no page errors ${errs.join(" | ")}`);
   await browser.close();
   console.log(`\n${pass} checks passed`);
 })().catch(e => { console.error(e); process.exit(1); });
