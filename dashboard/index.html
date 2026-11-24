@@ -2454,7 +2454,14 @@ function renderV2() {
     <div class="v2-msg" id="v2SmsMsg"></div></div>`);
   // Live transfer
   const t = f.transfer;
-  if (v2Usable(t)) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
+  /* ownerOnly (the API's FEATURE_URGENT_TRANSFER): calls go only to the owner's mobile on file,
+     so there is nothing to type or choose, just on and off. */
+  if (v2Usable(t) && t.ownerOnly) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
+    <div class="v2-row">When a caller asks for a person, or something is urgent, your receptionist can put them through to your mobile${t.destination ? `, <b>${esc(t.destination)}</b>` : ""}.</div>
+    <div class="v2-row muted" style="font-size:13px">Your receptionist takes their message first. If you don't pick up, you get it by text.</div>
+    <div class="v2-row">${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : `<button type="button" class="btn" id="v2TrOwn">Switch on</button>`}</div>
+    <div class="v2-msg" id="v2TrMsg"></div></div>`);
+  else if (v2Usable(t)) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
     <div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}"></label>
       <label>Ring for <select id="v2TrRing">${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
     <div class="v2-row muted" style="font-size:13px">Use a different phone from the one that forwards to your receptionist, or the call would loop. If nobody answers, the caller leaves a message.</div>
@@ -2528,6 +2535,11 @@ function wireV2() {
     if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
     msg("v2TrMsg", "Saving…");
     await after("v2TrMsg", await v2Post("transfer", { enabled: true, destination: $("v2TrNum").value, ring_seconds: Number($("v2TrRing").value), accept: true, consent_version: v2.consent.version }), "Saved.");
+  });
+  on("v2TrOwn", async () => {
+    if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
+    msg("v2TrMsg", "Saving…");
+    await after("v2TrMsg", await v2Post("transfer", { enabled: true, accept: true, consent_version: v2.consent.version }), "Saved.");
   });
   on("v2TrOff", async () => { msg("v2TrMsg", "Saving…"); await after("v2TrMsg", await v2Post("transfer", { enabled: false }), "Off."); });
   on("v2EmSave", async () => {
