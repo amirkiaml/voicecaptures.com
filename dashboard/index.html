@@ -2522,7 +2522,7 @@ function wireV2() {
     const want = sms.checked; sms.checked = !want;
     if (want && !(await v2Consent("Texts to your callers", v2.consent.caller_sms))) return;
     msg("v2SmsMsg", "Saving…");
-    await after("v2SmsMsg", await v2Post("caller-sms", want ? { enabled: true, accept: true, consent_version: v2.consent.version } : { enabled: false }), want ? "On." : "Off.");
+    await after("v2SmsMsg", await v2Post("caller-sms", want ? { enabled: true, accept: true, consent_version: v2.consent.caller_sms_version || v2.consent.version } : { enabled: false }), want ? "On." : "Off.");
   };
   on("v2TrSave", async () => {
     if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
