@@ -100,7 +100,7 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "22 November 2026"
+PRIVACY_UPDATED = "24 November 2026"
 TERMS_UPDATED = "22 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
@@ -2036,6 +2036,24 @@ only what it needs to do its part.</p>
   <li><strong>Supabase</strong> &mdash; the database holding your call records
   (Canada)</li>
 </ul>
+<h2>Google Calendar</h2>
+<p>If you connect Google Calendar, your receptionist checks when you are free and
+adds bookings to your primary calendar during calls. We ask Google for two
+permissions only: to see and edit events, and to see when you are free or busy.
+We read your calendar only for that: the free and busy times we check, the
+bookings we add, and your upcoming events, which we show only to you in your
+dashboard.</p>
+<p>During a call, the times you are free and the booking&rsquo;s date, time and
+title pass through Vapi, which runs the call, and the language model the assistant
+speaks with (OpenAI). To keep the connection, we store
+the access tokens Google gives us in our database (Supabase, Canada), which is
+encrypted at rest. When you press Disconnect in your dashboard, we revoke the
+tokens with Google and delete them. We do not use your calendar data for
+anything else, we do not sell it, and we do not use it to train AI models.</p>
+<p>VoiceCaptures&rsquo;s use and transfer to any other app of information received
+from Google APIs will adhere to the
+<a href="https://developers.google.com/terms/api-services-user-data-policy">Google
+API Services User Data Policy</a>, including the Limited Use requirements.</p>
 <p><strong>If you turn on the caller-sentiment add-on</strong>, the transcript of
 each call is sent to OpenAI to be scored. With the add-on off, no transcript is
 sent for scoring. For clinics we recommend leaving it off.</p>
