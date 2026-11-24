@@ -106,12 +106,13 @@ TERMS_UPDATED = "22 November 2026"
 # did. A "last updated" that changes while the words do not is the one thing a date like
 # this is for, and on a consent page it is worth being exact about. The consent VERSION
 # below is already separate, and neither moves unless this page's own wording does.
-CALLER_TEXTS_UPDATED = "17 November 2026"
+CALLER_TEXTS_UPDATED = "24 November 2026"
 
-# The version the in-product consent text is keyed to. The dashboard and
-# self-serve repos show matching wording under the same constant; bump it
-# here and there together when any consent clause below changes.
-CONSENT_VERSION = "2026-11-17"
+# The version the in-product caller-texts consent is keyed to: TorontoLeads
+# consent-texts.js CALLER_SMS_CONSENT_VERSION. Bump it here and there together
+# when that consent changes. 2026-11-24.1: the receptionist offers a text after a
+# message or a booking and sends one only on a yes (TorontoLeads#164).
+CONSENT_VERSION = "2026-11-24.1"
 
 # Share cards. A page gets its own when the default card would misdescribe it;
 # everything else uses the default. The filenames are versioned because
@@ -3810,8 +3811,9 @@ usage alerts &mdash; see <a href="/terms/">our Terms</a>.</p>
 <p>Nothing is sent to your callers by default. Each kind of message is a switch in
 your dashboard:</p>
 <ul>
-  <li><strong>Confirmation texts</strong> &mdash; the details of what was booked
-  or taken down, to a caller who wants them.</li>
+  <li><strong>Confirmation texts</strong> &mdash; after taking a message or booking
+  an appointment, our assistant asks the caller once whether they would like a text
+  confirming it, and sends one only if they say yes.</li>
   <li><strong>Missed-call text-back</strong> &mdash; a text to someone whose call
   was not answered.</li>
   <li><strong>Appointment reminders</strong> &mdash; before a booked
