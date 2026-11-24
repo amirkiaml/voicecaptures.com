@@ -430,6 +430,10 @@ async function loadV2() {}
   await page.click("#v2Reactivate").catch(() => {});
   await page.waitForTimeout(300);
   eq(nav[0], "https://checkout.stripe.com/c/pay/cs_react", "Reactivate: POSTs reactivate and goes to the new Checkout it returns");
+  await open(BILL({ ...lite, canManage: false, cancel: { at: "2026-12-23T05:00:00Z", cancelled: false, canReactivate: false } }), PLANS({ prompts: [] }));
+  ok(!(await page.$("#v2KeepPlan")) && /The account owner can keep the plan/.test(await page.textContent("#v2CancelBanner")), "a teammate (canManage false): no Keep my plan button, says the owner can");
+  await open(BILL({ ...lite, canManage: false, cancel: { at: null, cancelled: true, canReactivate: true } }), PLANS({ prompts: [] }));
+  ok(!(await page.$("#v2Reactivate")) && /The account owner can reactivate it/.test(await page.textContent("#v2Cancelled")), "…and no Reactivate button in the Billing card either");
   await open(BILL({ ...lite, cancel: { at: null, cancelled: true, canReactivate: false } }), PLANS({ prompts: [] }));
   ok(!(await page.$("#v2Reactivate")) && /Your old number has been released/.test(await page.textContent("#v2Cancelled")), "number released: no Reactivate, says to start again");
   await open(BILL({ ...lite, cancel: null }), PLANS({ prompts: [] }));
