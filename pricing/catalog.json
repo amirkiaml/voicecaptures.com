@@ -278,6 +278,8 @@
     "invite_45": {
       "label": "45-day invite (legacy)",
       "days": 45,
+      "minutes_cap": 100,
+      "minutes_cap_note": "100 minutes in total across the 45 days, on Personal and Business Lite alike. Decided by the owner on 2026-11-23.",
       "legacy": true
     }
   },

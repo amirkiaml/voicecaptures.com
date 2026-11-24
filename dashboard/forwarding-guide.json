@@ -73,6 +73,10 @@
       "text": "To check: dial *#61#. It should show {number} for unanswered calls."
     }
   },
+  "whilePaused": {
+   "text": "If you forwarded your phone to your receptionist, the calls you don't answer now hear that message instead of reaching your voicemail. To stop that, turn forwarding off:",
+   "todo": "TODO(owner): forwarding detection. We can't see whether a phone forwards to the line (SPEC §7, not built), so this is said to every paused or cancelled self-serve owner, worded as an if. The off codes are the FAQ's own answer (How do I turn it off?), never repeated here."
+  },
   "voicemail": {
     "text": "If your carrier's voicemail still answers first, ask your carrier to turn voicemail off on your line."
   },

@@ -28,6 +28,8 @@ const UA = {
   const raw = JSON.stringify(guide);
   eq([(raw.match(/Koodo/g) || []).length, guide.faq.find(f => f.q === "Which carrier?").a.includes("Tested on Koodo with an iPhone; other carriers not tested yet.")], [1, true], "carrier detail only in 'Which carrier?', one line");
   ok(!("undo" in guide.codes) && guide.faq.some(f => f.q === "How do I turn it off?"), "turning it off is said once (the Q&A), plus each code's own Turn off");
+  ok(/^If you forwarded your phone to your receptionist,/.test(guide.whilePaused.text) && !/##|\*\*/.test(guide.whilePaused.text) && /TODO\(owner\): forwarding detection/.test(guide.whilePaused.todo),
+    "whilePaused (the paused/cancelled banner): an if (no forwarding detection: TODO(owner)), and no codes of its own (the Q&A's answer follows it)");
   ok(!raw.includes("`"), "no backticks anywhere in the text");
   eq([guide.codeNumberFormat, G.codeNumber(N, "e164"), G.codeNumber(N, "10digit"), G.codeNumber("6475550142", "e164")], ["e164", N, "6475550142", N], "the number inside a code: one constant (codeNumberFormat), e164 or 10digit");
   const txt = G.toText(guide, "{number}");

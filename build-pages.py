@@ -100,18 +100,19 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "22 November 2026"
+PRIVACY_UPDATED = "24 November 2026"
 TERMS_UPDATED = "22 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
 # this is for, and on a consent page it is worth being exact about. The consent VERSION
 # below is already separate, and neither moves unless this page's own wording does.
-CALLER_TEXTS_UPDATED = "17 November 2026"
+CALLER_TEXTS_UPDATED = "24 November 2026"
 
-# The version the in-product consent text is keyed to. The dashboard and
-# self-serve repos show matching wording under the same constant; bump it
-# here and there together when any consent clause below changes.
-CONSENT_VERSION = "2026-11-17"
+# The version the in-product caller-texts consent is keyed to: TorontoLeads
+# consent-texts.js CALLER_SMS_CONSENT_VERSION. Bump it here and there together
+# when that consent changes. 2026-11-24.1: the receptionist offers a text after a
+# message or a booking and sends one only on a yes (TorontoLeads#164).
+CONSENT_VERSION = "2026-11-24.1"
 
 # Share cards. A page gets its own when the default card would misdescribe it;
 # everything else uses the default. The filenames are versioned because
@@ -2042,6 +2043,35 @@ sent for scoring. For clinics we recommend leaving it off.</p>
 <p>VoiceCaptures is live in Canada. We are rolling out to more countries, and
 the service is built around Canadian numbers, carriers and law.</p>
 
+<h2>Google Calendar data</h2>
+<p>If you connect a Google Calendar to {BRAND}, we access it only to run the
+booking feature you switched on:</p>
+<ul>
+  <li>we read <strong>free/busy times</strong> on your primary calendar, so your
+      receptionist only offers open times;</li>
+  <li>we <strong>create events</strong> for appointments your callers book, with the
+      caller&rsquo;s name, reason and callback number in the event;</li>
+  <li>we read your <strong>upcoming events</strong> to show your bookings in your
+      dashboard.</li>
+</ul>
+<p>We store your Google access and refresh tokens (encrypted at rest by our
+database provider), the name of your primary calendar, and the Google account
+email shown in your dashboard. We do not store copies of your calendar
+events.</p>
+<p>During a call, the open times for the day the caller asks about are passed to
+Vapi, the AI voice service that runs your receptionist, so it can offer them.
+Nothing else from your calendar is.</p>
+<p>We never sell Google user data, never use it for advertising, and never use it
+to train AI models. It is shared only with the service providers that run this
+feature, as listed above.</p>
+<p>{BRAND}&rsquo; use and transfer to any other app of information received from
+Google APIs will adhere to <a href="https://developers.google.com/terms/api-services-user-data-policy">Google
+API Services User Data Policy</a>, including the Limited Use requirements.</p>
+<p>You can disconnect at any time from your dashboard (Calendar &rarr;
+Disconnect), which revokes the tokens with Google and deletes them. You can also
+remove access at
+<a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</p>
+
 <h2>The international waitlist</h2>
 <p>If the service is not yet available where you are, you can ask us to tell you
 when it opens.</p>
@@ -3781,8 +3811,9 @@ usage alerts &mdash; see <a href="/terms/">our Terms</a>.</p>
 <p>Nothing is sent to your callers by default. Each kind of message is a switch in
 your dashboard:</p>
 <ul>
-  <li><strong>Confirmation texts</strong> &mdash; the details of what was booked
-  or taken down, to a caller who wants them.</li>
+  <li><strong>Confirmation texts</strong> &mdash; after taking a message or booking
+  an appointment, our assistant asks the caller once whether they would like a text
+  confirming it, and sends one only if they say yes.</li>
   <li><strong>Missed-call text-back</strong> &mdash; a text to someone whose call
   was not answered.</li>
   <li><strong>Appointment reminders</strong> &mdash; before a booked
