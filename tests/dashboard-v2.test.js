@@ -30,7 +30,7 @@ if (!shared) throw new Error("the shared rolling-out helpers moved; update this 
 ok(html.includes("    loadV2();\n"), "load() calls loadV2()");
 ok(/v2Post\("review-link", \{ link: \$\("v2Review"\)\.value\.trim\(\) \}\)/.test(html) && /v2Usable\(f\.review_requests\) \? `<div class="v2-row"><label>Google review link/.test(html), "Pro: the Google review link field, shown only where review requests are on the plan");
 
-const CONSENT = { version: "2026-11-17.1", caller_sms: "CALLER TEXT CONSENT", transfer: "TRANSFER CONSENT" };
+const CONSENT = { version: "2026-11-17.1", caller_sms_version: "2026-11-24.1", caller_sms: "CALLER TEXT CONSENT", transfer: "TRANSFER CONSENT" };
 const F = (status, extra = {}) => ({ status, running: true, ...extra });
 /*
  * THE FIXTURE EXERCISES EVERY GATE, which is why it is not one plan's real entitlements:
@@ -119,7 +119,7 @@ ${js}
   eq([await page.isChecked("#v2Sms"), (await page.evaluate(() => sent)).filter(x => x.p.includes("caller-sms")).length], [false, 0], "cancel: still off, nothing sent");
   await page.click("#v2Sms"); await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
   await page.waitForFunction(() => sent.some(x => x.p.includes("caller-sms")));
-  eq((await page.evaluate(() => sent)).find(x => x.p.includes("caller-sms")).body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "accepted: sends enabled + accept + the version shown");
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("caller-sms")).body, { enabled: true, accept: true, consent_version: "2026-11-24.1" }, "accepted: sends enabled + accept + the caller-texts version shown (its own since 2026-11-24)");
   await page.waitForFunction(() => $("v2SmsMsg") && $("v2SmsMsg").textContent === "On.");
   ok(true, "…then the card reloads from the server and says On.");
   eq(await page.inputValue(".v2Em >> nth=2"), "typed@x.test", "…keeping what was typed, unsaved, in another field");
