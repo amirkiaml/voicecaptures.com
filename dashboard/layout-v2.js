@@ -269,7 +269,12 @@
 
   /* Settings: the plan card, prettier: "On your plan" as ticked tiles; "Not on your plan" is
    * replaced by the Add-ons card. */
+  // A plan with no minutes to state (Enterprise before its contract minutes are set) reads
+  // "null minutes a month": leave that part out.
+  var NO_MIN = /^(null|undefined|contract|NaN) minutes a month( · )?/;
   function planCard() {
+    var sub = $("v2Sub");
+    if (sub && NO_MIN.test(sub.textContent)) sub.textContent = sub.textContent.replace(NO_MIN, "");
     var secs = $("v2Body").querySelectorAll(".v2-sec");
     for (var i = 0; i < secs.length; i++) {
       var h = secs[i].querySelector(".v2-h"), t = h ? h.textContent.trim() : "";
@@ -322,6 +327,8 @@
       var boxes = grid.querySelectorAll(".v2-plan"), hasEnt = false;
       for (var i = 0; i < boxes.length; i++) {
         var box = boxes[i], name = box.querySelector("b") ? box.querySelector("b").textContent.trim() : "";
+        var mins = box.children[2];
+        if (mins && NO_MIN.test(mins.textContent.trim())) mins.textContent = "";
         if (name === "Enterprise") { hasEnt = true; box.classList.add("dv2-ent-plan"); }
         if (box.classList.contains("cur") || box.querySelector("[data-plan]")) continue;
         var kids = Array.prototype.slice.call(box.children);
@@ -447,7 +454,10 @@
     "html.dv2 .hbars{gap:12px}",
     /* call log */
     "html.dv2 #dv2Main table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em}",
-    "html.dv2 #dv2Main tr.row:hover td{background:var(--dv2-sky)}",
+    /* Call log hover: the whole row, not each cell (on narrow logs the cells are grid boxes with gaps). */
+    "html.dv2 #log tr.row{border-radius:12px;transition:background .12s}",
+    "html.dv2 #log tr.row:hover,html.dv2 #log tr.row.open{background:var(--dv2-sky)}",
+    "html.dv2 #log tr.row:hover td,html.dv2 #log tr.row.open td{background:transparent}",
     "html.dv2 #dv2Main .pill{border-radius:999px}",
     /* sidebar details */
     "html.dv2 .dv2-biz{border-radius:14px;box-shadow:var(--dv2-shadow);background:var(--card)}",
