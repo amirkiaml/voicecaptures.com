@@ -78,7 +78,8 @@ async function loadV2() {}
   const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
   await ctx.route("**/*", r => r.request().url().startsWith("data:") ? r.continue() : r.abort());
   let page; const errs = [];
-  const open = async (b, p, st, ...rest) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st, ...rest)); await page.evaluate(() => loadV2Bill()); };
+  let selfUp = false;   // window.V2_SELF_UPGRADE: Personal -> Business by Switch, so the upgrade dialog stays covered
+  const open = async (b, p, st, ...rest) => { if (page) await page.close(); page = await ctx.newPage(); page.on("pageerror", e => errs.push(e.message)); await page.setContent(page0(b, p, st, ...rest)); await page.evaluate(u => { if (u) window.V2_SELF_UPGRADE = true; return loadV2Bill(); }, selfUp); };
   const sentTo = path => page.evaluate(p => sent.filter(x => x.p === p), path);
   /* The plan dialog's contents, and the button that confirms it. */
   const planModal = async () => (await page.waitForFunction(() => $("v2PlanModal").open), page.evaluate(() => ({
@@ -226,6 +227,15 @@ async function loadV2() {}
   }
   await open(PER_T({ used: 1, left: 14 }, { left: 14 }), PPLANS);
   ok(/14 of 15 minutes left/.test(await page.textContent("#v2Bill")) && /1\s*of 15 minutes used/.test(await page.textContent("#v2Bill")), "0:59 call: 14 left, 1 used");
+  // Personal -> Business is by email until the line can be rebuilt with a business prompt (owner, 24 Nov 2026).
+  ok(await page.$("[data-plan=business_lite]") === null, "Personal → Business: no Switch");
+  eq(await page.$eval("[data-down=business_lite]", a => [a.textContent, a.getAttribute("href")]), ["Email us", "mailto:sales@voicecaptures.com?subject=Move%20to%20Business%20Lite"], "…\"Email us\" instead");
+  await open(PER_T({ used: 1, left: 14 }, { left: 14 }), PLANS({ prompts: [], plans: [plan("personal", "Personal Line", 19, 190, 30, true), { ...plan("business_lite", "Business Lite", 99, 990, 100, false), byEmail: null }, plan("business_pro", "Business Pro", 199, 1990, 250, false, false)] }));
+  ok(await page.$("[data-plan=business_lite]") !== null, "…an API that says byEmail: null (the rebuild is on): Switch");
+  await open(BILL(), PLANS({ prompts: [], plans: [{ ...plan("personal", "Personal Line", 19, 190, 30, false), byEmail: "down" }, { ...plan("business_lite", "Business Lite", 99, 990, 100, true) }, { ...plan("business_pro", "Business Pro", 199, 1990, 250, false), byEmail: null }] }));
+  ok(await page.$("[data-down=personal]") !== null && await page.$("[data-plan=personal]") === null, "the API's byEmail \"down\": Email us");
+  selfUp = true;
+  await open(PER_T({ used: 1, left: 14 }, { left: 14 }), PPLANS);
   await page.click("[data-plan=business_lite]");
   /* #62's wording, now in the dialog rather than a confirm(): the same four promises. */
   const tc = await planModal();
