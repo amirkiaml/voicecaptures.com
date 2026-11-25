@@ -1,0 +1,42 @@
+# Runs the site tests (tests/*.test.js) on every pull request and every push to main.
+# Each test is a plain Node script; most drive a headless Chromium through Playwright.
+# No secrets are given to this job.
+name: test
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The site has no package.json; Playwright is a test-only tool, installed outside the repo.
+      - name: Install Playwright and Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund playwright@1.63.0
+          npx playwright install --with-deps chromium
+      - name: Run every test, one at a time
+        env:
+          NODE_PATH: ${{ runner.temp }}/pw/node_modules
+        run: |
+          fail=0
+          for t in tests/*.test.js; do
+            if timeout 300 node "$t" > out.txt 2>&1; then echo "ok    $t"; else echo "FAIL  $t"; cat out.txt; fail=$((fail + 1)); fi
+          done
+          echo "$fail failed"
+          [ "$fail" -eq 0 ]
