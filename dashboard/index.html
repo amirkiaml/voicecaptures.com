@@ -2354,7 +2354,7 @@ function wireV2Bill() {
 const V2_STATUS = { rolling_out: "Rolling out", coming_soon: "Coming soon", addon: "Add-on", none: "Upgrade" };
 const V2_LOCKED = { caller_sms: "Confirmation texts to callers", transfer: "Live transfer to a person", calendar_google: "Google Calendar booking",
   reminders: "Appointment reminders", review_requests: "Review requests", report: "Monthly report", sentiment: "Caller mood", history_90: "90 days of call history",
-  priority_support: "Priority support", custom_routing: "Custom routing", textback: "Missed-call text-back", coverage_mode: "Coverage mode" };
+  priority_support: "Priority support", custom_routing: "Custom routing", textback: "Missed-call text-back", coverage_mode: "After-hours mode" };
 let v2 = null;
 /*
  * ONLY WHAT WORKS TODAY GETS A ROW.
@@ -2505,7 +2505,9 @@ function renderV2() {
   // Settings-only features
   const cm = f.coverage_mode;
   if (v2Usable(cm) || toggles.length) sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
-    ${v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>` : ""}
+    ${v2Usable(cm) && Array.isArray(cm.options) ? `<div class="v2-row"><label>Outside your opening hours <select id="v2Cov">${[["24_7", "answer as usual"], ["after_hours", "say you're closed, give your hours, take a message"]].filter(([k]) => cm.options.includes(k)).map(([k, l]) => `<option value="${k}" ${(cm.value || "24_7") === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
+    <div class="v2-row muted" style="font-size:13px">Your opening hours are the ones in Settings. Urgent callers can still be put through if live transfer is on.</div>`
+    : v2Usable(cm) ? `<div class="v2-row"><label>Answer calls <select id="v2Cov">${[["24_7", "all the time"], ["after_hours", "after hours only"], ["overflow", "when I don't pick up"]].map(([k, l]) => `<option value="${k}" ${cm.value === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>` : ""}
     ${toggles.map(([k, l]) => `<label class="v2-row chk-inline"><input type="checkbox" class="v2Tg" data-k="${k}" ${f[k].value ? "checked" : ""}> ${esc(l)}</label>`).join("")}
     ${v2Usable(f.review_requests) ? `<div class="v2-row"><label>Google review link <input type="url" id="v2Review" placeholder="https://g.page/r/…/review" style="max-width:100%"></label><button type="button" class="btn-ghost" id="v2ReviewSave">Save</button></div>` : ""}
     <div class="v2-msg" id="v2MoreMsg"></div></div>`);
