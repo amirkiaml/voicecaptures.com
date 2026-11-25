@@ -86,6 +86,10 @@ ${js}
   eq([await page.textContent("#v2Title"), await page.textContent("#v2Sub")], ["Your plan: Business Lite", "100 minutes a month · extra 50 minutes for $75"], "plan line from the API (no price in the page)");
   ok(await page.isVisible("#v2CalOn"), "Google connect button");
   ok(await page.$("#v2CalBlocked") === null, "…and no reason line when nothing is in the way");
+  ok(await page.$("#v2Rebuild") === null, "…and no rebuild note on an ordinary line");
+  await open({ ...LITE, lineRebuild: { code: "needs_business_prompt", message: "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you." } });
+  eq(await page.textContent("#v2Rebuild .v2-row"), "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you.", "Personal → Business waiting for its business prompt: the card says why at the top");
+  await open(LITE);
   // The API refused booking on this line (TorontoLeads calendar-connect-refused): never "connected", say why, no Connect.
   await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: false, blocked: "Can't enable booking on this line (it's a personal line, and personal lines don't take bookings).", canConnect: false }) } });
   ok((await page.textContent("#v2Body")).includes("Google Calendar: not connected"), "a line that can't book: not connected");
