@@ -15,11 +15,12 @@ const page0 = `<!doctype html><style>${style}</style><body><div id="mapCard" hid
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const B = "/api/dashboard/admin/billing"; const CL = { id: "11111111-1111-4111-8111-111111111111" };
-window.sent = []; window.refuse = false;
+window.sent = []; window.refuse = false; window.noStart = false;
 async function api(p, o = {}) {
   sent.push({ p, m: o.method || "GET", body: o.body ? JSON.parse(o.body) : null });
   if (o.method === "POST") { if (refuse) { const e = new Error("Type the business name exactly (over_the_vines) to confirm."); e.status = 400; throw e; } return { ok: true, audit: 7 }; }
   const q = new URLSearchParams(p.split("?")[1]);
+  if (noStart && !q.get("plan_key")) { const e = new Error("Choose a plan."); e.status = 400; throw e; }
   return { business: "over_the_vines", confirmWith: "over_the_vines", after: { plan_key: q.get("plan_key") || "business_lite", billing_interval: q.get("billing") || "month" },
     changes: ["Plan: home_starter (legacy) → " + (q.get("plan_key") || "business_lite"), q.get("use_catalog_price") === "true" ? "Price and minutes → catalog" : "Price ($149/mo) and minutes (150) stay as they are", "Not touched: Stripe, the phone line, the assistant and its prompt"] };
 }
@@ -45,6 +46,12 @@ ${js}
   await page.fill("#mpConfirm", "over_the_vines"); await page.fill("#mpReason", "x"); await page.click("#mpGo");
   await page.waitForFunction(() => /Type the business name/.test($("mpMsg").textContent));
   ok(true, "a server refusal is shown");
+  // No plan to start from (no plan_key, an old plan_name that maps to none): a picker, not a dead end.
+  await page.evaluate(() => { refuse = false; noStart = true; return wireMapPlan(); });
+  ok(await page.isVisible("#mpPick") && !(await page.$("#mpGo")), "no starting plan: a 'Choose a plan…' picker, no Map button yet");
+  await page.selectOption("#mpPick", "enterprise");
+  await page.waitForSelector("#mpPlan");
+  eq(await page.$eval("#mpPlan", s => s.value), "enterprise", "…picking Enterprise opens the normal preview on Enterprise");
   eq(errs, [], "no page errors");
   await browser.close();
   console.log(`\n${pass} checks passed`);
