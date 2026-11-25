@@ -123,6 +123,12 @@ async function loadV2() {}
   await page.click("#v2Auto"); await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
   await page.waitForFunction(() => $("v2AutoMsg").textContent === "On.");
   eq((await sentTo("/api/dashboard/v2/auto-package"))[0].body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "accepted: enabled + the version shown");
+  // A cheaper plan: no Switch, "Email us" (owner, 24 Nov 2026).
+  ok(await page.$("[data-plan=personal]") === null, "a lower plan (Personal from Lite): no Switch button");
+  eq(await page.$eval("[data-down=personal]", a => [a.textContent, a.getAttribute("href")]), ["Email us", "mailto:sales@voicecaptures.com?subject=Move%20to%20Personal%20Line"], "…\"Email us\" instead, to sales, naming the plan");
+  ok(/To move to Personal Line, email sales@voicecaptures\.com\./.test(await page.textContent(".v2-plans")), "…and says so");
+  // The old dialog stays covered behind window.V2_SELF_DOWNGRADE.
+  await page.evaluate(() => { window.V2_SELF_DOWNGRADE = true; return loadV2Bill(); });
   await page.click("[data-plan=personal]");
   const down = await planModal();
   ok(down.open && down.title === "Move to Personal Line?", "downgrade: a dialog, not a confirm()");
@@ -196,6 +202,8 @@ async function loadV2() {}
   /* And in a trial a plan change promises no charge until the trial ends. A fresh card,
      because the one above has just started its plan. */
   await open(BILL({ trial: { end: "2026-12-04", cap: 60 }, period: { kind: "trial", start: "2026-11-15", end: "2026-11-29", used: 12, allowance: 60, packages: [] } }), PLANS({ prompts: [] }));
+  ok(await page.$("[data-plan=personal]") === null && await page.$("[data-down=personal]") !== null, "in a trial too: a lower plan is \"Email us\"");
+  await page.evaluate(() => { window.V2_SELF_DOWNGRADE = true; return loadV2Bill(); });
   await page.click("[data-plan=personal]");
   const inTrial = await planModal();
   ok(/no charge until/.test(inTrial.facts.join(" ")), "a plan change during a trial: no charge until the trial ends");
