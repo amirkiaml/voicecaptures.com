@@ -1850,7 +1850,17 @@ const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2So
    Upgrades and a change of billing on the same plan keep their Switch. window.V2_SELF_DOWNGRADE
    = true brings the old button back (the tests use it to keep the dialog covered). */
 const v2Lower = (x, plans) => { const ci = plans.findIndex(y => y.current), xi = plans.indexOf(x); return ci >= 0 && xi >= 0 && xi < ci; };
-const v2DownByEmail = (x, plans) => v2Lower(x, plans) && window.V2_SELF_DOWNGRADE !== true;
+/* PERSONAL TO A BUSINESS PLAN IS BY EMAIL TOO, until the line can be rebuilt with a business
+   prompt (owner, 24 Nov 2026). The API says which (plans[].byEmail: "down" | "upgrade" | null,
+   TorontoLeads); an API without the key gets the same rule here. The server refuses a smaller
+   plan; window.V2_SELF_DOWNGRADE / V2_SELF_UPGRADE bring the old buttons back for the tests. */
+const v2ByEmailKind = (x, plans) => {
+  if ("byEmail" in x) return x.byEmail || null;
+  const cur = plans.find(y => y.current);
+  if (v2Lower(x, plans)) return "down";
+  return cur && cur.key === "personal" && x.key !== "personal" ? "upgrade" : null;
+};
+const v2DownByEmail = (x, plans) => { const k = v2ByEmailKind(x, plans); return k === "down" ? window.V2_SELF_DOWNGRADE !== true : k === "upgrade" ? window.V2_SELF_UPGRADE !== true : false; };
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
  * WHAT THE PLAN THEY ARE ON COSTS AT THIS USAGE. Their plan, and no other.
