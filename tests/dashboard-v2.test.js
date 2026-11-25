@@ -14,6 +14,7 @@ const html = fs.readFileSync(path.join(__dirname, "..", "dashboard", "index.html
 const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 for (const [i, s] of scripts.entries()) new vm.Script(s, { filename: `dashboard-inline-${i}.js` });
 ok(true, `${scripts.length} inline script(s) parse`);
+ok(html.includes('coverage_mode: "After-hours mode"') && fs.readFileSync(path.join(__dirname, "..", "pricing", "presentation.json"), "utf8").includes('"coverage_modes": "After-hours mode"'), "the entitlement is called \"After-hours mode\" on the dashboard and the pricing data (owner, 24 Nov 2026: overflow dropped)");
 const style = /<style>([\s\S]*?)<\/style>/.exec(html)[1];
 const markup = /(<div class="card v2" id="v2Card"[\s\S]*?<\/dialog>)/.exec(html)[1];
 const js = /(\/\* ---------- Pricing v2 settings ----------[\s\S]*?)\nasync function api\(/.exec(html)[1];
