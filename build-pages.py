@@ -100,7 +100,7 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "24 November 2026"
+PRIVACY_UPDATED = "25 November 2026"
 TERMS_UPDATED = "22 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
@@ -2059,14 +2059,19 @@ database provider), the name of your primary calendar, and the Google account
 email shown in your dashboard. We do not store copies of your calendar
 events.</p>
 <p>During a call, the open times for the day the caller asks about are passed to
-Vapi, the AI voice service that runs your receptionist, so it can offer them.
-Nothing else from your calendar is.</p>
-<p>We never sell Google user data, never use it for advertising, and never use it
-to train AI models. It is shared only with the service providers that run this
-feature, as listed above.</p>
+our voice and AI providers &mdash; Vapi, which runs the call, and OpenAI, the
+language model your receptionist speaks with &mdash; for the sole purpose of
+answering that caller. They are used for nothing else, and nothing else from
+your calendar is sent at all.</p>
+<p>We never sell Google user data and never use it for advertising.
+<strong>Google user data is never used to train AI models</strong> &mdash; not by
+us, and not by the providers we send it to. It is shared only with the service
+providers that run this feature, as listed above.</p>
 <p>{BRAND}&rsquo; use and transfer to any other app of information received from
 Google APIs will adhere to <a href="https://developers.google.com/terms/api-services-user-data-policy">Google
 API Services User Data Policy</a>, including the Limited Use requirements.</p>
+<p>The use of raw or derived user data received from Workspace APIs will adhere
+to the Google User Data Policy, including the Limited Use requirements.</p>
 <p>You can disconnect at any time from your dashboard (Calendar &rarr;
 Disconnect), which revokes the tokens with Google and deletes them. You can also
 remove access at
