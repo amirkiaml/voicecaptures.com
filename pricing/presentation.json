@@ -112,7 +112,7 @@
 
   "annual": {
     "label": "2 months free",
-    "terms": "Annual is 2 months free, with your rate locked for the term. Cancel early and unused months come back as account credit."
+    "terms": "Annual is 2 months free, with your rate locked for the term. Cancelling takes effect at the end of the term; unused months are not refunded."
   },
 
   "alerts": {
@@ -129,7 +129,7 @@
     "personal_out_of_minutes": "Personal Line: without a package, callers past your minutes hear a short message that you can't take the call right now.",
     "setup": "Setup is included. We configure the assistant on your existing number. About 10 minutes of your time.",
     "clinics": "Clinics: privacy-first setup included.",
-    "no_contracts": "No contracts, cancel anytime.",
+    "no_contracts": "No long-term contracts; cancel a monthly plan anytime.",
     "existing_number": "Works with your existing number.",
     "packages_from_dashboard": "Extra minutes come in packages, bought from your dashboard."
   },
