@@ -1837,7 +1837,19 @@ async function wireMapPlan() {
   const draw = async (planKey, billing, useCat) => {
     let d;
     try { d = await api(`${url}?${new URLSearchParams({ ...(planKey ? { plan_key: planKey } : {}), billing: billing || "month", use_catalog_price: useCat ? "true" : "false" })}`); }
-    catch (e) { if (e.status === 404 && !/Client/.test(e.message)) { card.hidden = true; return; } card.hidden = false; card.innerHTML = `<h3>Map to new plan</h3><div class="err small">${esc(e.message)}</div>`; return; }
+    catch (e) {
+      if (e.status === 404 && !/Client/.test(e.message)) { card.hidden = true; return; }
+      card.hidden = false;
+      /* No plan to start from (no plan_key, and an old plan_name that maps to none): let the admin pick one. */
+      if (e.status === 400 && !planKey) {
+        card.innerHTML = `<h3>Map to new plan <span class="muted small">— by hand; nobody is moved automatically</span></h3>
+          <div class="filters"><select id="mpPick" aria-label="New plan"><option value="" selected>Choose a plan…</option>${MAP_PLANS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></div>
+          <div class="muted small">This client has no plan to start from. Pick the plan to preview what changes.</div>`;
+        $("mpPick").onchange = () => { if ($("mpPick").value) draw($("mpPick").value, billing, useCat); };
+        return;
+      }
+      card.innerHTML = `<h3>Map to new plan</h3><div class="err small">${esc(e.message)}</div>`; return;
+    }
     if (CL.id !== id) return;
     card.hidden = false;
     card.innerHTML = `<h3>Map to new plan <span class="muted small">— by hand; nobody is moved automatically</span></h3>
