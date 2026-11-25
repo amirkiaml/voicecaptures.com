@@ -1072,10 +1072,13 @@ function renderInsights(d) {
 }
 
 /* ---------- call log ---------- */
+// A booked call's word: "Appointment" for every self-serve / pricing-v2 line (the API says so),
+// "Tour" for the legacy tour client, as before (the API sends nothing for them).
+const bookingNoun = () => (last && (last.bookingNoun === "Appointment" || last.bookingNoun === "Tour")) ? last.bookingNoun : "Tour";
 function statusPill(c) {
   const map = {
     emergency: ["p-emergency", "Emergency"],
-    booked: ["p-booked", c.tour_booking_id ? "Tour booked" : "Booked"],
+    booked: ["p-booked", c.tour_booking_id ? `${bookingNoun()} booked` : "Booked"],
     pending: ["p-pending", "Needs callback"],
     abandoned: ["p-abandoned", "Hung up early"],
     other: ["p-other", "Inquiry"],
@@ -1394,7 +1397,7 @@ function renderLog(everything) {
         <div class="k">Request</div><div class="v">${esc(c.issue_description || "—")}</div>
         ${callback ? `<div class="k">Callback</div><div class="v">${esc(fmtPhone(callback))}${same ? " · same as caller ID" : ""}</div>` : ""}
         ${c.address ? `<div class="k">Address</div><div class="v">${esc(c.address)}</div>` : ""}
-        ${c.tour_start ? `<div class="k">Tour</div><div class="v">${esc(c.tour_start)}</div>` : ""}
+        ${c.tour_start ? `<div class="k">${bookingNoun()}</div><div class="v">${esc(c.tour_start)}</div>` : ""}
         ${c.preferred_date ? `<div class="k">Appointment</div><div class="v">${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : ""}
         ${c.caller_email ? `<div class="k">Email</div><div class="v">${esc(c.caller_email)}</div>` : ""}
         ${renderPremium(c, i)}
@@ -1850,7 +1853,17 @@ const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2So
    Upgrades and a change of billing on the same plan keep their Switch. window.V2_SELF_DOWNGRADE
    = true brings the old button back (the tests use it to keep the dialog covered). */
 const v2Lower = (x, plans) => { const ci = plans.findIndex(y => y.current), xi = plans.indexOf(x); return ci >= 0 && xi >= 0 && xi < ci; };
-const v2DownByEmail = (x, plans) => v2Lower(x, plans) && window.V2_SELF_DOWNGRADE !== true;
+/* PERSONAL TO A BUSINESS PLAN IS BY EMAIL TOO, until the line can be rebuilt with a business
+   prompt (owner, 24 Nov 2026). The API says which (plans[].byEmail: "down" | "upgrade" | null,
+   TorontoLeads); an API without the key gets the same rule here. The server refuses a smaller
+   plan; window.V2_SELF_DOWNGRADE / V2_SELF_UPGRADE bring the old buttons back for the tests. */
+const v2ByEmailKind = (x, plans) => {
+  if ("byEmail" in x) return x.byEmail || null;
+  const cur = plans.find(y => y.current);
+  if (v2Lower(x, plans)) return "down";
+  return cur && cur.key === "personal" && x.key !== "personal" ? "upgrade" : null;
+};
+const v2DownByEmail = (x, plans) => { const k = v2ByEmailKind(x, plans); return k === "down" ? window.V2_SELF_DOWNGRADE !== true : k === "upgrade" ? window.V2_SELF_UPGRADE !== true : false; };
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
  * WHAT THE PLAN THEY ARE ON COSTS AT THIS USAGE. Their plan, and no other.
@@ -2456,6 +2469,7 @@ function renderV2() {
     <div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
       ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : g.canConnect === false ? "" : `<button type="button" class="btn" id="v2CalOn">${g.blocked ? "Try again" : "Connect Google Calendar"}</button>`}</div>
     ${!g.connected && g.blocked ? `<div class="v2-row muted" id="v2CalBlocked">${esc(g.blocked)}</div>` : ""}
+    ${g.hoursSet === false && g.hoursNote ? `<div class="v2-row muted" id="v2CalHours">${esc(g.hoursNote)}</div>` : ""}
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
@@ -2465,7 +2479,14 @@ function renderV2() {
     <div class="v2-msg" id="v2SmsMsg"></div></div>`);
   // Live transfer
   const t = f.transfer;
-  if (v2Usable(t)) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
+  /* ownerOnly (the API's FEATURE_URGENT_TRANSFER): calls go only to the owner's mobile on file,
+     so there is nothing to type or choose, just on and off. */
+  if (v2Usable(t) && t.ownerOnly) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
+    <div class="v2-row">When a caller asks for a person, or something is urgent, your receptionist can put them through to your mobile${t.destination ? `, <b>${esc(t.destination)}</b>` : ""}.</div>
+    <div class="v2-row muted" style="font-size:13px">Your receptionist takes their message first. If you don't pick up, you get it by text.</div>
+    <div class="v2-row">${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : `<button type="button" class="btn" id="v2TrOwn">Switch on</button>`}</div>
+    <div class="v2-msg" id="v2TrMsg"></div></div>`);
+  else if (v2Usable(t)) sec.push(`<div class="v2-sec"><p class="v2-h">Live transfer</p>
     <div class="v2-row"><label>Transfer to <input type="tel" id="v2TrNum" placeholder="416-555-0123" value="${esc(t.destination || "")}"></label>
       <label>Ring for <select id="v2TrRing">${[10, 15, 20, 25, 30, 45, 60].map(s => `<option value="${s}" ${s === (t.ringSeconds || 20) ? "selected" : ""}>${s} seconds</option>`).join("")}</select></label></div>
     <div class="v2-row muted" style="font-size:13px">Use a different phone from the one that forwards to your receptionist, or the call would loop. If nobody answers, the caller leaves a message.</div>
@@ -2544,6 +2565,12 @@ function wireV2() {
     if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
     msg("v2TrMsg", "Saving…");
     await after("v2TrMsg", await v2Post("transfer", { enabled: true, destination: $("v2TrNum").value, ring_seconds: Number($("v2TrRing").value), accept: true, consent_version: v2.consent.version }), "Saved.");
+  });
+  on("v2TrOwn", async () => {
+    if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
+    msg("v2TrMsg", "Saving…");
+    // Owner-only transfer has its own consent ("my mobile on file", TorontoLeads #173): its version when the API gives one.
+    await after("v2TrMsg", await v2Post("transfer", { enabled: true, accept: true, consent_version: v2.consent.transfer_version || v2.consent.version }), "Saved.");
   });
   on("v2TrOff", async () => { msg("v2TrMsg", "Saving…"); await after("v2TrMsg", await v2Post("transfer", { enabled: false }), "Off."); });
   on("v2EmSave", async () => {

@@ -86,6 +86,11 @@ ${js}
   eq([await page.textContent("#v2Title"), await page.textContent("#v2Sub")], ["Your plan: Business Lite", "100 minutes a month · extra 50 minutes for $75"], "plan line from the API (no price in the page)");
   ok(await page.isVisible("#v2CalOn"), "Google connect button");
   ok(await page.$("#v2CalBlocked") === null, "…and no reason line when nothing is in the way");
+  ok(await page.$("#v2CalHours") === null, "…and no hours note when the API sends none");
+  await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: true, hoursSet: false, hoursNote: "Set your hours so callers are only offered times you're open." }) } });
+  eq(await page.textContent("#v2CalHours"), "Set your hours so callers are only offered times you're open.", "no hours the line can keep to: the Calendar card says so");
+  await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: true, hoursSet: true }) } });
+  ok(await page.$("#v2CalHours") === null, "…hours set: no note");
   ok(await page.$("#v2Rebuild") === null, "…and no rebuild note on an ordinary line");
   await open({ ...LITE, lineRebuild: { code: "needs_business_prompt", message: "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you." } });
   eq(await page.textContent("#v2Rebuild .v2-row"), "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you.", "Personal → Business waiting for its business prompt: the card says why at the top");
@@ -183,6 +188,27 @@ ${js}
   ok(await page.$(".v2Tg[data-k=reminders]") === null && await page.$(".v2Tg[data-k=review_requests]") === null,
     "...and a tag is not a switch: neither has a control");
   ok(!/Not on your plan/.test(pro) || !/Appointment reminders Upgrade/.test(pro), "a feature that is rolling out is not also listed as an upgrade");
+
+  console.log("Live transfer, owner's mobile only (ownerOnly)");
+  const OWN = JSON.parse(JSON.stringify(LITE));
+  OWN.features.transfer = F("live", { enabled: false, destination: "+14165550103", ringSeconds: 20, ownerOnly: true });
+  await open(OWN);
+  ok(await page.$("#v2TrNum") === null && await page.$("#v2TrRing") === null, "no number to type and no ring time to choose");
+  ok(/put them through to your mobile, \+14165550103\./.test(await page.textContent("#v2Body")) && /If you don't pick up, you get it by text\./.test(await page.textContent("#v2Body")), "says where calls go and what happens when nobody picks up");
+  await page.evaluate(() => { window.sent.length = 0; });
+  await page.click("#v2TrOwn"); ok((await page.textContent("#v2ModalText")) === "TRANSFER CONSENT", "…asks for the transfer consent");
+  await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
+  await page.waitForFunction(() => sent.some(x => x.p.includes("transfer")));
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("transfer")).body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "…and sends on + consent only (no destination)");
+  // The API's owner-mobile consent (TorontoLeads #173): its own text and version.
+  const OWN2 = JSON.parse(JSON.stringify(OWN));
+  OWN2.consent = { ...OWN2.consent, transfer: "OWNER MOBILE CONSENT", transfer_version: "2026-11-25.1" };
+  await open(OWN2);
+  await page.evaluate(() => { window.sent.length = 0; });
+  await page.click("#v2TrOwn"); ok((await page.textContent("#v2ModalText")) === "OWNER MOBILE CONSENT", "an API with the owner-mobile consent: that text is shown");
+  await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
+  await page.waitForFunction(() => sent.some(x => x.p.includes("transfer")));
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("transfer")).body, { enabled: true, accept: true, consent_version: "2026-11-25.1" }, "…and its version is sent");
 
   console.log("Personal");
   await open(PER);
