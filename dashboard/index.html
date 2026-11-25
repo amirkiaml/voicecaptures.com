@@ -2552,7 +2552,8 @@ function wireV2() {
   on("v2TrOwn", async () => {
     if (!(await v2Consent("Live transfer", v2.consent.transfer))) return;
     msg("v2TrMsg", "Saving…");
-    await after("v2TrMsg", await v2Post("transfer", { enabled: true, accept: true, consent_version: v2.consent.version }), "Saved.");
+    // Owner-only transfer has its own consent ("my mobile on file", TorontoLeads #173): its version when the API gives one.
+    await after("v2TrMsg", await v2Post("transfer", { enabled: true, accept: true, consent_version: v2.consent.transfer_version || v2.consent.version }), "Saved.");
   });
   on("v2TrOff", async () => { msg("v2TrMsg", "Saving…"); await after("v2TrMsg", await v2Post("transfer", { enabled: false }), "Off."); });
   on("v2EmSave", async () => {

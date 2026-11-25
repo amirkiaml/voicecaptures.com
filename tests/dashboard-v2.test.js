@@ -191,6 +191,15 @@ ${js}
   await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
   await page.waitForFunction(() => sent.some(x => x.p.includes("transfer")));
   eq((await page.evaluate(() => sent)).find(x => x.p.includes("transfer")).body, { enabled: true, accept: true, consent_version: "2026-11-17.1" }, "…and sends on + consent only (no destination)");
+  // The API's owner-mobile consent (TorontoLeads #173): its own text and version.
+  const OWN2 = JSON.parse(JSON.stringify(OWN));
+  OWN2.consent = { ...OWN2.consent, transfer: "OWNER MOBILE CONSENT", transfer_version: "2026-11-25.1" };
+  await open(OWN2);
+  await page.evaluate(() => { window.sent.length = 0; });
+  await page.click("#v2TrOwn"); ok((await page.textContent("#v2ModalText")) === "OWNER MOBILE CONSENT", "an API with the owner-mobile consent: that text is shown");
+  await page.check("#v2ModalOk"); await page.click("#v2ModalYes");
+  await page.waitForFunction(() => sent.some(x => x.p.includes("transfer")));
+  eq((await page.evaluate(() => sent)).find(x => x.p.includes("transfer")).body, { enabled: true, accept: true, consent_version: "2026-11-25.1" }, "…and its version is sent");
 
   console.log("Personal");
   await open(PER);
