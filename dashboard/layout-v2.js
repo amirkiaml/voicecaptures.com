@@ -224,9 +224,14 @@
     try { p = v2 && v2.plan; } catch (e) {}
     var ent = !!(p && p.key === "enterprise");
     document.documentElement.classList.toggle("dv2-ent", ent);
+    // Every plan gets its tag, in its own colour: Personal teal, Lite blue, Pro violet, Enterprise gold.
     var b = $("dv2Tier");
-    if (ent && !b) { b = el("div", { class: "dv2-tier", id: "dv2Tier" }); $("dv2Biz").appendChild(b); }
-    if (b) { b.textContent = ent ? p.label : ""; b.hidden = !ent; }
+    if (p && p.label && !b) { b = el("div", { class: "dv2-tier", id: "dv2Tier" }); $("dv2Biz").appendChild(b); }
+    if (b) {
+      b.textContent = p && p.label ? p.label : "";
+      b.hidden = !(p && p.label);
+      b.setAttribute("data-plan", p && p.key ? String(p.key).replace(/[^a-z_]/g, "") : "");
+    }
   }
   var SALES = "sales@voicecaptures.com";
   var mailto = function (subject) { return "mailto:" + SALES + "?subject=" + encodeURIComponent(subject); };
@@ -435,7 +440,18 @@
     "@media (max-width:759px){html.dv2:not([data-theme=dark]) #dv2Side{background:rgba(255,255,255,.9)} html.dv2 #dv2Main header h1{font-size:26px} html.dv2 #kpis .kpi .val{font-size:28px} html.dv2 #dv2Main .card{padding:16px}}",
     /* ---- Enterprise (html.dv2-ent): deep navy sidebar, white cards with an indigo edge,
      * a dark hero, gold accents. Same markup and data. ---- */
-    "html.dv2 .dv2-tier{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:linear-gradient(90deg,#f6e7b8,#e9c46a);color:#5a4210}",
+    /* Plan tag: its own colour, a soft glow that breathes, and a slow shine passing across it. */
+    "html.dv2 .dv2-tier{position:relative;overflow:hidden;display:inline-flex;align-items:center;margin-top:7px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;--t1:#dbe7ff;--t2:#9db8ff;--ti:#173c9c;--tg:rgba(37,99,235,.45);background:linear-gradient(90deg,var(--t1),var(--t2));color:var(--ti);animation:dv2Glow 3.2s ease-in-out infinite}",
+    "html.dv2 .dv2-tier::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:dv2Shine 4.5s ease-in-out infinite}",
+    "html.dv2 .dv2-tier::before{content:'✦';margin-right:5px;font-size:10px;animation:dv2Twinkle 2.4s ease-in-out infinite}",
+    "html.dv2 .dv2-tier[data-plan=personal]{--t1:#d5f5f0;--t2:#7fdccd;--ti:#0b5f55;--tg:rgba(20,184,166,.45)}",
+    "html.dv2 .dv2-tier[data-plan=business_lite]{--t1:#dbe7ff;--t2:#9db8ff;--ti:#173c9c;--tg:rgba(37,99,235,.5)}",
+    "html.dv2 .dv2-tier[data-plan=business_pro]{--t1:#ece3ff;--t2:#b9a0ff;--ti:#4a2a9e;--tg:rgba(124,58,237,.5)}",
+    "html.dv2 .dv2-tier[data-plan=enterprise]{--t1:#f8ebc4;--t2:#e3b95b;--ti:#5a4210;--tg:rgba(227,185,91,.65)}",
+    "@keyframes dv2Glow{0%,100%{box-shadow:0 0 0 0 transparent,0 0 6px 0 var(--tg)}50%{box-shadow:0 0 0 1px var(--tg),0 0 16px 2px var(--tg)}}",
+    "@keyframes dv2Shine{0%,55%{left:-60%}85%,100%{left:130%}}",
+    "@keyframes dv2Twinkle{0%,100%{opacity:.55;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}",
+    "@media (prefers-reduced-motion:reduce){html.dv2 .dv2-tier,html.dv2 .dv2-tier::after,html.dv2 .dv2-tier::before{animation:none}}",
     "html.dv2.dv2-ent{--dv2-gold:#e3b95b;--dv2-navy:#0d1630;--dv2-navy2:#1a2550}",
     "html.dv2.dv2-ent:not([data-theme=dark]) body{background:radial-gradient(1100px 520px at 85% -10%,#e9e6fb 0,rgba(233,230,251,0) 60%),#f4f5fa}",
     "html.dv2.dv2-ent #dv2Side,html.dv2.dv2-ent:not([data-theme=dark]) #dv2Side{background:linear-gradient(180deg,var(--dv2-navy),var(--dv2-navy2));border-right:0;color:#e8edf7}",

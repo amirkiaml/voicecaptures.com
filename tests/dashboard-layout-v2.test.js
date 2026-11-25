@@ -200,7 +200,9 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   eq(await e.$eval("#dv2Tier", b => b.textContent), "Enterprise", "…and the plan's own label under the business name");
   await e.context().close();
   const lite = await open("/dashboard/", { dash: DASH({ layout: "v2" }) });
-  ok(!(await lite.evaluate(() => document.documentElement.classList.contains("dv2-ent"))) && !(await lite.$("#dv2Tier:not([hidden])")), "any other plan: no Enterprise look, no badge");
+  await lite.waitForSelector("#dv2Tier");
+  ok(!(await lite.evaluate(() => document.documentElement.classList.contains("dv2-ent"))), "any other plan: no Enterprise look");
+  eq(await lite.$eval("#dv2Tier", b => [b.textContent, b.dataset.plan, b.hidden]), ["Business Lite", "business_lite", false], "…but its own plan tag, in its own colour");
   await lite.context().close();
 
   console.log("Deep links");
