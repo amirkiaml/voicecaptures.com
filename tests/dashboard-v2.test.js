@@ -85,6 +85,15 @@ ${js}
   ok(await page.isVisible("#v2Card"), "shown");
   eq([await page.textContent("#v2Title"), await page.textContent("#v2Sub")], ["Your plan: Business Lite", "100 minutes a month · extra 50 minutes for $75"], "plan line from the API (no price in the page)");
   ok(await page.isVisible("#v2CalOn"), "Google connect button");
+  ok(await page.$("#v2CalBlocked") === null, "…and no reason line when nothing is in the way");
+  // The API refused booking on this line (TorontoLeads calendar-connect-refused): never "connected", say why, no Connect.
+  await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: false, blocked: "Can't enable booking on this line (it's a personal line, and personal lines don't take bookings).", canConnect: false }) } });
+  ok((await page.textContent("#v2Body")).includes("Google Calendar: not connected"), "a line that can't book: not connected");
+  eq(await page.textContent("#v2CalBlocked"), "Can't enable booking on this line (it's a personal line, and personal lines don't take bookings).", "…the reason, as the API gives it");
+  ok(await page.$("#v2CalOn") === null && await page.$("#v2CalOff") === null, "…and no Connect (or Disconnect) button");
+  await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: false, blocked: "Can't enable booking on this line (we couldn't update the line just now).", canConnect: true }) } });
+  eq([await page.textContent("#v2CalOn"), await page.isVisible("#v2CalBlocked")], ["Try again", true], "a failure that may pass: the reason, and Try again");
+  await open(LITE);
   /* Outlook and Apple were a row of their own under Calendar, and a "Coming soon" badge
      each. A dated promise is not a setting: it belongs on the pricing page. */
   ok(!/Outlook|Apple/.test(await page.textContent("#v2Body")), "no Outlook or Apple row, and no Coming soon badge for them");
