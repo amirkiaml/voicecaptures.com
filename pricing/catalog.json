@@ -336,7 +336,6 @@
     "packages_carry_over": false,
     "auto_package_max_per_month": 2,
     "trial_grace_pct": 10,
-    "annual_multiplier": 10,
-    "annual_early_cancel": "account_credit"
+    "annual_multiplier": 10
   }
 }
