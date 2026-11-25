@@ -91,6 +91,9 @@ ${js}
   eq(await page.textContent("#v2CalHours"), "Set your hours so callers are only offered times you're open.", "no hours the line can keep to: the Calendar card says so");
   await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: true, hoursSet: true }) } });
   ok(await page.$("#v2CalHours") === null, "…hours set: no note");
+  ok(await page.$("#v2Rebuild") === null, "…and no rebuild note on an ordinary line");
+  await open({ ...LITE, lineRebuild: { code: "needs_business_prompt", message: "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you." } });
+  eq(await page.textContent("#v2Rebuild .v2-row"), "Your line is being set up for your Business plan. Booking, caller texts and call transfer switch on once it's ready; we'll email you.", "Personal → Business waiting for its business prompt: the card says why at the top");
   await open(LITE);
   // The API refused booking on this line (TorontoLeads calendar-connect-refused): never "connected", say why, no Connect.
   await open({ ...LITE, features: { ...LITE.features, calendar_google: F("live", { connected: false, blocked: "Can't enable booking on this line (it's a personal line, and personal lines don't take bookings).", canConnect: false }) } });

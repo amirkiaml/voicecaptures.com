@@ -2439,6 +2439,9 @@ function renderV2() {
   $("v2Title").textContent = `Your plan: ${p.label}`;
   $("v2Sub").textContent = `${p.minutes} minutes a month` + (p.package ? ` · extra ${p.package.minutes} minutes for $${p.package.price_cad}` : "");
   const sec = [];
+  // Personal -> Business: the line is waiting for its business prompt (TorontoLeads #183,
+  // PERSONAL_UPGRADE_REBUILD). Said once, at the top; the server refuses the switches with the same words.
+  if (d.lineRebuild && d.lineRebuild.message) sec.push(`<div class="v2-sec" id="v2Rebuild"><p class="v2-h">Setting up your Business plan</p><div class="v2-row muted">${esc(d.lineRebuild.message)}</div></div>`);
   const toggles = [["textback", "Text back callers who hang up before leaving a message"], ["reminders", "Send appointment reminders"], ["review_requests", "Ask happy callers for a review"], ["report", "Email me a monthly report"]].filter(([k]) => v2Usable(f[k]));
   /*
    * ON YOUR PLAN: the live features that have no setting of their own.
