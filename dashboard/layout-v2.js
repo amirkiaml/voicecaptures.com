@@ -76,7 +76,7 @@
     side.appendChild(sideTop);
     var biz = el("div", { class: "dv2-biz", id: "dv2Biz" });
     biz.appendChild(el("div", { class: "dv2-biz-name", id: "dv2BizName" }));
-    if ($("bizSelect")) biz.appendChild($("bizSelect"));
+    if ($("bizSelect")) biz.appendChild($("bizSelect"));   // kept, hidden: the switcher below drives it
     side.appendChild(biz);
     var nav = el("nav", { class: "dv2-nav", id: "dv2Nav" });
     TABS.forEach(function (t) {
@@ -138,6 +138,9 @@
     placeUsage();
     if (wide.addEventListener) wide.addEventListener("change", placeUsage); else wide.addListener(placeUsage);
 
+    /* ---- business switcher (more than one business, or an admin) ---- */
+    switcher(main.querySelector(".topbar"));
+
     /* ---- business name in the sidebar mirrors the header's ---- */
     var name = function () { $("dv2BizName").textContent = $("biz").textContent; account(); };
     name();
@@ -190,6 +193,99 @@
 
     addEventListener("hashchange", function () { show(fromHash()); });
     show(fromHash());
+  }
+
+  /* The business switcher. The page's own <select id="bizSelect"> stays the source of truth
+   * (renderBusinesses fills it, its change handler switches business); this draws it as a
+   * button + list and sets the select's value, then fires its change. Shown only when the
+   * select is. Sidebar on wide screens, top bar otherwise (the sidebar is a rail or a tab
+   * bar there). */
+  function switcher(topbar) {
+    var sel = $("bizSelect"); if (!sel) return;
+    var wrap = el("div", { class: "dv2-sw", id: "dv2Sw", hidden: "" });
+    var btn = el("button", { type: "button", class: "dv2-sw-btn", id: "dv2SwBtn", "aria-haspopup": "listbox", "aria-expanded": "false" });
+    var pop = el("div", { class: "dv2-sw-pop", id: "dv2SwPop", hidden: "" });
+    var search = el("input", { type: "search", class: "dv2-sw-search", id: "dv2SwSearch", placeholder: "Search businesses", "aria-label": "Search businesses", autocomplete: "off" });
+    var list = el("ul", { class: "dv2-sw-list", id: "dv2SwList", role: "listbox", "aria-label": "Choose business" });
+    pop.appendChild(search); pop.appendChild(list);
+    wrap.appendChild(btn); wrap.appendChild(pop);
+    var initials = function (n) { var w = String(n || "?").trim().split(/\s+/); return ((w[0] || "?")[0] + (w[1] ? w[1][0] : "")).toUpperCase(); };
+    var hue = function (n) { var h = 0; for (var i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 360; return h; };
+    var av = function (n) { var a = el("span", { class: "dv2-av", "aria-hidden": "true" }); a.textContent = initials(n); a.style.setProperty("--h", hue(n)); return a; };
+    var active = -1;
+    var items = function () { return Array.prototype.slice.call(list.querySelectorAll("li:not([hidden])")); };
+    var mark = function (i) {
+      var it = items(); if (!it.length) return;
+      active = (i + it.length) % it.length;
+      it.forEach(function (x, j) { x.classList.toggle("act", j === active); });
+      it[active].scrollIntoView({ block: "nearest" });
+    };
+    var close = function (focus) { pop.hidden = true; btn.setAttribute("aria-expanded", "false"); if (focus) btn.focus(); };
+    var open = function () {
+      pop.hidden = false; btn.setAttribute("aria-expanded", "true");
+      search.value = ""; filter();
+      var it = items(), cur = it.findIndex(function (x) { return x.getAttribute("aria-selected") === "true"; });
+      mark(cur < 0 ? 0 : cur);
+      if (!search.hidden) search.focus(); else list.focus();
+    };
+    var pick = function (id) {
+      close(true);
+      if (!id || id === sel.value) return;
+      sel.value = id;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));   // the page's own switch
+    };
+    var filter = function () {
+      var q = search.value.trim().toLowerCase();
+      Array.prototype.forEach.call(list.children, function (li) { li.hidden = !!q && li.dataset.name.toLowerCase().indexOf(q) < 0; });
+      mark(0);
+    };
+    var draw = function () {
+      var opts = Array.prototype.slice.call(sel.options);
+      wrap.hidden = sel.hidden || opts.length < 1;
+      var cur = sel.options[sel.selectedIndex] || opts[0];
+      btn.innerHTML = "";
+      if (cur) {
+        btn.appendChild(av(cur.text));
+        var t = el("span", { class: "dv2-sw-txt" }), n = el("span", { class: "dv2-sw-name" }), c = el("span", { class: "dv2-sw-sub" });
+        n.textContent = cur.text; c.textContent = opts.length + (opts.length === 1 ? " business" : " businesses");
+        t.appendChild(n); t.appendChild(c); btn.appendChild(t);
+        btn.appendChild(el("span", { class: "dv2-sw-chev", "aria-hidden": "true" }, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10l4 4 4-4"/></svg>'));
+      }
+      list.innerHTML = "";
+      opts.forEach(function (o) {
+        var li = el("li", { role: "option", "data-id": o.value, "data-name": o.text, "aria-selected": o.selected ? "true" : "false" });
+        li.appendChild(av(o.text));
+        var nm = el("span", { class: "dv2-sw-iname" }); nm.textContent = o.text; li.appendChild(nm);
+        if (o.selected) li.appendChild(el("span", { class: "dv2-sw-check", "aria-hidden": "true" }, "✓"));
+        li.addEventListener("click", function () { pick(o.value); });
+        li.addEventListener("mousemove", function () { var it = items(), j = it.indexOf(li); if (j !== active) mark(j); });
+        list.appendChild(li);
+      });
+      search.hidden = opts.length < 7;
+      $("dv2Biz").classList.toggle("dv2-has-sw", !wrap.hidden);
+    };
+    btn.addEventListener("click", function () { pop.hidden ? open() : close(false); });
+    search.addEventListener("input", filter);
+    list.tabIndex = -1;
+    pop.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); mark(active + 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); mark(active - 1); }
+      else if (e.key === "Enter") { e.preventDefault(); var it = items(); if (it[active]) pick(it[active].dataset.id); }
+      else if (e.key === "Escape") { e.preventDefault(); close(true); }
+      else if (e.key === "Tab") close(false);
+    });
+    btn.addEventListener("keydown", function (e) { if (e.key === "ArrowDown" && pop.hidden) { e.preventDefault(); open(); } });
+    document.addEventListener("click", function (e) { if (!pop.hidden && !wrap.contains(e.target)) close(false); });
+    new MutationObserver(draw).observe(sel, { childList: true, attributes: true, attributeFilter: ["hidden"], subtree: true });
+    draw();
+    var wide = matchMedia("(min-width: 1100px)");
+    var place = function () {
+      if (wide.matches) $("dv2Biz").insertBefore(wrap, $("dv2Biz").firstChild);
+      else if (topbar) topbar.insertBefore(wrap, topbar.firstChild);
+      wrap.classList.toggle("in-top", !wide.matches);
+    };
+    place();
+    if (wide.addEventListener) wide.addEventListener("change", place); else wide.addListener(place);
   }
 
   function fromHash() {
@@ -592,6 +688,43 @@
     "html.dv2 .dv2-cal-ico img{width:34px;height:auto;display:block}",
     "html.dv2 #dv2Main .dv2-cal-ico{width:52px;height:52px;border-radius:14px}",
     "html.dv2 .dv2-cal-head .panel-title{font-size:20px}",
+    /* ---- Business switcher ---- */
+    "html.dv2 #bizSelect{display:none!important}",
+    "html.dv2 .dv2-biz.dv2-has-sw .dv2-biz-name{display:none}",
+    "html.dv2 .dv2-sw{position:relative}",
+    "html.dv2 #dv2Side:has(.dv2-sw-pop:not([hidden])){overflow:visible}",
+    "html.dv2 #dv2Biz .dv2-sw-pop{left:-8px;width:auto;min-width:calc(100% + 16px);max-width:320px;white-space:nowrap}",
+    "html.dv2 .dv2-sw-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:2px;border-radius:10px}",
+    "html.dv2 .dv2-sw-btn:hover .dv2-sw-chev{background:var(--hover)}",
+    "html.dv2 .dv2-sw-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}",
+    "html.dv2 .dv2-av{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:12px;font-weight:800;letter-spacing:.02em;color:hsl(var(--h) 55% 32%);background:hsl(var(--h) 80% 92%)}",
+    "html.dv2[data-theme=dark] .dv2-av{color:hsl(var(--h) 80% 82%);background:hsl(var(--h) 35% 22%)}",
+    "html.dv2 .dv2-sw-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}",
+    "html.dv2 .dv2-sw-name{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+    "html.dv2 .dv2-sw-sub{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}",
+    "html.dv2 .dv2-sw-chev{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--muted);transition:transform .15s}",
+    "html.dv2 .dv2-sw-chev svg{width:18px;height:18px}",
+    "html.dv2 .dv2-sw-btn[aria-expanded=true] .dv2-sw-chev{transform:rotate(180deg)}",
+    "html.dv2 .dv2-sw-pop{position:absolute;z-index:40;top:calc(100% + 8px);left:0;width:100%;max-height:min(420px,70vh);display:flex;flex-direction:column;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 40px -12px rgba(15,23,42,.35);padding:8px;animation:dv2Pop .14s ease-out}",
+    "@keyframes dv2Pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}",
+    "html.dv2 .dv2-sw-search{font:inherit;font-size:14px;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:0 0 6px}",
+    "html.dv2 .dv2-sw-search:focus{outline:2px solid var(--accent);outline-offset:0}",
+    "html.dv2 .dv2-sw-list{list-style:none;margin:0;padding:0;overflow-y:auto;outline:0}",
+    "html.dv2 .dv2-sw-list li{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}",
+    "html.dv2 .dv2-sw-list li .dv2-av{width:28px;height:28px;border-radius:8px;font-size:11px}",
+    "html.dv2 .dv2-sw-list li.act{background:var(--hover)}",
+    "html.dv2 .dv2-sw-list li[aria-selected=true]{color:var(--accent)}",
+    "html.dv2 .dv2-sw-iname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+    "html.dv2 .dv2-sw-check{font-weight:800}",
+    "html.dv2.dv2-ent #dv2Side .dv2-sw-btn{color:#fff}",
+    "html.dv2.dv2-ent #dv2Side .dv2-sw-sub{color:#aab4cc}",
+    /* in the top bar (tablet/phone) */
+    "html.dv2 .dv2-sw.in-top{margin-right:auto;max-width:min(320px,60vw)}",
+    "html.dv2 .dv2-sw.in-top .dv2-sw-btn{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;box-shadow:var(--dv2-shadow)}",
+    "html.dv2 .dv2-sw.in-top .dv2-av{width:28px;height:28px;border-radius:999px}",
+    "html.dv2 .dv2-sw.in-top .dv2-sw-sub{display:none}",
+    "html.dv2 .dv2-sw.in-top .dv2-sw-pop{left:0;width:max(280px,100%);max-width:calc(100vw - 24px)}",
+    "html.dv2 #dv2Main .topbar{display:flex;align-items:center;gap:12px}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
