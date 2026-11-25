@@ -102,9 +102,11 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
     const shots = [["overview", "/dashboard/#overview", 1366, 1500], ["calls", "/dashboard/#calls", 1366, 1100], ["settings", "/dashboard/#settings", 1366, 1500],
       ["settings-soon", "/dashboard/#settings", 1366, 1000, SETTINGS(F("rolling_out"))], ["billing", "/dashboard/#billing", 1366, 900],
       ["tablet", "/dashboard/#overview", 900, 1300], ["phone", "/dashboard/#overview", 390, 1700], ["calendar-failed", "/dashboard/?calendar=failed&reason=Google%20said%20no%20access", 1366, 900],
-      ["dark", "/dashboard/#overview", 1366, 1200, undefined, "dark"]];
+      ["dark", "/dashboard/#overview", 1366, 1200, undefined, "dark"], ["ent-overview", "/dashboard/#overview", 1366, 1500, "ENT"], ["ent-settings", "/dashboard/#settings", 1366, 900, "ENT"],
+      ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
+    const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
     for (const [n, u, w, h, s, t] of shots) {
-      const p = await open(u, { dash: real, width: w, height: h, settings: s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+      const p = await open(u, { dash: real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
       await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: true }); await p.context().close(); console.log("shot", n);
     }
     await browser.close(); server.close(); return;
@@ -153,6 +155,17 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   await s.context().close();
   const n = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("none")) });
   ok(await n.isHidden("#dv2Cal"), "not on the plan: no Calendar card"); await n.context().close();
+
+  console.log("Enterprise");
+  const ENT = SETTINGS(F("live", { connected: false })); ENT.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
+  const e = await open("/dashboard/", { dash: DASH({ layout: "v2" }), settings: ENT });
+  await e.waitForSelector("#dv2Tier");
+  ok(await e.evaluate(() => document.documentElement.classList.contains("dv2-ent")), "plan enterprise: html.dv2-ent (the premium look)");
+  eq(await e.$eval("#dv2Tier", b => b.textContent), "Enterprise", "…and the plan's own label under the business name");
+  await e.context().close();
+  const lite = await open("/dashboard/", { dash: DASH({ layout: "v2" }) });
+  ok(!(await lite.evaluate(() => document.documentElement.classList.contains("dv2-ent"))) && !(await lite.$("#dv2Tier:not([hidden])")), "any other plan: no Enterprise look, no badge");
+  await lite.context().close();
 
   console.log("Deep links");
   const f = await open("/dashboard/?calendar=failed&reason=%3Cb%3EGoogle%3C%2Fb%3E%20refused", { dash: DASH({ layout: "v2" }) });
