@@ -1844,6 +1844,13 @@ const V2_SALES = "sales@voicecaptures.com";
 const v2SoonNoteHtml = () => ` <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
 const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2SoonNoteHtml()}`;
 /** A plan somebody can actually move to from here: priced, and with its checkout open. */
+/* MOVING TO A CHEAPER PLAN IS BY EMAIL FOR NOW (owner, 24 Nov 2026). A plan below the
+   current one in the list (the catalog's order, cheapest first) shows "Email us" instead of
+   Switch: going down changes what the line can do, and that is done with us, not by a button.
+   Upgrades and a change of billing on the same plan keep their Switch. window.V2_SELF_DOWNGRADE
+   = true brings the old button back (the tests use it to keep the dialog covered). */
+const v2Lower = (x, plans) => { const ci = plans.findIndex(y => y.current), xi = plans.indexOf(x); return ci >= 0 && xi >= 0 && xi < ci; };
+const v2DownByEmail = (x, plans) => v2Lower(x, plans) && window.V2_SELF_DOWNGRADE !== true;
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
  * WHAT THE PLAN THEY ARE ON COSTS AT THIS USAGE. Their plan, and no other.
@@ -1970,7 +1977,7 @@ function renderV2Bill() {
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
         <b>${esc(x.label)}</b>${v2Has(v2Interval === "year" ? x.year : x.month) ? `<div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div>` : `<div class="muted" style="font-size:13px">Priced on a call</div>`}<div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
-        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : cx && cx.cancelled ? "" : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
+        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : cx && cx.cancelled ? "" : v2DownByEmail(x, p.plans) ? `<div class="v2-row"><a class="btn-ghost" data-down="${esc(x.key)}" href="mailto:${V2_SALES}?subject=${encodeURIComponent(`Move to ${x.label}`)}">Email us</a></div><div class="muted" style="font-size:13px">To move to ${esc(x.label)}, email ${V2_SALES}.</div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
       ${b.trial ? `<div class="v2-start-row">
         <button type="button" class="btn-danger" id="v2Start">Start my plan now</button>
         <span class="v2-start-note">Ends your free trial today and charges the card on file. Otherwise it starts by itself on ${esc(v2Day(b.trial.end))}.</span>
