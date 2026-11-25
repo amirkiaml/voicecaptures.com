@@ -194,7 +194,19 @@
    * Google calendar is rolling out or coming soon for this plan, the card says
    * Coming soon with the button off. Not on the plan at all: no card ("Not on your
    * plan" in the plan card already says so). */
+  /* Enterprise: the plan's own label from /api/dashboard/v2/settings (`v2.plan`), shown as a
+   * badge under the business name, and a more premium look (html.dv2-ent). Styling only. */
+  function tier() {
+    var p = null;
+    try { p = v2 && v2.plan; } catch (e) {}
+    var ent = !!(p && p.key === "enterprise");
+    document.documentElement.classList.toggle("dv2-ent", ent);
+    var b = $("dv2Tier");
+    if (ent && !b) { b = el("div", { class: "dv2-tier", id: "dv2Tier" }); $("dv2Biz").appendChild(b); }
+    if (b) { b.textContent = ent ? p.label : ""; b.hidden = !ent; }
+  }
   function calendar() {
+    tier();
     var cardEl = $("dv2Cal"), body = $("dv2CalBody"), soon = $("dv2CalSoon");
     var secs = $("v2Body").querySelectorAll(".v2-sec"), found = null;
     for (var i = 0; i < secs.length; i++) {
@@ -302,6 +314,32 @@
     "html.dv2 .dv2-notice{border:0;box-shadow:var(--dv2-shadow)}",
     /* bottom tab bar on phones: frosted */
     "@media (max-width:759px){html.dv2:not([data-theme=dark]) #dv2Side{background:rgba(255,255,255,.9)} html.dv2 #dv2Main header h1{font-size:26px} html.dv2 #kpis .kpi .val{font-size:28px} html.dv2 #dv2Main .card{padding:16px}}",
+    /* ---- Enterprise (html.dv2-ent): deep navy sidebar, white cards with an indigo edge,
+     * a dark hero, gold accents. Same markup and data. ---- */
+    "html.dv2 .dv2-tier{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:linear-gradient(90deg,#f6e7b8,#e9c46a);color:#5a4210}",
+    "html.dv2.dv2-ent{--dv2-gold:#e3b95b;--dv2-navy:#0d1630;--dv2-navy2:#1a2550}",
+    "html.dv2.dv2-ent:not([data-theme=dark]) body{background:radial-gradient(1100px 520px at 85% -10%,#e9e6fb 0,rgba(233,230,251,0) 60%),#f4f5fa}",
+    "html.dv2.dv2-ent #dv2Side,html.dv2.dv2-ent:not([data-theme=dark]) #dv2Side{background:linear-gradient(180deg,var(--dv2-navy),var(--dv2-navy2));border-right:0;color:#e8edf7}",
+    "html.dv2.dv2-ent .dv2-side-top .brandbar{color:#fff}",
+    "html.dv2.dv2-ent .dv2-collapse{background:transparent;border-color:rgba(255,255,255,.18);color:#c9d3ea}",
+    "html.dv2.dv2-ent .dv2-biz{background:rgba(255,255,255,.06);border:1px solid rgba(227,185,91,.35);box-shadow:none}",
+    "html.dv2.dv2-ent .dv2-biz-name{color:#fff}",
+    "html.dv2.dv2-ent .dv2-nav a{color:#c9d3ea}",
+    "html.dv2.dv2-ent .dv2-nav a:hover{background:rgba(255,255,255,.06)}",
+    "html.dv2.dv2-ent .dv2-nav a.on{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 3px 0 0 var(--dv2-gold)}",
+    "html.dv2.dv2-ent .dv2-usage #usageCard{background:rgba(255,255,255,.06);color:#e8edf7;border:1px solid rgba(255,255,255,.1);box-shadow:none}",
+    "html.dv2.dv2-ent .dv2-usage #usageCard .muted,html.dv2.dv2-ent .dv2-usage #usageCard *{color:inherit}",
+    "html.dv2.dv2-ent .dv2-usage #usageCard .u-track{background:rgba(255,255,255,.15)}",
+    "html.dv2.dv2-ent .dv2-usage #usageCard .u-track>span{background:var(--dv2-gold)}",
+    "html.dv2.dv2-ent #dv2Main .hero{background:linear-gradient(120deg,var(--dv2-navy),#2b2f7a 70%,#4b3fa8);color:#fff}",
+    "html.dv2.dv2-ent #dv2Main .hero .label{color:var(--dv2-gold)}",
+    "html.dv2.dv2-ent #dv2Main .hero .note{color:#c9d3ea}",
+    "html.dv2.dv2-ent #kpis .kpi,html.dv2.dv2-ent #kpis .kpi:nth-child(n){background:var(--card);border-top:3px solid #4b3fa8}",
+    "html.dv2.dv2-ent #kpis .kpi .val{letter-spacing:-.02em}",
+    "html.dv2.dv2-ent .range button.on{background:var(--dv2-navy);color:#fff}",
+    "html.dv2.dv2-ent[data-theme=dark] .range button.on{background:#4b3fa8}",
+    "html.dv2.dv2-ent #dv2Main .dv2-cal{background:var(--card);border-top:3px solid var(--dv2-gold)}",
+    "@media (max-width:759px){html.dv2.dv2-ent #dv2Side,html.dv2.dv2-ent:not([data-theme=dark]) #dv2Side{background:var(--dv2-navy)}}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
