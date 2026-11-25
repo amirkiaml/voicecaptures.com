@@ -1844,6 +1844,13 @@ const V2_SALES = "sales@voicecaptures.com";
 const v2SoonNoteHtml = () => ` <a class="v2-soon-note" href="mailto:${V2_SALES}">Email ${V2_SALES} for now</a>`;
 const v2RollingOut = () => `<span class="v2-badge soon">Rolling out</span>${v2SoonNoteHtml()}`;
 /** A plan somebody can actually move to from here: priced, and with its checkout open. */
+/* MOVING TO A CHEAPER PLAN IS BY EMAIL FOR NOW (owner, 24 Nov 2026). A plan below the
+   current one in the list (the catalog's order, cheapest first) shows "Email us" instead of
+   Switch: going down changes what the line can do, and that is done with us, not by a button.
+   Upgrades and a change of billing on the same plan keep their Switch. window.V2_SELF_DOWNGRADE
+   = true brings the old button back (the tests use it to keep the dialog covered). */
+const v2Lower = (x, plans) => { const ci = plans.findIndex(y => y.current), xi = plans.indexOf(x); return ci >= 0 && xi >= 0 && xi < ci; };
+const v2DownByEmail = (x, plans) => v2Lower(x, plans) && window.V2_SELF_DOWNGRADE !== true;
 const v2Switchable = nx => !!nx && !nx.quoted && nx.checkoutEnabled !== false && v2Has(nx.price);
 /**
  * WHAT THE PLAN THEY ARE ON COSTS AT THIS USAGE. Their plan, and no other.
@@ -1970,7 +1977,7 @@ function renderV2Bill() {
         <label class="chk-inline"><input type="radio" name="v2Iv" value="year" ${v2Interval === "year" ? "checked" : ""}> Annual (2 months free)</label></div>
       <div class="v2-plans">${p.plans.map(x => { const cur = x.current && v2Interval === p.billing; return `<div class="v2-plan${x.current ? " cur" : ""}">
         <b>${esc(x.label)}</b>${v2Has(v2Interval === "year" ? x.year : x.month) ? `<div>${v2Money(v2Interval === "year" ? x.year : x.month)}/${v2Interval === "year" ? "year" : "month"}</div>` : `<div class="muted" style="font-size:13px">Priced on a call</div>`}<div class="muted" style="font-size:13px">${x.minutes} minutes a month</div>
-        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : cx && cx.cancelled ? "" : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
+        ${cur ? `<div class="v2-row"><span class="v2-badge">Current</span></div>` : cx && cx.cancelled ? "" : v2DownByEmail(x, p.plans) ? `<div class="v2-row"><a class="btn-ghost" data-down="${esc(x.key)}" href="mailto:${V2_SALES}?subject=${encodeURIComponent(`Move to ${x.label}`)}">Email us</a></div><div class="muted" style="font-size:13px">To move to ${esc(x.label)}, email ${V2_SALES}.</div>` : x.checkoutEnabled ? `<div class="v2-row"><button type="button" class="btn-ghost" data-plan="${esc(x.key)}">Switch</button></div>` : `<div class="v2-row">${v2RollingOut()}</div>`}</div>`; }).join("")}</div>
       ${b.trial ? `<div class="v2-start-row">
         <button type="button" class="btn-danger" id="v2Start">Start my plan now</button>
         <span class="v2-start-note">Ends your free trial today and charges the card on file. Otherwise it starts by itself on ${esc(v2Day(b.trial.end))}.</span>
@@ -2444,7 +2451,8 @@ function renderV2() {
   const g = f.calendar_google;
   if (v2Usable(g)) sec.push(`<div class="v2-sec"><p class="v2-h">Calendar</p>
     <div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
-      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : `<button type="button" class="btn" id="v2CalOn">Connect Google Calendar</button>`}</div>
+      ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : g.canConnect === false ? "" : `<button type="button" class="btn" id="v2CalOn">${g.blocked ? "Try again" : "Connect Google Calendar"}</button>`}</div>
+    ${!g.connected && g.blocked ? `<div class="v2-row muted" id="v2CalBlocked">${esc(g.blocked)}</div>` : ""}
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
@@ -2462,11 +2470,16 @@ function renderV2() {
     ${t.enabled ? `<button type="button" class="btn-ghost" id="v2TrOff">Switch off</button>` : ""}</div>
     <div class="v2-msg" id="v2TrMsg"></div></div>`);
   // Email recipients
-  const er = f.email_recipients, max = (er && er.max) || 1;
+  /* The owner always gets every summary (the API counts them in the plan's limit), so only the
+     extra people are editable: Business Lite and Pro = you + 2 more. An older API without
+     `extra` falls back to the plan's limit minus one. */
+  const er = f.email_recipients, max = (er && er.max) || 1, extra = er && Number.isInteger(er.extra) ? er.extra : Math.max(0, max - 1);
   if (v2Usable(er)) sec.push(`<div class="v2-sec"><p class="v2-h">Who gets call summaries by email</p>
-    <div class="v2-row">${Array.from({ length: max }, (_, i) => `<input type="email" class="v2Em" placeholder="name@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Email ${i + 1}">`).join("")}
+    <div class="v2-row">Always sent to you${er && er.owner ? ` (<b>${esc(er.owner)}</b>)` : ""}.</div>
+    ${extra ? `<div class="v2-row">${Array.from({ length: extra }, (_, i) => `<input type="email" class="v2Em" placeholder="teammate@example.com" value="${esc((er.emails || [])[i] || "")}" aria-label="Also send to, ${i + 1} of ${extra}">`).join("")}
     <button type="button" class="btn" id="v2EmSave">Save</button></div>
-    ${max < 3 ? `<div class="v2-row muted" style="font-size:13px">Up to 3 addresses on Business Lite and Pro.</div>` : ""}
+    <div class="v2-row muted" style="font-size:13px">They get the same summary as you; their addresses aren't shown to each other.</div>`
+    : `<div class="v2-row muted" style="font-size:13px">Add up to 2 more people on Business Lite and Pro.</div>`}
     <div class="v2-msg" id="v2EmMsg"></div></div>`);
   // Settings-only features
   const cm = f.coverage_mode;
