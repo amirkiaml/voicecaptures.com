@@ -60,6 +60,8 @@
     var root = document.documentElement;
     root.classList.add("dv2");
     var style = el("style", { id: "dv2Style" }); style.textContent = CSS; document.head.appendChild(style);
+    // The marketing site's type: Manrope throughout, Instrument Serif italic for one accent.
+    document.head.appendChild(el("link", { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" }));
     try { if (localStorage.getItem("vc_dv2_collapsed") === "1") root.classList.add("dv2-collapsed"); } catch (e) {}
 
     var wrap = app.parentNode, topbar = wrap.querySelector(".topbar"), brand = topbar && topbar.querySelector(".brandbar");
@@ -100,7 +102,10 @@
     var footer = app.querySelector("footer");
     TABS.forEach(function (t) { app.insertBefore(panels[t], footer); });
 
-    // Overview: the numbers and charts, in today's order.
+    // Overview: the assistant's number first, then the numbers and charts, in today's order.
+    panels.overview.appendChild(el("div", { class: "card dv2-assist", id: "dv2Assist", hidden: "" },
+      '<span class="dv2-assist-ico">' + svg("calls") + '</span><div class="dv2-assist-txt"><div class="dv2-assist-k">Your assistant\'s number</div>' +
+      '<div class="dv2-assist-v" id="dv2AssistNum"></div></div><button type="button" class="btn-ghost" id="dv2AssistCopy">Copy</button>'));
     move(panels.overview, [$("hero"), $("kpis"), section("daily")]);
     move(panels.overview, Array.prototype.slice.call(app.querySelectorAll(".row2")));
     move(panels.overview, [section("callers")]);
@@ -112,6 +117,8 @@
       '<p class="panel-title">Google Calendar</p><span class="dv2-soon" id="dv2CalSoon" hidden>Coming soon</span></div>' +
       '<div id="dv2CalBody"></div>');
     panels.settings.appendChild(cal);
+    panels.settings.appendChild(el("div", { class: "card dv2-acct", id: "dv2Acct" },
+      '<p class="panel-title">Your account</p><dl class="dv2-acct-list" id="dv2AcctList"></dl>'));
     move(panels.settings, byId(["v2Card", "v2Modal", "rnCard", "settings", "crCard", "pwPanel"]));
     // Billing: the minutes meter (when it isn't in the sidebar) and the billing card.
     move(panels.billing, byId(["v2Bill", "v2PlanModal"]));
@@ -126,7 +133,7 @@
     if (wide.addEventListener) wide.addEventListener("change", placeUsage); else wide.addListener(placeUsage);
 
     /* ---- business name in the sidebar mirrors the header's ---- */
-    var name = function () { $("dv2BizName").textContent = $("biz").textContent; };
+    var name = function () { $("dv2BizName").textContent = $("biz").textContent; account(); };
     name();
     new MutationObserver(function () {
       name();
@@ -135,9 +142,25 @@
       if (d && d.layout !== "v2") location.reload();
     }).observe($("biz"), { childList: true, characterData: true, subtree: true });
 
-    /* ---- Calendar card ---- */
+    /* ---- Calendar card, account card, plan card (whenever renderV2 redraws) ---- */
     new MutationObserver(calendar).observe($("v2Body"), { childList: true });
     calendar();
+    /* ---- Billing: plan boxes (whenever the billing card redraws) ---- */
+    new MutationObserver(billing).observe($("v2BillBody"), { childList: true });
+    billing();
+    /* ---- the assistant's number on Overview mirrors the receptionist-number card ---- */
+    var assist = function () {
+      var n = $("rnNum") ? $("rnNum").textContent.trim() : "";
+      $("dv2AssistNum").textContent = n;
+      $("dv2Assist").hidden = !n || $("rnCard").hidden;
+    };
+    assist();
+    new MutationObserver(assist).observe($("rnNum"), { childList: true, characterData: true, subtree: true });
+    new MutationObserver(assist).observe($("rnCard"), { attributes: true, attributeFilter: ["hidden"] });
+    $("dv2AssistCopy").addEventListener("click", function () {
+      var b = $("rnCopy"); if (b) b.click();   // the page's own Copy (same number, same feedback)
+      var me = $("dv2AssistCopy"); me.textContent = "Copied"; setTimeout(function () { me.textContent = "Copy"; }, 1500);
+    });
 
     /* ---- buttons that open something now on another tab ---- */
     var gear = $("gear");
@@ -205,8 +228,104 @@
     if (ent && !b) { b = el("div", { class: "dv2-tier", id: "dv2Tier" }); $("dv2Biz").appendChild(b); }
     if (b) { b.textContent = ent ? p.label : ""; b.hidden = !ent; }
   }
+  var SALES = "sales@voicecaptures.com";
+  var mailto = function (subject) { return "mailto:" + SALES + "?subject=" + encodeURIComponent(subject); };
+
+  /* Settings: the account card. Every value is one the page already has: /api/dashboard
+   * (business, sign-in email, assistant's number, time zone, history, and account.ownerPhone
+   * for V2), the hours line the page draws, and the plan from /api/dashboard/v2/settings.
+   * A row with no value is left out. */
+  function account() {
+    var d = data(), list = $("dv2AcctList"); if (!d || !list) return;
+    var p = null; try { p = v2 && v2.plan; } catch (e) {}
+    var ph = function (v) { try { return v ? fmtPhone(v) : ""; } catch (e) { return v || ""; } };
+    var hours = ($("hoursSub") && $("hoursSub").textContent || "").replace(/^Your hours:\s*/, "");
+    var rows = [
+      ["Business", d.businessName],
+      ["Owner's phone", d.account && ph(d.account.ownerPhone)],
+      ["Owner's email", d.account && d.account.ownerEmail],
+      ["Signed in as", d.signedInAs],
+      ["Assistant's number", $("rnNum") && $("rnNum").textContent.trim()],
+      ["Plan", p && p.label],
+      ["Open hours", hours],
+      ["Time zone", d.settings && d.settings.timezone],
+      ["Call history", d.retention && d.retention.days ? d.retention.days + " days" : ""]
+    ].filter(function (r) { return r[1]; });
+    if (d.account && d.account.ownerEmail && d.account.ownerEmail === d.signedInAs) rows = rows.filter(function (r) { return r[0] !== "Signed in as"; });
+    list.innerHTML = "";
+    rows.forEach(function (r) { var dt = el("dt"), dd = el("dd", { "data-k": r[0] }); dt.textContent = r[0]; dd.textContent = r[1]; list.appendChild(dt); list.appendChild(dd); });
+  }
+
+  /* Settings: the plan card, prettier. "Not on your plan" items get an Email us link to sales
+   * instead of an Upgrade / Add-on badge, and the "See Your plan above" line (Your plan is on
+   * Billing here) goes. */
+  function planCard() {
+    var secs = $("v2Body").querySelectorAll(".v2-sec");
+    for (var i = 0; i < secs.length; i++) {
+      var h = secs[i].querySelector(".v2-h"), t = h ? h.textContent.trim() : "";
+      if (t === "On your plan") secs[i].classList.add("dv2-onplan");
+      if (t === "Not on your plan") {
+        secs[i].classList.add("dv2-notplan");
+        var rows = secs[i].querySelectorAll(".v2-locked");
+        for (var j = 0; j < rows.length; j++) {
+          var b = rows[j].querySelector(".v2-badge"); if (!b) continue;
+          var label = rows[j].textContent.replace(b.textContent, "").trim();
+          var a = el("a", { class: "dv2-email", href: mailto("Add " + label) }); a.textContent = "Email us";
+          b.replaceWith(a);
+        }
+        var m = secs[i].querySelectorAll(".v2-row.muted");
+        for (var k = 0; k < m.length; k++) if (/Your plan/.test(m[k].textContent)) m[k].remove();
+      }
+    }
+  }
+
+  /* Billing: the plan boxes. Each plan that isn't yours gets one Email us button to sales,
+   * except a plan the page can switch to by itself (its own Switch button stays: e.g. a
+   * Personal line moving up to Business Lite). An Enterprise box in black is added when the
+   * customer isn't already on it. Add-ons that need an upgrade say Email us too. */
+  function billing() {
+    var body = $("v2BillBody"); if (!body) return;
+    var grid = body.querySelector("#v2Plans .v2-plans");
+    if (grid && !grid.dataset.dv2) {
+      grid.dataset.dv2 = "1";
+      var boxes = grid.querySelectorAll(".v2-plan"), hasEnt = false;
+      for (var i = 0; i < boxes.length; i++) {
+        var box = boxes[i], name = box.querySelector("b") ? box.querySelector("b").textContent.trim() : "";
+        if (name === "Enterprise") { hasEnt = true; box.classList.add("dv2-ent-plan"); }
+        if (box.classList.contains("cur") || box.querySelector("[data-plan]")) continue;
+        var kids = Array.prototype.slice.call(box.children);
+        for (var j = 3; j < kids.length; j++) kids[j].remove();   // keep name, price, minutes
+        var a = el("a", { class: "btn dv2-email-btn", href: mailto("Move to " + name) }); a.textContent = "Email us";
+        box.appendChild(a);
+      }
+      if (!hasEnt) {
+        var ent = el("div", { class: "v2-plan dv2-ent-plan" }, "<b>Enterprise</b><div>Custom pricing</div><div class=\"muted\">Minutes sized to your call volume</div>");
+        var ea = el("a", { class: "btn dv2-email-btn", href: mailto("Enterprise") }); ea.textContent = "Email us";
+        ent.appendChild(ea); grid.appendChild(ent);
+      }
+    }
+    var secs = body.querySelectorAll(".v2-sec");
+    for (var s2 = 0; s2 < secs.length; s2++) {
+      var h = secs[s2].querySelector(".v2-h"); if (!h) continue;
+      var t = h.textContent.trim();
+      if (t === "Add-ons") {
+        var bs = secs[s2].querySelectorAll(".v2-badge");
+        for (var q = 0; q < bs.length; q++) if (bs[q].textContent.trim() === "Upgrade") {
+          var lbl = bs[q].parentNode.textContent.split("·")[0].trim();
+          var al = el("a", { class: "dv2-email", href: mailto("Add " + lbl) }); al.textContent = "Email us"; bs[q].replaceWith(al);
+        }
+      }
+      if (secs[s2].id === "v2Tell" && !h.querySelector("em")) {
+        var m = /^(Tell us about )(your business)$/.exec(t);   // same words; the last two set in the site's serif italic
+        if (m) { h.textContent = m[1]; var em = el("em"); em.textContent = m[2]; h.appendChild(em); }
+      }
+    }
+  }
+
   function calendar() {
     tier();
+    account();
+    planCard();
     var cardEl = $("dv2Cal"), body = $("dv2CalBody"), soon = $("dv2CalSoon");
     var secs = $("v2Body").querySelectorAll(".v2-sec"), found = null;
     for (var i = 0; i < secs.length; i++) {
@@ -340,6 +459,74 @@
     "html.dv2.dv2-ent[data-theme=dark] .range button.on{background:#4b3fa8}",
     "html.dv2.dv2-ent #dv2Main .dv2-cal{background:var(--card);border-top:3px solid var(--dv2-gold)}",
     "@media (max-width:759px){html.dv2.dv2-ent #dv2Side,html.dv2.dv2-ent:not([data-theme=dark]) #dv2Side{background:var(--dv2-navy)}}",
+    /* ---- Round 2: type, logo, assistant number, account card, plan cards, tell-us form ---- */
+    "html.dv2 body{font-family:Manrope,'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:500;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}",
+    "html.dv2 h1,html.dv2 .panel-title,html.dv2 .kpi .val,html.dv2 .hero .val,html.dv2 .ins .v{font-family:Manrope,sans-serif;font-feature-settings:'tnum' 1,'ss01' 1}",
+    "html.dv2 #dv2Main header h1{font-weight:800;letter-spacing:-.03em}",
+    "html.dv2 #kpis .kpi .val,html.dv2 .hero .val{font-weight:800;letter-spacing:-.03em}",
+    "html.dv2 .ins .k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}",
+    "html.dv2 .ins .v{font-size:18px;font-weight:700;letter-spacing:-.01em;margin-top:2px}",
+    "html.dv2 .dv2-side-top .brandbar img{width:auto;height:22px;max-width:100%;object-fit:contain;flex:none}",
+    "html.dv2 .dv2-side-top .brandbar span{font-size:16px;font-weight:800;letter-spacing:-.02em}",
+    "html.dv2 .dv2-side-top .brandbar{gap:7px;min-width:0}",
+    "html.dv2 .btn,html.dv2 .btn-ghost{font-family:inherit;font-weight:700;border-radius:12px}",
+    /* assistant's number on Overview */
+    "html.dv2 .dv2-assist{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,var(--card),var(--dv2-sky))}",
+    "html.dv2 .dv2-assist-ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#fff;flex:none}",
+    "html.dv2 .dv2-assist-ico svg{width:24px;height:24px}",
+    "html.dv2 .dv2-assist-txt{flex:1;min-width:0}",
+    "html.dv2 .dv2-assist-k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}",
+    "html.dv2 .dv2-assist-v{font-size:28px;font-weight:800;letter-spacing:-.02em;font-feature-settings:'tnum' 1}",
+    "html.dv2.dv2-ent .dv2-assist-ico{background:var(--dv2-navy);color:var(--dv2-gold)}",
+    /* account card */
+    "html.dv2 .dv2-acct-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:10px 0 0}",
+    "html.dv2 .dv2-acct-list dt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
+    "html.dv2 .dv2-acct-list dd{margin:0;background:var(--raise);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;overflow-wrap:anywhere}",
+    "html.dv2 .dv2-acct-list dd::before{content:attr(data-k);display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}",
+    /* plan card on Settings */
+    "html.dv2 #v2Card .v2-sec{border-top:0;padding:14px 0 0}",
+    "html.dv2 #v2Card .v2-h,html.dv2 #v2Bill .v2-h{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}",
+    "html.dv2 #v2Card .dv2-onplan,html.dv2 #v2Card .dv2-notplan{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}",
+    "html.dv2 #v2Card .dv2-onplan .v2-h,html.dv2 #v2Card .dv2-notplan .v2-h{grid-column:1/-1;margin:0}",
+    "html.dv2 #v2Card .dv2-onplan .v2-row{margin:0;padding:12px 14px;border-radius:12px;background:linear-gradient(160deg,var(--dv2-mint),var(--card));font-weight:600;gap:10px;flex-wrap:nowrap}",
+    "html.dv2 #v2Card .dv2-onplan .v2-row::before{content:'✓';display:grid;place-items:center;width:22px;height:22px;flex:none;border-radius:50%;background:var(--good);color:#fff;font-size:12px;font-weight:800}",
+    "html.dv2 #v2Card .dv2-notplan .v2-row{margin:0;padding:12px 14px;border-radius:12px;border:1px dashed var(--line);flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;opacity:1;font-weight:600;color:var(--ink2)}",
+    "html.dv2 #v2Card input[type=email],html.dv2 #v2Card input[type=tel],html.dv2 #v2Card input[type=text],html.dv2 #v2Card select{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:220px}",
+    "html.dv2 #v2Card input:focus,html.dv2 #v2Card select:focus{outline:2px solid var(--accent);outline-offset:0}",
+    "html.dv2 #v2Bill .v2-plan .v2-badge{align-self:flex-start;font-size:12px;padding:4px 10px;background:var(--accent-soft);color:var(--accent)}",
+    "html.dv2 .dv2-email{font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}",
+    "html.dv2 .dv2-email:hover{text-decoration:underline}",
+    "html.dv2 #v2Title{font-size:22px}",
+    /* plan boxes on Billing */
+    "html.dv2 #v2Bill .v2-plans{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}",
+    "html.dv2 #v2Bill .v2-plan{display:flex;flex-direction:column;gap:4px;padding:20px;border-radius:18px;border:1px solid var(--line);background:var(--card);box-shadow:var(--dv2-shadow)}",
+    "html.dv2 #v2Bill .v2-plan>b{font-family:Manrope,sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em}",
+    "html.dv2 #v2Bill .v2-plan>b+div{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px}",
+    "html.dv2 #v2Bill .v2-plan .v2-row{margin-top:auto;padding-top:12px}",
+    "html.dv2 #v2Bill .v2-plan.cur{border:2px solid var(--accent);background:linear-gradient(160deg,var(--dv2-sky),var(--card) 70%)}",
+    "html.dv2 #v2Bill .v2-plan [data-plan],html.dv2 .dv2-email-btn{display:block;width:100%;text-align:center;margin-top:auto;padding:11px 14px;border-radius:12px;text-decoration:none}",
+    "html.dv2 .dv2-email-btn{margin-top:auto;background:var(--ink);color:var(--card);font-weight:700}",
+    "html.dv2 #v2Bill .v2-plan>.dv2-email-btn{margin-top:auto}",
+    "html.dv2 #v2Bill .v2-plan>.muted+.dv2-email-btn,html.dv2 #v2Bill .v2-plan>.muted+.v2-row{margin-top:16px}",
+    "html.dv2 #v2Bill .dv2-ent-plan{background:#0b1022;border-color:#0b1022;color:#fff}",
+    "html.dv2 #v2Bill .dv2-ent-plan .muted{color:#aab4cc}",
+    "html.dv2 #v2Bill .dv2-ent-plan .dv2-email-btn{background:#fff;color:#0b1022}",
+    "html.dv2 #v2Bill .dv2-ent-plan.cur{border:2px solid var(--dv2-gold,#e3b95b)}",
+    /* Tell us about your business: the site's contact form */
+    "html.dv2 #v2Tell{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;padding:28px;margin-top:16px;border:0;border-radius:22px;background:linear-gradient(160deg,#e2f1f5,#e8eefb)}",
+    "html.dv2[data-theme=dark] #v2Tell{background:linear-gradient(160deg,#10263a,#15233f)}",
+    "html.dv2 #v2Tell>.v2-h{grid-column:1/-1;font-family:Manrope,sans-serif;font-size:32px;font-weight:800;letter-spacing:-.03em;text-transform:none;color:var(--ink);margin:0}",
+    "html.dv2 #v2Tell>.v2-h em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:0}",
+    "html.dv2 #v2Tell>.v2-row.muted{grid-column:1/-1;font-size:15px!important;margin-bottom:12px}",
+    "html.dv2 #v2Tell>.v2-row{margin:0 0 12px}",
+    "html.dv2 #v2Tell>.v2-row:has(textarea),html.dv2 #v2Tell>.v2-row:has(#v2TellSend),html.dv2 #v2Tell>.v2-msg{grid-column:1/-1}",
+    "html.dv2 #v2Tell label{font-size:14px;font-weight:700;margin-bottom:8px}",
+    "html.dv2 #v2Tell .v2TellF{border-radius:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);background:var(--card);font-size:15px}",
+    "html.dv2 #v2Tell .v2TellF:focus{outline:2px solid var(--accent);outline-offset:0}",
+    "html.dv2 #v2Tell textarea.v2TellF{min-height:96px;resize:vertical}",
+    "html.dv2 #v2Tell #v2TellSend{flex:1;padding:16px;border-radius:999px;font-size:16px}",
+    "html.dv2 #v2Tell #v2TellNo{border-radius:999px;padding:16px 22px}",
+    "@media (max-width:759px){html.dv2 #v2Tell{grid-template-columns:1fr;padding:20px} html.dv2 #v2Tell>.v2-h{font-size:26px} html.dv2 .dv2-assist-v{font-size:22px}}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
@@ -347,6 +534,7 @@
     "@media (max-width:1099px){",
     "html.dv2 .wrap,html.dv2.dv2-collapsed .wrap{grid-template-columns:76px minmax(0,1fr)}",
     "html.dv2 .dv2-nav span,html.dv2 .dv2-biz,html.dv2 .dv2-usage,html.dv2 .brandbar span,html.dv2 .dv2-collapse{display:none}",
+    "html.dv2 .dv2-side-top{justify-content:center}",
     "html.dv2 .dv2-nav a{justify-content:center;padding:10px 0}",
     "html.dv2 #dv2Main{padding:14px 18px 40px}",
     "}",

@@ -46,9 +46,17 @@ const DASH = (o = {}) => ({ businessName: "Bluewave Plumbing", bookingNoun: "App
 const F = (status, extra = {}) => ({ status, running: true, ...extra });
 const SETTINGS = cal => ({ v2: true, plan: { key: "business_lite", label: "Business Lite", minutes: 100, package: { minutes: 50, price_cad: 75 }, emailRecipientsMax: 3 },
   features: { calendar_google: cal, caller_sms: F("none"), transfer: F("none"), email_recipients: F("live", { emails: [], max: 3, owner: "o@bluewave.test", extra: 2 }), coverage_mode: F("none"),
-    textback: F("none"), reminders: F("none"), review_requests: F("none"), report: F("none"), sentiment: F("addon"), history_90: F("none"), priority_support: F("none"), custom_routing: F("none") },
+    textback: F("none"), reminders: F("none"), review_requests: F("none"), report: F("none"), sentiment: F("addon"), history_90: F("addon"), priority_support: F("none"), custom_routing: F("none"),
+    answers_existing_number: F("live"), spam_screening: F("live"), messages_summary: F("live"), dashboard: F("live"), tailored_to_business: F("live") },
   consent: { version: "2026-11-17.1" } });
 
+const plan = (key, label, month, year, minutes, cur, co = true) => ({ key, label, month, year, minutes, package: null, checkoutEnabled: co, current: cur });
+const BILL = { plan: { key: "business_lite", label: "Business Lite", billing: "month", minutes: 100, package: { minutes: 50, price_cad: 75, lookup_key: "x" }, checkoutEnabled: true },
+  period: { kind: "billing", start: "2026-11-01", end: "2026-12-01", used: 40, allowance: 100, packages: [], shortCalls: 0 }, outOfMinutes: false,
+  autoPackage: { available: false, running: false, enabled: false, max: 2 }, consent: { version: "2026-11-17.1" }, credit: 0, pendingPlan: null, trial: null };
+const PLANS = { plans: [plan("personal", "Personal Line", 19, 190, 30, false), plan("business_lite", "Business Lite", 99, 990, 100, true), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)],
+  billing: "month", compare: { stay: { label: "Business Lite", cost: 99, coversMinutes: 100, packages: 0 }, next: { plan: "business_pro", label: "Business Pro", price: 199, minutes: 250 } },
+  addons: {}, addonsRunning: false, prompts: [], trial: null };
 const SUPABASE_STUB = `window.supabase = { createClient: () => ({ auth: {
   getSession: async () => ({ data: { session: { access_token: "t", user: { email: "o@bluewave.test" } } } }),
   onAuthStateChange: () => {}, signOut: async () => {} } }) };`;
@@ -65,9 +73,9 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const errs = [];
-  async function open(url, { dash = DASH(), settings = SETTINGS(F("live", { connected: false })), width = 1280, height = 900, theme = "light" } = {}) {
+  async function open(url, { dash = DASH(), settings = SETTINGS(F("live", { connected: false })), width = 1280, height = 900, theme = "light", bill = null, plans = null, tell = false } = {}) {
     const ctx = await browser.newContext({ viewport: { width, height }, serviceWorkers: "block" });
-    await ctx.addInitScript(t => { try { localStorage.setItem("vc_theme", t); } catch (e) {} }, theme);
+    await ctx.addInitScript(([t, tell]) => { try { localStorage.setItem("vc_theme", t); if (tell) localStorage.setItem("vc_tell_business", "1"); } catch (e) {} }, [theme, tell]);
     await ctx.route("**/*", r => {
       const u = new URL(r.request().url());
       if (u.origin === BASE) return r.continue();
@@ -78,6 +86,8 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
         if (u.pathname === "/api/dashboard") return J(dash);
         if (u.pathname === "/api/dashboard/v2/settings") return J(settings);
         if (u.pathname === "/api/dashboard/callbacks") return J({ open: [], done: [] });
+        if (u.pathname === "/api/dashboard/v2/billing") return J(bill || BILL);
+        if (u.pathname === "/api/dashboard/v2/plans") return J(plans || PLANS);
         return J({ error: "not here" }, 404);
       }
       return r.abort();
@@ -100,13 +110,13 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
     const dir = process.env.SHOTS, real = process.env.DASH_FIXTURE ? JSON.parse(fs.readFileSync(process.env.DASH_FIXTURE, "utf8")) : DASH({ layout: "v2" });
     fs.mkdirSync(dir, { recursive: true });
     const shots = [["overview", "/dashboard/#overview", 1366, 1500], ["calls", "/dashboard/#calls", 1366, 1100], ["settings", "/dashboard/#settings", 1366, 1500],
-      ["settings-soon", "/dashboard/#settings", 1366, 1000, SETTINGS(F("rolling_out"))], ["billing", "/dashboard/#billing", 1366, 900],
+      ["settings-soon", "/dashboard/#settings", 1366, 1000, SETTINGS(F("rolling_out"))], ["billing", "/dashboard/#billing", 1366, 1900],
       ["tablet", "/dashboard/#overview", 900, 1300], ["phone", "/dashboard/#overview", 390, 1700], ["calendar-failed", "/dashboard/?calendar=failed&reason=Google%20said%20no%20access", 1366, 900],
       ["dark", "/dashboard/#overview", 1366, 1200, undefined, "dark"], ["ent-overview", "/dashboard/#overview", 1366, 1500, "ENT"], ["ent-settings", "/dashboard/#settings", 1366, 900, "ENT"],
       ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
     const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
     for (const [n, u, w, h, s, t] of shots) {
-      const p = await open(u, { dash: real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+      const p = await open(u, { tell: true, dash: real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
       await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: true }); await p.context().close(); console.log("shot", n);
     }
     await browser.close(); server.close(); return;
@@ -147,6 +157,32 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   await v.click("#gear"); await v.waitForTimeout(100);
   ok(await v.isVisible("#settings"), "⚙ Customize opens the Customize card on Settings");
   await v.context().close();
+
+  console.log("Round 2: assistant number, account, plan cards, billing");
+  const r2 = await open("/dashboard/", { dash: DASH({ layout: "v2", account: { ownerPhone: "+14165550177", ownerEmail: "o@bluewave.test" } }) });
+  await r2.waitForFunction(() => document.getElementById("dv2AssistNum").textContent.trim() !== "");
+  eq(await r2.$eval("#dv2AssistNum", e => e.textContent.trim()), await r2.$eval("#rnNum", e => e.textContent.trim()), "Overview: the assistant's number, the same number the receptionist card shows");
+  ok(await r2.evaluate(() => document.querySelector("#dv2-overview").firstElementChild.id === "dv2Assist"), "…first on Overview");
+  await r2.click('#dv2Nav a[data-tab="settings"]'); await r2.waitForTimeout(150);
+  const acct = await r2.$$eval("#dv2AcctList dd", d => Object.fromEntries(d.map(x => [x.dataset.k, x.textContent])));
+  eq([acct["Owner's phone"], acct["Owner's email"], acct.Business, acct.Plan], ["+1 416-555-0177", "o@bluewave.test", "Bluewave Plumbing", "Business Lite"], "Settings: account card with the owner's phone and email, business and plan");
+  ok(!("Signed in as" in acct), "…signed-in email left out when it is the owner's email");
+  ok(await r2.$$eval("#v2Card .dv2-onplan .v2-row", r => r.length) >= 5, "plan card: On your plan items drawn as ticks");
+  const notPlan = await r2.$$eval("#v2Card .dv2-notplan .v2-row", r => r.map(x => [x.querySelector(".dv2-email") && x.querySelector(".dv2-email").getAttribute("href").startsWith("mailto:sales@voicecaptures.com"), !!x.querySelector(".v2-badge")]));
+  ok(notPlan.length > 0 && notPlan.every(([m, b]) => m && !b), "Not on your plan: Email us to sales@voicecaptures.com, no Upgrade / Add-on badges");
+  ok(!(await r2.$$eval("#v2Card .v2-row", r => r.some(x => /See "Your plan"/.test(x.textContent)))), "…and no 'See Your plan above' line");
+  await r2.click('#dv2Nav a[data-tab="billing"]'); await r2.waitForSelector("#v2Plans .v2-plan");
+  const boxes = await r2.$$eval("#v2Plans .v2-plan", b => b.map(x => [x.querySelector("b").textContent, x.classList.contains("cur"), x.querySelector(".dv2-email-btn") ? x.querySelector(".dv2-email-btn").textContent : null, x.classList.contains("dv2-ent-plan")]));
+  eq(boxes, [["Personal Line", false, "Email us", false], ["Business Lite", true, null, false], ["Business Pro", false, "Email us", false], ["Enterprise", false, "Email us", true]], "Billing: one Email us under each other plan, a black Enterprise box added");
+  ok(!(await r2.$("#v2Plans .v2-badge.soon")), "…no Rolling out badge left in the plan boxes");
+  await r2.context().close();
+  const PER = JSON.parse(JSON.stringify(PLANS)); PER.plans = [plan("personal", "Personal Line", 19, 190, 30, true), { ...plan("business_lite", "Business Lite", 99, 990, 100, false), byEmail: null }, plan("business_pro", "Business Pro", 199, 1990, 250, false, false)];   // byEmail null: the server lets this one switch itself
+  const PB = JSON.parse(JSON.stringify(BILL)); PB.plan = { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: null, checkoutEnabled: true };
+  const pr = await open("/dashboard/#billing", { dash: DASH({ layout: "v2" }), plans: PER, bill: PB });
+  await pr.waitForSelector("#v2Plans .v2-plan");
+  eq(await pr.$$eval("#v2Plans .v2-plan", b => b.map(x => [x.querySelector("b").textContent, x.querySelector("[data-plan]") ? "Switch" : x.querySelector(".dv2-email-btn") ? "Email us" : x.classList.contains("cur") ? "Current" : "?"])),
+    [["Personal Line", "Current"], ["Business Lite", "Switch"], ["Business Pro", "Email us"], ["Enterprise", "Email us"]], "a Personal line keeps its own Switch to Business Lite (no email needed)");
+  await pr.context().close();
 
   console.log("Calendar: Coming soon");
   const s = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("rolling_out")) });
