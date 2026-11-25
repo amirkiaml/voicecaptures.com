@@ -19,7 +19,12 @@ ok(!/a text to someone whose call was not answered/.test(text), "…the old text
 const terms = page("terms"), privacy = page("privacy");
 ok(/Missed-call text-back is sent only with the caller’s permission\./.test(terms) && /We text only callers who say yes, and we keep their answer with the call record\./.test(terms), "terms: text-back only with the caller's permission, asked on the call");
 ok(/text-back to a caller who, during the call, said we may text them/.test(terms) && !/text-back to a caller whose call was missed/.test(terms), "terms: the Text messages list says the same");
-ok(/Last updated: 24 November 2026/.test(terms), "terms: updated 24 November 2026");
+/* The terms page carries its own date, and the point is that it MOVED when this wording
+ * landed -- not that it says one particular day forever. Pinned to the literal, this broke
+ * the next time the terms page was edited for an unrelated reason. Read it off the source
+ * that generates it, exactly as the consent version above is read. */
+const termsDate = /TERMS_UPDATED = "([^"]+)"/.exec(py)[1];
+ok(new RegExp(`Last updated: ${termsDate}`).test(terms), `terms: updated ${termsDate}, the date build-pages.py generates`);
 ok(/our receptionist asks the caller during the call whether it may text them at that number, and the text is sent only if they say yes/.test(privacy), "privacy: the same sentence");
 ok(/Reply STOP to opt out|Reply STOP|reply STOP/i.test(terms) && /STOP/.test(privacy), "STOP kept on both");
 console.log(`\n${pass} checks passed`);
