@@ -101,7 +101,7 @@ TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
 PRIVACY_UPDATED = "24 November 2026"
-TERMS_UPDATED = "22 November 2026"
+TERMS_UPDATED = "25 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
 # this is for, and on a consent page it is worth being exact about. The consent VERSION
@@ -2254,14 +2254,13 @@ missed-payment terms below apply if the card stays unpaid.</p>
 <h2>Annual plans</h2>
 <p>You can pay for a year instead of by the month. An annual plan is
 {_annual_phrase()}, charged once, with your rate locked for the term.</p>
-<p><strong>Cancel early and the unused months come back as account credit</strong>
-&mdash; credit against future VoiceCaptures invoices, not a refund to your card.
-Credit does not expire while your account is open.</p>
-<p><strong>Refunds.</strong> Within 7 days of the day we charge it we
-will refund it in full on request. After that window we do not refund unused
-months as cash; a partial refund, or moving unused package credit to another
-period, is considered case by case and is at our discretion.
-</p>
+<p><strong>Cancelling an annual plan takes effect at the end of the term.</strong>
+Your line keeps answering until then and the plan does not renew. Unused months
+are not refunded and do not become account credit.</p>
+<p><strong>Refunds.</strong> An annual charge is not automatically refundable and
+there is no refund window. If something has gone wrong, email us at
+<a href="mailto:{EMAIL}">{EMAIL}</a>: we read every request and look at it by
+hand. We do refund occasionally, at our discretion. Nothing here promises one.</p>
 <p><strong>Minutes stay monthly</strong> on an annual plan. Paying for a year does
 not pool a year of minutes: your allowance is per month and does not carry over.</p>
 
@@ -2310,8 +2309,8 @@ answering.</p>
 emailing
 <a href="mailto:{EMAIL}">{EMAIL}</a>. After the trial, your service runs to the end
 of the month you&rsquo;ve paid for, and we don&rsquo;t refund partial months. If you
-are on a prepaid term, cancelling takes effect at the end of that term and the
-refund rule under Prepaid terms applies instead. When
+are on an annual plan or a prepaid term, cancelling takes effect at the end of
+that term, and the rule under Annual plans or Prepaid terms applies instead. When
 you leave, turn off call forwarding on your phone so calls ring through to you
 again.</p>
 
@@ -3452,8 +3451,10 @@ FAQ_GROUPS = [
          "ringing through to you. You set that with your forwarding, not your "
          "plan &mdash; 24/7, after-hours and overflow all work the same way."),
         ("Can I cancel anytime?",
-         "Yes. It is month to month with no contract. Cancel and forwarding reverts "
-         "to your own phone the same day."),
+         "A monthly plan is month to month with no contract: cancel and forwarding "
+         "reverts to your own phone the same day. An annual plan runs to the end of "
+         "its term \u2014 it stops renewing, your line keeps answering until then, "
+         "and unused months are not refunded."),
         ("What happens after the trial?",
          f"The trial is "
          f"{pricing_data.PLANS['personal']['trial']['days']} days on "
