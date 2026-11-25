@@ -1072,10 +1072,13 @@ function renderInsights(d) {
 }
 
 /* ---------- call log ---------- */
+// A booked call's word: "Appointment" for every self-serve / pricing-v2 line (the API says so),
+// "Tour" for the legacy tour client, as before (the API sends nothing for them).
+const bookingNoun = () => (last && (last.bookingNoun === "Appointment" || last.bookingNoun === "Tour")) ? last.bookingNoun : "Tour";
 function statusPill(c) {
   const map = {
     emergency: ["p-emergency", "Emergency"],
-    booked: ["p-booked", c.tour_booking_id ? "Tour booked" : "Booked"],
+    booked: ["p-booked", c.tour_booking_id ? `${bookingNoun()} booked` : "Booked"],
     pending: ["p-pending", "Needs callback"],
     abandoned: ["p-abandoned", "Hung up early"],
     other: ["p-other", "Inquiry"],
@@ -1394,7 +1397,7 @@ function renderLog(everything) {
         <div class="k">Request</div><div class="v">${esc(c.issue_description || "—")}</div>
         ${callback ? `<div class="k">Callback</div><div class="v">${esc(fmtPhone(callback))}${same ? " · same as caller ID" : ""}</div>` : ""}
         ${c.address ? `<div class="k">Address</div><div class="v">${esc(c.address)}</div>` : ""}
-        ${c.tour_start ? `<div class="k">Tour</div><div class="v">${esc(c.tour_start)}</div>` : ""}
+        ${c.tour_start ? `<div class="k">${bookingNoun()}</div><div class="v">${esc(c.tour_start)}</div>` : ""}
         ${c.preferred_date ? `<div class="k">Appointment</div><div class="v">${esc(c.preferred_date)} ${esc(c.preferred_time || "")}</div>` : ""}
         ${c.caller_email ? `<div class="k">Email</div><div class="v">${esc(c.caller_email)}</div>` : ""}
         ${renderPremium(c, i)}
@@ -2453,6 +2456,7 @@ function renderV2() {
     <div class="v2-row"><span>Google Calendar: <b>${g.connected ? "connected" : "not connected"}</b></span>
       ${g.connected ? `<button type="button" class="btn-ghost" id="v2CalOff">Disconnect</button>` : g.canConnect === false ? "" : `<button type="button" class="btn" id="v2CalOn">${g.blocked ? "Try again" : "Connect Google Calendar"}</button>`}</div>
     ${!g.connected && g.blocked ? `<div class="v2-row muted" id="v2CalBlocked">${esc(g.blocked)}</div>` : ""}
+    ${g.hoursSet === false && g.hoursNote ? `<div class="v2-row muted" id="v2CalHours">${esc(g.hoursNote)}</div>` : ""}
     <div class="v2-msg" id="v2CalMsg"></div></div>`);
   // Caller texts
   const cs = f.caller_sms;
