@@ -113,13 +113,19 @@
     move(panels.calls, byId(["retentionNote", "logRow"]));
     // Settings: Calendar first, then the plan's controls, the number, Customize, requests, password.
     var cal = el("div", { class: "card dv2-cal", id: "dv2Cal", hidden: "" },
-      '<div class="dv2-cal-head"><span class="dv2-cal-ico">' + svg("calendar") + '</span>' +
+      '<div class="dv2-cal-head"><span class="dv2-cal-ico"><img src="/dashboard/img/google-calendar.png" alt="" width="26" height="27"></span>' +
       '<p class="panel-title">Google Calendar</p><span class="dv2-soon" id="dv2CalSoon" hidden>Coming soon</span></div>' +
       '<div id="dv2CalBody"></div>');
     panels.settings.appendChild(cal);
     panels.settings.appendChild(el("div", { class: "card dv2-acct", id: "dv2Acct" },
       '<p class="panel-title">Your account</p><dl class="dv2-acct-list" id="dv2AcctList"></dl>'));
-    move(panels.settings, byId(["v2Card", "v2Modal", "rnCard", "settings", "crCard", "pwPanel"]));
+    move(panels.settings, byId(["v2Card", "v2Modal"]));
+    panels.settings.appendChild(el("div", { class: "card dv2-addons", id: "dv2Addons", hidden: "" },
+      '<p class="panel-title">Add-ons</p><div class="dv2-addon-list" id="dv2AddonList"></div>'));
+    move(panels.settings, byId(["rnCard", "settings", "crCard", "pwPanel"]));
+    // Request a change: the same words, the last two set in the site's serif italic.
+    var crT = $("crCard") && $("crCard").querySelector(".panel-title");
+    if (crT && crT.textContent.trim() === "Request a change") { crT.textContent = "Request "; var cem = el("em"); cem.textContent = "a change"; crT.appendChild(cem); }
     // Billing: the minutes meter (when it isn't in the sidebar) and the billing card.
     move(panels.billing, byId(["v2Bill", "v2PlanModal"]));
 
@@ -261,27 +267,46 @@
     rows.forEach(function (r) { var dt = el("dt"), dd = el("dd", { "data-k": r[0] }); dt.textContent = r[0]; dd.textContent = r[1]; list.appendChild(dt); list.appendChild(dd); });
   }
 
-  /* Settings: the plan card, prettier. "Not on your plan" items get an Email us link to sales
-   * instead of an Upgrade / Add-on badge, and the "See Your plan above" line (Your plan is on
-   * Billing here) goes. */
+  /* Settings: the plan card, prettier: "On your plan" as ticked tiles; "Not on your plan" is
+   * replaced by the Add-ons card. */
   function planCard() {
     var secs = $("v2Body").querySelectorAll(".v2-sec");
     for (var i = 0; i < secs.length; i++) {
       var h = secs[i].querySelector(".v2-h"), t = h ? h.textContent.trim() : "";
       if (t === "On your plan") secs[i].classList.add("dv2-onplan");
-      if (t === "Not on your plan") {
-        secs[i].classList.add("dv2-notplan");
-        var rows = secs[i].querySelectorAll(".v2-locked");
-        for (var j = 0; j < rows.length; j++) {
-          var b = rows[j].querySelector(".v2-badge"); if (!b) continue;
-          var label = rows[j].textContent.replace(b.textContent, "").trim();
-          var a = el("a", { class: "dv2-email", href: mailto("Add " + label) }); a.textContent = "Email us";
-          b.replaceWith(a);
-        }
-        var m = secs[i].querySelectorAll(".v2-row.muted");
-        for (var k = 0; k < m.length; k++) if (/Your plan/.test(m[k].textContent)) m[k].remove();
-      }
+      // "Not on your plan" goes: the Add-ons card below says what can be added, and how.
+      if (t === "Not on your plan") secs[i].remove();
     }
+  }
+
+  /* Settings: Add-ons. Names and prices are the server's (/api/dashboard/v2/plans `addons`,
+   * from the catalog), never typed here. Each one not on the plan: "Auto-activation rolling
+   * out" and an Email us to sales. Included or active ones say so. The integration add-on is
+   * Enterprise-only and quoted, so it carries no price. */
+  function addons() {
+    var card = $("dv2Addons"), list = $("dv2AddonList"); if (!card) return;
+    var p = null; try { p = v2p; } catch (e) {}
+    var a = p && p.addons ? p.addons : null;
+    if (!a || !Object.keys(a).length) { card.hidden = true; return; }
+    var money = function (v) { try { return v2Money(v); } catch (e) { return "$" + v; } };
+    list.innerHTML = "";
+    var row = function (label, price, state) {
+      var r = el("div", { class: "dv2-addon" }), l = el("div", { class: "dv2-addon-l" }), n = el("div", { class: "dv2-addon-n" });
+      n.textContent = label; l.appendChild(n);
+      var tag = el("span", { class: "dv2-addon-tag" + (state ? " on" : "") }); tag.textContent = state || "Auto-activation rolling out"; l.appendChild(tag);
+      r.appendChild(l);
+      var right = el("div", { class: "dv2-addon-r" });
+      if (price) { var pr = el("span", { class: "dv2-addon-p" }); pr.textContent = price; right.appendChild(pr); }
+      if (!state) { var e = el("a", { class: "dv2-email-btn sm", href: mailto("Add " + label) }); e.textContent = "Email us"; right.appendChild(e); }
+      r.appendChild(right); list.appendChild(r);
+    };
+    Object.keys(a).forEach(function (k) {
+      var x = a[k]; if (!x || !x.label) return;
+      var state = x.status === "included" ? "Included in your plan" : x.active ? "Active" : "";
+      row(x.label, x.price_cad != null && x.status !== "quoted" ? money(x.price_cad) + "/mo" : "Quoted on a call", state);
+    });
+    row("Practice-software, field-service, POS or CRM integration", "Quoted on a call", "");
+    card.hidden = false;
   }
 
   /* Billing: the plan boxes. Each plan that isn't yours gets one Email us button to sales,
@@ -289,6 +314,7 @@
    * Personal line moving up to Business Lite). An Enterprise box in black is added when the
    * customer isn't already on it. Add-ons that need an upgrade say Email us too. */
   function billing() {
+    addons();
     var body = $("v2BillBody"); if (!body) return;
     var grid = body.querySelector("#v2Plans .v2-plans");
     if (grid && !grid.dataset.dv2) {
@@ -320,10 +346,6 @@
           var al = el("a", { class: "dv2-email", href: mailto("Add " + lbl) }); al.textContent = "Email us"; bs[q].replaceWith(al);
         }
       }
-      if (secs[s2].id === "v2Tell" && !h.querySelector("em")) {
-        var m = /^(Tell us about )(your business)$/.exec(t);   // same words; the last two set in the site's serif italic
-        if (m) { h.textContent = m[1]; var em = el("em"); em.textContent = m[2]; h.appendChild(em); }
-      }
     }
   }
 
@@ -331,6 +353,7 @@
     tier();
     account();
     planCard();
+    addons();
     var cardEl = $("dv2Cal"), body = $("dv2CalBody"), soon = $("dv2CalSoon");
     var secs = $("v2Body").querySelectorAll(".v2-sec"), found = null;
     for (var i = 0; i < secs.length; i++) {
@@ -529,20 +552,36 @@
     "html.dv2 #v2Bill .dv2-ent-plan .dv2-email-btn{background:#fff;color:#0b1022}",
     "html.dv2 #v2Bill .dv2-ent-plan.cur{border:2px solid var(--dv2-gold,#e3b95b)}",
     /* Tell us about your business: the site's contact form */
-    "html.dv2 #v2Tell{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;padding:28px;margin-top:16px;border:0;border-radius:22px;background:linear-gradient(160deg,#e2f1f5,#e8eefb)}",
-    "html.dv2[data-theme=dark] #v2Tell{background:linear-gradient(160deg,#10263a,#15233f)}",
-    "html.dv2 #v2Tell>.v2-h{grid-column:1/-1;font-family:Manrope,sans-serif;font-size:32px;font-weight:800;letter-spacing:-.03em;text-transform:none;color:var(--ink);margin:0}",
-    "html.dv2 #v2Tell>.v2-h em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:0}",
-    "html.dv2 #v2Tell>.v2-row.muted{grid-column:1/-1;font-size:15px!important;margin-bottom:12px}",
-    "html.dv2 #v2Tell>.v2-row{margin:0 0 12px}",
-    "html.dv2 #v2Tell>.v2-row:has(textarea),html.dv2 #v2Tell>.v2-row:has(#v2TellSend),html.dv2 #v2Tell>.v2-msg{grid-column:1/-1}",
-    "html.dv2 #v2Tell label{font-size:14px;font-weight:700;margin-bottom:8px}",
-    "html.dv2 #v2Tell .v2TellF{border-radius:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);background:var(--card);font-size:15px}",
-    "html.dv2 #v2Tell .v2TellF:focus{outline:2px solid var(--accent);outline-offset:0}",
-    "html.dv2 #v2Tell textarea.v2TellF{min-height:96px;resize:vertical}",
-    "html.dv2 #v2Tell #v2TellSend{flex:1;padding:16px;border-radius:999px;font-size:16px}",
-    "html.dv2 #v2Tell #v2TellNo{border-radius:999px;padding:16px 22px}",
-    "@media (max-width:759px){html.dv2 #v2Tell{grid-template-columns:1fr;padding:20px} html.dv2 #v2Tell>.v2-h{font-size:26px} html.dv2 .dv2-assist-v{font-size:22px}}",
+    /* "Tell us about your business" on Billing repeats Request a change (same channel): hidden in V2. */
+    "html.dv2 #v2Tell{display:none!important}",
+    /* Request a change: the site's contact form */
+    "html.dv2 #dv2Main #crCard{padding:30px;border:0;background:linear-gradient(160deg,#e2f1f5,#e8eefb)}",
+    "html.dv2[data-theme=dark] #dv2Main #crCard{background:linear-gradient(160deg,#10263a,#15233f)}",
+    "html.dv2 #crCard>.panel-title{font-size:32px;font-weight:800;letter-spacing:-.03em;margin:0 0 6px}",
+    "html.dv2 #crCard>.panel-title em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:0}",
+    "html.dv2 #crCard>.panel-sub{font-size:15px;color:var(--ink2);margin:0 0 18px}",
+    "html.dv2 #crCard .cr-topics legend,html.dv2 #crCard .cr-label{font-size:14px;font-weight:700;margin-bottom:10px}",
+    "html.dv2 #crCard .cr-topics{gap:8px;margin-bottom:18px}",
+    "html.dv2 #crCard .cr-topics label{background:var(--card);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:999px;padding:9px 14px;font-weight:600}",
+    "html.dv2 #crCard .cr-topics label:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}",
+    "html.dv2 #crCard textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:14px;padding:14px 16px;min-height:130px}",
+    "html.dv2 #crCard textarea:focus{outline:2px solid var(--accent);outline-offset:0}",
+    "html.dv2 #crCard .cr-foot{flex-direction:column-reverse;align-items:stretch;gap:10px;margin-top:14px}",
+    "html.dv2 #crCard #crSend{width:100%;padding:16px;border-radius:999px;font-size:16px}",
+    "html.dv2 #crCard .cr-count{text-align:right}",
+    /* Add-ons list */
+    "html.dv2 .dv2-addon-list{display:grid;gap:10px;margin-top:12px}",
+    "html.dv2 .dv2-addon{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-radius:16px;background:var(--raise);flex-wrap:wrap}",
+    "html.dv2 .dv2-addon-n{font-weight:700;font-size:16px}",
+    "html.dv2 .dv2-addon-tag{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}",
+    "html.dv2 .dv2-addon-tag.on{background:var(--good-soft);color:var(--good)}",
+    "html.dv2 .dv2-addon-r{display:flex;align-items:center;gap:12px;margin-left:auto}",
+    "html.dv2 .dv2-addon-p{font-weight:800;font-size:15px;padding:8px 14px;border-radius:999px;background:var(--card);white-space:nowrap}",
+    "html.dv2 .dv2-email-btn.sm{display:inline-block;width:auto;margin:0;padding:9px 16px;border-radius:999px;font-size:14px}",
+    /* Google Calendar icon */
+    "html.dv2 .dv2-cal-ico img{width:34px;height:auto;display:block}",
+    "html.dv2 #dv2Main .dv2-cal-ico{width:52px;height:52px;border-radius:14px}",
+    "html.dv2 .dv2-cal-head .panel-title{font-size:20px}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
