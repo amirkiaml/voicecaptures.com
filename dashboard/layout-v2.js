@@ -251,6 +251,57 @@
     "html.dv2 .dv2-cal .v2-h{display:none}",
     "html.dv2 .dv2-cal .v2-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-left:52px}",
     "html.dv2 .dv2-cal button[disabled]{opacity:.55;cursor:not-allowed}",
+    /* ---- Polish: styling only. Light theme gets the site's soft blue / lavender palette;
+     * dark keeps the page's own dark tokens with the same shapes. ---- */
+    "html.dv2{--dv2-r:18px;--dv2-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px -12px rgba(37,99,235,.14);--dv2-lav:#f1ecfd;--dv2-lav-ink:#6d4fd8;--dv2-mint:#e7f6ee;--dv2-peach:#fdf1e6;--dv2-sky:#e8effc}",
+    "html.dv2[data-theme=dark]{--dv2-shadow:0 1px 2px rgba(0,0,0,.3);--dv2-lav:#1f1a3a;--dv2-lav-ink:#b9a6ff;--dv2-mint:#0f2a20;--dv2-peach:#2d2114;--dv2-sky:#15233f}",
+    "html.dv2:not([data-theme=dark]) body{background:radial-gradient(1200px 600px at 85% -10%,#efe9fb 0,rgba(239,233,251,0) 60%),radial-gradient(900px 500px at 20% 0,#e8eefb 0,rgba(232,238,251,0) 60%),#f6f8fd}",
+    "html.dv2:not([data-theme=dark]) #dv2Side{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(247,245,255,.92));backdrop-filter:blur(8px)}",
+    "html.dv2 #dv2Main .card{border-radius:var(--dv2-r);border-color:color-mix(in srgb,var(--line) 70%,transparent);box-shadow:var(--dv2-shadow);padding:20px 22px}",
+    "html.dv2 #dv2Main header h1{font-size:32px;letter-spacing:-.02em;line-height:1.15}",
+    "html.dv2 #dv2Main header .sub{font-size:14px;margin-top:4px}",
+    "html.dv2 #dv2Main .panel-title{font-family:Manrope,'DM Sans',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em}",
+    "html.dv2 #dv2Main .panel-sub{font-size:13px}",
+    "html.dv2 .range{border-radius:12px;box-shadow:var(--dv2-shadow)}",
+    "html.dv2 .range button.on{background:var(--accent);color:#fff}",
+    "html.dv2 #dv2Main .gear{border-radius:12px}",
+    /* hero and KPI cards: soft tints, one per card */
+    "html.dv2 #dv2Main .hero{background:linear-gradient(120deg,var(--dv2-sky),var(--dv2-lav) 55%,var(--card));border:0}",
+    "html.dv2 #dv2Main .hero .label{color:var(--hero-label);font-weight:600}",
+    "html.dv2 #kpis{grid-template-columns:repeat(3,minmax(0,1fr))}",
+    "html.dv2 #kpis:has(>:nth-child(4):last-child),html.dv2 #kpis:has(>:nth-child(8):last-child){grid-template-columns:repeat(4,minmax(0,1fr))}",
+    "html.dv2 #kpis .kpi{border:0;position:relative;overflow:hidden}",
+    "html.dv2 #kpis .kpi:nth-child(4n+1){background:linear-gradient(160deg,var(--dv2-sky),var(--card) 90%)}",
+    "html.dv2 #kpis .kpi:nth-child(4n+2){background:linear-gradient(160deg,var(--dv2-lav),var(--card) 90%)}",
+    "html.dv2 #kpis .kpi:nth-child(4n+3){background:linear-gradient(160deg,var(--dv2-mint),var(--card) 90%)}",
+    "html.dv2 #kpis .kpi:nth-child(4n+4){background:linear-gradient(160deg,var(--dv2-peach),var(--card) 90%)}",
+    "html.dv2 #kpis .kpi .label{color:var(--ink2);font-weight:600;font-size:14px}",
+    "html.dv2 #kpis .kpi .val{font-size:34px;font-weight:700}",
+    "html.dv2 #kpis .delta{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--good-soft)}",
+    "html.dv2 #kpis .delta.down{background:var(--bad-soft)}",
+    "html.dv2 #kpis .bar{height:8px;border-radius:99px}",
+    /* highlights as soft rows */
+    "html.dv2 .insights{gap:8px}",
+    "html.dv2 .ins{background:var(--raise);border-radius:12px;padding:10px 14px}",
+    "html.dv2 .ins .v{font-size:17px}",
+    /* call outcomes */
+    "html.dv2 .hbars{gap:12px}",
+    /* call log */
+    "html.dv2 #dv2Main table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em}",
+    "html.dv2 #dv2Main tr.row:hover td{background:var(--dv2-sky)}",
+    "html.dv2 #dv2Main .pill{border-radius:999px}",
+    /* sidebar details */
+    "html.dv2 .dv2-biz{border-radius:14px;box-shadow:var(--dv2-shadow);background:var(--card)}",
+    "html.dv2 .dv2-nav a.on{background:linear-gradient(90deg,var(--accent-soft),var(--dv2-lav))}",
+    "html.dv2 .dv2-usage #usageCard{border-radius:16px;background:linear-gradient(160deg,var(--dv2-lav),var(--card));border:0;box-shadow:var(--dv2-shadow)}",
+    "html.dv2 .dv2-usage #usageCard .u-val{font-size:16px}",
+    /* Calendar card */
+    "html.dv2 #dv2Main .dv2-cal{background:linear-gradient(120deg,var(--dv2-sky),var(--card) 60%);border:0}",
+    "html.dv2 .dv2-cal-ico{background:var(--card);box-shadow:var(--dv2-shadow);width:44px;height:44px}",
+    "html.dv2 .dv2-cal .btn{border-radius:12px;padding:10px 16px}",
+    "html.dv2 .dv2-notice{border:0;box-shadow:var(--dv2-shadow)}",
+    /* bottom tab bar on phones: frosted */
+    "@media (max-width:759px){html.dv2:not([data-theme=dark]) #dv2Side{background:rgba(255,255,255,.9)} html.dv2 #dv2Main header h1{font-size:26px} html.dv2 #kpis .kpi .val{font-size:28px} html.dv2 #dv2Main .card{padding:16px}}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
