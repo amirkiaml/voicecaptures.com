@@ -56,7 +56,9 @@ const BILL = { plan: { key: "business_lite", label: "Business Lite", billing: "m
   autoPackage: { available: false, running: false, enabled: false, max: 2 }, consent: { version: "2026-11-17.1" }, credit: 0, pendingPlan: null, trial: null };
 const PLANS = { plans: [plan("personal", "Personal Line", 19, 190, 30, false), plan("business_lite", "Business Lite", 99, 990, 100, true), plan("business_pro", "Business Pro", 199, 1990, 250, false, false)],
   billing: "month", compare: { stay: { label: "Business Lite", cost: 99, coversMinutes: 100, packages: 0 }, next: { plan: "business_pro", label: "Business Pro", price: 199, minutes: 250 } },
-  addons: {}, addonsRunning: false, prompts: [], trial: null };
+  addons: { addon_calendar: { label: "Extra calendar or line", price_cad: 29, status: "available", active: false }, addon_history_90: { label: "90-day call history", price_cad: 19, status: "available", active: true },
+    addon_history_365: { label: "1-year call history", price_cad: 49, status: "available", active: false }, addon_sentiment: { label: "Caller sentiment", price_cad: 9, status: "available", active: false } },
+  addonsRunning: false, prompts: [], trial: null };
 const SUPABASE_STUB = `window.supabase = { createClient: () => ({ auth: {
   getSession: async () => ({ data: { session: { access_token: "t", user: { email: "o@bluewave.test" } } } }),
   onAuthStateChange: () => {}, signOut: async () => {} } }) };`;
@@ -168,13 +170,19 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   eq([acct["Owner's phone"], acct["Owner's email"], acct.Business, acct.Plan], ["+1 416-555-0177", "o@bluewave.test", "Bluewave Plumbing", "Business Lite"], "Settings: account card with the owner's phone and email, business and plan");
   ok(!("Signed in as" in acct), "…signed-in email left out when it is the owner's email");
   ok(await r2.$$eval("#v2Card .dv2-onplan .v2-row", r => r.length) >= 5, "plan card: On your plan items drawn as ticks");
-  const notPlan = await r2.$$eval("#v2Card .dv2-notplan .v2-row", r => r.map(x => [x.querySelector(".dv2-email") && x.querySelector(".dv2-email").getAttribute("href").startsWith("mailto:sales@voicecaptures.com"), !!x.querySelector(".v2-badge")]));
-  ok(notPlan.length > 0 && notPlan.every(([m, b]) => m && !b), "Not on your plan: Email us to sales@voicecaptures.com, no Upgrade / Add-on badges");
-  ok(!(await r2.$$eval("#v2Card .v2-row", r => r.some(x => /See "Your plan"/.test(x.textContent)))), "…and no 'See Your plan above' line");
+  ok(!(await r2.$$eval("#v2Card .v2-h", h => h.some(x => x.textContent.trim() === "Not on your plan"))), "Not on your plan: gone (the Add-ons card replaces it)");
+  await r2.waitForSelector("#dv2Addons:not([hidden]) .dv2-addon");
+  const ads = await r2.$$eval("#dv2AddonList .dv2-addon", r => r.map(x => [x.querySelector(".dv2-addon-n").textContent, x.querySelector(".dv2-addon-p") && x.querySelector(".dv2-addon-p").textContent, x.querySelector(".dv2-addon-tag").textContent, x.querySelector("a") ? x.querySelector("a").getAttribute("href").startsWith("mailto:sales@voicecaptures.com") : false]));
+  eq(ads, [["Extra calendar or line", "$29/mo", "Auto-activation rolling out", true], ["90-day call history", "$19/mo", "Active", false], ["1-year call history", "$49/mo", "Auto-activation rolling out", true],
+    ["Caller sentiment", "$9/mo", "Auto-activation rolling out", true], ["Practice-software, field-service, POS or CRM integration", "Quoted on a call", "Auto-activation rolling out", true]],
+    "Add-ons: the server's names and prices, Auto-activation rolling out + Email us (sales@), Active when on");
+  eq(await r2.$eval("#crCard .panel-title", t => [t.textContent, !!t.querySelector("em")]), ["Request a change", true], "Request a change: same words, contact-form look");
+  ok(await r2.$eval("#dv2Cal .dv2-cal-ico img", i => i.getAttribute("src")) === "/dashboard/img/google-calendar.png", "Calendar card: the Google Calendar icon");
   await r2.click('#dv2Nav a[data-tab="billing"]'); await r2.waitForSelector("#v2Plans .v2-plan");
   const boxes = await r2.$$eval("#v2Plans .v2-plan", b => b.map(x => [x.querySelector("b").textContent, x.classList.contains("cur"), x.querySelector(".dv2-email-btn") ? x.querySelector(".dv2-email-btn").textContent : null, x.classList.contains("dv2-ent-plan")]));
   eq(boxes, [["Personal Line", false, "Email us", false], ["Business Lite", true, null, false], ["Business Pro", false, "Email us", false], ["Enterprise", false, "Email us", true]], "Billing: one Email us under each other plan, a black Enterprise box added");
   ok(!(await r2.$("#v2Plans .v2-badge.soon")), "…no Rolling out badge left in the plan boxes");
+  ok(!(await r2.$("#v2Tell")) || await r2.isHidden("#v2Tell"), "Tell us about your business: not shown (Request a change covers it)");
   await r2.context().close();
   const PER = JSON.parse(JSON.stringify(PLANS)); PER.plans = [plan("personal", "Personal Line", 19, 190, 30, true), { ...plan("business_lite", "Business Lite", 99, 990, 100, false), byEmail: null }, plan("business_pro", "Business Pro", 199, 1990, 250, false, false)];   // byEmail null: the server lets this one switch itself
   const PB = JSON.parse(JSON.stringify(BILL)); PB.plan = { key: "personal", label: "Personal Line", billing: "month", minutes: 30, package: null, checkoutEnabled: true };
