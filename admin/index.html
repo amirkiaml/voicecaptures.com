@@ -1848,8 +1848,18 @@ async function wireMapPlan() {
       <div class="filters"><input id="mpReason" type="search" placeholder="Reason (required), e.g. told the client on…" aria-label="Reason" style="min-width:280px">
         <input id="mpConfirm" type="search" placeholder="Type ${esc(d.confirmWith)} to confirm" aria-label="Confirm with the business name">
         <button class="btn" id="mpGo" type="button" disabled style="border-color:var(--bad);color:var(--bad)">Map to ${esc((MAP_PLANS.find(x => x[0] === d.after.plan_key) || [])[1] || d.after.plan_key)}</button></div>
+      <div class="small muted">Stored name: <code id="mpName">${esc(d.confirmWith)}</code> <button class="btn" id="mpCopy" type="button" style="padding:2px 8px">Copy</button></div>
+      <div id="mpWhy" class="small" style="color:var(--bad)"></div>
       <div id="mpMsg" class="small"></div>`;
-    const ready = () => { $("mpGo").disabled = !($("mpConfirm").value === d.confirmWith && $("mpReason").value.trim()); };
+    /* The button stays off until both are true; say which is missing, so it never looks dead. */
+    const ready = () => {
+      const reason = !!$("mpReason").value.trim(), name = $("mpConfirm").value === d.confirmWith;
+      $("mpGo").disabled = !(reason && name);
+      $("mpGo").style.opacity = $("mpGo").disabled ? ".45" : "";
+      $("mpWhy").textContent = reason && name ? "" : `To enable: ${[!reason && "add a reason", !name && `type the exact business name (${d.confirmWith}, case and spaces matter)`].filter(Boolean).join(" and ")}.`;
+    };
+    $("mpCopy").onclick = () => { try { navigator.clipboard.writeText(d.confirmWith); $("mpCopy").textContent = "Copied"; } catch (e) {} };
+    ready();
     $("mpConfirm").oninput = ready; $("mpReason").oninput = ready;
     $("mpPlan").onchange = $("mpBill").onchange = $("mpCat").onchange = () => draw($("mpPlan").value, $("mpBill").value, $("mpCat").checked);
     $("mpGo").onclick = async () => {
