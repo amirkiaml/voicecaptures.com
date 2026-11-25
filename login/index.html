@@ -127,7 +127,7 @@
           <button class="btn-main" id="loginBtn" type="submit">Log in</button>
           <div class="msg" id="loginMsg" role="status"></div>
         </form>
-        <p class="foot" id="firstTime">First time here? Open the invite email we sent you to set your password, or use Forgot password.</p>
+        <p class="foot" id="firstTime">First time here? Use “Forgot password?” with the email you signed up with to set your password.</p>
         <p class="foot">Don't have an account? <a href="https://calendly.com/hello-voicecaptures">Book a demo</a></p>
       </section>
 
@@ -253,7 +253,8 @@
             busy($("loginBtn"), false, "Log in");
             // An invited customer has no password until they open the invite, so
             // "incorrect" is often "not set yet": point at the invite and Forgot password.
-            var INVITE = " Use the link in your invite email to set your password first, or use Forgot password.";
+            // Self-serve accounts are created without an invite (TorontoLeads SELFSERVE_SILENT_LOGIN): Forgot password is the way to a first password for everyone.
+            var INVITE = " If you haven't set a password yet, use “Forgot password?” to set one.";
             var m = /invalid login/i.test(r.error.message) ? "Email or password is incorrect." + INVITE
               : /not confirmed/i.test(r.error.message) ? INVITE.trim()
               : r.error.message;
