@@ -88,7 +88,8 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
         if (u.pathname === "/api/dashboard") { (globalThis.dashHits = globalThis.dashHits || []).push(u.searchParams.get("business")); return J(dash); }
         if (u.pathname === "/api/dashboard/v2/settings") return J(settings);
         if (u.pathname === "/api/dashboard/callbacks") return J({ open: [], done: [] });
-        if (u.pathname === "/api/dashboard/v2/billing") return J(bill || BILL);
+        if (u.pathname === "/api/dashboard/v2/billing") { (globalThis.billHits = globalThis.billHits || []).push(u.search); return J(globalThis.billNow || bill || BILL); }
+        if (u.pathname === "/api/dashboard/v2/keep-plan" && r.request().method() === "POST") { globalThis.keepHits = (globalThis.keepHits || 0) + 1; globalThis.billNow = { ...(bill || BILL), cancel: { at: null, cancelled: false, canReactivate: false, top: true } }; return J({ ok: true, kept: true }); }
         if (u.pathname === "/api/dashboard/billing-portal") { if (r.request().method() === "POST") { globalThis.portalHits = (globalThis.portalHits || 0) + 1; return J({ url: "https://billing.stripe.com/p/session/test" }); } return J({ available: portal }); }
         if (u.pathname === "/api/dashboard/v2/plans") return J(plans || PLANS);
         return J({ error: "not here" }, 404);
@@ -290,6 +291,29 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   const c = await open("/dashboard/?calendar=connected", { dash: DASH({ layout: "v2" }) });
   eq(await c.$eval("#dv2Notice", e => e.textContent), "Google Calendar connected.", "?calendar=connected: the success message");
   await c.context().close();
+
+  console.log("Cancel scheduled in the portal: said at the top, on every tab (FEATURE_CANCEL_TOP_BANNER)");
+  const CXB = (cx, o = {}) => ({ ...BILL, canManage: true, cancel: { at: "2026-12-23T05:00:00Z", cancelled: false, canReactivate: false, ...cx }, ...o });
+  globalThis.billHits = []; globalThis.keepHits = 0; globalThis.billNow = null;
+  const cx1 = await open("/dashboard/?billing=updated#overview", { dash: DASH({ layout: "v2" }), bill: CXB({ top: true }) });
+  ok(await cx1.isVisible("#cancelTopCard") && /Your plan is cancelled\. Service ends /.test(await cx1.textContent("#cancelTopCard")) && await cx1.isVisible("#cancelTopKeep"), "v2, Overview: the top card says the plan is cancelled, with Keep my plan");
+  ok(await cx1.evaluate(() => { const t = document.getElementById("cancelTopCard"), p = document.getElementById("dv2-overview"); return !p.contains(t) && !!(t.compareDocumentPosition(p) & Node.DOCUMENT_POSITION_FOLLOWING); }), "…above the tab panels, not inside one");
+  for (const t of ["calls", "settings", "billing"]) { await cx1.click(`#dv2Nav a[data-tab="${t}"]`); await cx1.waitForTimeout(60); ok(await cx1.isVisible("#cancelTopCard"), `…still shown on ${t}`); }
+  eq(globalThis.billHits.filter(q => q.includes("fresh=1")).length, 1, "back from the portal (?billing=updated): the first billing read asks ?fresh=1, once");
+  ok(!(await cx1.evaluate(() => location.search)).includes("billing="), "…and the query is removed, so a refresh doesn't ask again");
+  await cx1.click("#cancelTopKeep");
+  await cx1.waitForFunction(() => document.getElementById("cancelTopCard").hidden);
+  eq(globalThis.keepHits, 1, "Keep my plan: one POST to keep-plan, then the card goes");
+  await cx1.context().close(); globalThis.billNow = null;
+  const cx2 = await open("/dashboard/", { dash: DASH({ layout: "v2" }), bill: CXB({}) });
+  ok(await cx2.isHidden("#cancelTopCard"), "no top: true (flag off): no top card; the billing card still has its banner");
+  await cx2.context().close();
+  const cx3 = await open("/dashboard/", { dash: DASH({ layout: "v2" }), bill: CXB({ top: true }, { canManage: false }) });
+  ok(await cx3.isVisible("#cancelTopCard") && !(await cx3.$("#cancelTopKeep")) && /account owner can keep the plan/.test(await cx3.textContent("#cancelTopCard")), "a teammate: the card, no button, says the owner can");
+  await cx3.context().close();
+  const cx4 = await open("/dashboard/", { dash: DASH(), bill: CXB({ top: true }) });
+  ok(await cx4.isVisible("#cancelTopCard"), "legacy layout: the same top card");
+  await cx4.context().close();
 
   console.log("Phone");
   const ph = await open("/dashboard/", { dash: DASH({ layout: "v2" }), width: 390, height: 844 });

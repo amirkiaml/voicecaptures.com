@@ -89,6 +89,8 @@
   .mood-bar { display: flex; gap: 3px; height: 7px; margin-top: 14px; border-radius: 99px; overflow: hidden; }
   .mood-bar span { display: block; min-width: 0; }
   .paused-card { margin-bottom: 16px; border-color: var(--bad); background: linear-gradient(110deg, var(--bad-soft), var(--card) 70%); }
+  .cancel-top { margin-bottom: 16px; border-color: var(--warn); background: linear-gradient(110deg, var(--warn-soft), var(--card) 70%); }
+  .cancel-top h3 { margin: 0 0 6px; font-family: Manrope, "DM Sans", sans-serif; font-size: 18px; }
   .paused-card h3 { margin: 0 0 6px; font-family: Manrope, "DM Sans", sans-serif; font-size: 18px; }
   .buy { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
   .buy a { background: var(--accent-strong); color: #fff; text-decoration: none; font-weight: 600; padding: 9px 16px; border-radius: 10px; font-size: 14px; }
@@ -690,6 +692,8 @@
   </div>
 
   <div class="card paused-card" id="pausedCard" hidden></div>
+  <!-- A cancel scheduled in the Stripe portal, said above everything (FEATURE_CANCEL_TOP_BANNER: the billing answer's cancel.top). -->
+  <div class="card cancel-top" id="cancelTopCard" role="status" hidden></div>
   <!-- Every customer with a line: the API sends receptionistNumber. Not a customizable section: always shown. -->
   <div class="card rn" id="rnCard" hidden>
     <p class="panel-title">Your receptionist number</p>
@@ -1905,18 +1909,51 @@ function v2CostLine(st) {
     + `${v2Money(st.cost)} for ${st.coversMinutes} minutes`
     + (st.packages ? ` (${st.packages} extra package${st.packages > 1 ? "s" : ""})` : "") + `.</div>`;
 }
+/* Back from the Stripe portal (/dashboard/?billing=updated, FEATURE_CANCEL_TOP_BANNER): the first
+   billing read asks ?fresh=1, so a cancel the webhook hasn't stored yet is read from Stripe. Once,
+   and the query is removed so a refresh doesn't ask again. */
+let v2FreshAsk = new URLSearchParams(location.search).get("billing") === "updated";
+function v2BillingPath() {
+  if (!v2FreshAsk) return "/api/dashboard/v2/billing";
+  v2FreshAsk = false;
+  try { const u = new URL(location.href); u.searchParams.delete("billing"); history.replaceState(history.state, "", u.pathname + u.search + u.hash); } catch {}
+  return "/api/dashboard/v2/billing?fresh=1";
+}
+/* "Your plan is cancelled. Service ends Dec 23." at the top of the page, on every tab, with Keep my
+   plan. The billing card says it too; this is the one the owner sees on arriving from the portal. */
+function renderCancelTop() {
+  const el = $("cancelTopCard"); if (!el) return;
+  const cx = typeof v2b !== "undefined" && v2b && v2b.cancel;
+  if (!cx || !cx.top || !cx.at || cx.cancelled) { el.hidden = true; el.innerHTML = ""; return; }
+  el.innerHTML = `<h3>Your plan is cancelled. Service ends ${esc(fmtDay(cx.at))}.</h3>
+    <div>Until then your receptionist answers calls as usual. Changed your mind? Keep your plan and nothing changes.</div>
+    ${v2b.canManage === false ? `<div class="muted" style="font-size:13px;margin-top:10px">The account owner can keep the plan from this dashboard.</div>`
+      : `<div class="buy"><button type="button" class="btn" id="cancelTopKeep">Keep my plan</button></div>`}
+    <div class="muted" style="font-size:13px;margin-top:10px" id="cancelTopMsg"></div>`;
+  el.hidden = false;
+  const b = $("cancelTopKeep");
+  if (b) b.onclick = async () => {
+    const say = t => { const m = $("cancelTopMsg"); if (m) m.textContent = t || ""; };
+    b.disabled = true; say("Keeping your plan…");
+    let d = {}, r;
+    try { r = await api("/api/dashboard/v2/keep-plan", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }); d = await r.json().catch(() => ({})); } catch { r = null; }
+    if (r && r.ok) { await loadV2Bill(); return; }
+    b.disabled = false; say(d.error || "Couldn't keep your plan.");
+  };
+}
 async function loadV2Bill() {
   const card = $("v2Bill");
   try {
     const [rb, rp, rr, ri] = await Promise.all([
-      api("/api/dashboard/v2/billing"), api("/api/dashboard/v2/plans"),
+      api(v2BillingPath()), api("/api/dashboard/v2/plans"),
       /* Fetched here, not on a button: see the note where they are rendered. A section that
          cannot work is a section that is never drawn, so its answer has to be in hand
          before the card is built. */
       api("/api/dashboard/v2/reports"), api("/api/dashboard/v2/invoices"),
     ]);
-    if (!rb.ok) { card.hidden = true; return; }
+    if (!rb.ok) { card.hidden = true; if ($("cancelTopCard")) $("cancelTopCard").hidden = true; return; }
     v2b = await rb.json(); v2p = rp.ok ? await rp.json() : null;
+    renderCancelTop();
     v2Rep = rr.ok ? { ok: true, ...(await rr.json().catch(() => ({}))) } : null;
     v2Inv = ri.ok ? { ok: true, ...(await ri.json().catch(() => ({}))) } : null;
     if (!v2Interval) v2Interval = v2b.plan.billing;
