@@ -370,6 +370,10 @@
   .gate { max-width: 460px; margin: 10vh auto; text-align: center; }
   .gate h2 { font-family: Manrope, sans-serif; margin: 0 0 8px; }
   .gate p { color: var(--muted); }
+  .role-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--gray-soft); color: var(--muted); white-space: nowrap; }
+  .role-badge.owner { background: var(--accent-soft); color: var(--accent); }
+  .v2 .v2-team-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .v2 .v2-team-row span { overflow-wrap: anywhere; }
   @media (max-width: 640px) { .acct-btn .em-short { display: none; } .pw-grid { grid-template-columns: 1fr; } }
 
   /* ===== Look: navy cards, bold numbers, solid tags ===== */
@@ -599,7 +603,7 @@
   <div class="topbar">
     <a class="brandbar" href="/"><img src="/logo-mark.png" alt=""><span>VoiceCaptures</span></a>
     <div class="acct" id="acct" hidden>
-      <button class="acct-btn" id="acctBtn" type="button" aria-haspopup="true"><span class="avatar" id="avatar"></span><span class="em-short" id="emShort"></span></button>
+      <button class="acct-btn" id="acctBtn" type="button" aria-haspopup="true"><span class="avatar" id="avatar"></span><span class="em-short" id="emShort"></span><span class="role-badge" id="roleBadge" hidden></span></button>
       <div class="acct-menu" id="acctMenu" hidden>
         <div class="em" id="acctEmail"></div>
         <button type="button" id="toPw">Change password</button>
@@ -2458,14 +2462,17 @@ function v2Consent(title, text) {
   });
 }
 // keepEdits: re-render from the server but keep what the owner has typed in other, unsaved fields.
+let v2team = null;
 async function loadV2(keepEdits = false) {
   const card = $("v2Card");
   const typed = keepEdits ? [...card.querySelectorAll("input[type=tel], input[type=email], select")].map(el => el.value) : null;
   try {
-    const r = await api("/api/dashboard/v2/settings");
+    const [r, rt] = await Promise.all([api("/api/dashboard/v2/settings"), api("/api/dashboard/v2/team").catch(() => null)]);
     if (!r.ok) { card.hidden = true; return; }
     const d = await r.json();
     if (!d || d.v2 !== true) { card.hidden = true; return; }
+    // Settings → Team (FEATURE_DASHBOARD_TEAM; 404 when off: no section).
+    v2team = rt && rt.ok ? await rt.json().catch(() => null) : null;
     v2 = d; const drew = renderV2(); card.hidden = !drew;
     if (!drew) return;
     if (typed) { const now = [...card.querySelectorAll("input[type=tel], input[type=email], select")]; if (now.length === typed.length) now.forEach((el, i) => { el.value = typed[i]; }); }
@@ -2542,6 +2549,18 @@ function renderV2() {
     <div class="v2-row muted" style="font-size:13px">They get the same summary as you; their addresses aren't shown to each other.</div>`
     : `<div class="v2-row muted" style="font-size:13px">Add up to 2 more people on Business Lite and Pro.</div>`}
     <div class="v2-msg" id="v2EmMsg"></div></div>`);
+  // Team: who else can open this dashboard. Members see calls and settings; billing stays the owner's.
+  const tm = v2team;
+  if (tm && Array.isArray(tm.members)) sec.push(`<div class="v2-sec" id="v2Team"><p class="v2-h">Team</p>
+    <div class="v2-row muted" style="font-size:13px">People on your team can see calls and settings. Only the owner can change billing, cancel or reactivate${tm.canManage ? "" : ", or add and remove people"}.</div>
+    <div class="v2-row v2-team-row"><span>${esc(tm.owner || "")}</span><span class="role-badge owner">Owner</span></div>
+    ${tm.members.map(m => `<div class="v2-row v2-team-row"><span>${esc(m.email)}</span>${tm.canManage ? `<button type="button" class="btn-ghost v2TeamRm" data-email="${esc(m.email)}">Remove</button>` : `<span class="role-badge">Team member</span>`}</div>`).join("")}
+    ${tm.members.length ? "" : `<div class="v2-row muted">No one else yet.</div>`}
+    ${tm.canManage ? (tm.members.length < tm.max
+      ? `<div class="v2-row"><input type="text" inputmode="email" autocomplete="off" id="v2TeamEmail" placeholder="teammate@example.com" aria-label="Their email"><button type="button" class="btn" id="v2TeamAdd">Invite</button></div>
+         <div class="v2-row muted" style="font-size:13px">They get an email to set a password and sign in. Up to ${esc(tm.max)} people.</div>`
+      : `<div class="v2-row muted" style="font-size:13px">Your team is full (${esc(tm.max)} people). Remove someone to add another.</div>`) : ""}
+    <div class="v2-msg" id="v2TeamMsg"></div></div>`);
   // Settings-only features
   const cm = f.coverage_mode;
   if (v2Usable(cm) || toggles.length) sec.push(`<div class="v2-sec"><p class="v2-h">More</p>
@@ -2576,6 +2595,24 @@ function renderV2() {
 }
 function wireV2() {
   const msg = (id, t) => { const el = $(id); if (el) el.textContent = t || ""; };
+  const teamAdd = $("v2TeamAdd");
+  if (teamAdd) teamAdd.onclick = async () => {
+    const email = ($("v2TeamEmail").value || "").trim();
+    if (!email) { msg("v2TeamMsg", "Type their email first."); return; }
+    teamAdd.disabled = true; msg("v2TeamMsg", "Inviting…");
+    const r = await v2Post("team/invite", { email });
+    teamAdd.disabled = false;
+    if (!r.ok) { msg("v2TeamMsg", r.error || "Couldn't add them."); return; }
+    await loadV2(true);
+    msg("v2TeamMsg", r.note || (r.invite === "existing" ? `Added. ${email} already has a login, so we sent a sign-in link.` : `Invite sent to ${email}.`));
+  };
+  document.querySelectorAll(".v2TeamRm").forEach(b => b.onclick = async () => {
+    if (!window.confirm(`Remove ${b.dataset.email}? They lose access to this dashboard straight away.`)) return;
+    b.disabled = true;
+    const r = await v2Post("team/remove", { email: b.dataset.email });
+    if (!r.ok) { b.disabled = false; msg("v2TeamMsg", r.error || "Couldn't remove them."); return; }
+    await loadV2(true); msg("v2TeamMsg", "Removed.");
+  });
   // A toggle changes what the card shows, so it reloads (keeping unsaved typing); a plain save just says Saved.
   const after = async (id, r, okText, reload = true) => { msg(id, r.ok ? okText : (r.error || "Could not save.")); if (r.ok && reload) { await loadV2(true); msg(id, okText); } };
   const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
@@ -2643,7 +2680,21 @@ function renderAccount(email) {
   $("acctEmail").textContent = `Signed in as ${email}`;
 }
 
+/* Owner / Team member, next to the email (TorontoLeads FEATURE_DASHBOARD_TEAM: GET /api/dashboard/me,
+   404 when off, and then no badge). For the business on screen, so it's asked again on every load. An
+   admin viewing a client already has the Admin tag. */
+async function loadWho() {
+  const el = $("roleBadge"); if (!el) return;
+  try {
+    const r = await api("/api/dashboard/me");
+    const d = r.ok ? await r.json() : null;
+    const label = d && { owner: "Owner", member: "Team member" }[d.role];
+    el.hidden = !label; el.textContent = label || ""; el.className = `role-badge${d && d.role === "owner" ? " owner" : ""}`;
+    if (label) { $("acctEmail").textContent = `Signed in as ${d.email} · ${label}`; }
+  } catch { el.hidden = true; }
+}
 function renderBusinesses(list, current, isAdmin) {
+  loadWho();
   const sel = $("bizSelect");
   $("adminTag").hidden = !isAdmin;
   sel.hidden = !list || (list.length < 2 && !isAdmin);
