@@ -2778,21 +2778,39 @@ def _check_sparkles() -> None:
 # thing, the list for countries we have not opened in yet, and a plan card
 # offering to put a Canadian customer on it would say something untrue. The
 # word does not belong anywhere on these cards.
-CTA_OFF_LABEL = {"book_a_call": "Book a Call"}
-CTA_OFF_DEFAULT = "Talk to us"
+# Two labels across the four cards, and each says which of the two things
+# happens next. "Get Started" was on the two cards you can buy AND it is what
+# every SaaS says immediately before a sales form, so it named neither.
+#
+#   Build it now  -- you open the builder and make the thing, now, yourself.
+#   Book a Call   -- a scheduler opens.
+#
+# Pro and Enterprise already pointed at the SAME booking link and only differed
+# in wording, so "Talk to us" was a second name for one action, and a vaguer
+# one than the calendar it opens.
+CTA_SELF_SERVE = "Build it now"
+CTA_CALL = "Book a Call"
+
+# A plan that cannot be bought yet says so, in the card's own vocabulary: the
+# same sparkle the feature rows use for what has not shipped. It sits with the
+# button because that is where the question gets asked -- why can this one not
+# be built like the others?
+CTA_SOON = {"business_pro": "Self-serve rolling out soon"}
 
 
 def _plan_cta(p):
-    """Get Started, or a call. checkout_enabled decides."""
+    """Build it now, or a call. checkout_enabled decides."""
     key = p["key"]
     primary = "btn-primary" if p.get("badge") else "btn-ghost"
     if p["cta"] == "book_a_call" or not p["checkout_enabled"]:
-        label = CTA_OFF_LABEL.get(p["cta"], CTA_OFF_DEFAULT)
-        return (f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
-                f'target="_blank" rel="noopener">{label}</a>')
+        soon = CTA_SOON.get(key, "")
+        note = (f'<p class="pr-soon">{_sparkle_svg(0)}<span>{soon}</span></p>'
+                if soon else "")
+        return (note + f'<a class="btn {primary} pr-cta-btn" href="{CAL30}" '
+                f'target="_blank" rel="noopener">{CTA_CALL}</a>')
     # data-plan lets the billing switch rewrite ?billing= without a reload.
     return (f'<a class="btn {primary} pr-cta-btn" data-plan="{key}" '
-            f'href="{DEMO}/?plan={key}&amp;billing=month">Get Started</a>')
+            f'href="{DEMO}/?plan={key}&amp;billing=month">{CTA_SELF_SERVE}</a>')
 
 
 # Past six features the cards outgrow the fold on a wide screen, where four
@@ -3430,9 +3448,8 @@ def _pricing_body():
     answer, in about 30 seconds, without talking to anyone.</p>
     <div class="pr-cta">
       <a class="btn btn-primary" data-plan="{lite["key"]}"
-        href="{DEMO}/?plan={lite["key"]}&amp;billing=month">Get Started</a>
-      <a class="btn btn-ghost" href="/demo/?src=pricing">Build your assistant</a>
-      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">Book a Call</a>
+        href="{DEMO}/?plan={lite["key"]}&amp;billing=month&amp;src=pricing">{CTA_SELF_SERVE}</a>
+      <a class="btn btn-ghost" href="{CAL30}" target="_blank" rel="noopener">{CTA_CALL}</a>
     </div>
   </div>
 </section>

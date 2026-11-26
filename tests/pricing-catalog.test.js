@@ -18,6 +18,7 @@ const eq = (a, b, m) => { assert.deepStrictEqual(a, b, m); pass++; console.log("
 
 const root = path.join(__dirname, "..");
 const cat = JSON.parse(fs.readFileSync(path.join(root, "pricing/catalog.json"), "utf8"));
+const py = fs.readFileSync(path.join(root, "build-pages.py"), "utf8");
 const pres = JSON.parse(fs.readFileSync(path.join(root, "pricing/presentation.json"), "utf8"));
 const plans = cat.plans;
 const page = f => fs.readFileSync(path.join(root, f), "utf8");
@@ -255,23 +256,30 @@ ok(/waitlist/i.test(pricing.slice(pricing.indexOf(grid) + grid.length)),
 /* A plan that cannot be bought here sends you to the booking link, the same
    one Enterprise uses -- not to a contact anchor and not to a waitlist. */
 const CAL = "https://calendly.com/hello-voicecaptures/30min";
+/* Read off build-pages.py rather than retyped, so renaming a button is one edit
+   and this file cannot drift from the page it is checking. */
+const SELF = /CTA_SELF_SERVE = "([^"]+)"/.exec(py)[1];
+const CALL = /CTA_CALL = "([^"]+)"/.exec(py)[1];
 const ctas = [...grid.matchAll(/<a class="btn[^"]*pr-cta-btn"[^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g)]
   .map(m => ({ href: m[1].replace(/&amp;/g, "&"), label: m[2] }));
 eq(ctas.length, ORDER.length, `${ctas.length} plan buttons, one per card`);
 ORDER.forEach((key, i) => {
   const c = ctas[i];
   if (plans[key].checkout_enabled) {
-    eq(c.label, "Get Started", `${key}: buyable, so the button says Get Started`);
-    ok(c.href.includes(`plan=${key}`), `${key}: Get Started carries its own plan key`);
+    eq(c.label, SELF, `${key}: buyable, so the button says ${SELF}`);
+    ok(c.href.includes(`plan=${key}`), `${key}: ${SELF} carries its own plan key`);
   } else {
     eq(c.href, CAL, `${key}: not buyable, so the button opens the booking link`);
-    ok(["Talk to us", "Book a Call"].includes(c.label),
-       `${key}: button says "${c.label}"`);
+    eq(c.label, CALL, `${key}: not buyable, so the button says ${CALL}`);
   }
 });
-eq(ctas.map(c => c.label),
-   ["Get Started", "Get Started", "Talk to us", "Book a Call"],
-   "the four buttons, in order");
+/* TWO LABELS, NOT THREE. Pro and Enterprise point at the same booking link, so
+   wording them differently ("Talk to us" / "Book a Call") was two names for one
+   action. Whatever the labels say, a card offers exactly one of the two things
+   that can happen next: you build it, or you book a call. */
+eq([...new Set(ctas.map(c => c.label))].sort(), [CALL, SELF].sort(),
+   "two labels across the four cards, one per kind of action");
+eq(ctas.map(c => c.label), [SELF, SELF, CALL, CALL], "the four buttons, in order");
 for (const old of Object.keys(aliases)) {
   if (plans[old]) continue;
   ok(!new RegExp(`plan=${old}\\b`).test(pricing), `no page link still uses the old key ${old}`);

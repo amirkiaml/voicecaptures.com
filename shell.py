@@ -415,11 +415,46 @@ PRICING_CSS = """
 .ported .pr-card.pr-dark .pr-annual{color:#8FB4FF}
 .ported .pr-card.pr-dark .pr-feat .pr-ico{color:#8FB4FF}
 
+/* The one badge on the page, so it is allowed to shine. A flat blue pill read
+   as another label; the gradient runs blue -> the sparkle violet -> blue and
+   drifts slowly across it, which is the same vocabulary the feature sparkles
+   already use for "this is the good one". Reduced motion gets the gradient
+   standing still -- still richer than flat, with nothing moving. */
 .ported .pr-badge{position:absolute; top:calc(var(--s6) * -1); left:50%;
   transform:translateX(-50%); white-space:nowrap;
   padding:var(--s2) var(--s4); border-radius:var(--r-pill);
-  background:var(--blue); color:#fff; font-size:12px; font-weight:800;
-  letter-spacing:.06em; text-transform:uppercase}
+  background:linear-gradient(100deg,
+    var(--blue) 0%, #7C3AED 48%, var(--blue) 100%);
+  background-size:220% 100%; background-position:0% 50%;
+  box-shadow:0 2px 12px color-mix(in srgb, #7C3AED 38%, transparent);
+  color:#fff; font-size:12px; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase;
+  animation:pr-sheen 6s ease-in-out infinite}
+@keyframes pr-sheen{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+@media (prefers-reduced-motion: reduce){
+  .ported .pr-badge{animation:none; background-position:18% 50%}
+}
+
+/* "Self-serve rolling out soon" on a card you cannot buy yet. Sits directly
+   above its button, in the sparkle violet, and twinkles on the same keyframes
+   as the feature sparkles so it belongs to the card rather than to a banner. */
+.ported .pr-soon{display:flex; gap:var(--s2); align-items:center;
+  justify-content:center; margin:0 0 var(--s3); font-size:13.5px;
+  font-weight:700; color:#7C3AED; line-height:1.3}
+/* width/height explicitly: .pr-ico is sized under .pr-feat, and an inline SVG
+   outside that scope falls back to the CSS default of 300x150, which grew the
+   card by ~198px. The card-height test caught it. */
+.ported .pr-soon .pr-spark{flex:none; width:16px; height:16px;
+  color:#7C3AED; transform-origin:50% 50%;
+  animation:pr-twinkle 3.2s ease-in-out infinite}
+.ported .pr-card.pr-dark .pr-soon,
+.ported .pr-card.pr-dark .pr-soon .pr-spark{color:#C4B5FD}
+@media (prefers-reduced-motion: reduce){
+  .ported .pr-soon .pr-spark{animation:none; opacity:1; transform:none}
+}
 
 .ported .pr-top{display:block; margin-bottom:0}
 .ported .pr-top h3{margin:0; font-size:21px}
