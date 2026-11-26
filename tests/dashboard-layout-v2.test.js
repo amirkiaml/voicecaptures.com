@@ -119,6 +119,8 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
       ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
     const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
     const BIZ = ["The Bbq", "Ameer Kiani", "Amir Personal", "Create Ivf", "Del Grande Homes", "Home Services", "Mimi Mumu", "Over The Vines", "Yonge Bloor Dental"].map((name, i) => ({ id: i ? `b-${i}` : real.businessId, name }));
+    const FSH = SETTINGS(F("live", { connected: true })); FSH.features.caller_sms = F("live", { enabled: true }); FSH.features.transfer = F("live", { ownerOnly: true, enabled: false, destination: "+14168226186" });
+    shots.push(["features", "/dashboard/#settings", 1366, 1700, FSH]);
     shots.push(["customize", "/dashboard/#settings", 1366, 1000, undefined, undefined, false, "gear"], ["billing-manage", "/dashboard/#billing", 1366, 900, undefined, undefined, false, "trial"]);
     shots.push(["switcher", "/dashboard/#overview", 1366, 760, undefined, undefined, true], ["switcher-dark", "/dashboard/#overview", 1366, 760, undefined, "dark", true], ["switcher-phone", "/dashboard/#overview", 390, 700, undefined, undefined, true]);
     for (const [n, u, w, h, s, t, sw, extra] of shots) {
@@ -241,6 +243,17 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   const nb = await open("/dashboard/#billing", { dash: DASH({ layout: "v2" }) });
   ok(await nb.isHidden("#dv2BillBar"), "no billing portal for this customer: no Manage my plan");
   await nb.context().close();
+
+  console.log("Feature cards");
+  const FS = SETTINGS(F("live", { connected: false }));
+  FS.features.caller_sms = F("live", { enabled: true }); FS.features.transfer = F("live", { ownerOnly: true, enabled: false, destination: "+14165550188" });
+  const fc = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: FS });
+  await fc.waitForSelector("#v2Card .dv2-feat");
+  const cards = await fc.$$eval("#v2Card .dv2-feat", c => c.map(x => [x.querySelector(".v2-h").firstChild.textContent.trim(), !!x.querySelector(".dv2-feat-ico svg"), x.querySelector(".dv2-state").hidden ? null : x.querySelector(".dv2-state").textContent]));
+  eq(cards.slice(0, 3), [["Texts to callers", true, "On"], ["Live transfer", true, "Off"], ["Who gets call summaries by email", true, null]], "texts, transfer and email as feature cards: icon, title, On/Off where there's one switch");
+  eq(await fc.$eval("#v2Card .dv2-feat .v2-row b", b => b.textContent), "+1 416-555-0188", "the transfer number reads as a phone number");
+  ok(await fc.$eval("#v2Sms", c => getComputedStyle(c).appearance === "none"), "the checkbox is drawn as a switch");
+  await fc.context().close();
 
   console.log("Calendar: Coming soon");
   const s = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("rolling_out")) });
