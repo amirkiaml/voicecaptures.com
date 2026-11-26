@@ -400,6 +400,23 @@
     sec.insertBefore(ic, sec.firstChild);
     var pill = el("span", { class: "dv2-state", hidden: "" });
     h.appendChild(pill);
+    /* Owner-only live transfer: a switch, like Texts to callers, instead of a Switch on / off
+     * button. The switch presses the page's own button (its consent dialog, its save, its
+     * redraw); until the redraw it shows the line's real state. */
+    var trBtn = sec.querySelector("#v2TrOwn, #v2TrOff");
+    if (trBtn && !sec.querySelector("#v2TrSave")) {
+      var desc = sec.querySelector(".v2-row:not(.muted)");
+      var lab = el("label", { class: "v2-row chk-inline dv2-tr-switch" });
+      var cb = el("input", { type: "checkbox", id: "dv2TrSwitch", "aria-label": "Live transfer" });
+      cb.checked = trBtn.id === "v2TrOff";
+      lab.appendChild(cb);
+      var txt = el("span");
+      lab.appendChild(txt);
+      if (desc && desc !== trBtn.closest(".v2-row")) { while (desc.firstChild) txt.appendChild(desc.firstChild); desc.before(lab); desc.remove(); }
+      else trBtn.closest(".v2-row").before(lab);
+      trBtn.closest(".v2-row").classList.add("dv2-hide");
+      cb.addEventListener("change", function () { var want = cb.checked; cb.checked = !want; trBtn.click(); });
+    }
     var state = function () {
       var on = null;
       var cb = sec.querySelector("#v2Sms");
@@ -794,14 +811,13 @@
     "html.dv2 #settings #nsLabel{flex:1;min-width:200px}",
     "html.dv2 #settings .set-actions{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}",
     "html.dv2 #settings .set-actions .btn,html.dv2 #settings .set-actions .btn-ghost{padding:10px 20px}",
-    /* ---- Billing: Manage my plan; Start my plan now in green, not red ---- */
+    /* ---- Billing: Manage my plan; Start my plan now stays red (it charges the card today) ---- */
     "html.dv2 .dv2-bill-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;border-radius:var(--dv2-r);background:var(--card);box-shadow:var(--dv2-shadow);border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}",
     "html.dv2 .dv2-bill-bar .panel-title{margin:0 0 2px}",
     "html.dv2 .dv2-bill-bar .panel-sub{margin:0}",
     "html.dv2 .dv2-manage{padding:12px 20px;border-radius:12px;background:var(--ink);color:var(--card);border:0}",
     "html.dv2 .dv2-manage:hover{filter:brightness(1.15)}",
-    "html.dv2 .btn-danger{background:#16a34a;border-radius:12px;padding:12px 20px}",
-    "html.dv2 .btn-danger:hover{background:#15803d;filter:none}",
+    "html.dv2 .btn-danger{border-radius:12px;padding:12px 20px}",
     /* ---- Plan card: feature cards (texts, transfer, email, more) ---- */
     "html.dv2 #v2Card .v2-sec.dv2-feat{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:16px;align-items:start;margin-top:14px;padding:20px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:16px;background:var(--card)}",
     "html.dv2 #v2Card .v2-sec.dv2-feat>*{grid-column:2}",
@@ -813,6 +829,9 @@
     "html.dv2 #v2Card .dv2-feat .v2-row{margin:0 0 8px;line-height:1.5}",
     "html.dv2 #v2Card .dv2-feat .v2-row.muted{font-size:13px}",
     "html.dv2 #v2Card .dv2-feat .v2-row b{font-weight:800;white-space:nowrap}",
+    "html.dv2 #v2Card .dv2-feat .dv2-hide{display:none}",
+    "html.dv2 #v2Card .dv2-feat label.dv2-tr-switch{align-items:flex-start}",
+    "html.dv2 #v2Card .dv2-feat label.dv2-tr-switch input{margin-top:1px}",
     "html.dv2 #v2Card .dv2-feat label.chk-inline{display:flex;align-items:center;gap:12px;cursor:pointer;font-weight:600}",
     /* checkboxes in the feature cards as switches */
     "html.dv2 #v2Card .dv2-feat input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:42px;height:24px;margin:0;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:background .15s}",

@@ -254,6 +254,10 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   eq(cards.slice(0, 3), [["Texts to callers", true, "On"], ["Live transfer", true, "Off"], ["Who gets call summaries by email", true, null]], "texts, transfer and email as feature cards: icon, title, On/Off where there's one switch");
   eq(await fc.$eval("#v2Card .dv2-feat .v2-row b", b => b.textContent), "+1 416-555-0188", "the transfer number reads as a phone number");
   ok(await fc.$eval("#v2Sms", c => getComputedStyle(c).appearance === "none"), "the checkbox is drawn as a switch");
+  ok(await fc.isVisible("#dv2TrSwitch") && !(await fc.$eval("#dv2TrSwitch", c => c.checked)) && await fc.isHidden("#v2TrOwn"), "Live transfer: a switch like Texts to callers (off), not a Switch on button");
+  await fc.evaluate(() => document.getElementById("v2TrOwn").addEventListener("click", () => { window.__trHit = 1; }));
+  await fc.click("#dv2TrSwitch");
+  ok(await fc.evaluate(() => window.__trHit === 1 && !document.getElementById("dv2TrSwitch").checked), "…flipping it presses the page's own Switch on (consent, save, redraw), and shows the real state until then");
   await fc.context().close();
 
   console.log("Calendar: Coming soon");
