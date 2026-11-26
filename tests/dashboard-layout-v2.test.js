@@ -122,10 +122,10 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
     const BIZ = ["The Bbq", "Ameer Kiani", "Amir Personal", "Create Ivf", "Del Grande Homes", "Home Services", "Mimi Mumu", "Over The Vines", "Yonge Bloor Dental"].map((name, i) => ({ id: i ? `b-${i}` : real.businessId, name }));
     const FSH = SETTINGS(F("live", { connected: true })); FSH.features.caller_sms = F("live", { enabled: true }); FSH.features.transfer = F("live", { ownerOnly: true, enabled: false, destination: "+14168226186" });
     shots.push(["features", "/dashboard/#settings", 1366, 1700, FSH]);
-    shots.push(["customize", "/dashboard/#settings", 1366, 1000, undefined, undefined, false, "gear"], ["billing-manage", "/dashboard/#billing", 1366, 900, undefined, undefined, false, "trial"]);
+    shots.push(["customize", "/dashboard/#settings", 1366, 1000, undefined, undefined, false, "gear"], ["billing-manage", "/dashboard/#billing", 1366, 900, undefined, undefined, false, "trial"], ["billing-phone", "/dashboard/#billing", 390, 1400, undefined, undefined, false, "trial"]);
     shots.push(["switcher", "/dashboard/#overview", 1366, 760, undefined, undefined, true], ["switcher-dark", "/dashboard/#overview", 1366, 760, undefined, "dark", true], ["switcher-phone", "/dashboard/#overview", 390, 700, undefined, undefined, true]);
     for (const [n, u, w, h, s, t, sw, extra] of shots) {
-      const p = await open(u, { tell: true, portal: extra === "trial", bill: extra === "trial" ? { ...BILL, trial: { end: "2026-12-08T23:36:48Z" } } : null, dash: sw ? { ...real, businesses: BIZ, isAdmin: true } : real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+      const p = await open(u, { tell: true, portal: extra === "trial", bill: extra === "trial" ? { ...BILL, trial: { end: "2026-12-08T23:36:48Z", cap: 60, left: 23 } } : null, dash: sw ? { ...real, businesses: BIZ, isAdmin: true } : real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
       if (extra === "gear") { await p.click("#gear"); await p.waitForTimeout(300); await p.evaluate(() => document.getElementById("settings").scrollIntoView()); }
       if (sw) { await p.click("#dv2SwBtn"); await p.waitForTimeout(250); await p.mouse.move(150, 300); }
       await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: !sw && extra !== "gear" }); await p.context().close(); console.log("shot", n);
@@ -259,6 +259,17 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   await fc.click("#dv2TrSwitch");
   ok(await fc.evaluate(() => window.__trHit === 1 && !document.getElementById("dv2TrSwitch").checked), "…flipping it presses the page's own Switch on (consent, save, redraw), and shows the real state until then");
   await fc.context().close();
+
+  console.log("Trial and Monthly/Annual");
+  const tr = await open("/dashboard/#billing", { dash: DASH({ layout: "v2" }), bill: { ...BILL, trial: { end: "2026-12-08T23:36:48Z", cap: 60, left: 23 } } });
+  await tr.waitForSelector("#v2Start");
+  ok(await tr.evaluate(() => { const s = document.getElementById("v2Start").closest(".v2-sec"); return s && s.querySelector(".v2-h").textContent.trim() === "Free trial"; }), "Start my plan now sits in the Free trial section");
+  const [tb, bb] = await tr.evaluate(() => [document.querySelector(".dv2-trial .v2-row").getBoundingClientRect(), document.getElementById("v2Start").getBoundingClientRect()].map(r => ({ x: r.x, y: r.y, r: r.right })));
+  ok(bb.x > tb.r - 1 || bb.x > 600, "…to the right of the trial line");
+  ok(await tr.$eval("#v2Plans .dv2-seg", g => g.getAttribute("role") === "radiogroup"), "Monthly / Annual drawn as a two-way switch (still a radio group)");
+  await tr.click('#v2Plans .dv2-seg label:nth-child(2)');
+  eq(await tr.$eval('#v2Plans input[name="v2Iv"]:checked', i => i.value), "year", "…clicking Annual picks annual");
+  await tr.context().close();
 
   console.log("Calendar: Coming soon");
   const s = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("rolling_out")) });

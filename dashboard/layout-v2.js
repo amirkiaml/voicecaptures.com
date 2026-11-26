@@ -507,6 +507,19 @@
         ent.appendChild(ea); grid.appendChild(ent);
       }
     }
+    /* "Start my plan now" sits beside the Free trial line it ends (same button, same note,
+     * same message line, moved). Monthly / Annual reads as a two-way switch. */
+    var start = body.querySelector(".v2-start-row"), trialSec = null;
+    var hs = body.querySelectorAll(".v2-sec > .v2-h");
+    for (var hi = 0; hi < hs.length; hi++) if (hs[hi].textContent.trim() === "Free trial") trialSec = hs[hi].parentNode;
+    if (start && trialSec && start.parentNode !== trialSec) {
+      var sm = $("v2StartMsg");
+      trialSec.classList.add("dv2-trial");
+      trialSec.appendChild(start);
+      if (sm) trialSec.appendChild(sm);
+    }
+    var iv = body.querySelector('#v2Plans [role="radiogroup"]');
+    if (iv) iv.classList.add("dv2-seg");
     var secs = body.querySelectorAll(".v2-sec");
     for (var s2 = 0; s2 < secs.length; s2++) {
       var h = secs[s2].querySelector(".v2-h"); if (!h) continue;
@@ -846,6 +859,18 @@
     "html.dv2 #v2Card .dv2-feat input.v2Em{border-radius:12px;padding:10px 12px}",
     "html.dv2 #v2Card .dv2-feat .v2-msg:not(:empty){margin-top:6px;padding:10px 12px;border-radius:10px;background:var(--raise);font-size:13px;font-weight:600}",
     "html.dv2 #v2Card .dv2-feat .v2-badge.soon{margin-left:6px}",
+    /* ---- Billing: trial with Start my plan now beside it; Monthly / Annual switch ---- */
+    "html.dv2 #v2Bill .v2-sec.dv2-trial{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:center}",
+    "html.dv2 #v2Bill .dv2-trial>.v2-h,html.dv2 #v2Bill .dv2-trial>.v2-row{grid-column:1}",
+    "html.dv2 #v2Bill .dv2-trial>.v2-start-row{grid-column:2;grid-row:1/span 2;display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin:0;max-width:300px;text-align:right}",
+    "html.dv2 #v2Bill .dv2-trial .v2-start-note{font-size:12px;color:var(--muted)}",
+    "html.dv2 #v2Bill .dv2-trial>.v2-msg{grid-column:1/-1}",
+    "@media (max-width:759px){html.dv2 #v2Bill .v2-sec.dv2-trial{display:block} html.dv2 #v2Bill .dv2-trial>.v2-start-row{align-items:flex-start;text-align:left;max-width:none;margin-top:10px}}",
+    "html.dv2 #v2Bill .dv2-seg{display:inline-flex;gap:4px;padding:4px;margin:4px 0 14px;border-radius:999px;background:var(--raise);border:1px solid var(--line)}",
+    "html.dv2 #v2Bill .dv2-seg label{position:relative;display:inline-flex;align-items:center;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}",
+    "html.dv2 #v2Bill .dv2-seg input{position:absolute;opacity:0;pointer-events:none}",
+    "html.dv2 #v2Bill .dv2-seg label:has(input:checked){background:var(--accent);color:#fff;box-shadow:0 2px 8px -2px rgba(37,99,235,.5)}",
+    "html.dv2 #v2Bill .dv2-seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
