@@ -30,6 +30,11 @@
     settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
     billing: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
     collapse: '<path d="M15 6l-6 6 6 6"/>',
+    sms: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>',
+    transfer: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/><path d="M15 3h6v6M21 3l-6 6"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    sliders: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+    sparkle: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
     calendar: '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M8 14h3M8 17.5h6"/>'
   };
   var svg = function (k) { return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ICON[k] + "</svg>"; };
@@ -383,6 +388,34 @@
 
   /* Settings: the plan card, prettier: "On your plan" as ticked tiles; "Not on your plan" is
    * replaced by the Add-ons card. */
+  /* The plan card's control sections as feature cards: an icon, the title, an On/Off pill
+   * when the section has one switch, and toggles drawn as switches. Same controls, same ids,
+   * same handlers (renderV2 draws them; this only decorates). */
+  var FEAT = { "Texts to callers": "sms", "Live transfer": "transfer", "Who gets call summaries by email": "mail", "More": "sliders", "Rolling out next": "sparkle" };
+  function feature(sec, h, icon) {
+    if (sec.dataset.dv2Feat) return;
+    sec.dataset.dv2Feat = "1";
+    sec.classList.add("dv2-feat");
+    var ic = el("span", { class: "dv2-feat-ico", "aria-hidden": "true" }, svg(icon));
+    sec.insertBefore(ic, sec.firstChild);
+    var pill = el("span", { class: "dv2-state", hidden: "" });
+    h.appendChild(pill);
+    var state = function () {
+      var on = null;
+      var cb = sec.querySelector("#v2Sms");
+      if (cb) on = cb.checked;
+      if (sec.querySelector("#v2TrOff")) on = true; else if (sec.querySelector("#v2TrOwn, #v2TrSave")) on = false;
+      pill.hidden = on === null;
+      pill.textContent = on ? "On" : "Off";
+      pill.classList.toggle("on", !!on);
+    };
+    state();
+    sec.addEventListener("change", state);
+    // A raw +1XXXXXXXXXX in the text reads as a phone number.
+    var bs = sec.querySelectorAll(".v2-row b");
+    for (var i = 0; i < bs.length; i++) if (/^\+1\d{10}$/.test(bs[i].textContent.trim())) { try { bs[i].textContent = fmtPhone(bs[i].textContent.trim()); } catch (e) {} }
+  }
+
   // A plan with no minutes to state (Enterprise before its contract minutes are set) reads
   // "null minutes a month": leave that part out.
   var NO_MIN = /^(null|undefined|contract|NaN) minutes a month( · )?/;
@@ -393,6 +426,7 @@
     for (var i = 0; i < secs.length; i++) {
       var h = secs[i].querySelector(".v2-h"), t = h ? h.textContent.trim() : "";
       if (t === "On your plan") secs[i].classList.add("dv2-onplan");
+      if (FEAT[t]) feature(secs[i], h, FEAT[t]);
       // "Not on your plan" goes: the Add-ons card below says what can be added, and how.
       if (t === "Not on your plan") secs[i].remove();
     }
@@ -768,6 +802,31 @@
     "html.dv2 .dv2-manage:hover{filter:brightness(1.15)}",
     "html.dv2 .btn-danger{background:#16a34a;border-radius:12px;padding:12px 20px}",
     "html.dv2 .btn-danger:hover{background:#15803d;filter:none}",
+    /* ---- Plan card: feature cards (texts, transfer, email, more) ---- */
+    "html.dv2 #v2Card .v2-sec.dv2-feat{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:16px;align-items:start;margin-top:14px;padding:20px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:16px;background:var(--card)}",
+    "html.dv2 #v2Card .v2-sec.dv2-feat>*{grid-column:2}",
+    "html.dv2 .dv2-feat-ico{grid-column:1!important;grid-row:1/span 12;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}",
+    "html.dv2 .dv2-feat-ico svg{width:22px;height:22px}",
+    "html.dv2 #v2Card .dv2-feat>.v2-h{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;letter-spacing:-.01em;text-transform:none;color:var(--ink);margin:2px 0 8px}",
+    "html.dv2 .dv2-state{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--gray-soft);color:var(--muted)}",
+    "html.dv2 .dv2-state.on{background:var(--good-soft);color:var(--good)}",
+    "html.dv2 #v2Card .dv2-feat .v2-row{margin:0 0 8px;line-height:1.5}",
+    "html.dv2 #v2Card .dv2-feat .v2-row.muted{font-size:13px}",
+    "html.dv2 #v2Card .dv2-feat .v2-row b{font-weight:800;white-space:nowrap}",
+    "html.dv2 #v2Card .dv2-feat label.chk-inline{display:flex;align-items:center;gap:12px;cursor:pointer;font-weight:600}",
+    /* checkboxes in the feature cards as switches */
+    "html.dv2 #v2Card .dv2-feat input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:42px;height:24px;margin:0;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:background .15s}",
+    "html.dv2 #v2Card .dv2-feat input[type=checkbox]::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}",
+    "html.dv2 #v2Card .dv2-feat input[type=checkbox]:checked{background:var(--accent)}",
+    "html.dv2 #v2Card .dv2-feat input[type=checkbox]:checked::before{transform:translateX(18px)}",
+    "html.dv2 #v2Card .dv2-feat input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}",
+    "html.dv2 #v2Card .dv2-feat .btn,html.dv2 #v2Card .dv2-feat .btn-ghost{padding:10px 18px;border-radius:12px}",
+    "html.dv2 #v2Card .dv2-feat .v2-row:not(:has(input,button,select,a.btn)){display:block}",
+    "html.dv2 #v2Card .dv2-feat .v2-msg:empty{display:none}",
+    "html.dv2 #v2Card .dv2-feat>:last-child{margin-bottom:0}",
+    "html.dv2 #v2Card .dv2-feat input.v2Em{border-radius:12px;padding:10px 12px}",
+    "html.dv2 #v2Card .dv2-feat .v2-msg:not(:empty){margin-top:6px;padding:10px 12px;border-radius:10px;background:var(--raise);font-size:13px;font-weight:600}",
+    "html.dv2 #v2Card .dv2-feat .v2-badge.soon{margin-left:6px}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
