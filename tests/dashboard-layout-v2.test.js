@@ -75,7 +75,7 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const errs = [];
-  async function open(url, { dash = DASH(), settings = SETTINGS(F("live", { connected: false })), width = 1280, height = 900, theme = "light", bill = null, plans = null, tell = false } = {}) {
+  async function open(url, { dash = DASH(), settings = SETTINGS(F("live", { connected: false })), width = 1280, height = 900, theme = "light", bill = null, plans = null, tell = false, portal = false } = {}) {
     const ctx = await browser.newContext({ viewport: { width, height }, serviceWorkers: "block" });
     await ctx.addInitScript(([t, tell]) => { try { localStorage.setItem("vc_theme", t); if (tell) localStorage.setItem("vc_tell_business", "1"); } catch (e) {} }, [theme, tell]);
     await ctx.route("**/*", r => {
@@ -89,6 +89,7 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
         if (u.pathname === "/api/dashboard/v2/settings") return J(settings);
         if (u.pathname === "/api/dashboard/callbacks") return J({ open: [], done: [] });
         if (u.pathname === "/api/dashboard/v2/billing") return J(bill || BILL);
+        if (u.pathname === "/api/dashboard/billing-portal") { if (r.request().method() === "POST") { globalThis.portalHits = (globalThis.portalHits || 0) + 1; return J({ url: "https://billing.stripe.com/p/session/test" }); } return J({ available: portal }); }
         if (u.pathname === "/api/dashboard/v2/plans") return J(plans || PLANS);
         return J({ error: "not here" }, 404);
       }
@@ -118,11 +119,13 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
       ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
     const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
     const BIZ = ["The Bbq", "Ameer Kiani", "Amir Personal", "Create Ivf", "Del Grande Homes", "Home Services", "Mimi Mumu", "Over The Vines", "Yonge Bloor Dental"].map((name, i) => ({ id: i ? `b-${i}` : real.businessId, name }));
+    shots.push(["customize", "/dashboard/#settings", 1366, 1000, undefined, undefined, false, "gear"], ["billing-manage", "/dashboard/#billing", 1366, 900, undefined, undefined, false, "trial"]);
     shots.push(["switcher", "/dashboard/#overview", 1366, 760, undefined, undefined, true], ["switcher-dark", "/dashboard/#overview", 1366, 760, undefined, "dark", true], ["switcher-phone", "/dashboard/#overview", 390, 700, undefined, undefined, true]);
-    for (const [n, u, w, h, s, t, sw] of shots) {
-      const p = await open(u, { tell: true, dash: sw ? { ...real, businesses: BIZ, isAdmin: true } : real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+    for (const [n, u, w, h, s, t, sw, extra] of shots) {
+      const p = await open(u, { tell: true, portal: extra === "trial", bill: extra === "trial" ? { ...BILL, trial: { end: "2026-12-08T23:36:48Z" } } : null, dash: sw ? { ...real, businesses: BIZ, isAdmin: true } : real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+      if (extra === "gear") { await p.click("#gear"); await p.waitForTimeout(300); await p.evaluate(() => document.getElementById("settings").scrollIntoView()); }
       if (sw) { await p.click("#dv2SwBtn"); await p.waitForTimeout(250); await p.mouse.move(150, 300); }
-      await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: !sw }); await p.context().close(); console.log("shot", n);
+      await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: !sw && extra !== "gear" }); await p.context().close(); console.log("shot", n);
     }
     await browser.close(); server.close(); return;
   }
@@ -224,6 +227,20 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   await mp.keyboard.press("Escape");
   ok(await mp.isHidden("#dv2SwPop"), "Escape closes it");
   await mp.context().close();
+
+  console.log("Customize and billing");
+  const cb = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), portal: true });
+  await cb.click("#gear"); await cb.waitForTimeout(150);
+  eq(await cb.$eval("#settings .dv2-set-h .panel-title", e => e.textContent), "Customize", "Customize card: a heading like the other cards");
+  await cb.click('#dv2Nav a[data-tab="billing"]'); await cb.waitForTimeout(150);
+  ok(await cb.isVisible("#dv2Manage"), "Billing: Manage my plan, when the billing portal is available");
+  await cb.route("https://billing.stripe.com/**", r => r.fulfill({ body: "ok" }));
+  await cb.click("#dv2Manage"); await cb.waitForTimeout(400);
+  ok((globalThis.portalHits || 0) >= 1, "…it opens the same Stripe billing portal as Manage billing");
+  await cb.context().close();
+  const nb = await open("/dashboard/#billing", { dash: DASH({ layout: "v2" }) });
+  ok(await nb.isHidden("#dv2BillBar"), "no billing portal for this customer: no Manage my plan");
+  await nb.context().close();
 
   console.log("Calendar: Coming soon");
   const s = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("rolling_out")) });
