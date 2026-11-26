@@ -100,7 +100,7 @@ def _promo_phrases() -> str:
 TERMS_RULES = pricing_data.CATALOG["rules"]
 
 ROOT = pathlib.Path(__file__).parent
-PRIVACY_UPDATED = "25 November 2026"
+PRIVACY_UPDATED = "26 November 2026"
 TERMS_UPDATED = "25 November 2026"
 # Its own date, because this page borrowed the terms' one and so moved whenever the terms
 # did. A "last updated" that changes while the words do not is the one thing a date like
@@ -2064,8 +2064,8 @@ database provider), the name of your primary calendar, and the Google account
 email shown in your dashboard. We do not store copies of your calendar
 events.</p>
 <p>During a call, the open times for the day the caller asks about are passed to
-our voice and AI providers only to answer that caller. They are used for nothing
-else, and nothing else from your calendar is sent at all.</p>
+our voice and AI providers only to answer that caller. We use them for nothing
+else, and nothing else from your calendar is sent.</p>
 <p><strong>Who else sees it.</strong> Google data reaches only the processors
 that run this feature, and each receives only the part it needs:</p>
 <ul>
@@ -2080,13 +2080,14 @@ that run this feature, and each receives only the part it needs:</p>
   summary and monthly report, which say what was booked.</li>
 </ul>
 <p>None of them receives your calendar itself.</p>
-<p><strong>How long they keep it, and how it is protected.</strong> Our AI
-provider holds a copy of the conversation for 14 days, the shortest window it
-offers, before deleting it. Text message records are kept for 14 days. Our phone
-provider stores no call audio. Deleted data can take up to a further 30 days to
-clear a provider&rsquo;s backup systems. Your Google tokens never leave us: they
-are not sent to any of these processors. Information moves between us and each
-provider over encrypted connections.</p>
+<p><strong>How long they keep it, and how it is protected.</strong> Vapi keeps
+call logs for about 14 days under its own policy, which it can change. Twilio
+keeps text message records for 14 days, and Twilio stores no call audio. Call
+recordings and transcripts, which may include the times discussed on the call,
+are stored in our database and kept for your plan&rsquo;s call-history period
+(14 days on Business Lite). Your Google tokens never leave us: they are not sent
+to any of these processors. Information moves between us and each provider over
+encrypted connections.</p>
 <p>We never sell Google user data, never use it for advertising, and never use
 it to train AI models.</p>
 <p>{BRAND}&rsquo; use and transfer to any other app of information received from
