@@ -85,7 +85,7 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
       if (u.hostname === "api.voicecaptures.com") {
         const J = (b, s = 200) => r.fulfill({ status: s, contentType: "application/json", body: JSON.stringify(b) });
         if (u.pathname === "/api/dashboard/config") return J({ supabaseUrl: "https://x.supabase.co", supabaseKey: "k" });
-        if (u.pathname === "/api/dashboard") return J(dash);
+        if (u.pathname === "/api/dashboard") { (globalThis.dashHits = globalThis.dashHits || []).push(u.searchParams.get("business")); return J(dash); }
         if (u.pathname === "/api/dashboard/v2/settings") return J(settings);
         if (u.pathname === "/api/dashboard/callbacks") return J({ open: [], done: [] });
         if (u.pathname === "/api/dashboard/v2/billing") return J(bill || BILL);
@@ -117,9 +117,12 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
       ["dark", "/dashboard/#overview", 1366, 1200, undefined, "dark"], ["ent-overview", "/dashboard/#overview", 1366, 1500, "ENT"], ["ent-settings", "/dashboard/#settings", 1366, 900, "ENT"],
       ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
     const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
-    for (const [n, u, w, h, s, t] of shots) {
-      const p = await open(u, { tell: true, dash: real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
-      await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: true }); await p.context().close(); console.log("shot", n);
+    const BIZ = ["The Bbq", "Ameer Kiani", "Amir Personal", "Create Ivf", "Del Grande Homes", "Home Services", "Mimi Mumu", "Over The Vines", "Yonge Bloor Dental"].map((name, i) => ({ id: i ? `b-${i}` : real.businessId, name }));
+    shots.push(["switcher", "/dashboard/#overview", 1366, 760, undefined, undefined, true], ["switcher-dark", "/dashboard/#overview", 1366, 760, undefined, "dark", true], ["switcher-phone", "/dashboard/#overview", 390, 700, undefined, undefined, true]);
+    for (const [n, u, w, h, s, t, sw] of shots) {
+      const p = await open(u, { tell: true, dash: sw ? { ...real, businesses: BIZ, isAdmin: true } : real, width: w, height: h, settings: s === "ENT" ? ENTS : s || SETTINGS(F("live", { connected: false })), theme: t || "light" });
+      if (sw) { await p.click("#dv2SwBtn"); await p.waitForTimeout(250); await p.mouse.move(150, 300); }
+      await p.screenshot({ path: path.join(dir, `${n}.png`), fullPage: !sw }); await p.context().close(); console.log("shot", n);
     }
     await browser.close(); server.close(); return;
   }
@@ -191,6 +194,36 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   eq(await pr.$$eval("#v2Plans .v2-plan", b => b.map(x => [x.querySelector("b").textContent, x.querySelector("[data-plan]") ? "Switch" : x.querySelector(".dv2-email-btn") ? "Email us" : x.classList.contains("cur") ? "Current" : "?"])),
     [["Personal Line", "Current"], ["Business Lite", "Switch"], ["Business Pro", "Email us"], ["Enterprise", "Email us"]], "a Personal line keeps its own Switch to Business Lite (no email needed)");
   await pr.context().close();
+
+  console.log("Business switcher");
+  const MULTI = DASH({ layout: "v2", businesses: [{ id: "b-1", name: "Bluewave Plumbing" }, { id: "b-2", name: "Create Ivf" }, { id: "b-3", name: "Del Grande Homes" }] });
+  const sw = await open("/dashboard/", { dash: MULTI });
+  await sw.waitForSelector("#dv2Sw:not([hidden])");
+  ok(await sw.isHidden("#bizSelect"), "the page's own select is kept but hidden");
+  eq(await sw.$eval("#dv2SwBtn .dv2-sw-name", e => e.textContent), "Bluewave Plumbing", "the button shows the current business");
+  ok(await sw.evaluate(() => !!document.querySelector("#dv2Biz #dv2Sw")), "wide screen: in the sidebar");
+  await sw.click("#dv2SwBtn");
+  eq(await sw.$$eval("#dv2SwList li", l => l.map(x => [x.dataset.name, x.getAttribute("aria-selected")])), [["Bluewave Plumbing", "true"], ["Create Ivf", "false"], ["Del Grande Homes", "false"]], "the list: every business, the current one ticked");
+  ok(await sw.isHidden("#dv2SwSearch"), "three businesses: no search box");
+  await sw.keyboard.press("ArrowDown"); await sw.keyboard.press("Enter");
+  await sw.waitForFunction(() => true);
+  await sw.waitForTimeout(300);
+  ok((globalThis.dashHits || []).includes("b-2"), "arrow down + Enter: the page's own switch loads Create Ivf");
+  ok(await sw.isHidden("#dv2SwPop"), "…and the list closes");
+  await sw.context().close();
+  const one = await open("/dashboard/", { dash: DASH({ layout: "v2" }) });
+  ok(await one.isHidden("#dv2Sw") && await one.isVisible("#dv2BizName"), "one business (not an admin): no switcher, just the name");
+  await one.context().close();
+  const MANY = DASH({ layout: "v2", businesses: Array.from({ length: 9 }, (_, i) => ({ id: `b-${i + 1}`, name: i ? `Client ${i}` : "Bluewave Plumbing" })) });
+  const mp = await open("/dashboard/", { dash: MANY, width: 390, height: 844 });
+  await mp.waitForSelector("#dv2Sw:not([hidden])");
+  ok(await mp.evaluate(() => !!document.querySelector(".topbar #dv2Sw")) && await mp.isVisible("#dv2SwBtn"), "phone: the switcher is in the top bar (it was unreachable before)");
+  await mp.click("#dv2SwBtn"); await mp.fill("#dv2SwSearch", "client 7");
+  eq(await mp.$$eval("#dv2SwList li:not([hidden])", l => l.map(x => x.dataset.name)), ["Client 7"], "nine businesses: a search box that filters");
+  ok(await mp.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "…no sideways scroll");
+  await mp.keyboard.press("Escape");
+  ok(await mp.isHidden("#dv2SwPop"), "Escape closes it");
+  await mp.context().close();
 
   console.log("Calendar: Coming soon");
   const s = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }), settings: SETTINGS(F("rolling_out")) });
