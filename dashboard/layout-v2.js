@@ -123,6 +123,24 @@
     panels.settings.appendChild(el("div", { class: "card dv2-addons", id: "dv2Addons", hidden: "" },
       '<p class="panel-title">Add-ons</p><div class="dv2-addon-list" id="dv2AddonList"></div>'));
     move(panels.settings, byId(["rnCard", "settings", "crCard", "pwPanel"]));
+    // Customize: a heading, like every other card on the tab.
+    var set = $("settings");
+    if (set && !set.querySelector(".dv2-set-h")) set.insertBefore(el("div", { class: "dv2-set-h" },
+      '<p class="panel-title">Customize</p><p class="panel-sub">Your hours, what your dashboard shows, and your own call statuses.</p>'), set.firstChild);
+    // Billing: "Manage my plan" opens the same Stripe billing portal as the account menu's
+    // Manage billing (the page's own button), shown only when that one is.
+    var mb = $("billing");
+    if (mb) {
+      var bar = el("div", { class: "dv2-bill-bar", id: "dv2BillBar", hidden: "" });
+      var mbtn = el("button", { type: "button", class: "btn dv2-manage", id: "dv2Manage" }, "Manage my plan");
+      mbtn.addEventListener("click", function () { mb.click(); });
+      bar.appendChild(el("div", { class: "dv2-bill-bar-t" }, '<p class="panel-title">Billing</p><p class="panel-sub">Card, invoices and cancellation are in your secure Stripe billing page.</p>'));
+      bar.appendChild(mbtn);
+      panels.billing.insertBefore(bar, panels.billing.firstChild);
+      var syncBar = function () { bar.hidden = mb.hidden; mbtn.disabled = mb.disabled; mbtn.textContent = mb.disabled ? mb.textContent.replace("Opening billing", "Opening") : "Manage my plan"; };
+      syncBar();
+      new MutationObserver(syncBar).observe(mb, { attributes: true, attributeFilter: ["hidden", "disabled"], childList: true, characterData: true, subtree: true });
+    }
     // Request a change: the same words, the last two set in the site's serif italic.
     var crT = $("crCard") && $("crCard").querySelector(".panel-title");
     if (crT && crT.textContent.trim() === "Request a change") { crT.textContent = "Request "; var cem = el("em"); cem.textContent = "a change"; crT.appendChild(cem); }
@@ -725,6 +743,31 @@
     "html.dv2 .dv2-sw.in-top .dv2-sw-sub{display:none}",
     "html.dv2 .dv2-sw.in-top .dv2-sw-pop{left:0;width:max(280px,100%);max-width:calc(100vw - 24px)}",
     "html.dv2 #dv2Main .topbar{display:flex;align-items:center;gap:12px}",
+    /* ---- Customize card ---- */
+    "html.dv2 #dv2Main #settings{padding:24px 26px}",
+    "html.dv2 .dv2-set-h{margin-bottom:16px}",
+    "html.dv2 .dv2-set-h .panel-title{margin:0 0 2px}",
+    "html.dv2 #settings .set-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}",
+    "html.dv2 #settings .set-grid label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);gap:6px}",
+    "html.dv2 #settings .set-grid select,html.dv2 #settings .set-grid input,html.dv2 #settings #nsLabel,html.dv2 #settings #nsCounts{font:inherit;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink);background:var(--raise);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:12px;padding:11px 12px}",
+    "html.dv2 #settings select:focus,html.dv2 #settings input:focus{outline:2px solid var(--accent);outline-offset:0}",
+    "html.dv2 #settings .set-row{display:block;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}",
+    "html.dv2 #settings .set-k{display:block;width:auto;padding:0;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}",
+    "html.dv2 #settings .chip{padding:8px 14px;margin:0 8px 8px 0;font-size:14px;font-weight:600;background:var(--card);border-color:color-mix(in srgb,var(--line) 80%,transparent);transition:background .12s,border-color .12s}",
+    "html.dv2 #settings .chip input{accent-color:var(--accent)}",
+    "html.dv2 #settings .chip:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}",
+    "html.dv2 #settings .add-status{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}",
+    "html.dv2 #settings #nsLabel{flex:1;min-width:200px}",
+    "html.dv2 #settings .set-actions{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}",
+    "html.dv2 #settings .set-actions .btn,html.dv2 #settings .set-actions .btn-ghost{padding:10px 20px}",
+    /* ---- Billing: Manage my plan; Start my plan now in green, not red ---- */
+    "html.dv2 .dv2-bill-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;border-radius:var(--dv2-r);background:var(--card);box-shadow:var(--dv2-shadow);border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}",
+    "html.dv2 .dv2-bill-bar .panel-title{margin:0 0 2px}",
+    "html.dv2 .dv2-bill-bar .panel-sub{margin:0}",
+    "html.dv2 .dv2-manage{padding:12px 20px;border-radius:12px;background:var(--ink);color:var(--card);border:0}",
+    "html.dv2 .dv2-manage:hover{filter:brightness(1.15)}",
+    "html.dv2 .btn-danger{background:#16a34a;border-radius:12px;padding:12px 20px}",
+    "html.dv2 .btn-danger:hover{background:#15803d;filter:none}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
