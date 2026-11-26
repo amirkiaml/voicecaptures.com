@@ -92,6 +92,12 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
         if (u.pathname === "/api/dashboard/v2/keep-plan" && r.request().method() === "POST") { globalThis.keepHits = (globalThis.keepHits || 0) + 1; globalThis.billNow = { ...(bill || BILL), cancel: { at: null, cancelled: false, canReactivate: false, top: true } }; return J({ ok: true, kept: true }); }
         if (u.pathname === "/api/dashboard/billing-portal") { if (r.request().method() === "POST") { globalThis.portalHits = (globalThis.portalHits || 0) + 1; return J({ url: "https://billing.stripe.com/p/session/test" }); } return J({ available: portal }); }
         if (u.pathname === "/api/dashboard/v2/plans") return J(plans || PLANS);
+        if (u.pathname === "/api/dashboard/me" && globalThis.me) return J(globalThis.me);
+        if (u.pathname === "/api/dashboard/v2/team" && globalThis.teamNow) return J(globalThis.teamNow);
+        if (u.pathname === "/api/dashboard/v2/team/invite" && globalThis.teamNow) { const b = JSON.parse(r.request().postData() || "{}"); (globalThis.teamPosts = globalThis.teamPosts || []).push(["invite", b.email]);
+          globalThis.teamNow = { ...globalThis.teamNow, members: [...globalThis.teamNow.members, { email: b.email }] }; return J({ ok: true, invite: "invited" }); }
+        if (u.pathname === "/api/dashboard/v2/team/remove" && globalThis.teamNow) { const b = JSON.parse(r.request().postData() || "{}"); (globalThis.teamPosts = globalThis.teamPosts || []).push(["remove", b.email]);
+          globalThis.teamNow = { ...globalThis.teamNow, members: globalThis.teamNow.members.filter(m => m.email !== b.email) }; return J({ ok: true }); }
         return J({ error: "not here" }, 404);
       }
       return r.abort();
@@ -314,6 +320,37 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   const cx4 = await open("/dashboard/", { dash: DASH(), bill: CXB({ top: true }) });
   ok(await cx4.isVisible("#cancelTopCard"), "legacy layout: the same top card");
   await cx4.context().close();
+
+  console.log("Team (FEATURE_DASHBOARD_TEAM): the role badge and Settings → Team");
+  globalThis.me = null; globalThis.teamNow = null;
+  const tm0 = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }) });
+  ok(await tm0.isHidden("#roleBadge") && !(await tm0.$("#v2Team")), "API off (404s): no badge, no Team section");
+  await tm0.context().close();
+  globalThis.me = { email: "owner@bbq.test", role: "owner" };
+  globalThis.teamNow = { canManage: true, role: "owner", owner: "owner@bbq.test", members: [{ email: "mate@bbq.test" }], max: 5 }; globalThis.teamPosts = [];
+  const tm1 = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }) });
+  await tm1.waitForSelector("#roleBadge:not([hidden])");
+  eq(await tm1.textContent("#roleBadge"), "Owner", "the owner: an Owner badge next to the email");
+  ok(await tm1.isVisible("#v2Team") && await tm1.evaluate(() => document.getElementById("dv2-settings").contains(document.getElementById("v2Team"))), "Settings → Team, on the Settings tab");
+  ok(/mate@bbq\.test/.test(await tm1.textContent("#v2Team")) && await tm1.isVisible(".v2TeamRm") && await tm1.isVisible("#v2TeamAdd"), "…the owner, the member with Remove, and Invite");
+  await tm1.fill("#v2TeamEmail", "new@bbq.test"); await tm1.click("#v2TeamAdd");
+  await tm1.waitForFunction(() => /Invite sent to new@bbq\.test/.test(document.getElementById("v2TeamMsg").textContent));
+  ok(/new@bbq\.test/.test(await tm1.textContent("#v2Team")) && (await tm1.inputValue("#v2TeamEmail")) === "", "Invite: one POST, the list redraws with them, and the box is empty again");
+  tm1.once("dialog", d => d.accept());
+  await tm1.click('.v2TeamRm[data-email="mate@bbq.test"]');
+  await tm1.waitForFunction(() => document.getElementById("v2TeamMsg").textContent === "Removed.");
+  eq(globalThis.teamPosts, [["invite", "new@bbq.test"], ["remove", "mate@bbq.test"]], "Remove: asks first, then one POST");
+  await tm1.context().close();
+  globalThis.me = { email: "mate@bbq.test", role: "member" };
+  globalThis.teamNow = { canManage: false, role: "member", owner: "owner@bbq.test", members: [{ email: "mate@bbq.test" }], max: 5 };
+  const tm2 = await open("/dashboard/#settings", { dash: DASH({ layout: "v2" }) });
+  await tm2.waitForSelector("#roleBadge:not([hidden])");
+  eq(await tm2.textContent("#roleBadge"), "Team member", "a member: a Team member badge");
+  ok(await tm2.isVisible("#v2Team") && !(await tm2.$("#v2TeamAdd")) && !(await tm2.$(".v2TeamRm")) && /Only the owner can change billing, cancel or reactivate, or add and remove people/.test(await tm2.textContent("#v2Team")), "…sees the team, no Invite or Remove, and says only the owner can");
+  await tm2.setViewportSize({ width: 390, height: 800 });
+  ok(await tm2.isVisible("#roleBadge"), "…the badge stays on a phone, where the email is hidden");
+  await tm2.context().close();
+  globalThis.me = null; globalThis.teamNow = null;
 
   console.log("Phone");
   const ph = await open("/dashboard/", { dash: DASH({ layout: "v2" }), width: 390, height: 844 });
