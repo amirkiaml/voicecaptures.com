@@ -51,9 +51,19 @@ const SPARKLES = {
     eq(marked[plan], labels, `${plan}: exactly ${labels.length} sparkled`);
   }
   const total = Object.values(SPARKLES).reduce((n, l) => n + l.length, 0);
-  // Count the markup, not the stylesheet: ".pr-spark" also appears in CSS.
-  eq((pricing.match(/class="pr-ico pr-spark"/g) || []).length, total,
-     `${total} sparkles rendered`);
+  /* Count the markup, not the stylesheet: ".pr-spark" also appears in CSS.
+     Feature sparkles only: a card that cannot be bought yet carries one more,
+     in its "self-serve rolling out soon" note beside the button, and that one
+     is counted on its own below so this number stays tied to SPARKLES. */
+  const featureSparkles = pricing.replace(/<p class="pr-soon">[\s\S]*?<\/p>/g, " ");
+  eq((featureSparkles.match(/class="pr-ico pr-spark"/g) || []).length, total,
+     `${total} sparkles rendered on feature rows`);
+  /* The note itself: one sparkle, one card, and it sits with the button rather
+     than in the feature list. */
+  const soon = [...pricing.matchAll(/<p class="pr-soon">([\s\S]*?)<\/p>/g)].map(m => m[1]);
+  eq(soon.length, 1, "one card carries a rolling-out note");
+  ok(/class="pr-ico pr-spark"/.test(soon[0]) && /Self-serve rolling out soon/.test(soon[0]),
+     "…a sparkle and the words, in the card's own vocabulary");
 
   console.log("\n  Decorative, and no layout shift");
   const icons = await p.evaluate(() => {
