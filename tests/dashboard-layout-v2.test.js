@@ -115,7 +115,7 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
     fs.mkdirSync(dir, { recursive: true });
     const shots = [["overview", "/dashboard/#overview", 1366, 1500], ["calls", "/dashboard/#calls", 1366, 1100], ["settings", "/dashboard/#settings", 1366, 1500],
       ["settings-soon", "/dashboard/#settings", 1366, 1000, SETTINGS(F("rolling_out"))], ["billing", "/dashboard/#billing", 1366, 1900],
-      ["tablet", "/dashboard/#overview", 900, 1300], ["phone", "/dashboard/#overview", 390, 1700], ["calendar-failed", "/dashboard/?calendar=failed&reason=Google%20said%20no%20access", 1366, 900],
+      ["tablet", "/dashboard/#overview", 900, 1300], ["phone", "/dashboard/#overview", 360, 1100], ["calendar-failed", "/dashboard/?calendar=failed&reason=Google%20said%20no%20access", 1366, 900],
       ["dark", "/dashboard/#overview", 1366, 1200, undefined, "dark"], ["ent-overview", "/dashboard/#overview", 1366, 1500, "ENT"], ["ent-settings", "/dashboard/#settings", 1366, 900, "ENT"],
       ["ent-dark", "/dashboard/#overview", 1366, 900, "ENT", "dark"], ["ent-phone", "/dashboard/#overview", 390, 900, "ENT"]];
     const ENTS = SETTINGS(F("live", { connected: false })); ENTS.plan = { key: "enterprise", label: "Enterprise", minutes: 600, package: null, emailRecipientsMax: 3 };
@@ -333,6 +333,9 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
   console.log("Phone");
   const ph = await open("/dashboard/", { dash: DASH({ layout: "v2" }), width: 390, height: 844 });
   ok(await ph.evaluate(() => getComputedStyle(document.getElementById("dv2Side")).position === "fixed"), "bottom tab bar");
+  await ph.waitForFunction(() => document.getElementById("dv2AssistNum").textContent.trim() !== "");
+  ok(await ph.$eval("#dv2AssistNum", e => { const r = e.getClientRects(); return r.length === 1 && e.scrollWidth <= e.clientWidth + 1; }), "phone: the assistant's number on one line, not cut");
+  eq(await ph.$eval("#kpis", g => getComputedStyle(g).gridTemplateColumns.split(" ").length), 2, "phone: KPI cards two across");
   ok(await ph.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "no sideways scroll");
   for (const t of ["calls", "settings", "billing"]) { await ph.click(`#dv2Nav a[data-tab="${t}"]`); await ph.waitForTimeout(80); ok(await ph.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${t}: no sideways scroll`); }
   ok(await ph.evaluate(() => !!document.querySelector("#dv2-billing #usageCard")), "minutes meter moves to Billing");

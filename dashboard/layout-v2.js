@@ -871,6 +871,9 @@
     "html.dv2 #v2Bill .dv2-seg input{position:absolute;opacity:0;pointer-events:none}",
     "html.dv2 #v2Bill .dv2-seg label:has(input:checked){background:var(--accent);color:#fff;box-shadow:0 2px 8px -2px rgba(37,99,235,.5)}",
     "html.dv2 #v2Bill .dv2-seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}",
+    /* ---- Phones: the assistant's number in one piece; KPI cards two across ---- */
+    "html.dv2 .dv2-assist-v{white-space:nowrap}",
+    "@media (max-width:759px){html.dv2 .dv2-assist{display:grid;grid-template-columns:40px minmax(0,1fr);gap:4px 12px;padding:16px} html.dv2 .dv2-assist-ico{width:40px;height:40px;border-radius:12px;grid-row:1/span 2} html.dv2 .dv2-assist-ico svg{width:20px;height:20px} html.dv2 .dv2-assist-k{font-size:11px;white-space:nowrap} html.dv2 .dv2-assist-v{font-size:clamp(20px,6.4vw,26px)} html.dv2 #dv2AssistCopy{grid-column:2;justify-self:start;padding:6px 14px;font-size:14px} html.dv2 #kpis,html.dv2 #kpis:has(>:nth-child(4):last-child),html.dv2 #kpis:has(>:nth-child(8):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}}",
     /* Collapsed rail, and tablets: icons only */
     "html.dv2.dv2-collapsed .dv2-nav span,html.dv2.dv2-collapsed .dv2-biz,html.dv2.dv2-collapsed .dv2-usage,html.dv2.dv2-collapsed .brandbar span{display:none}",
     "html.dv2.dv2-collapsed .dv2-side-top{flex-direction:column}",
